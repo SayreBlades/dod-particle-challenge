@@ -13,6 +13,8 @@ const SimImpl = switch (opts.stage) {
     7 => @import("stages/07_align/sim.zig").Sim,
     8 => @import("stages/08_alloc/sim.zig").Sim,
     9 => @import("stages/09_synthesis/sim.zig").Sim,
+    10 => @import("stages/10_rasterizer/sim.zig").Sim,
+    11 => @import("stages/11_record/sim.zig").Sim,
     else => @compileError("stage not yet implemented"),
 };
 

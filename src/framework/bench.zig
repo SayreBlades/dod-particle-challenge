@@ -48,6 +48,8 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     // the whole process is a clean step() region for xctrace to wrap.
     var single_n: ?usize = null;
     var single_iters: ?usize = null;
+    var render_mode = false;
+    var record_dir: ?[]const u8 = null;
     {
         var it_opt: ?std.process.Args.Iterator = std.process.Args.Iterator.initAllocator(init.minimal.args, alloc) catch null;
         if (it_opt) |*it| {
@@ -58,6 +60,10 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
                     if (it.next()) |val| single_n = std.fmt.parseInt(usize, val, 10) catch null;
                 } else if (std.mem.eql(u8, arg, "--iters")) {
                     if (it.next()) |val| single_iters = std.fmt.parseInt(usize, val, 10) catch null;
+                } else if (std.mem.eql(u8, arg, "--render")) {
+                    render_mode = true;
+                } else if (std.mem.eql(u8, arg, "--record")) {
+                    if (it.next()) |val| record_dir = val;
                 }
             }
         }
@@ -95,6 +101,25 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
                 std.debug.print("  {d} floats diverge (max delta = {d:.2}, first at index {d})\n\n", .{ r.divergent_count, r.max_delta, r.first_divergent_index });
             }
         }
+    }
+
+    // --- record mode (stage 11): headless fixed-step render -> PNG -> ffmpeg ---
+    // Runs AFTER the golden check above: the math is proven before the video
+    // is exported. Comptime-gated to stage 11 so stages 1-10 never analyze
+    // (or link) the stb/ffmpeg record path.
+    if (record_dir) |dir| {
+        if (comptime stage_n == 11) {
+            try recordVideo(SimImpl, alloc, io, dir);
+        } else {
+            std.debug.print("--record requires -Dstage=11 (this binary is stage {d})\n", .{stage_n});
+        }
+        return;
+    }
+
+    // --- render benchmark (--render): times Sim.render() separately from step() ---
+    if (render_mode) {
+        try renderBench(SimImpl, alloc, io);
+        return;
     }
 
     // --- benchmark sweep ---
@@ -174,4 +199,150 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         "", "", "", "", "", "", "wall(ms):", sweep_wall_ms,
     });
     std.debug.print("\n  total particles-frames simulated: {d}\n", .{total_frames});
+}
+
+// --- render benchmark (--render) --------------------------------------------------
+
+const RENDER_W: u32 = 1024;
+const RENDER_H: u32 = 1024;
+const RENDER_SETTLE_STEPS: usize = 120; // 2s = kill_age -> steady-state spread
+
+/// Render-time benchmark (stage 10's instrument, P11): times Sim.render()
+/// exactly the way the step sweep times Sim.step() — warmup, TRIALS runs,
+/// keep min ns/frame. The step bench is firewalled from rendering; this flag
+/// is the render-side counterpart, so the rasterizer's cost is measurable
+/// separately from the sim's cost. Iters scale ~1/N so every N costs roughly
+/// the same wall time (render is O(N) splats + a fixed 4 MB clear).
+fn renderBench(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io) !void {
+    const fb = try alloc.alloc(u8, @as(usize, RENDER_W) * RENDER_H * 4);
+    defer alloc.free(fb);
+
+    std.debug.print("=== Render benchmark (framebuffer {d}x{d}, trials={d} per N; reporting min) ===\n", .{ RENDER_W, RENDER_H, TRIALS });
+    std.debug.print("  render() timed end-to-end (clear + splat) after {d} settle steps.\n\n", .{RENDER_SETTLE_STEPS});
+    std.debug.print("  {s:>10} | {s:>6} | {s:>14} | {s:>14} | {s:>11}\n", .{ "N", "iters", "ns/frame(min)", "ns/particle", "frames/sec" });
+    std.debug.print("  {s:-<10}-+-{s:-<6}-+-{s:-<14}-+-{s:-<14}-+-{s:-<11}\n", .{ "", "", "", "", "" });
+
+    for (SWEEP) |n| {
+        var sim = SimImpl.init(alloc, .{ .n = n, .seed = config.spawn_seed }) catch |e| {
+            std.debug.print("  {d:>10} | (init failed: {t})\n", .{ n, e });
+            continue;
+        };
+        defer sim.deinit();
+
+        // Settle to a steady-state spatial distribution (init places every
+        // particle at the origin — maximally overlapped, unrepresentative).
+        var s: usize = 0;
+        while (s < RENDER_SETTLE_STEPS) : (s += 1) sim.step(config.dt);
+
+        const iters: usize = @max(10, @min(200, 13_000_000 / @max(n, 1)));
+
+        var wu: usize = 0;
+        while (wu < 2) : (wu += 1) sim.render(fb, RENDER_W, RENDER_H);
+
+        var min_ns_frame: f64 = std.math.inf(f64);
+        var trial: usize = 0;
+        while (trial < TRIALS) : (trial += 1) {
+            const t0 = Io.Timestamp.now(io, .awake);
+            var it: usize = 0;
+            while (it < iters) : (it += 1) sim.render(fb, RENDER_W, RENDER_H);
+            const t1 = Io.Timestamp.now(io, .awake);
+            const ns_frame = @as(f64, @floatFromInt(t0.durationTo(t1).nanoseconds)) / @as(f64, @floatFromInt(iters));
+            if (ns_frame < min_ns_frame) min_ns_frame = ns_frame;
+        }
+
+        std.debug.print("  {d:>10} | {d:>6} | {d:>14.1} | {d:>14.4} | {d:>11.1}\n", .{
+            n, iters, min_ns_frame, min_ns_frame / @as(f64, @floatFromInt(n)), 1e9 / min_ns_frame,
+        });
+    }
+    std.debug.print("\n", .{});
+}
+
+// --- record mode (stage 11, --record <dir>) ----------------------------------------
+
+const RECORD_N: usize = 65_000; // play mode's DEFAULT_N — visual parity
+const RECORD_STEPS: usize = 600; // fixed steps, fixed dt -> deterministic replay
+const RECORD_FPS: u32 = 30; // capture every 2nd step: 300 frames = 10 s
+
+/// Headless video export (P12: determinism enables replay). Runs the sim for
+/// RECORD_STEPS fixed steps, renders every 2nd step into an RGBA framebuffer,
+/// writes each frame as a PNG via stb_image_write, then shells out to ffmpeg
+/// to encode <dir>/video.mp4 (30 fps × 300 frames = 10 s at 1024² — the
+/// acceptance spec). Deterministic: same seed + same dt ⇒ byte-identical
+/// PNGs across runs.
+fn recordVideo(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, out_dir: []const u8) !void {
+    const stb = @import("../bindings/stb.zig");
+
+    const frames_dir = try std.fmt.allocPrint(alloc, "{s}/frames", .{out_dir});
+    defer alloc.free(frames_dir);
+    const video_path = try std.fmt.allocPrint(alloc, "{s}/video.mp4", .{out_dir});
+    defer alloc.free(video_path);
+
+    var dir = std.Io.Dir.cwd();
+    try dir.createDirPath(io, frames_dir);
+
+    std.debug.print("=== Record: {s} ===\n", .{fw.stageName(@import("options").stage)});
+    std.debug.print("  sim: N={d}, seed=0x{X}, {d} steps @ dt={d:.6}\n", .{ RECORD_N, config.spawn_seed, RECORD_STEPS, config.dt });
+    std.debug.print("  capture: every 2nd step -> {d} frames @ {d} fps = {d:.1} s at {d}x{d}\n\n", .{
+        RECORD_STEPS / 2, RECORD_FPS, @as(f64, RECORD_STEPS / 2) / @as(f64, RECORD_FPS), RENDER_W, RENDER_H,
+    });
+
+    var sim = try SimImpl.init(alloc, .{ .n = RECORD_N, .seed = config.spawn_seed });
+    defer sim.deinit();
+
+    const fb = try alloc.alloc(u8, @as(usize, RENDER_W) * RENDER_H * 4);
+    defer alloc.free(fb);
+
+    const record_t0 = Io.Timestamp.now(io, .awake);
+    var frame: usize = 0;
+    var step_i: usize = 0;
+    while (step_i < RECORD_STEPS) : (step_i += 1) {
+        sim.step(config.dt);
+        if (step_i % 2 != 0) continue;
+        sim.render(fb, RENDER_W, RENDER_H);
+        const path = try std.fmt.allocPrintSentinel(alloc, "{s}/frame_{d:0>4}.png", .{ frames_dir, frame }, 0);
+        defer alloc.free(path);
+        if (stb.stbi_write_png(path.ptr, @intCast(RENDER_W), @intCast(RENDER_H), 4, fb.ptr, @intCast(RENDER_W * 4)) == 0) {
+            std.debug.print("  ERROR: stbi_write_png failed for {s}\n", .{path});
+            return error.PngWriteFailed;
+        }
+        frame += 1;
+        if (frame % 60 == 0) std.debug.print("  wrote {d}/{d} frames...\n", .{ frame, RECORD_STEPS / 2 });
+    }
+    const record_t1 = Io.Timestamp.now(io, .awake);
+    std.debug.print("  wrote {d} frames to {s}/ in {d:.1} ms\n\n", .{
+        frame, frames_dir, @as(f64, @floatFromInt(record_t0.durationTo(record_t1).nanoseconds)) / 1e6,
+    });
+
+    // Encode: 300 frames @ 30 fps = 10 s. yuv420p for player compatibility
+    // (1024×1024 is even — valid for 4:2:0). crf 18 = visually lossless.
+    std.debug.print("  encoding {s} via ffmpeg...\n", .{video_path});
+    const pattern = try std.fmt.allocPrint(alloc, "{s}/frame_%04d.png", .{frames_dir});
+    defer alloc.free(pattern);
+    const result = std.process.run(alloc, io, .{
+        .argv = &.{ "ffmpeg", "-y", "-framerate", "30", "-i", pattern, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-movflags", "+faststart", video_path },
+        .stdout_limit = .limited(1 << 20),
+        .stderr_limit = .limited(1 << 20),
+    }) catch |e| {
+        std.debug.print("  ERROR: failed to spawn ffmpeg ({t}). Is ffmpeg on PATH?\n", .{e});
+        std.debug.print("  frames are still in {s}/ — encode manually:\n", .{frames_dir});
+        std.debug.print("    ffmpeg -y -framerate 30 -i {s} -c:v libx264 -pix_fmt yuv420p -crf 18 {s}\n", .{ pattern, video_path });
+        return e;
+    };
+    defer alloc.free(result.stdout);
+    defer alloc.free(result.stderr);
+
+    if (!result.term.success()) {
+        const tail = result.stderr[result.stderr.len -| 2000 ..];
+        std.debug.print("  ERROR: ffmpeg exited nonzero. stderr tail:\n{s}\n", .{tail});
+        return error.FfmpegFailed;
+    }
+
+    const stat = try dir.statFile(io, video_path, .{});
+    std.debug.print("  wrote {s} ({d:.2} MB, {d} frames @ {d} fps = {d:.1} s)\n", .{
+        video_path,
+        @as(f64, @floatFromInt(stat.size)) / (1024.0 * 1024.0),
+        frame,
+        RECORD_FPS,
+        @as(f64, @floatFromInt(frame)) / @as(f64, RECORD_FPS),
+    });
 }

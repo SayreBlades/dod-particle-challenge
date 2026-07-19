@@ -36,6 +36,15 @@ pub fn build(b: *std.Build) void {
             .link_libc = true,
         }),
     });
+    // --- stb_image_write (only linked for stages 10/11, per plan §3.7) ---
+    if (stage >= 10) {
+        exe.root_module.addCSourceFile(.{
+            .file = b.path("src/stb_impl.c"),
+            .flags = &.{"-std=c11"},
+        });
+        exe.root_module.addIncludePath(b.path("vendor/stb"));
+    }
+
     exe.root_module.addOptions("options", opts);
     exe.root_module.addImport("raylib", raylib_module: {
         const rl_mod = b.createModule(.{
@@ -53,6 +62,18 @@ pub fn build(b: *std.Build) void {
     const run = b.addRunArtifact(exe);
     const run_step = b.step("run", "Run the app");
     run_step.dependOn(&run.step);
+
+    // --- unit tests (stage 10's rasterizer byte-equivalence proof) ---
+    const unit_tests = b.addTest(.{
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/test_root.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+    const run_tests = b.addRunArtifact(unit_tests);
+    const test_step = b.step("test", "Run unit tests (stage 10 rasterizer equivalence)");
+    test_step.dependOn(&run_tests.step);
 }
 
 pub const Mode = enum { play, bench, audit };
@@ -66,6 +87,10 @@ fn addRaylib(
         "-std=c11",
         "-DPLATFORM_DESKTOP",
         "-DGRAPHICS_API_OPENGL_33",
+        // Disable raylib's image-export helpers (ExportImage* — unused by us).
+        // They embed stb_image_write with IMPLEMENTATION inside rtextures.c,
+        // which would collide with our own src/stb_impl.c (stages 10/11).
+        "-DSUPPORT_IMAGE_EXPORT=0",
         "-ObjC",
     };
 

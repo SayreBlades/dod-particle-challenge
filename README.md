@@ -10,7 +10,7 @@ laid out memory for the loops instead of for the concept, the loops got 10× fas
 and the code got simpler. This lab walks through that transformation in stages;
 the math never changes between stages, only the data layout and access pattern do.
 
-**Status:** Stage 9 of 9 — last landed C7/stage 9 + C8 (synthesis: the full DOD composition, P10. Composes the *time winners* from stages 2–8 — aligned SoA (2,3,7) + @Vector(4) (6) + branchy respawn (time-optimal at low churn) + `life` removed (4) + dead `switch` deleted (5, without the sort). The detour techniques (4's compaction, 5's sort, 8's double-buffer) are **excluded** — measured regressions at natural churn (O(n) every frame; the double-buffer doubles the working set 29→59 B/p, ~4–5× slower than stage 7). The plan's "compose every winner" is reinterpreted honestly as "compose every *time* winner"; the detour techniques are structurally valuable (P5, P6, P9) but regime-conditional (high churn). Cumulative speedup vs stage 1: **~1.7× at 1M** (peak; 1.464 → 0.867 ns/p), honestly revised from the plan's aspirational 8–15× — bounded above by the memory bandwidth ceiling (68/29 ≈ 2.3× theoretical max; 8× would exceed the memory ceiling 3×). The density progression (0.361 → 0.722, 2× reclaimed entropy) tracks the ns/particle reduction (2.24 → 0.87 at 1M, 2.6×) — two views of one transformation across nine stages. Golden PASS (max delta = 0.00). Non-bonus stages complete; stages 10–11 (bonus) remain.)
+**Status:** Stage 11 of 11 — last landed C9 (bonus stages, P11/P12). **All checkpoints C1–C9 green.** Stage 10 (the renderer is data too): same sim as stage 9 with an optimized rasterizer — comptime color LUT + packed RGBA + one NEON `uqadd` per splat row + one whole-box bounds check — **byte-identical output** (`zig build test` proves it) at **~3.4× render throughput** (N≥262K; measured by the new `--render` bench flag, since play mode is vsync-capped). Stage 11 (determinism enables replay): `--record out/` exports a deterministic headless video — golden check first, then 600 fixed steps → 300 PNGs → ffmpeg → `out/video.mp4` (30 fps, 10 s, 1024²), with byte-identical PNGs across runs. The nine-stage layout arc: ~1.7× sim speedup at 1M vs the naive baseline (bandwidth-ceiling-bounded, honestly revised from the plan's 8–15×), density 0.361 → 0.722 — two views of one transformation. Golden PASS across every stage.)
 
 ## Quick start
 
@@ -63,6 +63,24 @@ loop touches** — stages 2–9 should drive it UP as cold/constant fields leave
 the hot loop, the qualitative twin of `ns/particle` falling. Runs against the
 same fixed seed + steps as the golden check. See
 `.scratch/plan/RESULTS.md` for the per-stage density rollup.
+
+### Bonus stages (10: optimized rasterizer · 11: video export)
+
+```sh
+# Stage 10: same sim as 9, optimized renderer (~3.4× render at N≥262K)
+zig build run -Dstage=10 -Dmode=play -Doptimize=ReleaseFast
+
+# Render benchmark — times Sim.render() separately from Sim.step()
+zig build -Dstage=9  -Dmode=bench -Doptimize=ReleaseFast && ./zig-out/bin/dod-particles --render
+zig build -Dstage=10 -Dmode=bench -Doptimize=ReleaseFast && ./zig-out/bin/dod-particles --render
+
+# Rasterizer byte-equivalence proof (optimized == naive, byte for byte)
+zig build test
+
+# Stage 11: deterministic headless video export (requires ffmpeg on PATH)
+zig build -Dstage=11 -Dmode=bench -Doptimize=ReleaseFast && ./zig-out/bin/dod-particles --record out/
+# -> out/frames/*.png (300 frames) + out/video.mp4 (30 fps, 10 s, 1024²)
+```
 
 `-Dstage` selects the data layout (1–11); `-Dmode` selects the driver.
 `zig build run` builds + executes; `zig build` alone only builds to
@@ -416,7 +434,7 @@ diagnostic instead, which suffices for their (honest-detour) time story.
 | C6 | Stage 3 (SoA) — flagship layout transformation | 3     | [x]      |
 | C7 | Stages 4–9 each pass acceptance                | 4–9   | [stages 4–9 ✅](evidence/C7-stage9.md) |
 | C8 | Synthesis verified, RESULTS recorded           | 9     | [x](evidence/C7-stage9.md) |
-| C9 | Bonus stages (rasterizer + video export)       | 10,11 | [ ]      |
+| C9 | Bonus stages (rasterizer + video export)       | 10,11 | [x](evidence/C9.md) |
 
 ## Hardware target
 
