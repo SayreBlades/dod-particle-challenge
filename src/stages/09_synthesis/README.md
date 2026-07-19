@@ -206,7 +206,8 @@ doesn't add/remove hot-loop fields, only deletes the dead switch and the dead
 | 4–9 | 0.722 | `life` leaves storage; cold array deleted; color→lookup |
 
 Density climbed 0.361 → 0.722 (2× reclaimed entropy ≈ 2× reclaimed bandwidth) —
-the qualitative twin of `ns/particle` falling 2.24 → 0.87 at 1M (2.6×). The two
+the qualitative twin of `ns/particle` falling 1.464 → 0.867 at 1M (1.69×,
+same-N — the byte-ratio bound once stage 1's cache discount fades). The two
 views of the same transformation track each other across the whole lab.
 
 ---
@@ -251,6 +252,6 @@ detours as measured regressions.
 **The cumulative speedup vs stage 1 is ~1.6× at 1M** (peak), bounded above by
 the memory bandwidth ceiling. The plan's 8–15× was aspirational and physically
 unreachable at 1M (8× would exceed the memory ceiling 3×). The real synthesis
-win is the 2× density reclamation (0.36→0.72) tracking the 2.6× ns/particle
-reduction (2.24→0.87 at 1M) — two views of one transformation, measured across
-nine stages.
+win is the 2× density reclamation (0.36→0.72) tracking the 1.69× ns/particle
+reduction (1.464→0.867 at 1M, same-N) — two views of one transformation,
+measured across nine stages.

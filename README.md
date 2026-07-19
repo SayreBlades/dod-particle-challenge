@@ -4,13 +4,75 @@ A hands-on laboratory for *feeling* the cache/perf lessons from Mike Acton's
 CppCon 2014 talk, ["Data-Oriented Design and C++"](https://www.youtube.com/watch?v=rX0ItVEVjHc),
 implemented as an interactive **raylib game** in Zig on Apple Silicon.
 
-The thesis, in one sentence: *the object was a lie.* There was never a "Particle"
-— there were five loops that touched overlapping subsets of its fields. When we
-laid out memory for the loops instead of for the concept, the loops got 10× faster
-and the code got simpler. This lab walks through that transformation in stages;
-the math never changes between stages, only the data layout and access pattern do.
+The thesis under test, in one sentence: *the object was a lie.* There was never
+a "Particle" — there were five loops that touched overlapping subsets of its
+fields. Lay out memory for the loops instead of for the concept, the talk says,
+and the loops get dramatically faster. This lab walks that transformation in
+stages; the math never changes between stages, only the data layout and access
+pattern do.
 
-**Status:** Stage 11 of 11 — last landed C9 (bonus stages, P11/P12). **All checkpoints C1–C9 green.** Stage 10 (the renderer is data too): same sim as stage 9 with an optimized rasterizer — comptime color LUT + packed RGBA + one NEON `uqadd` per splat row + one whole-box bounds check — **byte-identical output** (`zig build test` proves it) at **~3.4× render throughput** (N≥262K; measured by the new `--render` bench flag, since play mode is vsync-capped). Stage 11 (determinism enables replay): `--record out/` exports a deterministic headless video — golden check first, then 600 fixed steps → 300 PNGs → ffmpeg → `out/video.mp4` (30 fps, 10 s, 1024²), with byte-identical PNGs across runs. The nine-stage layout arc: ~1.7× sim speedup at 1M vs the naive baseline (bandwidth-ceiling-bounded, honestly revised from the plan's 8–15×), density 0.361 → 0.722 — two views of one transformation. Golden PASS across every stage.)
+The measured answer on this machine: **~1.7× faster sim (peak, N=1M) and ~3.4×
+faster renderer** — not the ~10× the talk's framing (and this plan's original
+8–15× expectation) suggests. That gap is not a failed experiment; it's the
+best lesson in the repo. See [Why not 10×?](#why-not-10-the-honest-ceiling) below.
+
+**Status:** Stage 11 of 11 — last landed C9 (bonus stages, P11/P12). **All checkpoints C1–C9 green.** Stage 10 (the renderer is data too): same sim as stage 9 with an optimized rasterizer — comptime color LUT + packed RGBA + one NEON `uqadd` per splat row + one whole-box bounds check — **byte-identical output** (`zig build test` proves it) at **~3.4× render throughput** (N≥262K; measured by the new `--render` bench flag, since play mode is vsync-capped). Stage 11 (determinism enables replay): `--record out/` exports a deterministic headless video — golden check first, then 600 fixed steps → 300 PNGs → ffmpeg → `out/video.mp4` (30 fps, 10 s, 1024²), with byte-identical PNGs across runs. The nine-stage layout arc: ~1.7× sim speedup at 1M vs the naive baseline (bandwidth-ceiling-bounded, honestly revised from the plan's 8–15×), density 0.361 → 0.722 — two views of one transformation. Golden PASS across every stage.
+
+## Why not 10×? (the honest ceiling)
+
+The talk's framing — and the plan's original 8–15× expectation — promised a
+big cumulative multiplier. The measured result is ~1.7× at N=1M (1.57× at
+64M). The gap is fully explained, per stage, in the READMEs; the short version:
+
+**1. The ceiling was always ~2.3× at large N — the plan just didn't compute it
+first.** At N≥1M the sim is bandwidth-bound: `ns/particle = bytes ÷ bandwidth`.
+Stage 1 walks 68 B/particle; the physics needs only 29 B/p. The most byte-
+reduction can *ever* win here is 68/29 ≈ **2.3×**, and only in the fully
+bandwidth-bound regime. An 8× win at 1M would be 0.18 ns/p — 161 GB/s of
+equivalent streaming, ~3× the M4's measured single-core ceiling (~54 GB/s).
+Not "insufficiently optimized" — physically unreachable for this data volume.
+Stage 2's compute+bytes fit (`src/stages/02_hotcold/README.md` §2) is what put
+numbers on the envelope.
+
+**2. The "product of per-stage ratios" never existed.** The 8–15× assumed the
+wins multiply. Four of the seven transformation stages measured *slower* than
+their predecessor on this toolchain and regime (3: 0.64×, 4: 0.45×, 5: 0.41×,
+8: 0.22× — honest detours, each documented in its stage README), so stages 6/7
+went back to stage 3's base instead of stacking on 4/5. There is no product —
+there's one winning path (2 → 3 → 6 → 7, plus two free cleanups), worth ~2.6×
+in theory and landing at 1.7× measured (stage 1's measured ns/p was already
+above its own bandwidth floor thanks to cache effects, which compresses the
+ratio). Stage 9's README §7 has the full decomposition.
+
+**3. The strawman wasn't naive enough for 10×.** Acton's big numbers come from
+production OOP: pointer chasing, virtual dispatch, per-object allocation, fat
+aggregates — often ~10× wasted bytes. Stage 1 is a single flat AoS array: no
+indirection, no vtables, no allocation churn — the *best-case* "OOP". It
+wastes only 68/28 ≈ 2.4× bytes, and the wasted-byte ratio IS the ceiling for
+any layout win: **you can't reclaim bytes you never wasted.** A 10× here would
+have required a baseline dragging ~300 B/particle.
+
+**4. The regime never stressed the branch techniques.** Compaction, sort-by-
+kind, and the double-buffer pay off under high churn and unpredictable
+branches. This sim kills ~0.83% of particles per frame in a learnable pattern,
+and the compiler had already optimized the per-particle `switch(kind)` away
+(stage 5's PMC measured ~0.5% Discarded *with* the switch present). Each
+technique landed structurally — the audit proves it — but there was no
+measured pain to relieve. Their payoff regimes are documented, not gated.
+
+**Where the wins did land:** sim 1.69× (peak, N=1M; 1.57× at 64M — right at
+the byte-ratio bound once stage 1's cache discount fades); renderer **3.4×**
+(the naive rasterizer had more slack — per-byte clamps, per-pixel branches);
+hot-loop information density 0.361 → 0.722 (**2×** reclaimed entropy). One
+honest caveat: stage 9 at 1M sustains 33 GB/s effective — 62% of the ceiling —
+because the scalar age/kill/respawn pass was never vectorized. That's the
+remaining headroom.
+
+**The meta-lesson:** the talk is a *method*, not a multiplier — measure
+everything, compute the envelope, let the data decide. The lab's first real
+product was the envelope computation that proved 10× was never available for
+this sim on this machine. A measured 1.7× with a known ceiling is a better
+DOD lesson than a retrofitted 10×.
 
 ## Quick start
 
@@ -123,9 +185,13 @@ zig build -Dstage=N -Dmode=bench -Doptimize=ReleaseFast
 3. **Benchmark table** — the N-sweep. Read `ns/particle` across N:
    - It should generally *decrease* as N grows (fixed costs amortize).
    - It *increases* at the L2 spill point (1M→4M on M4) — that's expected.
-   - **Between stages**, later stages should have lower `ns/particle` than
-     earlier ones at large N. If stage 3 isn't faster than stage 2 at N≥1M,
-     the transformation didn't land.
+   - **Between stages**, the time-win stages have lower `ns/particle` than
+     their base: stage 2 < stage 1 (N≥65K); stage 6 < stages 2 and 3 (N≥65K);
+     stage 9 ≈ stage 7 < everything (N≥1M). **Stages 3, 4, 5, and 8 are the
+     honest detours** — each measured *slower* than its predecessor on this
+     toolchain/regime, and their landing is proven by the audit (density +
+     fingerprint), not the clock. Each detour's README explains why and names
+     the regime where the technique pays. See "Why not 10×?" above.
 
 **Reproducibility note:** bench output goes to stderr via `std.debug.print`,
 so it works whether or not a terminal is attached. The golden file
@@ -147,7 +213,10 @@ zig build -Dstage=N -Dmode=audit -Doptimize=ReleaseFast
 3. **MEAN density** — the headline number, size-weighted over the dumped
    fields. It should **rise** across stages as cold/constant fields leave the
    hot loop — the qualitative twin of `ns/particle` falling. Stage 1 ≈ 0.36;
-   later stages should climb toward ~0.9.
+   the measured plateau is ≈ 0.72 (stages 3–9) — once only real-signal fields
+   remain, the mean saturates at their natural entropy (`pos.z`/`vel.z` are
+   near-constant at 0.26–0.28 and 3-value `kind` is 0.32, which keep the
+   weighted mean below the ~0.9 of the pure-signal fields).
 
 The audit links no raylib and never touches the hot path — it's *context*, not
 an acceptance gate. The per-field interpretation and what each stage's density

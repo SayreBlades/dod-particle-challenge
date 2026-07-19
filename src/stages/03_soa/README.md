@@ -110,6 +110,15 @@ not a ceiling imposed by memory.
   takes a full scalar cycle instead of ¼ of a `@Vector(4)` cycle, so the
   compute that *was* hidden behind streaming in stages 1–2 becomes *visible*.
 
+**Stage 2's own model missed this.** Its compute+bytes fit predicted stage 3
+at `0.45 + 0.017·24 ≈ 0.86 ns/p` — a ~1.24× *win* — assuming the compute term
+stayed at 0.45 ns/p while bytes fell. The compute term didn't stay: the scalar
+4-pass, 8-stream structure exploded it. The model's *structure* was right
+(time = compute + k·bytes); its assumption that compute is layout-invariant
+was wrong. That assumption is exactly what stage 6 later exploits — and
+stage 2's README carries the prediction uncorrected on purpose: the miss, and
+its explanation, are part of the arc.
+
 ### The transformation still *lands* — the audit proves it
 
 The layout transformation is not a no-op just because the time didn't move. The
