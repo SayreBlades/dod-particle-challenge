@@ -19,7 +19,9 @@ const sim_map = std.StaticStringMap(type).initComptime(.{
     .{ "stage10", @import("stages/10_rasterizer/sim.zig").Sim },
     .{ "stage11", @import("stages/11_record/sim.zig").Sim },
     // --- the layout verticals (src/layouts/; -Dlayout=LX -Dstrat=name) ---
-    // L1 arms land with the V1 vertical (naive, naive_r1, par, halide_a).
+    .{ "L1.naive", @import("layouts/L1_aos_full/naive.zig").Sim },
+    .{ "L1.naive_r1", @import("layouts/L1_aos_full/naive_r1.zig").Sim },
+    .{ "L1.par", @import("layouts/L1_aos_full/par.zig").Sim },
 });
 
 const SimImpl = sim_map.get(opts.name) orelse

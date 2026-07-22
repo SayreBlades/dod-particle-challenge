@@ -88,8 +88,11 @@ pub const FieldDump = struct {
 ///   const Data = @import("data.zig").Data;
 ///   const H = struct {
 ///       pub fn step(sim: *Sim, dt: f32) void { ... }
+///       (use `sim: anytype` if another strategy re-exports the step —
+///       each fw.Strategy instantiation is a distinct type)
 ///       // optional overrides/decls:
 ///       // pub fn render(sim: *const Sim, fb: []u8, w: u32, h: u32) void
+///       // pub const Extra = struct { ... }    — strategy-owned state
 ///       // pub fn initExtra(sim: *Sim) !void   — scratch allocation
 ///       // pub fn deinitExtra(sim: *Sim) void   — scratch free
 ///       // pub fn scratchBytes(sim: *const Sim) usize — reported in bytes/p
@@ -111,8 +114,11 @@ pub fn Strategy(comptime Data: type, comptime H: type) type {
         pub const golden_class: GoldenClass = if (@hasDecl(H, "golden_class")) H.golden_class else .bit_exact;
         pub const render_color_semantics: RenderColorSemantics = if (@hasDecl(H, "render_color_semantics")) H.render_color_semantics else .current_kind;
 
+        pub const Extra = if (@hasDecl(H, "Extra")) H.Extra else void;
+
         alloc: std.mem.Allocator,
         data: Data,
+        extra: Extra = undefined, // strategy-owned (scratch, pool, ...)
         rng: std.Random.DefaultPrng,
         kill_rng: std.Random.DefaultPrng, // dedicated kill stream (-Ddeath=half)
         frame: usize, // step counter (-Ddeath=alternating)
@@ -132,7 +138,7 @@ pub fn Strategy(comptime Data: type, comptime H: type) type {
             // discipline: identical sequence to the arc's single-RNG sims).
             self.data = try Data.init(alloc, &self.rng, desc);
             errdefer self.data.deinit(alloc);
-            if (@hasDecl(H, "initExtra")) try H.initExtra(self);
+            if (@hasDecl(H, "initExtra")) try H.initExtra(self, desc);
             return self;
         }
 
