@@ -13,8 +13,9 @@
 # region — one xctrace launch = one (stage, N, trial) counter row.
 #
 # Usage:
-#   scripts/pmc_collect.sh <stage> <N> <iters> <trial>
-#   scripts/pmc_collect.sh 2 1000000 500 1
+#   scripts/pmc_collect.sh <stage|strat> <N> <iters> <trial>
+#   scripts/pmc_collect.sh 2 1000000 500 1        # arc stage
+#   scripts/pmc_collect.sh L1.naive 1000000 500 1 # layout strategy (dot => -Dlayout/-Dstrat)
 #
 # Output: .scratch/pmc/s{stage}_n{N}_t{trial}.csv (one row: stage,N,trial,
 #         cycles,delivery_bottleneck,discarded_bottleneck,processing_bottleneck)
@@ -27,10 +28,18 @@
 
 set -euo pipefail
 
-STAGE="${1:?usage: pmc_collect.sh <stage> <N> <iters> <trial>}"
+STAGE="${1:?usage: pmc_collect.sh <stage|strat> <N> <iters> <trial>}"
 N="${2:?}"
 ITERS="${3:?}"
 TRIAL="${4:?}"
+
+# Accept a strategy name (contains a dot: L1.naive) or an arc stage number.
+if [[ "$STAGE" == *.* ]]; then
+    BUILD_OPT="-Dlayout=${STAGE%%.*} -Dstrat=${STAGE#*.}"
+else
+    BUILD_OPT="-Dstage=$STAGE"
+fi
+TAG="${STAGE//./_}"  # dots are awkward in filenames
 
 XCTRACE=""
 for candidate in \
@@ -49,18 +58,18 @@ fi
 BIN="$(cd "$(dirname "$0")/.." && pwd)/zig-out/bin/dod-particles"
 if [ ! -x "$BIN" ]; then
     echo "error: $BIN not found. Build first:" >&2
-    echo "  zig build -Dstage=$STAGE -Dmode=bench -Doptimize=ReleaseFast" >&2
+    echo "  zig build $BUILD_OPT -Dmode=bench -Doptimize=ReleaseFast" >&2
     exit 1
 fi
 
 OUTDIR="$(cd "$(dirname "$0")/.." && pwd)/.scratch/pmc"
 mkdir -p "$OUTDIR"
-TRACE="$OUTDIR/s${STAGE}_n${N}_t${TRIAL}.trace"
-CSV="$OUTDIR/s${STAGE}_n${N}_t${TRIAL}.csv"
+TRACE="$OUTDIR/s${TAG}_n${N}_t${TRIAL}.trace"
+CSV="$OUTDIR/s${TAG}_n${N}_t${TRIAL}.csv"
 
-# Build the stage if needed (silent if up-to-date).
-echo "building stage $STAGE..." >&2
-zig build -Dstage="$STAGE" -Dmode=bench -Doptimize=ReleaseFast >&2 2>&1 || true
+# Build the sim if needed (silent if up-to-date).
+echo "building $STAGE ($BUILD_OPT)..." >&2
+zig build "$BUILD_OPT" -Dmode=bench -Doptimize=ReleaseFast >&2 2>&1 || true
 
 # xctrace ignores --output when launching a process (known quirk); it writes
 # to Launch_<name>_<timestamp>.trace in CWD. We launch from a temp dir and

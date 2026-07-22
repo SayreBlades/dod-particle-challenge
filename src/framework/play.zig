@@ -17,8 +17,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     defer rl.closeWindow();
     rl.setTargetFPS(60);
 
-    const stage_n = @import("options").stage;
-    const stage_label = fw.stageName(stage_n);
+    const stage_label = @import("options").label;
 
     var sim = try SimImpl.init(alloc, .{ .n = DEFAULT_N, .seed = 0xC0FFEE });
     defer sim.deinit();

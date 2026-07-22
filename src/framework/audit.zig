@@ -60,7 +60,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
 
     std.debug.print("=== Data-density audit (Acton zip-test) ===\n", .{});
     std.debug.print("  sim: {s}, N={d}, steps={d} (post-step snapshot)\n", .{
-        fw.stageName(@import("options").stage), AUDIT_N, AUDIT_STEPS,
+        @import("options").label, AUDIT_N, AUDIT_STEPS,
     });
     std.debug.print("  oracle: gzip -c (lower bound on information content)\n\n", .{});
 

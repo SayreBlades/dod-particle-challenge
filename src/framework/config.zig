@@ -12,6 +12,7 @@
 // proper ballistic arcs (fountain) instead of monotonic acceleration. The
 // per-frame force is gravity + drag only.
 
+const std = @import("std");
 const vec = @import("vec.zig");
 
 pub const dt: f32 = 1.0 / 60.0;
@@ -23,6 +24,28 @@ pub const spawn_radius: f32 = 0.05; // tight emitter around origin
 
 // World extents: positions in [-view_half, view_half] map to the framebuffer.
 pub const view_half: f32 = 2.0;
+
+// --- death-pattern regimes (layout-matrix.md §2.5, build option -Ddeath=) ---
+
+pub const DeathPattern = enum { natural, half, alternating };
+
+/// The active death pattern. `natural` is the golden-checked sim; `half` and
+/// `alternating` are adversarial regimes (golden compile-skipped in bench — a
+/// different sim, loudly). Comptime-known, so isDead prunes to exactly the
+/// original age test in natural builds: zero cost, zero RNG perturbation.
+pub const death_pattern: DeathPattern = std.meta.stringToEnum(DeathPattern, @import("options").death) orelse
+    @compileError("invalid -Ddeath (natural | half | alternating)");
+
+/// The kill decision for particle `i` this frame. `kill_rng` is a DEDICATED
+/// stream (never the spawn RNG — spawn draws stay comparable across patterns);
+/// drawn only in .half. `frame` is used only in .alternating.
+pub inline fn isDead(age: f32, i: usize, frame: usize, kill_rng: *std.Random.DefaultPrng) bool {
+    return switch (death_pattern) {
+        .natural => age >= kill_age,
+        .half => kill_rng.random().float(f32) < 0.5,
+        .alternating => (i + frame) % 2 == 0,
+    };
+}
 
 // Per-kind initial velocity (set at spawn). Lookup, not branch.
 pub const impulse: [3]vec.Vec3 = .{

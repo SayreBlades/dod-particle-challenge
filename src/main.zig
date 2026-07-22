@@ -1,22 +1,29 @@
-// Entry point. Comptime switch on opts.stage -> SimImpl, opts.mode -> driver.
+// Entry point. Comptime registry: opts.name -> SimImpl, opts.mode -> driver.
+// build.zig resolves -Dlayout/-Dstrat (verticals) or -Dstage (arc) to a
+// canonical name; every name below must match a registry entry in build.zig.
 const std = @import("std");
 const opts = @import("options");
 const fw = @import("framework/sim.zig");
 
-const SimImpl = switch (opts.stage) {
-    1 => @import("stages/01_naive/sim.zig").Sim,
-    2 => @import("stages/02_hotcold/sim.zig").Sim,
-    3 => @import("stages/03_soa/sim.zig").Sim,
-    4 => @import("stages/04_compact/sim.zig").Sim,
-    5 => @import("stages/05_sortbykind/sim.zig").Sim,
-    6 => @import("stages/06_simd/sim.zig").Sim,
-    7 => @import("stages/07_align/sim.zig").Sim,
-    8 => @import("stages/08_alloc/sim.zig").Sim,
-    9 => @import("stages/09_synthesis/sim.zig").Sim,
-    10 => @import("stages/10_rasterizer/sim.zig").Sim,
-    11 => @import("stages/11_record/sim.zig").Sim,
-    else => @compileError("stage not yet implemented"),
-};
+const sim_map = std.StaticStringMap(type).initComptime(.{
+    // --- the arc (src/stages/, untouched history; -Dstage=N) ---
+    .{ "stage1", @import("stages/01_naive/sim.zig").Sim },
+    .{ "stage2", @import("stages/02_hotcold/sim.zig").Sim },
+    .{ "stage3", @import("stages/03_soa/sim.zig").Sim },
+    .{ "stage4", @import("stages/04_compact/sim.zig").Sim },
+    .{ "stage5", @import("stages/05_sortbykind/sim.zig").Sim },
+    .{ "stage6", @import("stages/06_simd/sim.zig").Sim },
+    .{ "stage7", @import("stages/07_align/sim.zig").Sim },
+    .{ "stage8", @import("stages/08_alloc/sim.zig").Sim },
+    .{ "stage9", @import("stages/09_synthesis/sim.zig").Sim },
+    .{ "stage10", @import("stages/10_rasterizer/sim.zig").Sim },
+    .{ "stage11", @import("stages/11_record/sim.zig").Sim },
+    // --- the layout verticals (src/layouts/; -Dlayout=LX -Dstrat=name) ---
+    // L1 arms land with the V1 vertical (naive, naive_r1, par, halide_a).
+});
+
+const SimImpl = sim_map.get(opts.name) orelse
+    @compileError("unknown sim '" ++ opts.name ++ "' (see strat_labels in build.zig / sim_map in main.zig)");
 
 pub fn main(init: std.process.Init) !void {
     return switch (opts.mode) {

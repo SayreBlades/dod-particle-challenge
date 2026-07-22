@@ -2,5 +2,5 @@
 // relative imports inside the module path; the comptime reference pulls the
 // target file's tests into the build.
 comptime {
-    _ = @import("stages/10_rasterizer/render.zig");
+    _ = @import("framework/render_opt.zig");
 }

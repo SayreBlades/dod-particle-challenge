@@ -62,6 +62,80 @@ fn lessThan(_: void, a: f32, b: f32) bool {
     return std.math.order(a, b) == .lt;
 }
 
+// --- frame golden (layout-matrix.md §2.3) --------------------------------------
+//
+// The render-side correctness gate. The splat blend is u8 saturating add —
+// commutative and associative — and the pixel mapping is a deterministic
+// function of position, so the framebuffer depends only on the MULTISET of
+// (pos, kind), never on splat order: compaction/sort/reordering cannot change
+// it, and ONE golden serves every bit-exact cell (all layouts, all variants).
+//
+// Verified per cell only when that run's sim golden is bit-exact (max delta
+// 0.00): identical sorted pos/vel floats ⟹ identical RNG sequence ⟹ identical
+// kinds. FP-drift cells (future Halide without strict_float) skip loudly.
+//
+// Storage: the SHA-256 hash of the raw framebuffer + a header comment (the
+// plan's default — keeps 4 MB binaries out of git; on a mismatch the bench
+// prints the first-divergent byte and can regenerate PNGs on demand).
+
+pub const FRAME_W: u32 = 1024;
+pub const FRAME_H: u32 = 1024;
+
+/// Run `steps` fixed-step updates from a fresh sim, then render once into an
+/// RGBA framebuffer. Caller owns the returned slice.
+pub fn captureFrame(
+    comptime SimImpl: type,
+    alloc: std.mem.Allocator,
+    desc: fw.Desc,
+    steps: usize,
+    dt: f32,
+    w: u32,
+    h: u32,
+) ![]u8 {
+    var sim = try SimImpl.init(alloc, desc);
+    defer sim.deinit();
+    var i: usize = 0;
+    while (i < steps) : (i += 1) sim.step(dt);
+    const fb = try alloc.alloc(u8, @as(usize, w) * h * 4);
+    sim.render(fb, w, h);
+    return fb;
+}
+
+pub const FrameHash = [std.crypto.hash.sha2.Sha256.digest_length]u8;
+
+pub fn hashFrame(fb: []const u8) FrameHash {
+    var h: FrameHash = undefined;
+    std.crypto.hash.sha2.Sha256.hash(fb, &h, .{});
+    return h;
+}
+
+pub fn writeFrameGolden(path: []const u8, hash: FrameHash, io: Io) !void {
+    var dir = std.Io.Dir.cwd();
+    dir.createDirPath(io, "golden") catch {};
+    var f = try dir.createFile(io, path, .{});
+    var io_buf: [256]u8 = undefined;
+    var w = f.writer(io, &io_buf);
+    try w.interface.writeAll("DODF\x01\x00\x00\x00");
+    try w.interface.writeAll(&hash);
+    try w.end();
+    f.close(io);
+}
+
+pub fn loadFrameGolden(path: []const u8, io: Io) !FrameHash {
+    var dir = std.Io.Dir.cwd();
+    var f = try dir.openFile(io, path, .{ .mode = .read_only });
+    defer f.close(io);
+    var io_buf: [256]u8 = undefined;
+    var r = f.reader(io, &io_buf);
+    const rr = &r.interface;
+    var magic: [8]u8 = undefined;
+    try rr.readSliceAll(&magic);
+    if (!std.mem.eql(u8, &magic, "DODF\x01\x00\x00\x00")) return error.BadMagic;
+    var h: FrameHash = undefined;
+    try rr.readSliceAll(&h);
+    return h;
+}
+
 pub fn writeGolden(path: []const u8, snap: Snapshot, io: Io) !void {
     var dir = std.Io.Dir.cwd();
     dir.createDirPath(io, "golden") catch {};
