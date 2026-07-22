@@ -1,0 +1,11 @@
+# The Halide sweep environment (layout-verticals.md §6.3). Not used by
+# `zig build` itself beyond the one generator invocation — Python is the
+# sweep/generator driver only.
+#   uv venv .venv-halide
+#   uv pip install --python .venv-halide/bin/python -e .
+# (or: uv pip install --python .venv-halide/bin/python halide matplotlib)
+[project]
+name = "dod-particles-halide"
+version = "0.1.0"
+requires-python = ">=3.9"
+dependencies = ["halide>=21", "matplotlib"]

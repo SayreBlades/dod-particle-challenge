@@ -15,7 +15,7 @@
 #   THREADS=8 scripts/vertical_collect.sh "L1.par"    # thread-count knob
 #
 # Output: .scratch/verticals/<layout>.csv — rows like
-#   csv,<name>,<mode>,<death>,<N>,<bytes/p>,<ns_frame>,<extra...>
+#   csv,<name>,<mode>,<death>,<threads>,<N>,<bytes/p>,<ns_frame>,<extra...>
 #     step:   ...,bytes_p,ns_frame_min,ns_particle,gbs_eff
 #     frame:  ...,bytes_p,ns_frame_min,step_ns,render_ns
 #     render: ...,,(empty),ns_frame_min,ns_particle,(empty)

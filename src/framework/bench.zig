@@ -249,8 +249,8 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         std.debug.print("  {d:>10} | {d:>7} | {d:>9.1} | {d:>14.3} | {d:>14.1} | {d:>11.1} | {d:>8.2} | {d:>11.1}\n", .{
             n, bytes_per_p, working_set_mb, ns_per_particle, min_ns_frame, frames_sec, gbs_eff, runtime_ms,
         });
-        if (csv_mode) std.debug.print("csv,{s},step,{s},{d},{d},{d:.1},{d:.4},{d:.2}\n", .{
-            @import("options").name, DEATH_COL, n, bytes_per_p, min_ns_frame, ns_per_particle, gbs_eff,
+        if (csv_mode) std.debug.print("csv,{s},step,{s},{d},{d},{d},{d:.1},{d:.4},{d:.2}\n", .{
+            @import("options").name, DEATH_COL, threads, n, bytes_per_p, min_ns_frame, ns_per_particle, gbs_eff,
         });
     }
 
@@ -321,8 +321,8 @@ fn renderBench(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, csv: bo
         std.debug.print("  {d:>10} | {d:>6} | {d:>14.1} | {d:>14.4} | {d:>11.1}\n", .{
             n, iters, min_ns_frame, min_ns_frame / @as(f64, @floatFromInt(n)), 1e9 / min_ns_frame,
         });
-        if (csv) std.debug.print("csv,{s},render,{s},{d},,{d:.1},{d:.4},\n", .{
-            @import("options").name, DEATH_COL, n, min_ns_frame, min_ns_frame / @as(f64, @floatFromInt(n)),
+        if (csv) std.debug.print("csv,{s},render,{s},{d},{d},,{d:.1},{d:.4},\n", .{
+            @import("options").name, DEATH_COL, threads, n, min_ns_frame, min_ns_frame / @as(f64, @floatFromInt(n)),
         });
     }
     std.debug.print("\n", .{});
@@ -393,8 +393,8 @@ fn frameBench(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, csv: boo
         std.debug.print("  {d:>10} | {d:>6} | {d:>12.1} | {d:>12.1} | {d:>12.1} | {d:>13.4} | {d:>11.1}\n", .{
             n, iters, step_ns_at_min, render_ns_at_min, min_frame_ns, min_frame_ns / @as(f64, @floatFromInt(n)), 1e9 / min_frame_ns,
         });
-        if (csv) std.debug.print("csv,{s},frame,{s},{d},{d},{d:.1},{d:.1},{d:.1}\n", .{
-            @import("options").name, DEATH_COL, n, sim.bytesPerParticle(), min_frame_ns, step_ns_at_min, render_ns_at_min,
+        if (csv) std.debug.print("csv,{s},frame,{s},{d},{d},{d},{d:.1},{d:.1},{d:.1}\n", .{
+            @import("options").name, DEATH_COL, threads, n, sim.bytesPerParticle(), min_frame_ns, step_ns_at_min, render_ns_at_min,
         });
     }
     std.debug.print("\n", .{});

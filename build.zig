@@ -11,6 +11,7 @@ pub fn build(b: *std.Build) void {
     const layout_opt = b.option([]const u8, "layout", "layout id, e.g. L1 (needs -Dstrat)");
     const strat_opt = b.option([]const u8, "strat", "strategy name, e.g. naive | simd | par | halide_a");
     const stage_opt = b.option([]const u8, "stage", "arc stage number 1..11");
+    const halide_variant_opt = b.option([]const u8, "halide_variant", "Halide sweep candidate id (links a pre-generated zig-out/halide/<strat>_<id>.a)");
     const mode_str = b.option([]const u8, "mode", "play | bench | audit") orelse "play";
     const death_str = b.option([]const u8, "death", "death pattern: natural | half | alternating") orelse "natural";
     if (!std.mem.eql(u8, death_str, "natural") and !std.mem.eql(u8, death_str, "half") and !std.mem.eql(u8, death_str, "alternating")) {
@@ -30,6 +31,8 @@ pub fn build(b: *std.Build) void {
     // main.zig's comptime registry must have an arm for each.
     var name: []const u8 = undefined;
     var label: []const u8 = undefined;
+    var layout_sel: ?[]const u8 = null;
+    var strat_sel: ?[]const u8 = null;
     if (stage_opt) |stage_str| {
         if (layout_opt != null or strat_opt != null)
             std.debug.print("warning: both -Dstage and -Dlayout/-Dstrat given; -Dstage wins\n", .{});
@@ -46,6 +49,8 @@ pub fn build(b: *std.Build) void {
     } else {
         const layout = layout_opt orelse "L1";
         const strat = strat_opt orelse "naive";
+        layout_sel = layout;
+        strat_sel = strat;
         name = b.fmt("{s}.{s}", .{ layout, strat });
         label = stratLabel(layout, strat) orelse
             std.debug.panic("invalid -Dlayout='{s}' -Dstrat='{s}' (see strat_labels in build.zig)", .{ layout, strat });
@@ -74,6 +79,33 @@ pub fn build(b: *std.Build) void {
             .link_libc = true,
         }),
     });
+    // --- Halide path (layout-verticals.md §6.3): ONLY for halide_* strategies.
+    // Fully gated: arc stages and Zig strategies never touch python/Halide.
+    // The generator (Python bindings, full parity in v21 — no C++ toolchain in
+    // the build) emits zig-out/halide/<strat>[_<variant>].{h,a} with the
+    // runtime bundled; the exe links the static .a. No libHalide at runtime.
+    if (strat_sel) |strat| {
+        if (std.mem.startsWith(u8, strat, "halide")) {
+            const layout = layout_sel.?;
+            // If this python is missing, the generator step fails loudly at
+            // build time; set HALIDE_PYTHON or create the env:
+            //   uv venv .venv-halide && uv pip install --python .venv-halide/bin/python halide
+            const python = b.graph.environ_map.get("HALIDE_PYTHON") orelse ".venv-halide/bin/python";
+            const stem = if (halide_variant_opt) |v| b.fmt("{s}_{s}", .{ strat, v }) else strat;
+            const out_prefix = b.fmt("zig-out/halide/{s}", .{stem});
+            if (halide_variant_opt == null) {
+                // Default candidate: run the layout's generator now.
+                const gen = b.addSystemCommand(&.{
+                    python,
+                    b.fmt("src/layouts/{s}/{s}_gen.py", .{ layoutDir(layout), strat }),
+                    out_prefix,
+                });
+                exe.step.dependOn(&gen.step);
+            } // else: the sweep pre-generated the variant; just link it.
+            exe.root_module.addObjectFile(b.path(b.fmt("{s}.a", .{out_prefix})));
+        }
+    }
+
     // --- stb_image_write (linked unconditionally: --record is a bench flag on
     // every sim, not a stage-11 special case; one small C file) ---
     exe.root_module.addCSourceFile(.{
@@ -144,7 +176,17 @@ const strat_labels = [_]StratEntry{
     .{ .layout = "L1", .strat = "naive", .label = "L1.naive (AoS full-field baseline; = arc stage 1)" },
     .{ .layout = "L1", .strat = "naive_r1", .label = "L1.naive_r1 (naive + optimized splat render)" },
     .{ .layout = "L1", .strat = "par", .label = "L1.par (multicore range-partitioned, two-phase)" },
+    .{ .layout = "L1", .strat = "halide_a", .label = "L1.halide_a (Halide math passes, natural seam; AoS strided)" },
 };
+
+/// Layout id -> folder name (one per vertical; extended as verticals land).
+fn layoutDir(layout: []const u8) []const u8 {
+    const map = std.StaticStringMap([]const u8).initComptime(.{
+        .{ "L1", "L1_aos_full" },
+    });
+    return map.get(layout) orelse
+        std.debug.panic("unknown layout '{s}' (see layoutDir in build.zig)", .{layout});
+}
 
 fn stratLabel(layout: []const u8, strat: []const u8) ?[]const u8 {
     for (strat_labels) |s|
