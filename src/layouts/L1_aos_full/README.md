@@ -46,8 +46,8 @@ Gate Ns: 65K (cache-resident) / 1M (L2-spill) / 4M (DRAM).
 | **naive_r1**     | + optimized splat (render_opt)          | bit-exact                   |           1.277 |       1.415 |        1.593 | **239.4 µs** | **2544.1 µs** |
 | **par**          | two-phase multicore (T=1 row)           | bit-exact                   |           1.465 |       1.799 |        1.998 |     401.8 µs |     5221.3 µs |
 | **par (best-T)** | T per N: 4/4/10                         | bit-exact ∀T                | **0.894** (T=4) | 1.464 (T=4) | 1.693 (T=10) |            — |             — |
-| **halide_a**     | Halide math passes, natural seam (vw=4) | **bit-exact** (StrictFloat) |          2.686 |       4.033 |       4.654 |     477.6 µs |     7678.3 µs |
-| halide best      | Adams2019 autoschedule                  | bit-exact                   |               — |       3.677 |            — |            — |             — |
+| **halide_a**     | Halide math, ONE fused nest (pos+vel+age = naive's full branch-free loop body), natural seam (vw=4) | **bit-exact** (StrictFloat) | 2.481 | 2.877 | 2.921 | 467.1 µs | 6383.3 µs |
+| halide best      | manual vw=8 (sweep optimum)             | bit-exact                   |               — |       2.794 |            — |            — |             — |
 
 PMC profile, naive @1M (xctrace): **useful 42.8% · discarded 33.0% ·
 processing 21.1% · delivery 3.2%** — a third of all slots are discarded work
@@ -96,10 +96,13 @@ delta 0.00** and framebuffer golden PASS — Halide's codegen is bit-identical
 to Zig's scalar fmul+fadd for this kernel. **No gate relaxation is needed;
 Halide strategies are bit-exact class.** (Re-confirmed per vertical.)
 
-**What halide_a is:** the two math passes (integrate+forces) as an AOT
+**What halide_a is:** naive.zig's complete branch-free loop body —
+`pos += vel*dt`, `vel += (g + drag*vel)*dt`, `age += dt` — as an AOT
 pipeline over the AoS buffer (2-D interleaved: component stride 1, particle
-stride 17 floats), in place; age/kill/respawn stays in Zig (the natural
-seam — RNG discipline untouched by construction). The generator is
+stride 17 floats), computed in ONE fused loop nest (`compute_with`), in
+place; kill/respawn stays in Zig (the natural seam — RNG discipline
+untouched by construction). The formulation exists for assembly-level
+comparability with naive.zig's step loop (§5b). The generator is
 `halide_a_gen.py` (Python bindings — v21 parity; **deviation from the
 plan's `<name>_gen.cpp` naming**: no C++ toolchain in the build at all,
 same artifacts). `zig build -Dlayout=L1 -Dstrat=halide_a` runs the
@@ -111,25 +114,32 @@ at runtime.
 
 | candidate       |  ns/p |   | candidate       |                ns/p |
 |-----------------|------:|---|-----------------|--------------------:|
-| manual vw=1     | 4.170 |   | vw=4 + parallel |               35.92 |
-| manual vw=2     | 4.052 |   | vw=8 + parallel |               29.24 |
-| manual vw=4     | 4.003 |   | Mullapudi2016   |               16.73 |
-| manual vw=8     | 4.002 |   | **Adams2019**   |           **3.677** |
-| vw=1 + parallel | 37.03 |   | Li2018          |                5.50 |
-| vw=2 + parallel | 28.88 |   | Anderson2021    | excluded (GPU-only) |
+| manual vw=1     | 3.087 |   | vw=4 + parallel |               15.41 |
+| manual vw=2     | 2.945 |   | vw=8 + parallel |               14.14 |
+| manual vw=4     | 2.828 |   | Mullapudi2016   |               24.39 |
+| **manual vw=8** | **2.794** |   | Adams2019     |                4.53 |
+| vw=1 + parallel | 27.23 |   | Li2018          |                6.95 |
+| vw=2 + parallel | 23.18 |   | Anderson2021    | excluded (GPU-only) |
+
+(Fused-nest generator. Note the inversion vs the pre-fusion pipeline:
+manual schedules now BEAT every autoscheduler — Adams2019 found 3.68 on
+the two-output pipeline but only 4.53 here; the third output changed the
+cost model's choice, and not for the better. The landscape is
+schedule-fragile; the floor is not.)
 
 **Findings:**
 
-1. **The AoS strided-gather floor is ~3.7 ns/p — 2.6× slower than Zig
-   scalar naive (1.415) on the same layout; ~2.1× cache-resident (2.686 vs
-   1.267 @65K).** Manual vector width barely matters (4.17→4.00: the gather
-   IS the cost, not the vector shape), and the best search Halide owns
-   (Adams2019's learned cost model) finds 3.68. Nothing approaches scalar.
-   The mechanism is decomposed in §5a. This is the planned L1 measurement:
-   the AoS vectorization cost, proven on a toolchain that *does*
-   vectorize — it vindicates the arc's stage-3 SoA premise independently of
-   Zig's autovectorization quirks (the old confound, resolved).
-2. **Parallel Halide is catastrophic** (28.9–37.0 ns/p): `parallel(i)`
+1. **The AoS strided-gather floor is ~2.8 ns/p — 1.9× slower than Zig
+   naive (1.461) on the same layout, at every N band (2.48 vs 1.27 @65K,
+   2.92 vs 1.63 @4M).** Manual vector width barely matters (3.09→2.79:
+   the gather IS the cost, not the vector shape), and every autoscheduler
+   LOSES to the trivial manual `vectorize(i)` schedule. Nothing approaches
+   naive. The mechanism is decomposed in §5a/§5b. This is the planned L1
+   measurement: the AoS vectorization cost, proven on a toolchain that
+   *does* vectorize — it vindicates the arc's stage-3 SoA premise
+   independently of Zig's autovectorization quirks (the old confound,
+   resolved).
+2. **Parallel Halide is catastrophic** (14.1–27.2 ns/p even after fusion): `parallel(i)`
    spreads a bandwidth-bound strided walk across Halide's runtime pool and
    the cost multiplies. Contrast with L1.par's graceful curve — Zig's
    two-phase pool vs Halide's one-line knob: the knob exists, but the
@@ -142,38 +152,82 @@ at runtime.
 
 ### 5a. Why halide_a is slow — the mechanism, honestly
 
-Three multiplicative terms, in order of fixability:
+halide_a computes naive.zig's COMPLETE branch-free loop body (pos, vel,
+age) in ONE fused Halide nest (the pre-fusion two-nest version measured
+4.03 @1M; fusion alone bought 29%). Two multiplicative terms remain:
 
-1. **The seam forces multi-pass; AoS makes every pass pay full stride.**
+1. **The seam forces TWO walks; AoS makes every walk pay full stride.**
    L1.naive fuses math+age+kill into ONE per-particle loop (1 walk × 68 B).
-   halide_a runs pos_out and vel_out as separate Halide loop nests, then a
-   Zig age/kill loop: 3 walks × 68 B = 204 B/p effective traffic. The
-   smoking gun is the bandwidth arithmetic at 1M: 204 B/p ÷ 4.033 ns/p ≈
-   51 GB/s actual — Halide is AT the DRAM ceiling (naive: 47 GB/s), it just
-   spends 2/3 of the bus re-walking the array. On SoA this term is cheap
-   (the age/kill pass touches only age+kind ≈ 5 B/p, not the whole struct)
-   — which is why the seam hurts AoS specifically.
-2. **NEON can't gather.** Vectorizing `data(c, i..i+3)` at stride 17 lowers
-   to scalar `ldr` + `fmov`/`ins` lane-insertion on both the load and store
-   side (no hardware gather on arm64 NEON; `ld3` deinterleaves only
-   3-tuples — the tuple3 layout's opening, not AoS's). objdump of the vw=4
-   loop body: ~170 instructions, of which 3 fmul + 3 fadd are math. The
-   cache-resident gap (2.1–2.2× at 4K–262K) is this instruction storm plus
-   the extra loop nests, since bandwidth is not binding there.
+   halide_a runs the fused Halide math nest, then a Zig kill/respawn walk:
+   2 × 68 B = 136 B/p effective traffic. The smoking gun is the bandwidth
+   arithmetic at 1M: 136 B/p ÷ 2.877 ns/p = **47.3 GB/s actual — exactly
+   naive's bandwidth** (1.443 ns/p × 68 B/p). Halide is AT the DRAM
+   ceiling; the entire DRAM-side gap is the second walk. On SoA this term
+   is cheap (the kill walk touches only age+kind ≈ 5 B/p, not the whole
+   struct) — which is why the seam hurts AoS specifically.
+2. **NEON can't gather, and the shuffle tax is the cache-resident gap.**
+   Vectorizing `data(c, i..i+3)` at stride 17 lowers to scalar `ldr` +
+   per-lane `ld1.s` insertion on the load side and per-lane `st1.s`
+   extraction on the store side (no hardware gather on arm64 NEON; `ld3`
+   deinterleaves only 3-tuples — the tuple3 layout's opening, not AoS's).
+   §5b counts the instructions: ~44/particle vs naive's ~24, with 2× fewer
+   math ops. At 65K (bandwidth not binding) that instruction storm IS the
+   2.0× gap.
 3. **Parallel multiplies the damage.** 68 B stride guarantees chunk
    boundaries split cache lines → false sharing on the strided stores,
-   plus Halide pool dispatch, on an already bandwidth-bound walk (28.9–37.0
+   plus Halide pool dispatch, on an already bandwidth-bound walk (14.1–27.2
    ns/p).
 
-**Could any Halide formulation match naive on AoS?** The fixable term is
-(1): fuse pos+vel+age into ONE pipeline pass (Tuple output or
-`compute_with`) and write the kill decision to a 1 B/p dead mask, with Zig
-doing the par-style mask scan + serial respawn: traffic ≈ 68+2 B/p ≈
-naive's 68. That ties naive at DRAM-bound N — but term (2) still taxes
-cache-resident N, and a scalar-fused variant that dodges (2) is just
-"Halide as a C compiler." Estimate: ~1.6–2.0 ns/p. Recorded as the
-optional `halide_a2` follow-up; the conclusion (no vectorization win
-exists on AoS) is not in doubt, only the constant.
+**Could any Halide formulation match naive on AoS?** Term (1) is closable:
+write the kill decision to a 1 B/p dead mask in the pipeline and let Zig do
+the par-style mask scan + serial respawn — traffic ≈ 68+2 B/p ≈ naive's
+68, a tie at DRAM-bound N. Term (2) is not closable: the gather is
+stride-17's structural cost on NEON. Estimate for the dead-mask variant:
+~1.6–2.0 ns/p. Recorded as the optional `halide_a2` follow-up; the
+conclusion (no vectorization win exists on AoS) is not in doubt, only the
+constant.
+
+### 5b. The assembly comparison — naive.zig vs the Halide nest
+
+naive.zig's compiled step loop
+(`_framework.sim.Strategy(...naive.H).step`, ReleaseFast, objdump):
+~24 instructions steady-state per particle:
+
+```
+ldr  q1, [x21]        # pos.xyz + vel.x in ONE 16 B load
+ldr  d2, [x21,#0x10]  # vel.yz
+ext  v3, v1, v2, #0xc # build vel.4s
+fmul.4s v0, v3, v4    # vel * dt          ← 4-wide, ACROSS COMPONENTS
+fadd.4s v0, v1, v0    # pos + vel*dt
+str  q0, [x21]        # write pos.xyz (+vel.x) in one 16 B store
+fmul.2s / fadd.2s ×2  # vel' = vel + (g + drag*vel)*dt, 2-wide
+str  d0, [x21,#0x10]
+fadd s0 (age) ; fcmp ; b.lt   # kill branch → rare Data.spawn call
+```
+
+Three loads + three stores cover all 28 hot bytes; LLVM **auto-vectorized
+per-particle, across the x/y/z components** (the one vectorization AoS
+permits). Two honest surprises: the deliberate `switch(kind)` and the
+cold-field touches (`_ = p.mass` …) were dead-code-eliminated entirely —
+the strawman's remaining cost is the 68 B stride, not the dummy work.
+
+The Halide fused nest (`_halide_a`, vw=4), inner loop per component:
+~25 instructions per 4 particles per component — per-lane `ld1.s` gathers
+(4 scalar-addressed lane loads per input vector), 1 `fmul.4s` + 1
+`fadd.4s` of actual math, per-lane `st1.s` scatters; ×7 components
+(pos/vel/age) ≈ **44 instructions/particle, ~1.8 of them math**.
+
+The comparison in one line: **LLVM vectorized naive ACROSS COMPONENTS
+(xyz lanes — free, no gather); Halide vectorized ACROSS PARTICLES
+(`vectorize(i,4)` — stride-17 gather on every load and store).** The
+component-lane formulation is the only good SIMD on AoS, and it is not
+expressible as a Halide schedule knob on this pipeline shape (`vectorize`
+applies to the iteration dimension; the component dim has extent 3 and is
+shared across output Funcs). That inexpressibility is itself a finding:
+the schedule language assumes you already chose a vectorizable layout.
+
+(Disassemble locally: `objdump -d zig-out/bin/dod-particles | grep -A40
+'naive.H).step'` and `objdump -d zig-out/halide/halide_a.a`.)
 
 ## 6. Cross-references
 

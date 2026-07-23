@@ -51,6 +51,7 @@ extern fn halide_a(
     drag: f32,
     pos_out: *halide_buffer_t,
     vel_out: *halide_buffer_t,
+    age_out: *halide_buffer_t,
 ) c_int;
 
 const FLOAT32: halide_type_t = .{ .code = 2, .bits = 32, .lanes = 1 }; // halide_type_float
@@ -90,17 +91,27 @@ const H = struct {
             .dimensions = 2,
             .dim = &out_dims,
         };
+        var age_dim = [1]halide_dimension_t{
+            .{ .min = 0, .extent = @intCast(n), .stride = stride_floats, .flags = 0 },
+        };
+        var buf_age: halide_buffer_t = .{
+            .host = base + @offsetOf(Particle, "age"),
+            .type = FLOAT32,
+            .dimensions = 1,
+            .dim = &age_dim,
+        };
 
-        // 1+2. Integrate + forces (Halide pipeline, in place).
-        const rc = halide_a(&buf_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, &buf_pos, &buf_vel);
+        // 1+2+3. Integrate + forces + age — the Halide pipeline, ONE fused
+        // loop nest, in place. This is naive.zig's entire branch-free math.
+        const rc = halide_a(&buf_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, &buf_pos, &buf_vel, &buf_age);
         std.debug.assert(rc == 0);
 
-        // 3+4. Age / kill / respawn — Zig, branchy scalar (the natural seam),
-        // index order so the RNG draw sequence matches L1.naive exactly.
+        // 4. Kill / respawn — Zig, branchy scalar (the natural seam), index
+        // order so the RNG draw sequence matches L1.naive exactly. (Age was
+        // already updated by the pipeline.)
         // 5. The naive schedule's kind-switch + cold touches stay too: the
         //    comparison is "same schedule, Halide does the math".
         for (data.particles, 0..) |*p, i| {
-            p.age += dt;
             if (config.isDead(p.age, i, sim.frame, &sim.kill_rng)) {
                 data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));
             }

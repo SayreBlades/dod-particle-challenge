@@ -25,8 +25,11 @@ sched = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
 vw = int(sched.get("vector_width", 4))
 par = bool(sched.get("parallel", False))
 
-# --- algorithm (identical math to config.zig, expressed over the AoS buffer) ---
-# components: pos = c 0..2, vel = c 3..5. age (c 7) stays in Zig.
+# --- algorithm (identical math to naive.zig's branch-free loop body,
+# expressed over the AoS buffer): pos += vel*dt; vel += (g + drag*vel)*dt;
+# age += dt. components: pos = c 0..2, vel = c 3..5, age = c 7.
+# The whole point is assembly-level comparability with naive.zig's step
+# loop: ONE fused loop nest doing the same per-particle math.
 data = hl.ImageParam(hl.Float(32), 2, "data")
 data.dim(0).set_stride(1)
 data.dim(1).set_stride(17)
@@ -45,16 +48,20 @@ g = hl.select(c == 0, gx, hl.select(c == 1, gy, gz))
 
 pos_out = hl.Func("pos_out")
 vel_out = hl.Func("vel_out")
+age_out = hl.Func("age_out")
 # pos' = pos + vel*dt        (reads OLD vel — aliasing is safe: pos_out writes
 # vel' = vel + (g + drag*vel)*dt   only c 0..2, reads only c 0..5 same-i)
+# age' = age + dt            (1-D over i; c 7 in the struct)
 pos_out[c, i] = data[c, i] + data[c + 3, i] * dt
 vel_out[c, i] = data[c + 3, i] + (g + drag * data[c + 3, i]) * dt
+age_out[i] = data[7, i] + dt
 
 # Output descriptors: same AoS stride, disjoint component ranges — aliased
 # in-place into the particle array (elementwise, same-i dependence only).
 for f in (pos_out, vel_out):
     f.output_buffer().dim(0).set_stride(1)
     f.output_buffer().dim(1).set_stride(17)
+age_out.output_buffer().dim(0).set_stride(17)
 
 autosched = sched.get("autoscheduler")
 target = hl.get_host_target()
@@ -63,14 +70,20 @@ target = target.with_feature(hl.TargetFeature.StrictFloat)  # the FP gate
 # --- schedule (manual directives only when NOT autoscheduling — the
 # autoscheduler refuses pipelines with directives already applied) ---
 if not autosched:
+    # Fuse all three outputs into ONE loop nest at i — the same per-particle
+    # loop structure as naive.zig's step, for honest assembly comparison.
+    vel_out.compute_with(pos_out, i)
+    age_out.compute_with(pos_out, i)
     if vw > 1:
         pos_out.vectorize(i, vw)
         vel_out.vectorize(i, vw)
+        age_out.vectorize(i, vw)
     if par:
         pos_out.parallel(i)
         vel_out.parallel(i)
+        age_out.parallel(i)
 
-pipeline = hl.Pipeline([pos_out, vel_out])
+pipeline = hl.Pipeline([pos_out, vel_out, age_out])
 if autosched:
     # The autoscheduler replaces the manual schedule entirely. Plugins ship
     # in the pip package's lib/ but aren't auto-discovered — load explicitly.
@@ -83,6 +96,7 @@ if autosched:
     N_EST = 1_000_000
     for f in (pos_out, vel_out):
         f.set_estimates([hl.Range(0, 3), hl.Range(0, N_EST)])
+    age_out.set_estimates([hl.Range(0, N_EST)])
     data.set_estimates([hl.Range(0, 17), hl.Range(0, N_EST)])
     dt.set_estimate(1.0 / 60.0)
     gx.set_estimate(0.0)
