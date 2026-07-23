@@ -226,6 +226,34 @@ applies to the iteration dimension; the component dim has extent 3 and is
 shared across output Funcs). That inexpressibility is itself a finding:
 the schedule language assumes you already chose a vectorizable layout.
 
+The two vectorization axes, visualized:
+
+```
+naive (lanes = ONE particle's components — memory-adjacent):
+  ldr q1:  v1 = [ pos.x │ pos.y │ pos.z │ vel.x ]   16 B contiguous, 1 load
+  ext:     v3 = [ vel.x │ vel.y │ vel.z │ drag·vx ] shuffle, no memory
+  fmul.4s  v3 × [dt dt dt dt]
+  fadd.4s  v1 + that = [ px' │ py' │ pz' │ vx' ]
+  str q0:  writes pos' AND vel.x' in ONE 16 B store
+  → 1 load feeds 4 lanes; ~24 insns/particle, ~7 math
+
+halide (lanes = FOUR particles' same component — 68 B apart):
+  ldur s6 ; ld1.s {v6}[1] ; ld1.s {v6}[2] ; ld1.s {v6}[3]
+    v6 = [ px(i) │ px(i+1) │ px(i+2) │ px(i+3) ]   4 loads + 3 inserts
+    v7 = [ vx(i) │ vx(i+1) │ vx(i+2) │ vx(i+3) ]   4 more loads + 3 inserts
+  fmul.4s ; fadd.4s          ← the only math, 2 ops per 4 particles
+  stur s6 ; st1.s {v6}[1..3] ← 4 scalar stores, ~272 B apart
+  × 7 components ≈ 44 insns/particle, ~1.8 math
+```
+
+(De-vectorizing naive as a control: Zig exposes no `-fno-vectorize`; the
+levers are `doNotOptimizeAway` on scalar intermediates (surgical),
+interleaving cold fields (a different layout, by our rules), opaque calls
+(confounding overhead), volatile (restores the cold touches but forbids
+all reordering — a different machine). Recorded as the optional
+`naive_novec` control; at DRAM-bound N the prediction is it still beats
+halide_a — the gap there is walks, not vector width.)
+
 (Disassemble locally: `objdump -d zig-out/bin/dod-particles | grep -A40
 'naive.H).step'` and `objdump -d zig-out/halide/halide_a.a`.)
 
