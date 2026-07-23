@@ -48,6 +48,7 @@ Gate Ns: 65K (cache-resident) / 1M (L2-spill) / 4M (DRAM).
 | **par (best-T)** | T per N: 4/4/10                                                                                     | bit-exact ∀T                | **0.894** (T=4) | 1.464 (T=4) | 1.693 (T=10) |            — |             — |
 | **naive_novec**  | naive with auto-vectorization disabled (opaque-asm control, §5c)                                        | bit-exact                   |           1.547 |       1.608 |        1.698 |     403.4 µs |     5232.8 µs |
 | **halide_a**     | Halide math, ONE fused nest (pos+vel+age = naive's full branch-free loop body), natural seam (vw=4) | **bit-exact** (StrictFloat) |           2.481 |       2.877 |        2.921 |     467.1 µs |     6383.3 µs |
+| **halide_a2**    | a + dead-mask (Zig scans 1 B/p, not the struct), LEAN 9×1-D scalar streams (§5d)                  | **bit-exact** (StrictFloat) |           1.749 |       1.929 |        2.106 |     421.4 µs |     5416.0 µs |
 | halide best      | manual vw=8 (sweep optimum)                                                                         | bit-exact                   |               — |       2.794 |            — |            — |             — |
 
 PMC profile, naive @1M (xctrace): **useful 42.8% · discarded 33.0% ·
@@ -290,6 +291,41 @@ Two findings:
    Even truly scalar, the single-walk loop beats Halide's two-walk gather
    at every band (60–79%). The gather tax and the seam's second walk are
    the whole story — §5a/§5b stand unchanged.
+
+### 5d. Chasing parity: the dead-mask variant (halide_a2)
+
+The user's challenge: *a non-vectorized Halide schedule should produce
+nearly naive's assembly and performance, right?* Measured answer, in three
+steps:
+
+1. **Scalar schedule (vw=1) alone does NOT tie.** Same 19 scalar FP ops,
+   yes — but the strategy still pays the seam's second walk (Zig kill pass
+   over the full struct): 3.087 @1M = 136 B/p at the ~44–47 GB/s ceiling.
+   The walk count, not the instruction mix, dominates at DRAM.
+2. **The dead mask kills the second walk.** Moving the kill decision into
+   the pipeline (1 B/p mask, Zig runs par's block scan + serial respawn)
+   drops traffic to ~70 B/p ≈ naive's 68. First attempt: 2.66 @1M —
+   better, but 26 GB/s actual = ISSUE-bound, not bandwidth-bound. The
+   (c,i)-formulated generator made gravity a runtime `select` on c
+   (6 fcsel/particle) and Halide emitted per-row clamps: 179 cmp / 27 csel
+   / 6 fcsel vs 23 fmul/fadd in the disassembly.
+3. **The LEAN reformulation (9 single-component 1-D Funcs, compute_with-
+   fused) makes gravity a hoisted constant and every access a plain
+   strided walk: 1.749 @65K / 1.929 @1M / 2.106 @4M** — Halide's best on
+   AoS: within +34% of naive @1M, +20% of novec. The residual gap, visible
+   in the disassembly: per-stream clamp guards inside the fused loop
+   (~40 cmp/branch/stack-reload instructions per particle on top of the
+   19 FP + 18 memory ops) — Halide's runtime buffer model re-proving
+   bounds Zig's static struct layout never has to.
+
+**The honest verdict on "nearly identical assembly":** the FP math is
+identical (19 scalar ops, bit-exact); the *frame around it* is not —
+Halide's buffer abstraction carries a per-stream, per-particle tax that
+Zig's statically-known layout doesn't pay. On AoS the taxes stack:
+gather tax (if vectorized) + seam tax (if natural) + abstraction tax
+(always). Best-case Halide on L1: **1.93 vs naive 1.44 @1M**. On SoA the
+first two taxes vanish and the third is amortized over unit-stride
+streams — that is why the interesting Halide layouts are still to come.
 
 ## 6. Cross-references
 
