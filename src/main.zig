@@ -23,6 +23,7 @@ const sim_map = std.StaticStringMap(type).initComptime(.{
     .{ "L1.naive_r1", @import("layouts/L1_aos_full/naive_r1.zig").Sim },
     .{ "L1.par", @import("layouts/L1_aos_full/par.zig").Sim },
     .{ "L1.halide_a", @import("layouts/L1_aos_full/halide_a.zig").Sim },
+    .{ "L1.naive_novec", @import("layouts/L1_aos_full/naive_novec.zig").Sim },
 });
 
 const SimImpl = sim_map.get(opts.name) orelse

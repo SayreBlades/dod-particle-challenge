@@ -177,6 +177,7 @@ const strat_labels = [_]StratEntry{
     .{ .layout = "L1", .strat = "naive_r1", .label = "L1.naive_r1 (naive + optimized splat render)" },
     .{ .layout = "L1", .strat = "par", .label = "L1.par (multicore range-partitioned, two-phase)" },
     .{ .layout = "L1", .strat = "halide_a", .label = "L1.halide_a (Halide math passes, natural seam; AoS strided)" },
+    .{ .layout = "L1", .strat = "naive_novec", .label = "L1.naive_novec (naive with auto-vectorization disabled — the true scalar control)" },
 };
 
 /// Layout id -> folder name (one per vertical; extended as verticals land).

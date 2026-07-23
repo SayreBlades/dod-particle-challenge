@@ -40,14 +40,15 @@ against.
 Step: ns/particle (step-only sweep). Frame: ns/frame (step+render, `--frame`).
 Gate Ns: 65K (cache-resident) / 1M (L2-spill) / 4M (DRAM).
 
-| strategy         | technique                               | golden                      |       step @65K |    step @1M |     step @4M |   frame @65K |     frame @1M |
-|------------------|-----------------------------------------|-----------------------------|----------------:|------------:|-------------:|-------------:|--------------:|
-| **naive**        | the baseline (= arc stage 1)            | bit-exact                   |           1.267 |       1.443 |        1.630 |     384.5 µs |     5098.9 µs |
-| **naive_r1**     | + optimized splat (render_opt)          | bit-exact                   |           1.277 |       1.415 |        1.593 | **239.4 µs** | **2544.1 µs** |
-| **par**          | two-phase multicore (T=1 row)           | bit-exact                   |           1.465 |       1.799 |        1.998 |     401.8 µs |     5221.3 µs |
-| **par (best-T)** | T per N: 4/4/10                         | bit-exact ∀T                | **0.894** (T=4) | 1.464 (T=4) | 1.693 (T=10) |            — |             — |
-| **halide_a**     | Halide math, ONE fused nest (pos+vel+age = naive's full branch-free loop body), natural seam (vw=4) | **bit-exact** (StrictFloat) | 2.481 | 2.877 | 2.921 | 467.1 µs | 6383.3 µs |
-| halide best      | manual vw=8 (sweep optimum)             | bit-exact                   |               — |       2.794 |            — |            — |             — |
+| strategy         | technique                                                                                           | golden                      |       step @65K |    step @1M |     step @4M |   frame @65K |     frame @1M |
+|------------------|-----------------------------------------------------------------------------------------------------|-----------------------------|----------------:|------------:|-------------:|-------------:|--------------:|
+| **naive**        | the baseline (= arc stage 1)                                                                        | bit-exact                   |           1.267 |       1.443 |        1.630 |     384.5 µs |     5098.9 µs |
+| **naive_r1**     | + optimized splat (render_opt)                                                                      | bit-exact                   |           1.277 |       1.415 |        1.593 | **239.4 µs** | **2544.1 µs** |
+| **par**          | two-phase multicore (T=1 row)                                                                       | bit-exact                   |           1.465 |       1.799 |        1.998 |     401.8 µs |     5221.3 µs |
+| **par (best-T)** | T per N: 4/4/10                                                                                     | bit-exact ∀T                | **0.894** (T=4) | 1.464 (T=4) | 1.693 (T=10) |            — |             — |
+| **naive_novec**  | naive with auto-vectorization disabled (opaque-asm control, §5c)                                        | bit-exact                   |           1.547 |       1.608 |        1.698 |     403.4 µs |     5232.8 µs |
+| **halide_a**     | Halide math, ONE fused nest (pos+vel+age = naive's full branch-free loop body), natural seam (vw=4) | **bit-exact** (StrictFloat) |           2.481 |       2.877 |        2.921 |     467.1 µs |     6383.3 µs |
+| halide best      | manual vw=8 (sweep optimum)                                                                         | bit-exact                   |               — |       2.794 |            — |            — |             — |
 
 PMC profile, naive @1M (xctrace): **useful 42.8% · discarded 33.0% ·
 processing 21.1% · delivery 3.2%** — a third of all slots are discarded work
@@ -112,14 +113,14 @@ at runtime.
 **The sweep** (`scripts/halide_sweep.py` → `.scratch/halide/L1.csv` +
 `L1_landscape.png`), step ns/p @1M:
 
-| candidate       |  ns/p |   | candidate       |                ns/p |
-|-----------------|------:|---|-----------------|--------------------:|
-| manual vw=1     | 3.087 |   | vw=4 + parallel |               15.41 |
-| manual vw=2     | 2.945 |   | vw=8 + parallel |               14.14 |
-| manual vw=4     | 2.828 |   | Mullapudi2016   |               24.39 |
-| **manual vw=8** | **2.794** |   | Adams2019     |                4.53 |
-| vw=1 + parallel | 27.23 |   | Li2018          |                6.95 |
-| vw=2 + parallel | 23.18 |   | Anderson2021    | excluded (GPU-only) |
+| candidate       |      ns/p |   | candidate       |                ns/p |
+|-----------------|----------:|---|-----------------|--------------------:|
+| manual vw=1     |     3.087 |   | vw=4 + parallel |               15.41 |
+| manual vw=2     |     2.945 |   | vw=8 + parallel |               14.14 |
+| manual vw=4     |     2.828 |   | Mullapudi2016   |               24.39 |
+| **manual vw=8** | **2.794** |   | Adams2019       |                4.53 |
+| vw=1 + parallel |     27.23 |   | Li2018          |                6.95 |
+| vw=2 + parallel |     23.18 |   | Anderson2021    | excluded (GPU-only) |
 
 (Fused-nest generator. Note the inversion vs the pre-fusion pipeline:
 manual schedules now BEAT every autoscheduler — Adams2019 found 3.68 on
@@ -256,6 +257,39 @@ halide_a — the gap there is walks, not vector width.)
 
 (Disassemble locally: `objdump -d zig-out/bin/dod-particles | grep -A40
 'naive.H).step'` and `objdump -d zig-out/halide/halide_a.a`.)
+
+### 5c. The de-vectorization control (naive_novec)
+
+**Method.** Zig exposes no `-fno-vectorize`, and the obvious
+door—`doNotOptimizeAway(&x); return x;`—does NOT work: an input-only asm
+operand leaves dataflow transparent, and LLVM re-packs after the barrier
+(measured: vel.x/y still became `fmul.2s`). The working lever is an
+**opaque-output asm box** (`asm ("" : [ret] "=w" (-> f32) : [in] "w" (x)`)
+applied to every input and result of the per-component math: the optimizer
+cannot prove the output equals the input, so SLP cannot pack across the
+box. Verified by disassembly, not assumed: the loop contains **0 vector
+ops** and exactly **19 scalar FP ops** — the hand-count of naive's math
+(pos 3 mul + 3 add; vel 3×(2 mul + 2 add); age 1 add). The boxes compile
+to no-ops at emission, so there is no barrier tax in the measurement.
+
+**Results** (golden still 0.00 — scalar and packed lanes are both IEEE):
+
+| band    | naive | naive_novec | scalar tax | halide_a | scalar naive still beats the gather by |
+|---------|------:|------------:|-----------:|---------:|---------------------------------------:|
+| @65K    | 1.267 |       1.547 |       +22% |    2.481 |                                    60% |
+| @1M     | 1.443 |       1.608 |       +11% |    2.877 |                                    79% |
+| @4M     | 1.630 |       1.698 |        +4% |    2.921 |                                    72% |
+
+Two findings:
+
+1. **LLVM's component-lane vectorization earns ~10–25%, not 2×** — and it
+   earns it cache-resident (+22% @65K; naive's fancy prologue even makes
+   novec FASTER at 4K: 1.52 vs 2.12). At DRAM bands the tax nearly
+   vanishes (+4–11%): one 68 B walk dominates; vector width is rounding.
+2. **The AoS verdict does not depend on naive being secretly vectorized.**
+   Even truly scalar, the single-walk loop beats Halide's two-walk gather
+   at every band (60–79%). The gather tax and the seam's second walk are
+   the whole story — §5a/§5b stand unchanged.
 
 ## 6. Cross-references
 
