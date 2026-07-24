@@ -52,8 +52,19 @@ pub fn build(b: *std.Build) void {
         layout_sel = layout;
         strat_sel = strat;
         name = b.fmt("{s}.{s}", .{ layout, strat });
-        label = stratLabel(layout, strat) orelse
-            std.debug.panic("invalid -Dlayout='{s}' -Dstrat='{s}' (see strat_labels in build.zig)", .{ layout, strat });
+        label = stratLabel(layout, strat) orelse {
+            // Collect the valid strategy names for the error message.
+            var valid = std.ArrayList(u8).initCapacity(b.allocator, 128) catch unreachable;
+            for (strat_labels) |s| {
+                if (std.mem.eql(u8, s.layout, layout)) {
+                    valid.appendSlice(b.allocator, s.strat) catch unreachable;
+                    valid.appendSlice(b.allocator, ", ") catch unreachable;
+                }
+            }
+            if (valid.items.len == 0)
+                std.debug.panic("unknown layout '{s}' (no strategies registered; see strat_labels in build.zig)", .{layout});
+            std.debug.panic("invalid -Dstrat='{s}' for layout {s} — valid: {s}", .{ strat, layout, valid.items[0 .. valid.items.len - 2] });
+        };
     }
 
     const opts = b.addOptions();
