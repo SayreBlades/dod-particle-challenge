@@ -69,26 +69,33 @@ def splitmix64(x):
     return z ^ (z >> 31)
 
 SEED = hl.u64(0xC0FFEE)
-def draw(tag):
-    # one independent 64-bit draw per (i, frame, tag)
-    return splitmix64(SEED ^ (frame * hl.u64(0x100000001B3)) ^ (hl.cast(U64, i) * hl.u64(0x9E3779B1)) ^ hl.u64(tag))
 
-def draw_f32(tag):
-    # uniform [0,1): top 24 bits / 2^24
-    return hl.cast(hl.Float(32), draw(tag) >> 40) * (1.0 / 16777216.0)
+# ONE splitmix64 draw per particle, bit-sliced into all four respawn fields
+# (the hash was the b1.v1 bottleneck: 4 full draws/particle, ~30 integer
+# ops — the measured 2.83 ns/p flat). 64 bits = 16 kind (Lemire, exactly
+# uniform over 2^16, same algorithm as Zig's intRangeAtMost) + 16 jx + 16
+# jy + 16 age. 16-bit resolution: jitter step ~1.5e-6, age step ~3e-5 s —
+# finer than f32's effective precision at these scales; distributions match
+# naive's 24-bit draws in shape (statistical class by design regardless).
+h = splitmix64(SEED ^ (frame * hl.u64(0x100000001B3)) ^ (hl.cast(U64, i) * hl.u64(0x9E3779B1)))
 
-h_kind = hl.cast(hl.UInt(8), (draw(1) >> 32) % 3)   # 2^64 ≡ 1 mod 3: bias ~2^-64, noted
-h_jx = (draw_f32(2) - hl.f32(0.5)) * hl.f32(0.1)
-h_jy = (draw_f32(3) - hl.f32(0.5)) * hl.f32(0.1)
-h_age = draw_f32(4) * kill_age
-h_kill = draw_f32(0xDEAD)                            # dedicated kill stream
+u16 = lambda shift: hl.cast(hl.UInt(32), (h >> shift) & 0xFFFF)
+h_kind = hl.cast(hl.UInt(8), (u16(48) * 3) >> 16)                    # Lemire
+h_jx = (hl.cast(hl.Float(32), u16(32)) * (1.0 / 65536.0) - hl.f32(0.5)) * hl.f32(0.1)
+h_jy = (hl.cast(hl.Float(32), u16(16)) * (1.0 / 65536.0) - hl.f32(0.5)) * hl.f32(0.1)
+h_age = hl.cast(hl.Float(32), u16(0)) * (1.0 / 65536.0) * kill_age
+if death == "half":
+    # dedicated kill stream (drawn only in half builds — spawn-hash work
+    # stays comparable across regimes)
+    h_kill = splitmix64(SEED ^ hl.u64(0xDEAD) ^ (frame * hl.u64(0x100000001B3)) ^ (hl.cast(U64, i) * hl.u64(0x9E3779B1)))
+    h_kill_f = hl.cast(hl.Float(32), h_kill >> 40) * (1.0 / 16777216.0)
 
 # --- kill test (death pattern is build-time) ---
 age_new = data[7, i] + dt
 if death == "natural":
     dead = age_new >= kill_age
 elif death == "half":
-    dead = h_kill < hl.f32(0.5)
+    dead = h_kill_f < hl.f32(0.5)
 elif death == "alternating":
     dead = ((hl.cast(U64, i) + frame) % 2) == 0
 else:

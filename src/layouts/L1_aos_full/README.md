@@ -49,6 +49,7 @@ Gate Ns: 65K (cache-resident) / 1M (L2-spill) / 4M (DRAM).
 | **naive_novec**  | naive with auto-vectorization disabled (opaque-asm control, §5c)                                        | bit-exact                   |           1.547 |       1.608 |        1.698 |     403.4 µs |     5232.8 µs |
 | **halide_a**     | Halide math, ONE fused nest (pos+vel+age = naive's full branch-free loop body), natural seam (vw=4) | **bit-exact** (StrictFloat) |           2.481 |       2.877 |        2.921 |     467.1 µs |     6383.3 µs |
 | **halide_a2**    | a + dead-mask (Zig scans 1 B/p, not the struct), LEAN 9×1-D scalar streams (§5d)                  | **bit-exact** (StrictFloat) |           1.749 |       1.929 |        2.106 |     421.4 µs |     5416.0 µs |
+| **halide_b1**    | FULL Halide step: math + branchless hash-RNG respawn, zero Zig passes (§5e)                          | **statistical** (RNG model) |           2.717 |       2.737 |        2.754 |            — |             — |
 | halide best      | manual vw=8 (sweep optimum)                                                                         | bit-exact                   |               — |       2.794 |            — |            — |             — |
 
 PMC profile, naive @1M (xctrace): **useful 42.8% · discarded 33.0% ·
@@ -333,6 +334,50 @@ gather tax (if vectorized) + seam tax (if natural) + abstraction tax
 (always). Best-case Halide on L1: **1.93 vs naive 1.44 @1M**. On SoA the
 first two taxes vanish and the third is amortized over unit-stride
 streams — that is why the interesting Halide layouts are still to come.
+
+### 5e. The full-Halide step (halide_b1): branchless respawn, and what it costs
+
+Moving the respawn INTO the pipeline is possible — b1 is the proof: math +
+select-blend respawn with a per-particle hash RNG (splitmix64 over
+(i, frame, draw)), one fused nest, zero Zig passes. But §2.3's fundamental
+tension sets the terms: naive draws respawn RNG only for the dead, in death
+order; a branchless blend needs respawn values for EVERY particle, which no
+death-order stream can feed. The hash is a DIFFERENT RNG model → **golden
+class statistical** (declared; both goldens print SKIPPED, never silent).
+Distributional equivalence evidence (audit, N=1024×600 steps, b1 vs naive):
+pos 0.726/0.734, vel 0.743/0.743, age 0.874/0.879, kind 0.322/0.317,
+MEAN 0.359/0.361. (Halide does ship `random_float()` et al — deterministic
+hash-based, same model; we hand-roll splitmix64 for the bit-slicing below
+and full control of the streams.)
+
+**Why b1 is slower than naive — and why it CAN'T be close at natural
+churn.** Not a codegen gap: b1 does fundamentally MORE work per particle.
+naive's steady-state loop is ~24 instructions (19 FP math + loop/branch)
+and pays respawn cost only for the ~0.83% that die; b1's loop is the same
+19 FP ops PLUS the hash and the blend for 100% of particles — respawn as
+always-on work. The disassembly mix says it plainly: integer hash ops
+(lsr/lsl/eor/mul) and selects (fcsel/csel) outnumber the FP math. Assembly
+can only be "nearly identical" when the algorithms do the same work; these
+don't. (v1: 4 full splitmix64 draws/particle → 2.83 flat. v2: ONE draw
+bit-sliced into kind(16,Lemire)+jx(16)+jy(16)+age(16) → 2.72 flat. The
+remaining tax: 8 blend-selects + impulse select-chains + the per-stream
+clamp guards every fused Halide nest pays.)
+
+| N | b1 ns/p | | vs naive | vs a2 |
+|---|--------:|---|---------:|------:|
+| 65K | 2.717 | | 2.14× | 1.55× |
+| 1M | 2.737 | | 1.90× | 1.42× |
+| 4M | 2.754 | | 1.69× | 1.31× |
+
+**Flat across every band** — b1 is COMPUTE-bound (25 GB/s, half the
+ceiling): the always-on respawn work never amortizes at natural churn. The
+flip side is the adversarial table (§4): death-rate-invariance makes it the
+champion of the regime that breaks everything else.
+
+**The full Halide-on-AoS picture, closed:** gather tax (vectorized stride
+17) → seam tax (second walk) → abstraction tax (clamp guards) → branchless
+tax (respawn for all N). Every formulation pays one; the taxes are the
+layout's, and the layout is the whole story.
 
 ## 6. Cross-references
 
