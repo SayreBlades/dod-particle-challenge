@@ -343,3 +343,118 @@ streams — that is why the interesting Halide layouts are still to come.
   the cross-layout summary.
 - Old-branch bug fixed here: r1 renders now clear the framebuffer
   explicitly (the old lean_r1 relied on fresh zero pages).
+
+## 7. Reproduce: build / run / bench / profile
+
+Everything below from the repo root, ReleaseFast. **Bench output goes to
+stderr** (pipe `2>&1` when grepping). Every full bench run checks the sim
+golden + framebuffer golden BEFORE timing — correctness is not separable
+from measurement. All numbers regenerate with these commands; the tables
+above are one Apple M4 session.
+
+### The command template (every strategy)
+
+```bash
+# BUILD
+zig build -Dlayout=L1 -Dstrat=<NAME> -Dmode=bench -Doptimize=ReleaseFast
+
+# RUN — golden checks, then the full step sweep (N=4K..64M)
+./zig-out/bin/dod-particles
+
+# BENCH variants
+./zig-out/bin/dod-particles --frame          # step+render per frame (decomposed)
+./zig-out/bin/dod-particles --render         # render only
+./zig-out/bin/dod-particles --csv            # machine-readable rows (append to any mode)
+./zig-out/bin/dod-particles --n 1000000 --iters 200   # single-N, golden skipped (PMC mode)
+./zig-out/bin/dod-particles --threads 4      # worker count (.par strategies)
+./zig-out/bin/dod-particles --record out/    # 600 steps -> 300 PNGs -> ffmpeg mp4
+
+# other modes
+zig build -Dlayout=L1 -Dstrat=<NAME> -Dmode=audit -Doptimize=ReleaseFast && ./zig-out/bin/dod-particles
+zig build -Dlayout=L1 -Dstrat=<NAME> -Dmode=play  -Doptimize=ReleaseFast && ./zig-out/bin/dod-particles
+
+# PROFILE (Apple PMC counters: % useful / processing / delivery / discarded)
+scripts/pmc_collect.sh L1.<NAME> 1000000 500 1     # -> .scratch/pmc/
+
+# ADVERSARIAL death regimes (build option; golden skipped loudly)
+zig build -Dlayout=L1 -Dstrat=<NAME> -Dmode=bench -Doptimize=ReleaseFast -Ddeath=half
+
+# BATCH collection (appends to .scratch/verticals/L1.csv)
+scripts/vertical_collect.sh "L1.<NAME>" "step frame"
+DEATH=half THREADS=4 scripts/vertical_collect.sh "L1.<NAME>" "step"
+```
+
+### naive
+
+The reference sim — a bench run **regenerates** `golden/stage1.bin` and
+`golden/frame.sha256` (identical bytes to arc stage 1's, always).
+
+```bash
+zig build -Dlayout=L1 -Dstrat=naive -Dmode=bench -Doptimize=ReleaseFast
+./zig-out/bin/dod-particles
+scripts/pmc_collect.sh L1.naive 1000000 500 1
+# the auto-vectorized loop (README §5b):
+objdump -d zig-out/bin/dod-particles | grep -A40 'naive.H).step'
+```
+
+### naive_r1
+
+Same sim, optimized splat. The render-side claims live in `--frame` and
+`--render`; the framebuffer golden proves byte-identity to naive's r0.
+
+```bash
+zig build -Dlayout=L1 -Dstrat=naive_r1 -Dmode=bench -Doptimize=ReleaseFast
+./zig-out/bin/dod-particles --frame
+./zig-out/bin/dod-particles --render --csv
+```
+
+### naive_novec
+
+The de-vectorization control (§5c). Verify the claim yourself — the step
+loop must contain ZERO vector ops (`.2s`/`.4s`/q-register math):
+
+```bash
+zig build -Dlayout=L1 -Dstrat=naive_novec -Dmode=bench -Doptimize=ReleaseFast
+./zig-out/bin/dod-particles
+ADDR=$(nm zig-out/bin/dod-particles | grep 'naive_novec.H).step' | awk '{print "0x"$1}')
+objdump -d --start-address=$ADDR zig-out/bin/dod-particles | grep -cE '\.2s|\.4s'   # expect: loop has none
+```
+
+### par
+
+Two-phase multicore. The honest rows: the T=1 overhead check (vs naive),
+the thread sweep (crossover N ≈ 1M), and the adversarial regime (its
+championship). Golden is bit-exact at every T — check T=10 explicitly.
+
+```bash
+zig build -Dlayout=L1 -Dstrat=par -Dmode=bench -Doptimize=ReleaseFast
+./zig-out/bin/dod-particles --threads 10            # golden PASS at T=10 IS the two-phase proof
+for t in 1 2 4 6 8 10; do ./zig-out/bin/dod-particles --n 1000000 --iters 200 --threads $t 2>&1 | grep '  1000000'; done
+DEATH=half THREADS=4 scripts/vertical_collect.sh "L1.par" "step"
+```
+
+### halide_a / halide_a2
+
+Gated toolchain: the build runs the generator (Python bindings) and links
+the bundled-runtime `.a` into `zig-out/halide/`. Env setup once:
+`uv venv .venv-halide && uv pip install --python .venv-halide/bin/python halide matplotlib`
+(override with `HALIDE_PYTHON`).
+
+```bash
+zig build -Dlayout=L1 -Dstrat=halide_a -Dmode=bench -Doptimize=ReleaseFast
+./zig-out/bin/dod-particles
+
+# ad-hoc schedule candidate (variant path: build links, doesn't regenerate)
+.venv-halide/bin/python src/layouts/L1_aos_full/halide_a_gen.py zig-out/halide/halide_a_vw8 '{"vector_width":8}'
+zig build -Dlayout=L1 -Dstrat=halide_a -Dhalide_variant=vw8 -Dmode=bench -Doptimize=ReleaseFast
+./zig-out/bin/dod-particles --n 1000000 --iters 200
+
+# the schedule sweep + landscape chart (+ autoschedulers; needs matplotlib)
+.venv-halide/bin/python scripts/halide_sweep.py        # -> .scratch/halide/L1.csv, L1_landscape.png
+
+# the pipeline's assembly (the gather storm, §5b):
+objdump -d zig-out/halide/halide_a.a
+```
+
+`halide_a2` builds/runs the same way (its generator defaults to scalar
+vw=1, lean 9×1-D formulation, `halide_a2_gen.py`).
