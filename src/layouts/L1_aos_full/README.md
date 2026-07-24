@@ -80,8 +80,15 @@ This is §4.3's hardware truth, measured on the layout where it hurts most.
 |-------------|------------:|----------:|------:|
 | naive       |       1.443 |     9.334 |  6.5× |
 | par T=1     |       1.799 |     8.117 |  4.5× |
-| **par T=4** |       1.464 | **6.288** |  4.3× |
+| par T=4     |       1.464 |     6.288 |  4.3× |
 | par T=8     |       1.546 |     6.436 |  4.2× |
+| **halide_b1** |       2.830 | **2.905** | **1.03×** |
+
+**halide_b1 is L1's adversarial champion**: its cost is death-rate-INVARIANT
+(the branchless blend computes respawn values for all N regardless), so the
+regime that breaks every branchy/two-phase strategy leaves it untouched —
+2.91 vs par-best 6.29 vs naive 9.33 @1M half. The natural-churn price is
+the hash tax (§5e).
 
 At 50% churn the branchy kill branch in naive mispredicts on every other
 particle — the worst case the arc documented but never measured. par's

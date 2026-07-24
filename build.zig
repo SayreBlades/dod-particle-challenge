@@ -110,6 +110,8 @@ pub fn build(b: *std.Build) void {
                     python,
                     b.fmt("src/layouts/{s}/{s}_gen.py", .{ layoutDir(layout), strat }),
                     out_prefix,
+                    "{}", // schedule_json default
+                    death_str, // generators that need the death pattern read argv[3]
                 });
                 exe.step.dependOn(&gen.step);
             } // else: the sweep pre-generated the variant; just link it.
@@ -190,6 +192,7 @@ const strat_labels = [_]StratEntry{
     .{ .layout = "L1", .strat = "halide_a", .label = "L1.halide_a (Halide math passes, natural seam; AoS strided)" },
     .{ .layout = "L1", .strat = "naive_novec", .label = "L1.naive_novec (naive with auto-vectorization disabled — the true scalar control)" },
     .{ .layout = "L1", .strat = "halide_a2", .label = "L1.halide_a2 (Halide math + dead mask, scalar; the tie-naive formulation)" },
+    .{ .layout = "L1", .strat = "halide_b1", .label = "L1.halide_b1 (full Halide step: branchless hash respawn; STATISTICAL class)" },
 };
 
 /// Layout id -> folder name (one per vertical; extended as verticals land).
