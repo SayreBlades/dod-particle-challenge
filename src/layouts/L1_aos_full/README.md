@@ -354,6 +354,11 @@ above are one Apple M4 session.
 
 ### The command template (every strategy)
 
+`<NAME>` is one of this layout's strategies:
+**`naive` · `naive_r1` · `naive_novec` · `par` · `halide_a` · `halide_a2`**
+(unknown names fail the build with the valid list, per `strat_labels` in
+build.zig).
+
 ```bash
 # BUILD
 zig build -Dlayout=L1 -Dstrat=<NAME> -Dmode=bench -Doptimize=ReleaseFast
