@@ -11,7 +11,7 @@
 #   scripts/vertical_collect.sh                       # default: L1 strategies × {step,frame}
 #   scripts/vertical_collect.sh "L1.naive L1.par"     # subset of strategies
 #   scripts/vertical_collect.sh "L1.naive" "step frame render"
-#   DEATH=half scripts/vertical_collect.sh "L1.naive" # adversarial regime
+#   Q=0.5 scripts/vertical_collect.sh "L1.naive"      # churn regime (q, the accident rate)
 #   THREADS=8 scripts/vertical_collect.sh "L1.par"    # thread-count knob
 #
 # Output: .scratch/verticals/<layout>.csv — rows like
@@ -27,7 +27,7 @@ cd "$ROOT"
 
 STRATS="${1:-L1.naive L1.naive_r1 L1.par}"
 MODES="${2:-step frame}"
-DEATH="${DEATH:-natural}"
+Q="${Q:-0.0}"
 THREADS="${THREADS:-1}"
 
 for s in $STRATS; do
@@ -35,8 +35,8 @@ for s in $STRATS; do
     strat="${s#*.}"
     OUT=".scratch/verticals/${layout}.csv"
     mkdir -p .scratch/verticals
-    echo "=== building $s (death=$DEATH threads=$THREADS) ===" >&2
-    zig build -Dlayout="$layout" -Dstrat="$strat" -Dmode=bench -Ddeath="$DEATH" -Doptimize=ReleaseFast >&2 2>&1
+    echo "=== building $s (q=$Q threads=$THREADS) ===" >&2
+    zig build -Dlayout="$layout" -Dstrat="$strat" -Dmode=bench -Ddeath="$Q" -Doptimize=ReleaseFast >&2 2>&1
     for mode in $MODES; do
         flag="--$mode"
         [ "$mode" = "step" ] && flag=""

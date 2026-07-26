@@ -9,7 +9,7 @@
 //   Phase 2 (SERIAL respawn): scan the dead mask in index order, respawning
 //     from the single shared spawn RNG in exactly the serial strategy's
 //     order. O(dead) ≈ 0.83% of N at natural churn (Amdahl is kind); under
-//     -Ddeath=half it's 50% and the win must be re-read (that IS the
+//     q≈0.5 it's ~50% and the win must be re-read (that IS the
 //     adversarial experiment).
 //
 // Golden claim: bit-exact at ANY worker count (respawn sequence identical to
@@ -22,7 +22,7 @@
 // cost of two-phase, isolated by the T=1 row against plain L1.naive (the
 // pool-overhead check).
 //
-// -Ddeath=half under parallel: each chunk draws kill decisions from a
+// -Ddeath=<q> under parallel: each chunk draws kill decisions from a
 // chunk-local RNG (kill_seed ^ chunk_lo) — deterministic per (T, chunk),
 // independent of scheduling. Golden is skipped in that regime anyway.
 //
@@ -42,7 +42,7 @@ const H = struct {
     pub const Extra = struct {
         dead: []u8, // parallel-phase kill flags; +1 B/p (see scratchBytes)
         pool: ?*pool_mod.Pool,
-        kill_seed: u64, // base seed for per-chunk kill RNGs (-Ddeath=half)
+        kill_seed: u64, // base seed for per-chunk kill RNGs (q>0)
         cur_dt: f32, // dt of the in-flight step, read by pool tasks
     };
 
@@ -96,7 +96,7 @@ const H = struct {
         const data = &sim.data;
         const dead = sim.extra.dead;
         const dt = sim.extra.cur_dt;
-        // Chunk-local kill RNG for -Ddeath=half: deterministic per (T, chunk),
+        // Chunk-local kill RNG for q>0: deterministic per (T, chunk),
         // independent of scheduling order. Never drawn in natural builds.
         var kr = std.Random.DefaultPrng.init(sim.extra.kill_seed ^ @as(u64, lo));
 
@@ -111,7 +111,7 @@ const H = struct {
                 .z = v.z + (config.gravity.z + config.drag * v.z) * dt,
             };
             p.age += dt;
-            dead[i] = @intFromBool(config.isDead(p.age, i, sim.frame, &kr));
+            dead[i] = @intFromBool(config.isDead(p.age, &kr));
             _ = switch (p.kind) {
                 .smoke => {},
                 .spark => {},

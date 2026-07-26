@@ -41,7 +41,7 @@ inline fn box(x: f32) f32 {
 pub const H = struct {
     pub fn step(sim: *Sim, dt: f32) void {
         const data = &sim.data;
-        for (data.particles, 0..) |*p, i| {
+        for (data.particles) |*p| {
             // 1. Integrate: pos += vel * dt — inputs AND results boxed.
             p.pos.x = box(box(p.pos.x) + box(p.vel.x) * dt);
             p.pos.y = box(box(p.pos.y) + box(p.vel.y) * dt);
@@ -59,7 +59,7 @@ pub const H = struct {
             p.age = box(p.age) + dt;
 
             // 4. Kill → respawn (identical to naive)
-            if (config.isDead(p.age, i, sim.frame, &sim.kill_rng)) {
+            if (config.isDead(p.age, &sim.kill_rng)) {
                 data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));
             }
 

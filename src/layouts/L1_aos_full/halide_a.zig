@@ -111,8 +111,8 @@ const H = struct {
         // already updated by the pipeline.)
         // 5. The naive schedule's kind-switch + cold touches stay too: the
         //    comparison is "same schedule, Halide does the math".
-        for (data.particles, 0..) |*p, i| {
-            if (config.isDead(p.age, i, sim.frame, &sim.kill_rng)) {
+        for (data.particles) |*p| {
+            if (config.isDead(p.age, &sim.kill_rng)) {
                 data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));
             }
             _ = switch (p.kind) {

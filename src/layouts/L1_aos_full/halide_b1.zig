@@ -14,14 +14,16 @@
 // Performance shape: one 68 B walk, no Zig pass, no branch anywhere — the
 // blend computes respawn values for ALL N every frame (~99% wasted at
 // natural churn: the branchless tax), plus ~4 splitmix64 draws/particle
-// (integer-heavy). The payoff regime is adversarial churn (-Ddeath=half):
+// (integer-heavy). The payoff regime is adversarial churn (q≈0.5):
 // a2's serial Zig respawn eats 50% of N there; this strategy's cost is
 // death-rate-INVARIANT.
 //
-// The generator takes the death pattern at BUILD time (build.zig passes
-// -Ddeath through), so the kill test matches the Zig strategies' regimes:
-// natural = age' >= kill_age; half = dedicated kill-hash < 0.5 (separate
-// hash stream from the spawn draws); alternating = (i+frame) % 2 == 0.
+// The generator takes the death rate q at BUILD time (build.zig passes
+// -Ddeath=<float> through): the kill test is competing-risks (§7) —
+// age' >= kill_age OR kill-hash < q. q=0 (natural) prunes to age-only and
+// draws no kill hash; the spawn-hash work is identical across q. The
+// statistical-class claim holds for every q: trajectories diverge from
+// stage1.bin by design (per-particle hash RNG), distributions match.
 
 const std = @import("std");
 const fw = @import("../../framework/sim.zig");

@@ -21,7 +21,7 @@
 //     missed-generation races.
 //
 // Determinism contract for .par cells: tasks must not draw from the sim's
-// spawn RNG. Kill decisions under -Ddeath=half use per-chunk kill RNGs
+// spawn RNG. Kill decisions under q>0 use per-chunk kill RNGs
 // (deterministic per chunk, independent of scheduling).
 
 const std = @import("std");

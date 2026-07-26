@@ -39,7 +39,7 @@ const GOLDEN_N: usize = 1024;
 const EPS: f32 = 1e-4;
 const GOLDEN_PATH = "golden/stage1.bin";
 const FRAME_GOLDEN_PATH = "golden/frame.sha256";
-// CSV death-pattern column (build option -Ddeath=, §2.5).
+// CSV death column (build option -Ddeath=<q>, optimization-framework §7).
 const DEATH_COL = @import("options").death;
 
 pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
@@ -89,12 +89,15 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     // --- correctness: generate (reference cell L1.naive) or verify ---
     const is_reference = @import("options").is_reference;
 
-    // Golden checks are defined only for the natural death pattern (matrix
-    // §2.5): adversarial regimes are a different sim — skipped loudly.
-    const death_natural = comptime std.mem.eql(u8, @import("options").death, "natural");
+    // Golden checks are defined only for the natural death pattern
+    // (optimization-framework.md §7: competing risks, q=0 = natural).
+    // q>0 is a different sim — goldens skipped loudly; the invariant suite
+    // (§10.6, Phase 1) is the correctness floor at q>0.
+    const death_q = @import("options").death;
+    const death_natural = comptime death_q == 0.0;
     if (!pmc_mode and !death_natural) {
-        std.debug.print("=== Correctness: SKIPPED (death={s} — adversarial regime, golden N/A) ===\n\n", .{@import("options").death});
-        std.debug.print("=== Frame golden: SKIPPED (death={s}) ===\n\n", .{@import("options").death});
+        std.debug.print("=== Correctness: SKIPPED (death q={d} — churn regime, golden N/A; invariants: Phase 1) ===\n\n", .{death_q});
+        std.debug.print("=== Frame golden: SKIPPED (death q={d}) ===\n\n", .{death_q});
     }
     if (!pmc_mode and death_natural) {
         if (is_reference) {
@@ -249,7 +252,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         std.debug.print("  {d:>10} | {d:>7} | {d:>9.1} | {d:>14.3} | {d:>14.1} | {d:>11.1} | {d:>8.2} | {d:>11.1}\n", .{
             n, bytes_per_p, working_set_mb, ns_per_particle, min_ns_frame, frames_sec, gbs_eff, runtime_ms,
         });
-        if (csv_mode) std.debug.print("csv,{s},step,{s},{d},{d},{d},{d:.1},{d:.4},{d:.2}\n", .{
+        if (csv_mode) std.debug.print("csv,{s},step,{d},{d},{d},{d},{d:.1},{d:.4},{d:.2}\n", .{
             @import("options").name, DEATH_COL, threads, n, bytes_per_p, min_ns_frame, ns_per_particle, gbs_eff,
         });
     }
@@ -321,7 +324,7 @@ fn renderBench(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, csv: bo
         std.debug.print("  {d:>10} | {d:>6} | {d:>14.1} | {d:>14.4} | {d:>11.1}\n", .{
             n, iters, min_ns_frame, min_ns_frame / @as(f64, @floatFromInt(n)), 1e9 / min_ns_frame,
         });
-        if (csv) std.debug.print("csv,{s},render,{s},{d},{d},,{d:.1},{d:.4},\n", .{
+        if (csv) std.debug.print("csv,{s},render,{d},{d},{d},,{d:.1},{d:.4},\n", .{
             @import("options").name, DEATH_COL, threads, n, min_ns_frame, min_ns_frame / @as(f64, @floatFromInt(n)),
         });
     }
@@ -393,7 +396,7 @@ fn frameBench(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, csv: boo
         std.debug.print("  {d:>10} | {d:>6} | {d:>12.1} | {d:>12.1} | {d:>12.1} | {d:>13.4} | {d:>11.1}\n", .{
             n, iters, step_ns_at_min, render_ns_at_min, min_frame_ns, min_frame_ns / @as(f64, @floatFromInt(n)), 1e9 / min_frame_ns,
         });
-        if (csv) std.debug.print("csv,{s},frame,{s},{d},{d},{d},{d:.1},{d:.1},{d:.1}\n", .{
+        if (csv) std.debug.print("csv,{s},frame,{d},{d},{d},{d},{d:.1},{d:.1},{d:.1}\n", .{
             @import("options").name, DEATH_COL, threads, n, sim.bytesPerParticle(), min_frame_ns, step_ns_at_min, render_ns_at_min,
         });
     }
@@ -474,7 +477,7 @@ fn recordVideo(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, out_dir
     defer alloc.free(result.stdout);
     defer alloc.free(result.stderr);
 
-    if (!result.term.success()) {
+    if (switch (result.term) { .exited => |c| c != 0, else => true }) {
         const tail = result.stderr[result.stderr.len -| 2000 ..];
         std.debug.print("  ERROR: ffmpeg exited nonzero. stderr tail:\n{s}\n", .{tail});
         return error.FfmpegFailed;

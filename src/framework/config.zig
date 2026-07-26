@@ -25,26 +25,40 @@ pub const spawn_radius: f32 = 0.05; // tight emitter around origin
 // World extents: positions in [-view_half, view_half] map to the framebuffer.
 pub const view_half: f32 = 2.0;
 
-// --- death-pattern regimes (layout-matrix.md §2.5, build option -Ddeath=) ---
+// --- death model: competing risks (optimization-framework.md §7) ---
+//
+// A particle dies when EITHER it ages out (age >= kill_age) OR it draws an
+// accident (per-frame Bernoulli with rate q, from the dedicated kill-RNG
+// stream — never the spawn RNG). Lifetime = min(kill_age, geometric(q)).
+//
+// `q` is a comptime build option (-Ddeath=<float>, default 0 = natural).
+// natural (q=0) is the golden-checked sim: isDead prunes to exactly the
+// original age test, zero cost, zero RNG perturbation. q>0 is the churn
+// regime sweep (§7); goldens are skipped loudly (§10.6 — the invariant
+// suite, Phase 1) and the sim is a different one by design.
+//
+// Draw discipline (§7): exactly one kill-RNG draw per non-aged-out particle
+// per frame, in index order (short-circuit: aged-out particles consume no
+// draw). Parallel cells use the per-chunk kill-RNG pattern par.zig already
+// has. The sim stays deterministic given (seed, q, T).
+//
+// Retired: the old `natural | half | alternating` enum. `alternating` was a
+// predictability regime, not a rate — the hybrid's high-q end covers the
+// unpredictable-death regime it was probing. `half` (pure coin-flip,
+// age-ignoring) is replaced by the competing-risks family; age stays
+// load-bearing at every rate (death axis orthogonal to field-set, §7).
 
-pub const DeathPattern = enum { natural, half, alternating };
-
-/// The active death pattern. `natural` is the golden-checked sim; `half` and
-/// `alternating` are adversarial regimes (golden compile-skipped in bench — a
-/// different sim, loudly). Comptime-known, so isDead prunes to exactly the
-/// original age test in natural builds: zero cost, zero RNG perturbation.
-pub const death_pattern: DeathPattern = std.meta.stringToEnum(DeathPattern, @import("options").death) orelse
-    @compileError("invalid -Ddeath (natural | half | alternating)");
+/// The per-frame accident rate q (comptime). natural ≡ q = 0.
+pub const q: f32 = @floatCast(@import("options").death);
 
 /// The kill decision for particle `i` this frame. `kill_rng` is a DEDICATED
-/// stream (never the spawn RNG — spawn draws stay comparable across patterns);
-/// drawn only in .half. `frame` is used only in .alternating.
-pub inline fn isDead(age: f32, i: usize, frame: usize, kill_rng: *std.Random.DefaultPrng) bool {
-    return switch (death_pattern) {
-        .natural => age >= kill_age,
-        .half => kill_rng.random().float(f32) < 0.5,
-        .alternating => (i + frame) % 2 == 0,
-    };
+/// stream (never the spawn RNG); drawn only when q > 0 and the particle has
+/// not aged out (short-circuit). Comptime-known q, so isDead prunes to
+/// exactly `age >= kill_age` in natural builds: zero cost, zero RNG draw.
+pub inline fn isDead(age: f32, kill_rng: *std.Random.DefaultPrng) bool {
+    if (age >= kill_age) return true;
+    if (q == 0) return false; // comptime-pruned in natural builds
+    return kill_rng.random().float(f32) < q;
 }
 
 // Per-kind initial velocity (set at spawn). Lookup, not branch.

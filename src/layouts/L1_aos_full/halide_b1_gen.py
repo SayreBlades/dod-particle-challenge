@@ -17,10 +17,11 @@
 #   vel'  = select(dead, impulse[k']+jitter, vel + (g + drag*vel)*dt)
 #   age'' = select(dead, h_age*kill_age,     age')
 #   kind' = select(dead, h_kind,             kind)
-# kill_test is death-pattern-dependent (build-time, argv[3]):
-#   natural     → age' >= kill_age
-#   half        → dedicated kill hash < 0.5 (separate stream from spawn hash)
-#   alternating → (i + frame) % 2 == 0
+# kill_test is competing-risks (optimization-framework.md §7), build-time
+# via argv[3] = q (float, default 0 = natural):
+#   dead = age' >= kill_age  OR  (q > 0 and kill_hash < q)
+# q=0 prunes to age-only and draws no kill hash (spawn-hash work identical
+# across q).
 #
 # kind is u8 inside the 68 B struct (byte offset 65) — not addressable in
 # the f32 buffer view, so it travels as a second, u8-typed 1-D buffer
@@ -28,7 +29,7 @@
 #
 # Default schedule SCALAR (stride-17 gather tax applies as ever).
 #
-# Usage: python halide_b1_gen.py <out_prefix> [schedule_json] [death]
+# Usage: python halide_b1_gen.py <out_prefix> [schedule_json] [q]
 
 import halide as hl
 import json
@@ -39,7 +40,7 @@ import os
 os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
 
 sched = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
-death = sys.argv[3] if len(sys.argv) > 3 else "natural"
+q = float(sys.argv[3]) if len(sys.argv) > 3 else 0.0
 vw = int(sched.get("vector_width", 1))
 par = bool(sched.get("parallel", False))
 
@@ -84,22 +85,19 @@ h_kind = hl.cast(hl.UInt(8), (u16(48) * 3) >> 16)                    # Lemire
 h_jx = (hl.cast(hl.Float(32), u16(32)) * (1.0 / 65536.0) - hl.f32(0.5)) * hl.f32(0.1)
 h_jy = (hl.cast(hl.Float(32), u16(16)) * (1.0 / 65536.0) - hl.f32(0.5)) * hl.f32(0.1)
 h_age = hl.cast(hl.Float(32), u16(0)) * (1.0 / 65536.0) * kill_age
-if death == "half":
-    # dedicated kill stream (drawn only in half builds — spawn-hash work
-    # stays comparable across regimes)
+if q > 0:
+    # dedicated kill stream (drawn only when q>0 — spawn-hash work stays
+    # comparable across regimes). short-circuit: aged-out particles would
+    # consume no draw in the Zig path; here the hash is computed branchlessly
+    # regardless (the branchless tax), but only factored in when age < kill_age.
     h_kill = splitmix64(SEED ^ hl.u64(0xDEAD) ^ (frame * hl.u64(0x100000001B3)) ^ (hl.cast(U64, i) * hl.u64(0x9E3779B1)))
     h_kill_f = hl.cast(hl.Float(32), h_kill >> 40) * (1.0 / 16777216.0)
 
-# --- kill test (death pattern is build-time) ---
+# --- kill test (competing risks, build-time q) ---
 age_new = data[7, i] + dt
-if death == "natural":
-    dead = age_new >= kill_age
-elif death == "half":
-    dead = h_kill_f < hl.f32(0.5)
-elif death == "alternating":
-    dead = ((hl.cast(U64, i) + frame) % 2) == 0
-else:
-    raise ValueError(f"unknown death pattern {death}")
+dead = age_new >= kill_age
+if q > 0:
+    dead = dead | (h_kill_f < hl.f32(q))
 
 # --- impulse LUT (config.impulse) as select chains on the drawn kind ---
 def impulse(comp):
@@ -168,4 +166,4 @@ hl.Pipeline(outs).compile_to_static_library(
     "halide_b1",
     target,
 )
-print(f"emitted {out}.h {out}.a (vw={vw} parallel={par} death={death} branchless-B1)")
+print(f"emitted {out}.h {out}.a (vw={vw} parallel={par} q={q} branchless-B1)")

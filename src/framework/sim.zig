@@ -104,9 +104,10 @@ pub const FieldDump = struct {
 /// Standard state every strategy gets: the `Data`, the spawn RNG (shared
 /// stream: `Data.init` draws the initial spawns from it, `step` draws
 /// respawns — same sequence as the arc's single-RNG sims, so the golden
-/// holds), a DEDICATED kill RNG (drawn only under -Ddeath=half so spawn
-/// draws stay comparable across death patterns), the frame counter
-/// (-Ddeath=alternating), and the thread count (serial strategies ignore).
+/// holds), a DEDICATED kill RNG (drawn only under q>0 so spawn draws stay
+/// comparable across rates, optimization-framework.md §7), and the frame
+/// counter (used by the B1-blend per-particle hash RNG), and the thread count
+/// (serial strategies ignore).
 pub fn Strategy(comptime Data: type, comptime H: type) type {
     return struct {
         const Self = @This();
@@ -120,8 +121,8 @@ pub fn Strategy(comptime Data: type, comptime H: type) type {
         data: Data,
         extra: Extra = undefined, // strategy-owned (scratch, pool, ...)
         rng: std.Random.DefaultPrng,
-        kill_rng: std.Random.DefaultPrng, // dedicated kill stream (-Ddeath=half)
-        frame: usize, // step counter (-Ddeath=alternating)
+        kill_rng: std.Random.DefaultPrng, // dedicated kill stream (drawn only when q>0, §7)
+        frame: usize, // step counter (B1-blend per-particle hash RNG uses this)
         threads: usize,
         n: usize, // mirrors data.n — framework drivers read sim.n directly
 
@@ -144,7 +145,7 @@ pub fn Strategy(comptime Data: type, comptime H: type) type {
 
         pub fn step(self: *Self, dt: f32) void {
             H.step(self, dt);
-            self.frame +%= 1; // -Ddeath=alternating counter (free in natural builds)
+            self.frame +%= 1; // B1-blend hash RNG frame counter (free otherwise)
         }
 
         pub fn render(self: *const Self, fb: []u8, w: u32, h: u32) void {

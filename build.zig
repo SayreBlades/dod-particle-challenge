@@ -13,10 +13,15 @@ pub fn build(b: *std.Build) void {
     const stage_opt = b.option([]const u8, "stage", "arc stage number 1..11");
     const halide_variant_opt = b.option([]const u8, "halide_variant", "Halide sweep candidate id (links a pre-generated zig-out/halide/<strat>_<id>.a)");
     const mode_str = b.option([]const u8, "mode", "play | bench | audit") orelse "play";
-    const death_str = b.option([]const u8, "death", "death pattern: natural | half | alternating") orelse "natural";
-    if (!std.mem.eql(u8, death_str, "natural") and !std.mem.eql(u8, death_str, "half") and !std.mem.eql(u8, death_str, "alternating")) {
-        std.debug.panic("invalid -Ddeath='{s}' (natural|half|alternating)", .{death_str});
-    }
+    // Death model (optimization-framework.md §7): competing risks. `-Ddeath`
+    // is the per-frame accident rate q (a float, default 0 = natural). The
+    // old `natural | half | alternating` enum is retired; natural ≡ q=0
+    // comptime-prunes to the plain age test, half is now q≈0.5 of the
+    // competing-risks family, alternating is gone (the hybrid's high-q end
+    // covers it).
+    const death_q = b.option(f64, "death", "per-frame accident rate q (natural = 0; e.g. 0.5)") orelse 0.0;
+    if (!std.math.isFinite(death_q) or death_q < 0.0 or death_q >= 1.0)
+        std.debug.panic("invalid -Ddeath={d} (expect 0 <= q < 1)", .{death_q});
 
     const mode: Mode = blk: {
         if (std.mem.eql(u8, mode_str, "play")) break :blk .play;
@@ -40,9 +45,10 @@ pub fn build(b: *std.Build) void {
             std.debug.panic("invalid -Dstage='{s}' (expected integer)", .{stage_str});
         };
         // Arc invariant (layout-verticals.md §8.1): stages are natural-only
-        // and are never edited; adversarial death regimes are layouts-only.
-        if (!std.mem.eql(u8, death_str, "natural"))
-            std.debug.panic("-Ddeath={s} requires a layout (-Dlayout/-Dstrat); arc stages are natural-only", .{death_str});
+        // (q=0) and are never edited; adversarial death regimes are
+        // layouts-only.
+        if (death_q != 0.0)
+            std.debug.panic("-Ddeath={d} requires a layout (-Dlayout/-Dstrat); arc stages are natural-only (q=0)", .{death_q});
         name = b.fmt("stage{d}", .{stage});
         label = arcLabel(stage) orelse
             std.debug.panic("invalid -Dstage={d} (expected 1..11)", .{stage});
@@ -74,7 +80,7 @@ pub fn build(b: *std.Build) void {
     // strategy (= arc stage 1's code, moved). Arc stage 1 also regenerates,
     // preserving main's behavior while the arc is the only consumer.
     opts.addOption(bool, "is_reference", std.mem.eql(u8, name, "L1.naive") or std.mem.eql(u8, name, "stage1"));
-    opts.addOption([]const u8, "death", death_str);
+    opts.addOption(f64, "death", death_q);
     opts.addOption(Mode, "mode", mode_enum);
 
     // --- raylib C library (compiled directly; raylib-zig build is broken on 0.17-dev) ---
@@ -114,7 +120,7 @@ pub fn build(b: *std.Build) void {
                     b.fmt("src/layouts/{s}/{s}_gen.py", .{ layoutDir(layout), halideBase(strat) }),
                     out_prefix,
                     "{}", // schedule_json default
-                    death_str, // generators that need the death pattern read argv[3]
+                    b.fmt("{d}", .{death_q}), // generators that need q read argv[3] as a float
                 });
                 exe.step.dependOn(&gen.step);
             } // else: the sweep pre-generated the variant; just link it.

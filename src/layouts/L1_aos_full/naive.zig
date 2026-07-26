@@ -9,7 +9,7 @@
 // Golden: bit-exact. This is the reference sim itself (= arc stage 1's code):
 // bench mode generates golden/stage1.bin and golden/frame.sha256 from it.
 // -Ddeath support: the kill test goes through config.isDead; in natural
-// builds that prunes to the plain age test, zero cost, RNG untouched.
+// (q=0) builds that prunes to the plain age test, zero cost, RNG untouched.
 
 const std = @import("std");
 const fw = @import("../../framework/sim.zig");
@@ -24,7 +24,7 @@ pub const H = struct {
     // step — each fw.Strategy instantiation is a distinct type.
     pub fn step(sim: anytype, dt: f32) void {
         const data = &sim.data;
-        for (data.particles, 0..) |*p, i| {
+        for (data.particles) |*p| {
             // 1. Integrate: pos += vel * dt
             p.pos = p.pos.add(p.vel.scale(dt));
 
@@ -40,7 +40,7 @@ pub const H = struct {
             p.age += dt;
 
             // 4. Kill → respawn (in place; seed % len == i by construction)
-            if (config.isDead(p.age, i, sim.frame, &sim.kill_rng)) {
+            if (config.isDead(p.age, &sim.kill_rng)) {
                 data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));
             }
 
