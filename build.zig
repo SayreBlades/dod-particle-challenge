@@ -102,13 +102,16 @@ pub fn build(b: *std.Build) void {
             // build time; set HALIDE_PYTHON or create the env:
             //   uv venv .venv-halide && uv pip install --python .venv-halide/bin/python halide
             const python = b.graph.environ_map.get("HALIDE_PYTHON") orelse ".venv-halide/bin/python";
-            const stem = if (halide_variant_opt) |v| b.fmt("{s}_{s}", .{ strat, v }) else strat;
+            // The pipeline this strategy links: viz/variant strategies share
+            // a base strategy's generator and .a (no <strat>_gen.py of their own).
+            const base = halideBase(strat);
+            const stem = if (halide_variant_opt) |v| b.fmt("{s}_{s}", .{ base, v }) else base;
             const out_prefix = b.fmt("zig-out/halide/{s}", .{stem});
             if (halide_variant_opt == null) {
                 // Default candidate: run the layout's generator now.
                 const gen = b.addSystemCommand(&.{
                     python,
-                    b.fmt("src/layouts/{s}/{s}_gen.py", .{ layoutDir(layout), strat }),
+                    b.fmt("src/layouts/{s}/{s}_gen.py", .{ layoutDir(layout), halideBase(strat) }),
                     out_prefix,
                     "{}", // schedule_json default
                     death_str, // generators that need the death pattern read argv[3]
@@ -193,7 +196,17 @@ const strat_labels = [_]StratEntry{
     .{ .layout = "L1", .strat = "naive_novec", .label = "L1.naive_novec (naive with auto-vectorization disabled — the true scalar control)" },
     .{ .layout = "L1", .strat = "halide_a2", .label = "L1.halide_a2 (Halide math + dead mask, scalar; the tie-naive formulation)" },
     .{ .layout = "L1", .strat = "halide_b1", .label = "L1.halide_b1 (full Halide step: branchless hash respawn; STATISTICAL class)" },
+    .{ .layout = "L1", .strat = "halide_a2_viz", .label = "L1.halide_a2_viz (a2 + pipeline-visualization render; --record)" },
 };
+
+/// The base Halide strategy whose generator/.a a strategy links (identity
+/// for real Halide strategies; viz wrappers map to their base).
+fn halideBase(strat: []const u8) []const u8 {
+    const map = std.StaticStringMap([]const u8).initComptime(.{
+        .{ "halide_a2_viz", "halide_a2" },
+    });
+    return map.get(strat) orelse strat;
+}
 
 /// Layout id -> folder name (one per vertical; extended as verticals land).
 fn layoutDir(layout: []const u8) []const u8 {

@@ -46,10 +46,10 @@ Gate Ns: 65K (cache-resident) / 1M (L2-spill) / 4M (DRAM).
 | **naive_r1**     | + optimized splat (render_opt)                                                                      | bit-exact                   |           1.277 |       1.415 |        1.593 | **239.4 µs** | **2544.1 µs** |
 | **par**          | two-phase multicore (T=1 row)                                                                       | bit-exact                   |           1.465 |       1.799 |        1.998 |     401.8 µs |     5221.3 µs |
 | **par (best-T)** | T per N: 4/4/10                                                                                     | bit-exact ∀T                | **0.894** (T=4) | 1.464 (T=4) | 1.693 (T=10) |            — |             — |
-| **naive_novec**  | naive with auto-vectorization disabled (opaque-asm control, §5c)                                        | bit-exact                   |           1.547 |       1.608 |        1.698 |     403.4 µs |     5232.8 µs |
+| **naive_novec**  | naive with auto-vectorization disabled (opaque-asm control, §5c)                                    | bit-exact                   |           1.547 |       1.608 |        1.698 |     403.4 µs |     5232.8 µs |
 | **halide_a**     | Halide math, ONE fused nest (pos+vel+age = naive's full branch-free loop body), natural seam (vw=4) | **bit-exact** (StrictFloat) |           2.481 |       2.877 |        2.921 |     467.1 µs |     6383.3 µs |
-| **halide_a2**    | a + dead-mask (Zig scans 1 B/p, not the struct), LEAN 9×1-D scalar streams (§5d)                  | **bit-exact** (StrictFloat) |           1.749 |       1.929 |        2.106 |     421.4 µs |     5416.0 µs |
-| **halide_b1**    | FULL Halide step: math + branchless hash-RNG respawn, zero Zig passes (§5e)                          | **statistical** (RNG model) |           2.717 |       2.737 |        2.754 |            — |             — |
+| **halide_a2**    | a + dead-mask (Zig scans 1 B/p, not the struct), LEAN 9×1-D scalar streams (§5d)                    | **bit-exact** (StrictFloat) |           1.749 |       1.929 |        2.106 |     421.4 µs |     5416.0 µs |
+| **halide_b1**    | FULL Halide step: math + branchless hash-RNG respawn, zero Zig passes (§5e)                         | **statistical** (RNG model) |           2.717 |       2.737 |        2.754 |            — |             — |
 | halide best      | manual vw=8 (sweep optimum)                                                                         | bit-exact                   |               — |       2.794 |            — |            — |             — |
 
 PMC profile, naive @1M (xctrace): **useful 42.8% · discarded 33.0% ·
@@ -363,11 +363,11 @@ bit-sliced into kind(16,Lemire)+jx(16)+jy(16)+age(16) → 2.72 flat. The
 remaining tax: 8 blend-selects + impulse select-chains + the per-stream
 clamp guards every fused Halide nest pays.)
 
-| N | b1 ns/p | | vs naive | vs a2 |
-|---|--------:|---|---------:|------:|
-| 65K | 2.717 | | 2.14× | 1.55× |
-| 1M | 2.737 | | 1.90× | 1.42× |
-| 4M | 2.754 | | 1.69× | 1.31× |
+| N   | b1 ns/p |   | vs naive | vs a2 |
+|-----|--------:|---|---------:|------:|
+| 65K |   2.717 |   |    2.14× | 1.55× |
+| 1M  |   2.737 |   |    1.90× | 1.42× |
+| 4M  |   2.754 |   |    1.69× | 1.31× |
 
 **Flat across every band** — b1 is COMPUTE-bound (25 GB/s, half the
 ceiling): the always-on respawn work never amortizes at natural churn. The

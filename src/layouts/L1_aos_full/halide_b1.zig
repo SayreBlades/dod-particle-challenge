@@ -62,6 +62,9 @@ extern fn halide_b1(
     vel_z_out: *halide_buffer_t,
     age_out: *halide_buffer_t,
     kind_out: *halide_buffer_t,
+    color_r_out: *halide_buffer_t,
+    color_g_out: *halide_buffer_t,
+    color_b_out: *halide_buffer_t,
 ) c_int;
 
 const FLOAT32: halide_type_t = .{ .code = 2, .bits = 32, .lanes = 1 };
@@ -102,6 +105,9 @@ const H = struct {
         var dvz: [1]halide_dimension_t = undefined;
         var dag: [1]halide_dimension_t = undefined;
         var dkd: [1]halide_dimension_t = undefined;
+        var dcr: [1]halide_dimension_t = undefined;
+        var dcg: [1]halide_dimension_t = undefined;
+        var dcb: [1]halide_dimension_t = undefined;
         const pos_off = @offsetOf(Particle, "pos");
         const vel_off = @offsetOf(Particle, "vel");
         var buf_px = out1d(base + pos_off + 0, n, stride_floats, FLOAT32, &dpx);
@@ -112,8 +118,12 @@ const H = struct {
         var buf_vz = out1d(base + vel_off + 8, n, stride_floats, FLOAT32, &dvz);
         var buf_age = out1d(base + @offsetOf(Particle, "age"), n, stride_floats, FLOAT32, &dag);
         var buf_kind = out1d(base + @offsetOf(Particle, "kind"), n, stride_bytes, UINT8, &dkd);
+        const color_off = @offsetOf(Particle, "color");
+        var buf_cr = out1d(base + color_off + 0, n, stride_floats, FLOAT32, &dcr);
+        var buf_cg = out1d(base + color_off + 4, n, stride_floats, FLOAT32, &dcg);
+        var buf_cb = out1d(base + color_off + 8, n, stride_floats, FLOAT32, &dcb);
 
-        const rc = halide_b1(&buf_in, &buf_kind_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, config.kill_age, sim.frame, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_kind);
+        const rc = halide_b1(&buf_in, &buf_kind_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, config.kill_age, sim.frame, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_kind, &buf_cr, &buf_cg, &buf_cb);
         std.debug.assert(rc == 0);
     }
 };

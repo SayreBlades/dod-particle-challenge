@@ -129,10 +129,26 @@ age_out = hl.Func("age_out")
 age_out[i] = hl.select(dead, h_age, age_new)
 age_out.output_buffer().dim(0).set_stride(17)
 
+kind_now = hl.select(dead, h_kind, kind_in[i])
 kind_out = hl.Func("kind_out")
-kind_out[i] = hl.select(dead, h_kind, kind_in[i])
+kind_out[i] = kind_now
 kind_out.output_buffer().dim(0).set_stride(68)
 outs += [age_out, kind_out]
+
+# Color: the stored field must stay color ≡ kindColor(kind) — v1 omitted
+# these writes, so respawned particles kept their previous life's color
+# (the stale-cold bug, caught VISUALLY: mixed streams in the b1 video).
+# data.spawn writes color at spawn; the blend must too. Written
+# unconditionally from kind_now (no old-color loads needed).
+for ci, comp in enumerate(("r", "g", "b")):
+    f = hl.f32
+    table = {"r": (f(120.0), f(255.0), f(100.0)),
+             "g": (f(120.0), f(180.0), f(200.0)),
+             "b": (f(120.0), f(60.0), f(255.0))}[comp]
+    cf = hl.Func(f"color_{comp}_out")
+    cf[i] = hl.select(kind_now == 1, table[1], hl.select(kind_now == 2, table[2], table[0]))
+    cf.output_buffer().dim(0).set_stride(17)
+    outs.append(cf)
 
 target = hl.get_host_target()
 target = target.with_feature(hl.TargetFeature.StrictFloat)  # math identical

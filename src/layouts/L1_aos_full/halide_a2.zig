@@ -119,23 +119,23 @@ const H = struct {
         const rc = halide_a2(&buf_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, config.kill_age, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_dead);
         std.debug.assert(rc == 0);
 
-        // 4. Respawn — the par-style SERIAL scan in index order (block-wise
-        // zero-skip: death is sparse at natural churn), so the spawn RNG draw
-        // sequence matches L1.naive exactly. 1 B/p walk.
-        const dead = sim.extra.dead;
-        const B = 32;
-        var i: usize = 0;
-        while (i + B <= n) : (i += B) {
-            const block: @Vector(B, u8) = dead[i..][0..B].*;
-            if (@reduce(.Or, block) == 0) continue;
-            var j: usize = i;
-            while (j < i + B) : (j += 1) {
-                if (dead[j] != 0) data.spawn(&sim.rng, j);
-            }
-        }
-        while (i < n) : (i += 1) {
-            if (dead[i] != 0) data.spawn(&sim.rng, i);
-        }
+        // // 4. Respawn — the par-style SERIAL scan in index order (block-wise
+        // // zero-skip: death is sparse at natural churn), so the spawn RNG draw
+        // // sequence matches L1.naive exactly. 1 B/p walk.
+        // const dead = sim.extra.dead;
+        // const B = 32;
+        // var i: usize = 0;
+        // while (i + B <= n) : (i += B) {
+        //     const block: @Vector(B, u8) = dead[i..][0..B].*;
+        //     if (@reduce(.Or, block) == 0) continue;
+        //     var j: usize = i;
+        //     while (j < i + B) : (j += 1) {
+        //         if (dead[j] != 0) data.spawn(&sim.rng, j);
+        //     }
+        // }
+        // while (i < n) : (i += 1) {
+        //     if (dead[i] != 0) data.spawn(&sim.rng, i);
+        // }
     }
 };
 
