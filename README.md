@@ -1,5 +1,12 @@
 # DOD Particle Lab — Zig
 
+> **Note (in flight):** this README is being superseded by the optimization
+> framework (`.scratch/plan/optimization-framework.md`). The 11-stage arc it
+> documents has been relocated to `.scratch/orig/stages/` as reference history
+> (no longer a build target; `-Dstage` is retired). The live code is the layout
+> verticals under `src/layouts/` (L1 first). Code is scavenged from the arc
+> where useful — `L1.naive` is arc stage 1's step.
+
 A hands-on laboratory for *feeling* the cache/perf lessons from Mike Acton's
 CppCon 2014 talk, ["Data-Oriented Design and C++"](https://www.youtube.com/watch?v=rX0ItVEVjHc),
 implemented as an interactive **raylib game** in Zig on Apple Silicon.
