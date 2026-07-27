@@ -13,9 +13,8 @@
 # region — one xctrace launch = one (stage, N, trial) counter row.
 #
 # Usage:
-#   scripts/pmc_collect.sh <stage|strat> <N> <iters> <trial>
-#   scripts/pmc_collect.sh 2 1000000 500 1        # arc stage
-#   scripts/pmc_collect.sh L1.naive 1000000 500 1 # layout strategy (dot => -Dlayout/-Dstrat)
+#   scripts/pmc_collect.sh <strat> <N> <iters> <trial>
+#   scripts/pmc_collect.sh L1.B1.w1-naive.w2-naive 1000000 500 1 # layout cell (dot => -Dlayout/-Dstrat)
 #
 # Output: .scratch/pmc/s{stage}_n{N}_t{trial}.csv (one row: stage,N,trial,
 #         cycles,delivery_bottleneck,discarded_bottleneck,processing_bottleneck)
@@ -33,11 +32,14 @@ N="${2:?}"
 ITERS="${3:?}"
 TRIAL="${4:?}"
 
-# Accept a strategy name (contains a dot: L1.naive) or an arc stage number.
+# Accept a strategy name (contains a dot: L1.B1.w1-naive.w2-naive).
+# (The arc stage-number path is retired — -Dstage is gone; the arc is
+# relocated to .scratch/orig/.)
 if [[ "$STAGE" == *.* ]]; then
     BUILD_OPT="-Dlayout=${STAGE%%.*} -Dstrat=${STAGE#*.}"
 else
-    BUILD_OPT="-Dstage=$STAGE"
+    echo "error: '$STAGE' is not a cell name (expected L<layout>.<strat>)" >&2
+    exit 1
 fi
 TAG="${STAGE//./_}"  # dots are awkward in filenames
 

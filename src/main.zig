@@ -10,14 +10,20 @@ const sim_map = std.StaticStringMap(type).initComptime(.{
     // The arc (the old src/stages/, the project's history) is relocated to
     // .scratch/orig/stages as reference history, not a build target
     // (optimization-framework §11/§16.1). -Dstage is retired; its cells are
-    // scavenged where useful (L1.naive == arc stage 1's step).
-    .{ "L1.naive", @import("layouts/L1_aos_full/naive.zig").Sim },
-    .{ "L1.naive_r1", @import("layouts/L1_aos_full/naive_r1.zig").Sim },
+    // scavenged where useful (L1.B1.w1-naive.w2-naive == arc stage 1's step).
+    //
+    // B1 cells compose walk files (walks/w1-*, w2-*) — each cell is a thin
+    // declaration block + a composition (H.step = w1.step, H.render =
+    // w2.render). The cell name encodes the blueprint + per-walk impl.
+    .{ "L1.B1.w1-naive.w2-naive", @import("layouts/L1_aos_full/cells/B1.w1-naive.w2-naive.zig").Sim },
+    .{ "L1.B1.w1-naive.w2-opt", @import("layouts/L1_aos_full/cells/B1.w1-naive.w2-opt.zig").Sim },
+    .{ "L1.B1.w1-scalar.w2-naive", @import("layouts/L1_aos_full/cells/B1.w1-scalar.w2-naive.zig").Sim },
+    .{ "L1.B1.w1-halide.w2-naive", @import("layouts/L1_aos_full/cells/B1.w1-halide.w2-naive.zig").Sim },
+    .{ "L1.B1.w1-halide.w2-opt", @import("layouts/L1_aos_full/cells/B1.w1-halide.w2-opt.zig").Sim },
+    // --- cells pending relabel (other blueprints, Phase 0/1) ---
     .{ "L1.par", @import("layouts/L1_aos_full/par.zig").Sim },
     .{ "L1.halide_a", @import("layouts/L1_aos_full/halide_a.zig").Sim },
-    .{ "L1.naive_novec", @import("layouts/L1_aos_full/naive_novec.zig").Sim },
     .{ "L1.halide_a2", @import("layouts/L1_aos_full/halide_a2.zig").Sim },
-    .{ "L1.halide_b1", @import("layouts/L1_aos_full/halide_b1.zig").Sim },
     .{ "L1.halide_a2_viz", @import("layouts/L1_aos_full/halide_a2_viz.zig").Sim },
 });
 

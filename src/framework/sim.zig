@@ -238,7 +238,7 @@ pub fn Strategy(comptime Data: type, comptime H: type) type {
     return struct {
         const Self = @This();
 
-        pub const golden_class: GoldenClass = if (@hasDecl(H, "golden_class")) H.golden_class else .bit_exact;
+        pub const golden_class: GoldenClass = if (@hasDecl(H, "cell_decl")) H.cell_decl.golden else if (@hasDecl(H, "golden_class")) H.golden_class else .bit_exact;
         pub const render_color_semantics: RenderColorSemantics = if (@hasDecl(H, "render_color_semantics")) H.render_color_semantics else .current_kind;
         /// The cell declaration (§8). Optional during the Phase-0 rollout:
         /// cells without one report `cell_decl = null` (manifest marks them

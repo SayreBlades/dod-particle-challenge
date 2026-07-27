@@ -25,7 +25,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-STRATS="${1:-L1.naive L1.naive_r1 L1.par}"
+STRATS="${1:-L1.B1.w1-naive.w2-naive L1.B1.w1-naive.w2-opt L1.B1.w1-halide.w2-naive}"
 MODES="${2:-step frame}"
 Q="${Q:-0.0}"
 THREADS="${THREADS:-1}"
