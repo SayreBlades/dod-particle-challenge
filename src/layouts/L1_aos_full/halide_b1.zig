@@ -82,6 +82,24 @@ const H = struct {
     // header). Physics identical; trajectories diverge from stage1.bin.
     pub const golden_class: fw.GoldenClass = .statistical;
 
+    // Cell declaration (§8): B1 blend variant — walk 1 is the full step in
+    // Halide (math + branchless blend respawn + per-particle hash RNG);
+    // walk 2 is the default r0 render. Same blueprint as naive (B1),
+    // different walk-1 semantic variant: blend vs branchy. The golden is
+    // statistical (different RNG model by design).
+    pub const cell_decl: fw.CellDecl = .{
+        .layout = "L1_aos_full",
+        .blueprint = .B1,
+        .ordering = .identity,
+        .intermediates = .none,
+        .walks = &.{
+            .{ .impl = .halide, .schedule = .scalar, .parallel = .none, .variant = .blend },
+            .{ .impl = .zig, .schedule = .r0, .parallel = .none, .variant = .none },
+        },
+        .golden = .statistical,
+        .halide_expressible = "walk1 yes (branchless blend, per-particle hash RNG); walk2 n/a (render)",
+    };
+
     pub fn step(sim: *Sim, dt: f32) void {
         const data = &sim.data;
         const n = data.n;

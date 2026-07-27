@@ -86,6 +86,14 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     const facts = hardware.detect();
     hardware.print(facts);
 
+    // --- cell declaration (§8): print every axis on every run, never silent ---
+    const manifest = @import("manifest.zig");
+    if (SimImpl.cell_decl) |cd| {
+        manifest.printCellHeader(@import("options").name, cd);
+    } else {
+        std.debug.print("=== Cell ===\n  name: {s}\n  (pending — cell_decl not declared)\n\n", .{@import("options").name});
+    }
+
     // --- correctness: generate (reference cell L1.naive) or verify ---
     const is_reference = @import("options").is_reference;
 

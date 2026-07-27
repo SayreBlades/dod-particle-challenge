@@ -27,7 +27,8 @@ pub fn build(b: *std.Build) void {
         if (std.mem.eql(u8, mode_str, "play")) break :blk .play;
         if (std.mem.eql(u8, mode_str, "bench")) break :blk .bench;
         if (std.mem.eql(u8, mode_str, "audit")) break :blk .audit;
-        std.debug.panic("invalid -Dmode='{s}' (play|bench|audit)", .{mode_str});
+        if (std.mem.eql(u8, mode_str, "manifest")) break :blk .manifest;
+        std.debug.panic("invalid -Dmode='{s}' (play|bench|audit|manifest)", .{mode_str});
     };
     const mode_enum: Mode = mode;
 
@@ -152,9 +153,49 @@ pub fn build(b: *std.Build) void {
     const run_tests = b.addRunArtifact(unit_tests);
     const test_step = b.step("test", "Run unit tests (render_opt rasterizer equivalence)");
     test_step.dependOn(&run_tests.step);
+
+    // --- manifest regeneration (optimization-framework §14/§17.4) ---
+    // The declaration blocks in strategy files are the single source of truth;
+    // experiments/cells/<layout>.md is a parser-generated artifact. This step
+    // builds the exe in manifest mode and runs it, writing the manifest to
+    // experiments/cells/L1.md. Check in the output; regenerate after editing
+    // any cell_decl.
+    const manifest_exe = b.addExecutable(.{
+        .name = "dod-manifest",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        }),
+    });
+    // Manifest mode: build with -Dmode=manifest and a default sim (L1.naive);
+    // main.zig iterates the whole sim_map regardless of the selected sim.
+    const manifest_opts = b.addOptions();
+    manifest_opts.addOption([]const u8, "name", "L1.naive");
+    manifest_opts.addOption([]const u8, "label", "manifest");
+    manifest_opts.addOption(bool, "is_reference", false);
+    manifest_opts.addOption(f64, "death", 0.0);
+    manifest_opts.addOption(Mode, "mode", .manifest);
+    manifest_exe.root_module.addOptions("options", manifest_opts);
+    manifest_exe.root_module.addImport("raylib", raylib_module: {
+        const rl_mod = b.createModule(.{
+            .root_source_file = b.path("src/bindings/raylib.zig"),
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        });
+        // raylib is linked so main.zig compiles (it imports the binding), but
+        // manifest mode never touches it — no window, no rendering.
+        rl_mod.linkLibrary(raylib_lib);
+        break :raylib_module rl_mod;
+    });
+    const run_manifest = b.addRunArtifact(manifest_exe);
+    const manifest_step = b.step("manifests", "Regenerate experiments/cells/L1.md from cell declarations");
+    manifest_step.dependOn(&run_manifest.step);
 }
 
-pub const Mode = enum { play, bench, audit };
+pub const Mode = enum { play, bench, audit, manifest };
 
 const StratEntry = struct { layout: []const u8, strat: []const u8, label: []const u8 };
 

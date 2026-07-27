@@ -20,6 +20,23 @@ const opt = @import("../../framework/render_opt.zig");
 const Data = @import("data.zig").Data;
 
 const H = struct {
+    // Cell declaration (§8): B1 branchy, r1 render variant — same walk 1
+    // as naive (re-exported step), walk 2 uses the optimized splat (r1:
+    // comptime color LUT + packed RGBA + NEON uqadd). A schedule variant
+    // of the base B1-branchy cell, not a new blueprint (§3 note).
+    pub const cell_decl: fw.CellDecl = .{
+        .layout = "L1_aos_full",
+        .blueprint = .B1,
+        .ordering = .identity,
+        .intermediates = .none,
+        .walks = &.{
+            .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .branchy },
+            .{ .impl = .zig, .schedule = .r1, .parallel = .none, .variant = .none },
+        },
+        .golden = .bit_exact,
+        .halide_expressible = "walk1 no (branchy respawn); walk2 n/a (render)",
+    };
+
     // Same schedule as naive (re-exported, not copied — the step is not
     // what this strategy changes).
     pub const step = @import("naive.zig").H.step;

@@ -20,6 +20,23 @@ const Data = layout.Data;
 const Particle = layout.Particle;
 
 pub const H = struct {
+    // Cell declaration (§8): B1 branchy variant — walk 1 fuses
+    // math+decide+respawn in one per-particle loop (the branchy respawn
+    // is the defining semantic variant); walk 2 is the default r0 render.
+    // This is the reference sim (generates golden/stage1.bin).
+    pub const cell_decl: fw.CellDecl = .{
+        .layout = "L1_aos_full",
+        .blueprint = .B1,
+        .ordering = .identity,
+        .intermediates = .none,
+        .walks = &.{
+            .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .branchy },
+            .{ .impl = .zig, .schedule = .r0, .parallel = .none, .variant = .none },
+        },
+        .golden = .bit_exact,
+        .halide_expressible = "walk1 no (branchy respawn — select is branchless); walk2 n/a (render)",
+    };
+
     // `anytype` so render-variant strategies (naive_r1) can re-export this
     // step — each fw.Strategy instantiation is a distinct type.
     pub fn step(sim: anytype, dt: f32) void {

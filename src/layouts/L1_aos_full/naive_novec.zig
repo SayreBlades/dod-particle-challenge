@@ -39,6 +39,23 @@ inline fn box(x: f32) f32 {
 }
 
 pub const H = struct {
+    // Cell declaration (§8): B1 branchy, scalar-forced schedule — the
+    // de-vectorization control. Same blueprint/variant as naive, but walk 1's
+    // schedule is .scalar (auto-vectorization disabled via boxed inputs — the
+    // true scalar floor). Isolates the schedule axis from the blueprint axis.
+    pub const cell_decl: fw.CellDecl = .{
+        .layout = "L1_aos_full",
+        .blueprint = .B1,
+        .ordering = .identity,
+        .intermediates = .none,
+        .walks = &.{
+            .{ .impl = .zig, .schedule = .scalar, .parallel = .none, .variant = .branchy },
+            .{ .impl = .zig, .schedule = .r0, .parallel = .none, .variant = .none },
+        },
+        .golden = .bit_exact,
+        .halide_expressible = "walk1 no (branchy respawn, de-vec control); walk2 n/a (render)",
+    };
+
     pub fn step(sim: *Sim, dt: f32) void {
         const data = &sim.data;
         for (data.particles) |*p| {
