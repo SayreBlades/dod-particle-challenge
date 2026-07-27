@@ -26,7 +26,9 @@ pub const decl: fw.WalkDecl = .{
 /// `sim: anytype` so any B1 cell can compose this walk (each
 /// fw.Strategy instantiation is a distinct type; duck-typing on the fields
 /// the Strategy helper guarantees: data, rng, kill_rng, frame).
-pub fn step(sim: anytype, dt: f32) void {
+/// B1 is unfused: fb is ignored (the splat lives in walk 2 / render).
+pub fn step(sim: anytype, dt: f32, fb: ?[]u8, w: u32, h: u32) void {
+    _ = fb; _ = w; _ = h; // unfused — no splat in step
     const data = &sim.data;
     for (data.particles) |*p| {
         // 1. Integrate: pos += vel * dt

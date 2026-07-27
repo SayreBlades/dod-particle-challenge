@@ -50,7 +50,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     var sim = try SimImpl.init(alloc, .{ .n = AUDIT_N, .seed = config.spawn_seed });
     defer sim.deinit();
     var i: usize = 0;
-    while (i < AUDIT_STEPS) : (i += 1) sim.step(config.dt);
+    while (i < AUDIT_STEPS) : (i += 1) sim.step(config.dt, null, 0, 0);
 
     const fields = try sim.dumpFields(alloc);
     defer {

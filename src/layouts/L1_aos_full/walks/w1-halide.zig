@@ -73,7 +73,8 @@ fn out1d(host: [*]u8, n: usize, stride: i32, t: halide_type_t, d: *[1]halide_dim
     return .{ .host = host, .type = t, .dimensions = 1, .dim = d };
 }
 
-pub fn step(sim: anytype, dt: f32) void {
+pub fn step(sim: anytype, dt: f32, fb: ?[]u8, w: u32, h: u32) void {
+    _ = fb; _ = w; _ = h; // unfused — no splat in step
     const data = &sim.data;
     const n = data.n;
     const base: [*]u8 = @ptrCast(&data.particles[0]);

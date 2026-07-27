@@ -39,7 +39,7 @@ pub fn capture(
     var sim = try SimImpl.init(alloc, desc);
     defer sim.deinit();
     var i: usize = 0;
-    while (i < steps) : (i += 1) sim.step(dt);
+    while (i < steps) : (i += 1) sim.step(dt, null, 0, 0);
     return try snapshotFromSim(SimImpl, sim, alloc);
 }
 
@@ -94,9 +94,9 @@ pub fn captureFrame(
 ) ![]u8 {
     var sim = try SimImpl.init(alloc, desc);
     defer sim.deinit();
-    var i: usize = 0;
-    while (i < steps) : (i += 1) sim.step(dt);
     const fb = try alloc.alloc(u8, @as(usize, w) * h * 4);
+    var i: usize = 0;
+    while (i < steps) : (i += 1) sim.step(dt, fb, w, h);
     sim.render(fb, w, h);
     return fb;
 }

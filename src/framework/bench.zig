@@ -235,11 +235,11 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         while (trial < TRIALS) : (trial += 1) {
             // warmup
             var w: usize = 0;
-            while (w < WARMUP) : (w += 1) sim.step(config.dt);
+            while (w < WARMUP) : (w += 1) sim.step(config.dt, null, 0, 0);
 
             const t0 = Io.Timestamp.now(io, .awake);
             var it: usize = 0;
-            while (it < iters) : (it += 1) sim.step(config.dt);
+            while (it < iters) : (it += 1) sim.step(config.dt, null, 0, 0);
             const t1 = Io.Timestamp.now(io, .awake);
             const ns: f64 = @floatFromInt(t0.durationTo(t1).nanoseconds);
             trial_runtime_ns += ns;
@@ -311,7 +311,7 @@ fn renderBench(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, csv: bo
         // Settle to a steady-state spatial distribution (init places every
         // particle at the origin — maximally overlapped, unrepresentative).
         var s: usize = 0;
-        while (s < RENDER_SETTLE_STEPS) : (s += 1) sim.step(config.dt);
+        while (s < RENDER_SETTLE_STEPS) : (s += 1) sim.step(config.dt, null, 0, 0);
 
         const iters: usize = @max(10, @min(200, 13_000_000 / @max(n, 1)));
 
@@ -370,7 +370,7 @@ fn frameBench(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, csv: boo
         // and primes caches/predictors, same role as the step sweep's warmup.
         var wu: usize = 0;
         while (wu < WARMUP) : (wu += 1) {
-            sim.step(config.dt);
+            sim.step(config.dt, fb, RENDER_W, RENDER_H);
             sim.render(fb, RENDER_W, RENDER_H);
         }
 
@@ -385,7 +385,7 @@ fn frameBench(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, csv: boo
             var it: usize = 0;
             while (it < iters) : (it += 1) {
                 const ts0 = Io.Timestamp.now(io, .awake);
-                sim.step(config.dt);
+                sim.step(config.dt, fb, RENDER_W, RENDER_H);
                 const ts1 = Io.Timestamp.now(io, .awake);
                 sim.render(fb, RENDER_W, RENDER_H);
                 const ts2 = Io.Timestamp.now(io, .awake);
@@ -450,7 +450,7 @@ fn recordVideo(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, out_dir
     var frame: usize = 0;
     var step_i: usize = 0;
     while (step_i < RECORD_STEPS) : (step_i += 1) {
-        sim.step(config.dt);
+        sim.step(config.dt, fb, RENDER_W, RENDER_H);
         if (step_i % 2 != 0) continue;
         sim.render(fb, RENDER_W, RENDER_H);
         const path = try std.fmt.allocPrintSentinel(alloc, "{s}/frame_{d:0>4}.png", .{ frames_dir, frame }, 0);

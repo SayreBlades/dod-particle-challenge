@@ -33,7 +33,8 @@ inline fn box(x: f32) f32 {
     );
 }
 
-pub fn step(sim: anytype, dt: f32) void {
+pub fn step(sim: anytype, dt: f32, fb: ?[]u8, w: u32, h: u32) void {
+    _ = fb; _ = w; _ = h; // unfused — no splat in step
     const data = &sim.data;
     for (data.particles) |*p| {
         // 1. Integrate: pos += vel * dt — inputs AND results boxed.

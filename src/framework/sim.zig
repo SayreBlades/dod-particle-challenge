@@ -277,8 +277,12 @@ pub fn Strategy(comptime Data: type, comptime H: type) type {
             return self;
         }
 
-        pub fn step(self: *Self, dt: f32) void {
-            H.step(self, dt);
+        /// step takes an optional framebuffer so fused blueprints (B5/B6/B7)
+        /// can splat inside the step walk (§17.7). fb == null = step-only
+        /// mode (no splat; the step bench and golden capture use this).
+        /// Unfused cells (B1-B4) ignore fb.
+        pub fn step(self: *Self, dt: f32, fb: ?[]u8, w: u32, h: u32) void {
+            H.step(self, dt, fb, w, h);
             self.frame +%= 1; // B1-blend hash RNG frame counter (free otherwise)
         }
 
