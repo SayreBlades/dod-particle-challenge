@@ -9,7 +9,7 @@
 // ordered spawn stream. Physics and respawn distributions are identical to
 // naive; trajectories are not → statistical golden class.
 //
-// The generator (w1-halide_gen.py) takes the death rate q at BUILD time: the
+// The generator (walks/w1-halide_gen.py) takes the death rate q at BUILD time: the
 // kill test is competing-risks (§7) — age' >= kill_age OR (q>0 and kill-hash <
 // q). q=0 prunes to age-only and draws no kill hash. The C function it emits
 // is `halide_b1` (an internal symbol; the walk file is named w1-halide).

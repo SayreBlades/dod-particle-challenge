@@ -101,9 +101,15 @@ pub fn build(b: *std.Build) void {
             const out_prefix = b.fmt("zig-out/halide/{s}", .{stem});
             if (halide_variant_opt == null) {
                 // Default candidate: run the layout's generator now.
+                // Walk-file generators (w1-/w2-) live in walks/; legacy
+                // strat generators live at the layout root (pending relabel).
+                const gen_dir = if (std.mem.startsWith(u8, base, "w1-") or std.mem.startsWith(u8, base, "w2-"))
+                    b.fmt("src/layouts/{s}/walks/{s}_gen.py", .{ layoutDir(layout), base })
+                else
+                    b.fmt("src/layouts/{s}/{s}_gen.py", .{ layoutDir(layout), base });
                 const gen = b.addSystemCommand(&.{
                     python,
-                    b.fmt("src/layouts/{s}/{s}_gen.py", .{ layoutDir(layout), base }),
+                    gen_dir,
                     out_prefix,
                     "{}", // schedule_json default
                     b.fmt("{d}", .{death_q}), // generators that need q read argv[3] as a float
