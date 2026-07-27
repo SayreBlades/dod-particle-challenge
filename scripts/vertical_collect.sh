@@ -9,10 +9,10 @@
 #
 # Usage:
 #   scripts/vertical_collect.sh                       # default: L1 strategies × {step,frame}
-#   scripts/vertical_collect.sh "L1.naive L1.par"     # subset of strategies
-#   scripts/vertical_collect.sh "L1.naive" "step frame render"
-#   Q=0.5 scripts/vertical_collect.sh "L1.naive"      # churn regime (q, the accident rate)
-#   THREADS=8 scripts/vertical_collect.sh "L1.par"    # thread-count knob
+#   scripts/vertical_collect.sh "L1.B1.w1-naive.w2-naive L1.B1.w1-halide.w2-naive"  # subset
+#   scripts/vertical_collect.sh "L1.B1.w1-naive.w2-naive" "step frame render"
+#   Q=0.5 scripts/vertical_collect.sh "L1.B1.w1-naive.w2-naive"                # churn regime (q)
+#   THREADS=8 scripts/vertical_collect.sh "L1.B1.w1-halide.w2-naive"  # (thread knob applies to parallel cells; B1 is serial)
 #
 # Output: .scratch/verticals/<layout>.csv — rows like
 #   csv,<name>,<mode>,<death>,<threads>,<N>,<bytes/p>,<ns_frame>,<extra...>

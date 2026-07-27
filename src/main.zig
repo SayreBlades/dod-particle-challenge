@@ -20,11 +20,6 @@ const sim_map = std.StaticStringMap(type).initComptime(.{
     .{ "L1.B1.w1-scalar.w2-naive", @import("layouts/L1_aos_full/cells/B1.w1-scalar.w2-naive.zig").Sim },
     .{ "L1.B1.w1-halide.w2-naive", @import("layouts/L1_aos_full/cells/B1.w1-halide.w2-naive.zig").Sim },
     .{ "L1.B1.w1-halide.w2-opt", @import("layouts/L1_aos_full/cells/B1.w1-halide.w2-opt.zig").Sim },
-    // --- cells pending relabel (other blueprints, Phase 0/1) ---
-    .{ "L1.par", @import("layouts/L1_aos_full/par.zig").Sim },
-    .{ "L1.halide_a", @import("layouts/L1_aos_full/halide_a.zig").Sim },
-    .{ "L1.halide_a2", @import("layouts/L1_aos_full/halide_a2.zig").Sim },
-    .{ "L1.halide_a2_viz", @import("layouts/L1_aos_full/halide_a2_viz.zig").Sim },
 });
 
 const SimImpl = sim_map.get(opts.name) orelse
