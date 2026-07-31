@@ -22,26 +22,32 @@ bytes you actually stream. The number of particles N decides whether that
 matters at all: at small N everything fits in cache and layout is noise; at
 large N the sim is bandwidth-bound and layout *is* the ceiling.
 
-This lab walks that transformation as **layout verticals** (currently
-`L1_aos_full`, the strawman AoS layout). The math never changes between cells
-— only the data layout and access pattern do. Each layout is explored by
+This lab explores that transformation across several **memory layout
+strategies** — each a different answer to how the particle data is arranged in
+RAM. The physics (the math, the seed, the death model) never changes between
+them; only the data layout and access pattern do. Each layout is explored by
 sweeping its **cells** (strategy variants) across particle counts N, death
 rates q, and thread counts, collecting per-trial timing into a run directory,
 then analyzing the aggregated data to find the **champion cell per regime**
 (no global winner — every champion carries regime + numbers + blueprint).
+
+The first layout is [L1 — AoS full-field](src/layouts/L1_aos_full/README.md):
+the strawman, one fat `Particle` struct per particle, every field the OOP
+object would carry. Later layouts cut the dead fields, split hot from cold,
+move to structure-of-arrays — each isolating one axis of the transformation.
 
 [acton]: https://www.youtube.com/watch?v=rX0ItVEVjHc
 [raylib]: https://github.com/raysan5/raylib
 
 ## Prerequisites
 
-| tool      | why                                              | version      |
-|-----------|--------------------------------------------------|--------------|
-| [Zig]     | the build + the sim                              | 0.16.0       |
-| [raylib]  | the play-mode renderer (git submodule, built)    | (pinned)     |
-| [uv]      | python env management (Halide generator + analysis) | any        |
-| [ffmpeg]  | `--record` video export (raw RGBA pipe)          | any          |
-| Xcode     | optional: PMC cycle-attribution (`pmc_*.sh`)     | macOS only   |
+| tool     | why                                                 | version    |
+|----------|-----------------------------------------------------|------------|
+| [Zig]    | the build + the sim                                 | 0.16.0     |
+| [raylib] | the play-mode renderer (git submodule, built)       | (pinned)   |
+| [uv]     | python env management (Halide generator + analysis) | any        |
+| [ffmpeg] | `--record` video export (raw RGBA pipe)             | any        |
+| Xcode    | optional: PMC cycle-attribution (`pmc_*.sh`)        | macOS only |
 
 [Zig]: https://ziglang.org
 [raylib]: https://github.com/raysan5/raylib
@@ -83,13 +89,13 @@ The cell registry lives in [`build.zig`](build.zig) (`strat_labels`) and
 [`src/main.zig`](src/main.zig) (`sim_map`) — both must list every buildable
 `(layout, strat)`. The current L1 cells:
 
-| strat                       | walk 1     | walk 2     | golden     |
-|-----------------------------|------------|------------|------------|
-| `B1.w1-naive.w2-naive`      | zig auto   | zig r0     | bit-exact (reference) |
-| `B1.w1-naive.w2-opt`        | zig auto   | zig r1     | bit-exact  |
-| `B1.w1-scalar.w2-naive`     | zig scalar | zig r0     | bit-exact  |
-| `B1.w1-halide.w2-naive`     | halide     | zig r0     | statistical |
-| `B1.w1-halide.w2-opt`       | halide     | zig r1     | statistical |
+| strat                   | walk 1     | walk 2 | golden                |
+|-------------------------|------------|--------|-----------------------|
+| `B1.w1-naive.w2-naive`  | zig auto   | zig r0 | bit-exact (reference) |
+| `B1.w1-naive.w2-opt`    | zig auto   | zig r1 | bit-exact             |
+| `B1.w1-scalar.w2-naive` | zig scalar | zig r0 | bit-exact             |
+| `B1.w1-halide.w2-naive` | halide     | zig r0 | statistical           |
+| `B1.w1-halide.w2-opt`   | halide     | zig r1 | statistical           |
 
 Halide cells need the Python env (`uv sync --extra halide`); the build
 runs the generator in `src/layouts/L1_aos_full/walks/w1-halide_gen.py` (via
@@ -104,7 +110,7 @@ runs the generator in `src/layouts/L1_aos_full/walks/w1-halide_gen.py` (via
 ./zig-out/bin/dod-particles --render --csv --ns 4000,65000                    # render only
 ./zig-out/bin/dod-particles --n 1000000 --iters 500                           # single N (PMC mode)
 ./zig-out/bin/dod-particles --record out/                                     # 10s MP4 via ffmpeg
-./zig-out/bin/dod-particles --threads 8                                        # parallel cells
+./zig-out/bin/dod-particles --threads 8                                       # parallel cells
 ```
 
 `-Ddeath=<q>` (build option) sets the competing-risks accident rate
