@@ -519,6 +519,14 @@ fn recordVideo(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, out_dir
     defer child.kill(io);
     const stdin_file = child.stdin orelse return error.NoStdinPipe;
 
+    // Settle to steady state before capturing: init places every particle at
+    // the origin (maximally overlapped, unrepresentative). Running
+    // RENDER_SETTLE_STEPS (2s = kill_age) reaches the developed fountain spread
+    // before the first recorded frame. Determinism is preserved (settle steps
+    // are deterministic too) — same seed+dt still yields byte-identical video.
+    var su: usize = 0;
+    while (su < RENDER_SETTLE_STEPS) : (su += 1) sim.step(config.dt, fb, RENDER_W, RENDER_H);
+
     const record_t0 = Io.Timestamp.now(io, .awake);
     var frame: usize = 0;
     var step_i: usize = 0;

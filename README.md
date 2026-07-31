@@ -54,14 +54,16 @@ then analyzing the aggregated data to find the **champion cell per regime**
 git clone --recurse-submodules <this-repo>
 cd dod-particle-lab-zig
 
-# Python env (one venv serves both roles):
-#   1. the Halide pipeline generator (build-time, for halide cells)
-#   2. the analysis notebook (pandas + matplotlib + jupyter)
-uv venv .venv
-uv pip install --python .venv/bin/python -e .
+# Python env (one command — creates .venv, installs deps, writes uv.lock):
+uv sync                      # analysis env: pandas + matplotlib + jupyterlab
+uv sync --extra halide       # also installs halide (needed to build the halide cells)
 ```
 
-If you don't care about Halide cells, `uv pip install --python .venv/bin/python pandas matplotlib jupyter` is enough (the three Zig cells build and collect without it).
+The Python env serves two roles: the **analysis notebook** (`pandas` +
+`matplotlib` + `jupyterlab`) and the **Halide pipeline generator** (build-time,
+for halide cells only). `uv sync` gives you the analysis env; add `--extra
+halide` if you'll build the two halide cells. The three Zig-only cells build
+and collect without any Python env at all.
 
 ## Build & run
 
@@ -89,8 +91,9 @@ The cell registry lives in [`build.zig`](build.zig) (`strat_labels`) and
 | `B1.w1-halide.w2-naive`     | halide     | zig r0     | statistical |
 | `B1.w1-halide.w2-opt`       | halide     | zig r1     | statistical |
 
-Halide cells need `HALIDE_PYTHON` (defaults to `.venv/bin/python`); the build
-runs the generator in `src/layouts/L1_aos_full/walks/w1-halide_gen.py` to emit
+Halide cells need the Python env (`uv sync --extra halide`); the build
+runs the generator in `src/layouts/L1_aos_full/walks/w1-halide_gen.py` (via
+`HALIDE_PYTHON`, defaulting to `.venv/bin/python`) to emit
 `zig-out/halide/w1-halide.{h,a}`, then links it.
 
 ### Bench runtime flags

@@ -1,15 +1,24 @@
-# The Python environment for this project serves two roles:
-#   1. the Halide pipeline generator (build.zig invokes it via HALIDE_PYTHON
-#      when a cell's walk 1 is halide — emits zig-out/halide/*.a);
-#   2. the analysis notebook (experiments/results/analyze.ipynb — pandas +
-#      matplotlib to turn collected CSVs into plots + champion grids).
+# Python environment for this project. Two roles:
+#   1. the analysis notebook (experiments/results/analyze.ipynb — pandas +
+#      matplotlib + jupyterlab to turn collected CSVs into plots + champion grids)
+#   2. the Halide pipeline generator (build-time, for halide cells only — emits
+#      zig-out/halide/*.a via src/layouts/*/walks/w1-halide_gen.py)
 #
-# One venv, set up once:
-#   uv venv .venv
-#   uv pip install --python .venv/bin/python -e .
-# (or: uv pip install --python .venv/bin/python halide matplotlib pandas)
+# One command sets up the env (creates .venv, installs everything):
+#   uv sync                      # analysis env (run the notebook)
+#   uv sync --extra halide       # also installs halide (build the halide cells)
+#
+# This project has no importable Python package — it's scripts + a notebook —
+# so tool.uv.package = false (uv sync installs deps only, not the project itself).
+
 [project]
 name = "dod-particles"
 version = "0.1.0"
 requires-python = ">=3.9"
-dependencies = ["halide>=21", "matplotlib", "pandas"]
+dependencies = ["pandas", "matplotlib", "jupyterlab"]
+
+[project.optional-dependencies]
+halide = ["halide>=21"]
+
+[tool.uv]
+package = false

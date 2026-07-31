@@ -101,7 +101,7 @@ for cell in $CELLS; do
         if ! zig build -Dlayout="$layout" -Dstrat="$strat" -Ddeath="$q" \
                 -Dmode=bench -Doptimize=ReleaseFast >&2 2>&1; then
             echo "    BUILD FAILED — skipping $cell (q=$q)." >&2
-            echo "    (halide cells need: uv pip install --python .venv/bin/python -e .)" >&2
+            echo "    (halide cells need: uv sync --extra halide)" >&2
             continue
         fi
         for mode in $MODES; do

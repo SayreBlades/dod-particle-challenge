@@ -94,7 +94,7 @@ pub fn build(b: *std.Build) void {
             const layout = layout_sel.?;
             // If this python is missing, the generator step fails loudly at
             // build time; set HALIDE_PYTHON or create the env:
-            //   uv venv .venv && uv pip install --python .venv/bin/python -e .
+            //   uv sync --extra halide
             const python = b.graph.environ_map.get("HALIDE_PYTHON") orelse ".venv/bin/python";
             // The pipeline this strategy links: viz/variant strategies share
             // a base strategy's generator and .a (no <base>_gen.py of their own).
