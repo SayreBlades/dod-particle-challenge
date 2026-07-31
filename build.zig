@@ -94,8 +94,8 @@ pub fn build(b: *std.Build) void {
             const layout = layout_sel.?;
             // If this python is missing, the generator step fails loudly at
             // build time; set HALIDE_PYTHON or create the env:
-            //   uv venv .venv-halide && uv pip install --python .venv-halide/bin/python halide
-            const python = b.graph.environ_map.get("HALIDE_PYTHON") orelse ".venv-halide/bin/python";
+            //   uv venv .venv && uv pip install --python .venv/bin/python -e .
+            const python = b.graph.environ_map.get("HALIDE_PYTHON") orelse ".venv/bin/python";
             // The pipeline this strategy links: viz/variant strategies share
             // a base strategy's generator and .a (no <base>_gen.py of their own).
             const stem = if (halide_variant_opt) |v| b.fmt("{s}_{s}", .{ base, v }) else base;
@@ -120,14 +120,6 @@ pub fn build(b: *std.Build) void {
             exe.root_module.addObjectFile(b.path(b.fmt("{s}.a", .{out_prefix})));
         }
     }
-
-    // --- stb_image_write (linked unconditionally: --record is a bench flag on
-    // every sim, not a stage-11 special case; one small C file) ---
-    exe.root_module.addCSourceFile(.{
-        .file = b.path("src/stb_impl.c"),
-        .flags = &.{"-std=c11"},
-    });
-    exe.root_module.addIncludePath(b.path("vendor/stb"));
 
     exe.root_module.addOptions("options", opts);
     exe.root_module.addImport("raylib", raylib_module: {
@@ -250,9 +242,9 @@ fn addRaylib(
         "-std=c11",
         "-DPLATFORM_DESKTOP",
         "-DGRAPHICS_API_OPENGL_33",
-        // Disable raylib's image-export helpers (ExportImage* — unused by us).
-        // They embed stb_image_write with IMPLEMENTATION inside rtextures.c,
-        // which would collide with our own src/stb_impl.c (render/record).
+        // Disable raylib's image-export helpers (ExportImage* — unused by us;
+        // --record pipes raw RGBA straight into ffmpeg, no image lib). Keeps
+        // raylib lean and avoids bundling stb_image_write inside rtextures.c.
         "-DSUPPORT_IMAGE_EXPORT=0",
         "-ObjC",
     };

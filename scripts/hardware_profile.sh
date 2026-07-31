@@ -1,13 +1,13 @@
 #!/bin/bash
 # hardware_profile.sh — print the cache/memory/SIMD profile of this machine.
 #
-# DOD only makes sense relative to concrete hardware facts. The framework's
-# stage 7 (alignment/tile sizing) and the benchmark N-sweep interpretation
-# both depend on these numbers. Run this on any machine to regenerate the
-# profile for that machine.
+# Human-readable counterpart to scripts/hardware_json.py (which emits JSON +
+# the machine_id used as a data dimension). The bench (src/framework/hardware.zig)
+# prints the same facts at the start of every run; this script is the
+# standalone CLI for capturing a machine's profile once.
 #
-# On macOS these come from sysctl; on Linux you'd read /sys/devices/system/cpu/
-# and /proc/meminfo instead (extend this script when porting).
+# On macOS these come from sysctl; on Linux read /sys/devices/system/cpu/ and
+# /proc/meminfo instead (extend this script when porting).
 #
 # Usage:  scripts/hardware_profile.sh
 
@@ -17,6 +17,7 @@ echo "=== Hardware profile ==="
 echo "date   : $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "host   : $(hostname -s)"
 echo "os     : $(uname -s) $(uname -r) ($(uname -m))"
+echo "machine_id : $(python3 "$(dirname "$0")/hardware_json.py" | python3 -c 'import sys,json;print(json.load(sys.stdin)["machine_id"])')"
 echo
 
 echo "cpu    : $(sysctl -n machdep.cpu.brand_string 2>/dev/null || echo 'unknown')"
