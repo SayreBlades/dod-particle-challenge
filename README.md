@@ -1,21 +1,37 @@
 # DOD Particle Lab — Zig
 
-A hands-on laboratory for *feeling* the cache/perf lessons from Mike Acton's
-CppCon 2014 talk, ["Data-Oriented Design and C++"](https://www.youtube.com/watch?v=rX0ItVEVjHc),
-implemented as an interactive **raylib game** in Zig on Apple Silicon.
+A **visual particle simulator** — a fountain of 65,000 particles in three
+streams (gray **smoke** rising, orange **sparks** arcing, blue **debris**
+scattering) — rendered live with [raylib] in Zig on Apple Silicon:
 
-The thesis under test, in one sentence: *the object was a lie.* There was never
-a "Particle" — there were loops that touched overlapping subsets of its fields.
-Lay out memory for the loops instead of for the concept, the talk says, and the
-loops get dramatically faster. This lab walks that transformation as **layout
-verticals** (currently `L1_aos_full`); the math never changes between cells,
-only the data layout and access pattern do.
+![three particle streams: smoke, sparks, debris](docs/fountain.gif)
 
-Each layout is explored by sweeping its **cells** (strategy variants) across
-particle counts N, death rates q, and thread counts, collecting per-trial
-timing into a run directory, then analyzing the aggregated data to find the
-**champion cell per regime** (no global winner — every champion carries regime
-+ numbers + blueprint).
+It runs at a steady 60 fps in play mode, but the interesting number is how
+*cheaply* each frame can be computed. That question — what does a frame of
+65,000 particles *cost*, and how low can that cost go — is what this lab is
+about. It's a hands-on laboratory for *feeling* the cache/perf lessons from
+Mike Acton's CppCon 2014 talk, ["Data-Oriented Design and C++"][acton].
+
+The thesis under test: a particle simulator is not one job, it's a handful of
+loops over the same particles — integrate physics, decide which died, respawn
+the dead, rasterize the survivors. Each loop touches a different subset of a
+particle's fields. Lay out memory for the loops (the hot fields contiguous,
+the cold ones out of the way) instead of for the object (one fat `Particle`
+struct), and the loops get dramatically faster — *if* you're paying for the
+bytes you actually stream. The number of particles N decides whether that
+matters at all: at small N everything fits in cache and layout is noise; at
+large N the sim is bandwidth-bound and layout *is* the ceiling.
+
+This lab walks that transformation as **layout verticals** (currently
+`L1_aos_full`, the strawman AoS layout). The math never changes between cells
+— only the data layout and access pattern do. Each layout is explored by
+sweeping its **cells** (strategy variants) across particle counts N, death
+rates q, and thread counts, collecting per-trial timing into a run directory,
+then analyzing the aggregated data to find the **champion cell per regime**
+(no global winner — every champion carries regime + numbers + blueprint).
+
+[acton]: https://www.youtube.com/watch?v=rX0ItVEVjHc
+[raylib]: https://github.com/raysan5/raylib
 
 ## Prerequisites
 
