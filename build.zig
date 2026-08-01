@@ -203,9 +203,16 @@ const strat_labels = [_]StratEntry{
     .{ .layout = "L1", .strat = "B1.w1-autovec.w2-simple", .label = "L1.B1.w1-autovec.w2-simple (B1: autovec branchy step + r0 render; reference sim)" },
     .{ .layout = "L1", .strat = "B1.w1-autovec.w2-opt", .label = "L1.B1.w1-autovec.w2-opt (B1: autovec branchy step + optimized r1 render)" },
     .{ .layout = "L1", .strat = "B1.w1-scalar.w2-simple", .label = "L1.B1.w1-scalar.w2-simple (B1: scalar-forced step + r0 render; de-vec control)" },
+    .{ .layout = "L1", .strat = "B1.w1-autovec-par.w2-simple", .label = "L1.B1.w1-autovec-par.w2-simple (B1: parallel branchy math+decide | serial respawn | r0 render)" },
+    .{ .layout = "L1", .strat = "B1.w1-blend.w2-simple", .label = "L1.B1.w1-blend.w2-simple (B1: Zig branchless blend + r0 render; STATISTICAL)" },
     .{ .layout = "L1", .strat = "B1.w1-halide.w2-simple", .label = "L1.B1.w1-halide.w2-simple (B1: Halide branchless blend + r0 render; STATISTICAL)" },
     .{ .layout = "L1", .strat = "B1.w1-halide.w2-opt", .label = "L1.B1.w1-halide.w2-opt (B1: Halide branchless blend + optimized r1 render; STATISTICAL)" },
+    .{ .layout = "L1", .strat = "B2.w1-autovec.w2-simple", .label = "L1.B2.w1-autovec.w2-simple (B2: math | decide+respawn | r0 render)" },
+    .{ .layout = "L1", .strat = "B2.w1-autovec-par.w2-simple", .label = "L1.B2.w1-autovec-par.w2-simple (B2: parallel math | decide+respawn | r0 render)" },
+    .{ .layout = "L1", .strat = "B3.w1-autovec.w2-simple", .label = "L1.B3.w1-autovec.w2-simple (B3: math+decide→mask | scan+respawn | r0 render)" },
     .{ .layout = "L1", .strat = "B3.w1-autovec-par.w2-rmerge", .label = "L1.B3.w1-autovec-par.w2-rmerge (B3: parallel math+decide→mask | serial respawn | r0 render; DE-RISK)" },
+    .{ .layout = "L1", .strat = "B4.w1-autovec.w2-simple", .label = "L1.B4.w1-autovec.w2-simple (B4: math+decide→list | respawn-dead | r0 render)" },
+    .{ .layout = "L1", .strat = "B4.w1-autovec-par.w2-rmerge", .label = "L1.B4.w1-autovec-par.w2-rmerge (B4: parallel math+decide→list | ranked-merge respawn | r0 render)" },
 };
 
 /// Returns the generator base name for a Halide cell, or null if the cell
