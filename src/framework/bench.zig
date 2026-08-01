@@ -123,8 +123,8 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     // --- invariant suite (--check): separate invocation, no timed-region overhead ---
     if (check_mode) {
         const death_q = @import("options").death;
-        std.debug.print("=== Invariant suite (--check, q={d}) ===\n", .{death_q});
-        var inv = correctness.checkInvariants(SimImpl, alloc, .{ .n = 1024, .seed = config.spawn_seed, .threads = threads }, 600, config.dt, death_q) catch |e| {
+        std.debug.print("=== Invariant suite (--check, q={d:.2}) ===\n", .{death_q});
+        var inv = correctness.checkInvariants(SimImpl, alloc, .{ .n = 1024, .seed = config.spawn_seed, .threads = threads }, 600, config.dt, @floatCast(death_q)) catch |e| {
             std.debug.print("  ERROR: invariant suite failed to run: {t}\n", .{e});
             return e;
         };
