@@ -91,7 +91,7 @@ print("  wrote", out)
 PYEOF
 
 # runs.csv header. collect.sh prefixes run_id,machine_id onto every bench row.
-HDR="run_id,machine_id,cell,mode,death_q,threads,N,bytes_per_particle,trial,ns_frame,ns_particle,,,"
+HDR="run_id,machine_id,cell,mode,death_q,threads,N,bytes_per_particle,trial,ns_frame,ns_particle"
 printf '%s\n' "$HDR" > "$RUN_DIR/runs.csv"
 printf 'run_id,machine_id,cell,death_q,checked\n' > "$RUN_DIR/checks.csv"
 

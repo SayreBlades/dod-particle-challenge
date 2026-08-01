@@ -293,7 +293,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
             // audit + PMC, not timing-derived -- S17.7).
             if (csv_mode) {
                 const ns_p: f64 = ns_frame / @as(f64, @floatFromInt(n));
-                std.debug.print("csv,{s},frame,{d},{d},{d},{d},{d},{d:.1},{d:.4},,,\n", .{
+                std.debug.print("csv,{s},frame,{d},{d},{d},{d},{d},{d:.1},{d:.4}\n", .{
                     @import("options").name, DEATH_COL, threads, n, bytes_per_p, trial, ns_frame, ns_p,
                 });
             }
