@@ -96,25 +96,32 @@ pub fn build(b: *std.Build) void {
             // build time; set HALIDE_PYTHON or create the env:
             //   uv sync --extra halide
             const python = b.graph.environ_map.get("HALIDE_PYTHON") orelse ".venv/bin/python";
-            // The pipeline this strategy links: viz/variant strategies share
-            // a base strategy's generator and .a (no <base>_gen.py of their own).
-            const stem = if (halide_variant_opt) |v| b.fmt("{s}_{s}", .{ base, v }) else base;
+            // Derive the Halide schedule from the strat name: a strat containing
+            // "-par" gets {"parallel":true}; the plain strat gets the default.
+            // (-Dhalide_variant still works for ad-hoc sweep variants; it adds
+            // a suffix to the stem and is expected to be pre-generated.)
+            const sched_json: []const u8 = if (std.mem.indexOf(u8, strat, "-par") != null)
+                "{\"parallel\":true}"
+            else
+                "{}";
+            // The stem: the base name, plus an optional explicit variant suffix.
+            // For a "-par" strat we bake "_par" into the stem so the parallel .a
+            // doesn't collide with the scalar .a (same generator, different schedule).
+            const stem_par = if (std.mem.indexOf(u8, strat, "-par") != null) "_par" else "";
+            const stem = if (halide_variant_opt) |v| b.fmt("{s}_{s}", .{ base, v }) else b.fmt("{s}{s}", .{ base, stem_par });
             const out_prefix = b.fmt("zig-out/halide/{s}", .{stem});
-            if (halide_variant_opt == null) {
-                // Default candidate: run the layout's generator now.
-                // Generators live at the layout root: <blueprint>.<walk>_gen.py
-                // (e.g. B1.w1-halide_gen.py). The base from halideGenBase
-                // already carries the blueprint prefix.
-                const gen_dir = b.fmt("src/layouts/{s}/{s}_gen.py", .{ layoutDir(layout), base });
-                const gen = b.addSystemCommand(&.{
-                    python,
-                    gen_dir,
-                    out_prefix,
-                    "{}", // schedule_json default
-                    b.fmt("{d}", .{death_q}), // generators that need q read argv[3] as a float
-                });
-                exe.step.dependOn(&gen.step);
-            } // else: the sweep pre-generated the variant; just link it.
+            // Always run the generator for the derived schedule (no more
+            // "pre-generated variant" expectation). A sweep can override the
+            // schedule via -Dhalide_variant=<suffix> (pre-generated) if needed.
+            const gen_dir = b.fmt("src/layouts/{s}/{s}_gen.py", .{ layoutDir(layout), base });
+            const gen = b.addSystemCommand(&.{
+                python,
+                gen_dir,
+                out_prefix,
+                sched_json,
+                b.fmt("{d}", .{death_q}), // generators that need q read argv[3] as a float
+            });
+            exe.step.dependOn(&gen.step);
             exe.root_module.addObjectFile(b.path(b.fmt("{s}.a", .{out_prefix})));
         }
     }
@@ -205,10 +212,15 @@ const strat_labels = [_]StratEntry{
     .{ .layout = "L1", .strat = "B1.w1-scalar.w2-simple", .label = "L1.B1.w1-scalar.w2-simple (B1: scalar-forced step + r0 render; de-vec control)" },
     .{ .layout = "L1", .strat = "B1.w1-autovec-par.w2-simple", .label = "L1.B1.w1-autovec-par.w2-simple (B1: parallel branchy math+decide | serial respawn | r0 render)" },
     .{ .layout = "L1", .strat = "B1.w1-blend.w2-simple", .label = "L1.B1.w1-blend.w2-simple (B1: Zig branchless blend + r0 render; STATISTICAL)" },
+    .{ .layout = "L1", .strat = "B1.w1-blend-par.w2-simple", .label = "L1.B1.w1-blend-par.w2-simple (B1: parallel Zig blend + r0 render; STATISTICAL)" },
     .{ .layout = "L1", .strat = "B1.w1-halide.w2-simple", .label = "L1.B1.w1-halide.w2-simple (B1: Halide branchless blend + r0 render; STATISTICAL)" },
     .{ .layout = "L1", .strat = "B1.w1-halide.w2-opt", .label = "L1.B1.w1-halide.w2-opt (B1: Halide branchless blend + optimized r1 render; STATISTICAL)" },
+    .{ .layout = "L1", .strat = "B1.w1-halide-par.w2-simple", .label = "L1.B1.w1-halide-par.w2-simple (B1: parallel Halide blend + r0 render; STATISTICAL; PREDICTED DRAM CHAMPION)" },
     .{ .layout = "L1", .strat = "B2.w1-autovec.w2-simple", .label = "L1.B2.w1-autovec.w2-simple (B2: math | decide+respawn | r0 render)" },
     .{ .layout = "L1", .strat = "B2.w1-autovec-par.w2-simple", .label = "L1.B2.w1-autovec-par.w2-simple (B2: parallel math | decide+respawn | r0 render)" },
+    .{ .layout = "L1", .strat = "B2.w1-halide.w2-simple", .label = "L1.B2.w1-halide.w2-simple (B2: Halide math | decide+respawn | r0 render)" },
+    .{ .layout = "L1", .strat = "B2.w1-halide-par.w2-simple", .label = "L1.B2.w1-halide-par.w2-simple (B2: parallel Halide math | decide+respawn | r0 render)" },
+    .{ .layout = "L1", .strat = "B3.w1-halide.w2-simple", .label = "L1.B3.w1-halide.w2-simple (B3: Halide math+decide→mask | scan+respawn | r0 render)" },
     .{ .layout = "L1", .strat = "B3.w1-autovec.w2-simple", .label = "L1.B3.w1-autovec.w2-simple (B3: math+decide→mask | scan+respawn | r0 render)" },
     .{ .layout = "L1", .strat = "B3.w1-autovec-par.w2-rmerge", .label = "L1.B3.w1-autovec-par.w2-rmerge (B3: parallel math+decide→mask | serial respawn | r0 render; DE-RISK)" },
     .{ .layout = "L1", .strat = "B4.w1-autovec.w2-simple", .label = "L1.B4.w1-autovec.w2-simple (B4: math+decide→list | respawn-dead | r0 render)" },
@@ -224,7 +236,13 @@ const strat_labels = [_]StratEntry{
 /// Any cell containing "w1-halide" maps to "w1-halide" (the walk-1 Halide
 /// pipeline generator, in walks/).
 fn halideGenBase(strat: []const u8) ?[]const u8 {
-    if (std.mem.indexOf(u8, strat, "w1-halide") != null) return "B1.w1-halide";
+    if (std.mem.indexOf(u8, strat, "w1-halide") != null) {
+        // Map the cell's blueprint prefix: B1.w1-halide / B2.w1-halide / B3.w1-halide.
+        // Each has its own generator + FFI binding at the layout root.
+        if (std.mem.startsWith(u8, strat, "B2.")) return "B2.w1-halide";
+        if (std.mem.startsWith(u8, strat, "B3.")) return "B3.w1-halide";
+        return "B1.w1-halide";
+    }
     return null;
 }
 
