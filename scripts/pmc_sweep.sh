@@ -41,7 +41,15 @@ N_ITERS_LIST="
 "
 
 OUTDIR="$(cd "$(dirname "$0")/.." && pwd)/.scratch/pmc"
+ROLLOUT_DIR="$OUTDIR"  # default: local .scratch/
+# Parse --run-dir from args
+prev=""
+for arg in "$@"; do
+    if [ "$prev" = "--run-dir" ]; then ROLLOUT_DIR="$arg"; fi
+    prev="$arg"
+done
 mkdir -p "$OUTDIR"
+mkdir -p "$ROLLOUT_DIR"
 
 # Count total launches for progress.
 total=0
@@ -74,10 +82,11 @@ done
 
 echo
 echo "=== building rollup (min per cell/N across trials) ===" >&2
-python3 - "$OUTDIR" << 'PYEOF'
+python3 - "$OUTDIR" "$ROLLOUT_DIR" << 'PYEOF'
 import sys, csv, os, glob
 
 outdir = sys.argv[1]
+rollout_dir = sys.argv[2]
 
 # Collect all trial CSVs.
 rows = {}  # (cell, N) -> list of trial dicts
@@ -97,7 +106,7 @@ for path in sorted(glob.glob(os.path.join(outdir, "*_n*_t*.csv"))):
             })
 
 # For each (cell, N), pick the trial with min cycles (cleanest sample).
-rollup_path = os.path.join(outdir, "pmc_rollup.csv")
+rollup_path = os.path.join(rollout_dir, "pmc_rollup.csv")
 with open(rollup_path, "w") as f:
     w = csv.writer(f)
     w.writerow(["cell", "N", "iters", "trial",

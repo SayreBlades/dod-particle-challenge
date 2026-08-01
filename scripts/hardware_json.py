@@ -82,7 +82,38 @@ def detect():
     ))
     h = hashlib.sha1(ident.encode()).hexdigest()[:8]
     f["machine_id"] = f"{f['hostname']}-{h}"
+    f["streaming_bw_gbs"] = _streaming_bw_gbs(f)
     return f
+
+
+def _streaming_bw_gbs(facts):
+    """Measure single-core streaming bandwidth: a memset-style loop over a
+    buffer larger than LLC, single-threaded, timed. Returns GB/s (1e9 B/s).
+    This is the bandwidth-attribution home after gbs_eff retired (§17.7): the
+    notebook plots achieved_bw = bytes/p*N/frame_time vs this ceiling."""
+    import time
+    # Buffer ~4x the L3 (or 256MB if L3 unknown) — bigger than LLC so we measure
+    # DRAM streaming, not cache.
+    l3 = facts.get("l3cachesize", 0)
+    buf_bytes = max(l3 * 4, 256 * 1024 * 1024) if l3 else 256 * 1024 * 1024
+    try:
+        buf = bytearray(buf_bytes)
+        # Warmup
+        for i in range(0, buf_bytes, 4096):
+            buf[i] = 1
+        t0 = time.perf_counter()
+        # Write pass: touch every byte (memset pattern).
+        for _ in range(3):
+            for i in range(0, buf_bytes, 64):  # cache-line stride
+                buf[i] = 0
+        t1 = time.perf_counter()
+        elapsed = t1 - t0
+        if elapsed <= 0:
+            return 0.0
+        total_bytes = buf_bytes * 3
+        return round(total_bytes / elapsed / 1e9, 2)
+    except Exception:
+        return 0.0
 
 
 if __name__ == "__main__":

@@ -29,8 +29,20 @@ cd "$ROOT"
 
 LAYOUT="${1:?usage: collect.sh <layout> [cells] [modes]}"
 CELLS_ARG="${2:-}"
-MODES="${3:-step frame render}"
-DEATH_RATES="${DEATH_RATES:-0}"
+MODES="${3:-frame}"
+# Death rates: default to the probe set; --full-rates swaps to the champion set.
+RATES_FILE="experiments/sweeps/death_rates.txt"
+# Parse --full-rates from args (before the positional layout arg)
+for arg in "$@"; do
+    if [ "$arg" = "--full-rates" ]; then RATES_FILE="experiments/sweeps/death_rates_full.txt"; fi
+done
+if [ -n "${DEATH_RATES:-}" ]; then
+    : # explicit override wins
+elif [ -f "$RATES_FILE" ]; then
+    DEATH_RATES="$(grep -vE '^[[:space:]]*(#|$)' "$RATES_FILE" | tr '\n' ' ')"
+else
+    DEATH_RATES="0.01 0.05 0.25"
+fi
 NS="${NS:-}"           # comma-list passed to bench --ns (empty = default SWEEP)
 TRIALS="${TRIALS:-3}"
 THREADS="${THREADS:-1}"
@@ -79,8 +91,9 @@ print("  wrote", out)
 PYEOF
 
 # runs.csv header. collect.sh prefixes run_id,machine_id onto every bench row.
-HDR="run_id,machine_id,cell,mode,death_q,threads,N,bytes_per_particle,trial,ns_frame,ns_particle,gbs_eff,step_ns,render_ns"
+HDR="run_id,machine_id,cell,mode,death_q,threads,N,bytes_per_particle,trial,ns_frame,ns_particle,,,"
 printf '%s\n' "$HDR" > "$RUN_DIR/runs.csv"
+printf 'run_id,machine_id,cell,death_q,checked\n' > "$RUN_DIR/checks.csv"
 
 NS_ARG=""
 [ -n "$NS" ] && NS_ARG="--ns $NS"
@@ -106,10 +119,8 @@ for cell in $CELLS; do
         fi
         for mode in $MODES; do
             case "$mode" in
-                step)   flag="" ;;
-                frame)  flag="--frame" ;;
-                render) flag="--render" ;;
-                *) echo "    unknown mode '$mode' — skipping" >&2; continue ;;
+                frame)  flag="" ;;
+                *) echo "    unknown mode '$mode' (only 'frame' is supported) — skipping" >&2; continue ;;
             esac
             echo "    $cell  $mode (q=$q)..." >&2
             # bench prints csv rows to stderr; merge, filter, prefix, append.
@@ -119,6 +130,10 @@ for cell in $CELLS; do
                 | sed "s/^csv,/${RUN_ID},${MACHINE_ID},/" \
                 >> "$RUN_DIR/runs.csv" || true
         done
+        # Invariant suite (--check): separate run, no timed-region overhead.
+        echo "    $cell  --check (q=$q)..." >&2
+        check_result=$(./zig-out/bin/dod-particles --check 2>&1 | grep '^checked=' || echo 'checked=ERROR')
+        printf '%s,%s,%s,%s,%s\n' "$RUN_ID" "$MACHINE_ID" "$cell" "$q" "$check_result" >> "$RUN_DIR/checks.csv"
     done
 done
 

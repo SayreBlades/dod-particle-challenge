@@ -57,6 +57,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     var single_iters: ?usize = null;
     var csv_mode = false;
     var record_dir: ?[]const u8 = null;
+    var check_mode = false;
     var threads: usize = 1;
     var trials_arg: ?usize = null;
     var ns_buf: [32]usize = undefined;
@@ -89,6 +90,8 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
                     }
                 } else if (std.mem.eql(u8, arg, "--record")) {
                     if (it.next()) |val| record_dir = val;
+                } else if (std.mem.eql(u8, arg, "--check")) {
+                    check_mode = true;
                 }
             }
         }
@@ -115,6 +118,27 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         manifest.printCellHeader(@import("options").name, cd);
     } else {
         std.debug.print("=== Cell ===\n  name: {s}\n  (pending — cell_decl not declared)\n\n", .{@import("options").name});
+    }
+
+    // --- invariant suite (--check): separate invocation, no timed-region overhead ---
+    if (check_mode) {
+        const death_q = @import("options").death;
+        std.debug.print("=== Invariant suite (--check, q={d}) ===\n", .{death_q});
+        var inv = correctness.checkInvariants(SimImpl, alloc, .{ .n = 1024, .seed = config.spawn_seed, .threads = threads }, 600, config.dt, death_q) catch |e| {
+            std.debug.print("  ERROR: invariant suite failed to run: {t}\n", .{e});
+            return e;
+        };
+        defer inv.deinit();
+        if (inv.passed) {
+            std.debug.print("  PASS (checked {d} particles, {d} deaths this frame)\n", .{ inv.n_checked, inv.deaths });
+        } else {
+            std.debug.print("  FAIL ({d} failures):\n", .{inv.failures.len});
+            for (inv.failures[0..@min(inv.failures.len, 10)]) |f| {
+                std.debug.print("    [{d}] {s}\n", .{ f.index, f.check });
+            }
+        }
+        std.debug.print("checked={s}\n", .{if (inv.passed) "PASS" else "FAIL"});
+        return;
     }
 
     // --- correctness: generate (reference cell L1.naive) or verify ---
