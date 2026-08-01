@@ -213,6 +213,10 @@ const strat_labels = [_]StratEntry{
     .{ .layout = "L1", .strat = "B3.w1-autovec-par.w2-rmerge", .label = "L1.B3.w1-autovec-par.w2-rmerge (B3: parallel math+decide→mask | serial respawn | r0 render; DE-RISK)" },
     .{ .layout = "L1", .strat = "B4.w1-autovec.w2-simple", .label = "L1.B4.w1-autovec.w2-simple (B4: math+decide→list | respawn-dead | r0 render)" },
     .{ .layout = "L1", .strat = "B4.w1-autovec-par.w2-rmerge", .label = "L1.B4.w1-autovec-par.w2-rmerge (B4: parallel math+decide→list | ranked-merge respawn | r0 render)" },
+    .{ .layout = "L1", .strat = "B5.w1-fused", .label = "L1.B5.w1-fused (B5: fused math+decide+respawn+render; FRAMEBUFFER-ONLY)" },
+    .{ .layout = "L1", .strat = "B6.w1-autovec.w2-fused", .label = "L1.B6.w1-autovec.w2-fused (B6: math | fused decide+respawn+render; FRAMEBUFFER-ONLY)" },
+    .{ .layout = "L1", .strat = "B7.w1-autovec.w2-fused", .label = "L1.B7.w1-autovec.w2-fused (B7: math+decide→mask | fused scan+respawn+render; FRAMEBUFFER-ONLY)" },
+    .{ .layout = "L1", .strat = "B8.w1-autovec.w2-fused", .label = "L1.B8.w1-autovec.w2-fused (B8: math+decide→list | fused respawn+render(dead) | render(live); FRAMEBUFFER-ONLY)" },
 };
 
 /// Returns the generator base name for a Halide cell, or null if the cell

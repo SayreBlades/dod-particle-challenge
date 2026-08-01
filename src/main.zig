@@ -22,6 +22,10 @@ const sim_map = std.StaticStringMap(type).initComptime(.{
     .{ "L1.B3.w1-autovec-par.w2-rmerge", @import("layouts/L1_aos_full/cells/B3.w1-autovec-par.w2-rmerge.zig").Sim },
     .{ "L1.B4.w1-autovec.w2-simple", @import("layouts/L1_aos_full/cells/B4.w1-autovec.w2-simple.zig").Sim },
     .{ "L1.B4.w1-autovec-par.w2-rmerge", @import("layouts/L1_aos_full/cells/B4.w1-autovec-par.w2-rmerge.zig").Sim },
+    .{ "L1.B5.w1-fused", @import("layouts/L1_aos_full/cells/B5.w1-fused.zig").Sim },
+    .{ "L1.B6.w1-autovec.w2-fused", @import("layouts/L1_aos_full/cells/B6.w1-autovec.w2-fused.zig").Sim },
+    .{ "L1.B7.w1-autovec.w2-fused", @import("layouts/L1_aos_full/cells/B7.w1-autovec.w2-fused.zig").Sim },
+    .{ "L1.B8.w1-autovec.w2-fused", @import("layouts/L1_aos_full/cells/B8.w1-autovec.w2-fused.zig").Sim },
 });
 
 const SimImpl = sim_map.get(opts.name) orelse
