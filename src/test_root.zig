@@ -2,5 +2,5 @@
 // relative imports inside the module path; the comptime reference pulls the
 // target file's tests into the build.
 comptime {
-    _ = @import("framework/render_opt.zig");
+    _ = @import("layouts/common/render_opt.zig");
 }

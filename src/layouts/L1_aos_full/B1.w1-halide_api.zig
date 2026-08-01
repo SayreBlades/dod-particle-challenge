@@ -1,33 +1,26 @@
-// Walk 1 — Halide branchless blend step (B1 walk 1, blend variant).
+// B1.w1-halide_api.zig — the Halide FFI binding for the B1 branchless-blend
+// step (shared by the B1 halide cells). Extern decl + buffer marshaling;
+// the generator (B1.w1-halide_gen.py) emits zig-out/halide/w1-halide.{h,a}.
 //
-// impl: halide, schedule: scalar, parallel: none, variant: blend
+// This is shared *infrastructure* (§8 rule 3): cells call `run()` like
+// calling memcpy — not imported as a walk. The cell's `step` owns the
+// blueprint; this file owns the FFI plumbing.
 //
-// The ENTIRE step in Halide: math + branchless blend respawn, one pipeline,
-// zero Zig passes. The blend computes respawn values for ALL N every frame
-// (the branchless tax) and draws from a per-particle hash RNG (splitmix64
-// over (i, frame, draw)) — a DIFFERENT RNG model than the branchy variant's
-// ordered spawn stream. Physics and respawn distributions are identical to
-// naive; trajectories are not → statistical golden class.
-//
-// The generator (walks/w1-halide_gen.py) takes the death rate q at BUILD time: the
-// kill test is competing-risks (§7) — age' >= kill_age OR (q>0 and kill-hash <
-// q). q=0 prunes to age-only and draws no kill hash. The C function it emits
-// is `halide_b1` (an internal symbol; the walk file is named w1-halide).
+// THE GOLDEN TENSION (read first): naive draws respawn RNG only for dead
+// particles, in death order — the golden's trajectories depend on that exact
+// sequence. A branchless blend needs respawn values for EVERY particle, so
+// no death-order stream can feed it. B1's answer: per-particle hash RNG
+// (splitmix64 over (i, frame, draw)) — deterministic, vectorizable, but a
+// DIFFERENT RNG model. Physics and respawn DISTRIBUTIONS are identical;
+// trajectories diverge from stage1.bin by design. The cell declares
+// golden_class = .statistical.
 
 const std = @import("std");
-const fw = @import("../../../framework/sim.zig");
-const config = @import("../../../framework/config.zig");
-const layout = @import("../data.zig");
+const config = @import("../../framework/config.zig");
+const layout = @import("data.zig");
 
-const Data = layout.Data;
-const Particle = layout.Particle;
-
-pub const decl: fw.WalkDecl = .{
-    .impl = .halide,
-    .schedule = .scalar,
-    .parallel = .none,
-    .variant = .blend,
-};
+pub const Data = layout.Data;
+pub const Particle = layout.Particle;
 
 const halide_type_t = extern struct { code: u8, bits: u8, lanes: u16 };
 const halide_dimension_t = extern struct { min: i32, extent: i32, stride: i32, flags: u32 };
@@ -73,9 +66,10 @@ fn out1d(host: [*]u8, n: usize, stride: i32, t: halide_type_t, d: *[1]halide_dim
     return .{ .host = host, .type = t, .dimensions = 1, .dim = d };
 }
 
-pub fn step(sim: anytype, dt: f32, fb: ?[]u8, w: u32, h: u32) void {
-    _ = fb; _ = w; _ = h; // unfused — no splat in step
-    const data = &sim.data;
+/// Run the Halide B1 branchless-blend step over the whole particle array
+/// in place. `frame` is the sim's frame counter (the per-particle hash RNG
+/// uses it). Competing-risks death (config.q) is baked into the emitted .a.
+pub fn run(data: *Data, dt: f32, frame: u64) void {
     const n = data.n;
     const base: [*]u8 = @ptrCast(&data.particles[0]);
     const stride_floats: i32 = @intCast(@sizeOf(Particle) / 4);
@@ -117,6 +111,6 @@ pub fn step(sim: anytype, dt: f32, fb: ?[]u8, w: u32, h: u32) void {
     var buf_cg = out1d(base + color_off + 4, n, stride_floats, FLOAT32, &dcg);
     var buf_cb = out1d(base + color_off + 8, n, stride_floats, FLOAT32, &dcb);
 
-    const rc = halide_b1(&buf_in, &buf_kind_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, config.kill_age, sim.frame, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_kind, &buf_cr, &buf_cg, &buf_cb);
+    const rc = halide_b1(&buf_in, &buf_kind_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, config.kill_age, frame, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_kind, &buf_cr, &buf_cg, &buf_cb);
     std.debug.assert(rc == 0);
 }

@@ -38,8 +38,8 @@
 // saturating add) — identical results.
 
 const std = @import("std");
-const fw = @import("sim.zig");
-const naive = @import("render.zig");
+const fw = @import("../../framework/sim.zig");
+const naive = @import("render_simple.zig");
 
 /// One splat row = two adjacent pixels, blended with one saturating-add op.
 pub const Row = @Vector(8, u8);
@@ -185,7 +185,7 @@ fn expectSameFrame(
 
 test "fast rasterizer == naive: random scene incl. off-screen + overlaps" {
     const alloc = std.testing.allocator;
-    const config = @import("config.zig");
+    const config = @import("../../framework/config.zig");
     const n = 20_000;
     const pos_x = try alloc.alloc(f32, n);
     defer alloc.free(pos_x);

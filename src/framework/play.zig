@@ -41,8 +41,8 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         if (rl.isKeyPressed(rl.KEY_F1)) show_hud = !show_hud;
 
         const dt: f32 = if (paused) 0 else rl.getFrameTime();
+        @memset(fb, 0);
         sim.step(dt, fb, @intCast(W), @intCast(H));
-        sim.render(fb, @intCast(W), @intCast(H));
         rl.updateTexture(tex, @ptrCast(fb.ptr));
 
         rl.beginDrawing();

@@ -21,7 +21,6 @@
 const std = @import("std");
 const fw = @import("../../framework/sim.zig");
 const config = @import("../../framework/config.zig");
-const rast = @import("../../framework/render.zig");
 
 pub const Particle = struct {
     pos: fw.Vec3,
@@ -123,15 +122,8 @@ pub const Data = struct {
         return out;
     }
 
-    /// r0 render: the naive per-particle splat walk over the AoS array.
-    /// One stream, all render fields adjacent — L1's render-side hypothesis
-    /// is that this is the cheapest walk of any layout (measured by --frame).
-    pub fn renderR0(self: *const Data, fb: []u8, w: u32, h: u32) void {
-        rast.clear(fb);
-        for (self.particles) |p| {
-            rast.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
-        }
-    }
+    // r0 render moved to layouts/common/render_simple.zig (pass/passKind).
+    // The cell's `step` calls the splat pass; the clear is the driver's job.
 };
 
 pub fn kindColor(k: fw.ParticleKind) fw.Vec4 {

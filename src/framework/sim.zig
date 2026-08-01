@@ -43,7 +43,7 @@ pub const RenderColorSemantics = enum { current_kind, stale_cold };
 //
 // IMPORTANT: CellDecl is a DECLARATION (metadata), not an execution engine.
 // It does not implement walks or chain their outputs to inputs. The strategy
-// code (H.step / H.render) still implements the walks and their data flow;
+// code (H.step) still implements the walks and their data flow;
 // CellDecl describes that data flow for attribution, manifest generation,
 // and runtime printing. The intermediates field names what carries the death
 // decision between walks (none/mask/list) — the strategy code owns the actual
@@ -185,12 +185,11 @@ pub const FieldDump = struct {
     bytes: []u8,
 };
 
-// Each stage's Sim must expose:
+// Each cell's Sim must expose (the Strategy helper generates all but `H.step`):
 //   pub const Sim = struct {
-//       <stage-specific fields — the layout IS the lesson>
+//       <framework-owned fields: data, rng, kill_rng, frame, threads, n>
 //       pub fn init(alloc: std.mem.Allocator, desc: Desc) anyerror!*@This();
-//       pub fn step(self: *@This(), dt: f32) void;
-//       pub fn render(self: *const @This(), fb: []u8, w: u32, h: u32) void;
+//       pub fn step(self: *@This(), dt: f32, fb: []u8, w: u32, h: u32) void;  // math + splat, always
 //       pub fn deinit(self: *@This()) void;
 //       pub fn snapshot(self: *const @This(), out: []f32) void;  // n*6 floats (px,py,pz,vx,vy,vz)
 //       pub fn bytesPerParticle(self: *const @This()) usize;
@@ -202,22 +201,19 @@ pub const FieldDump = struct {
 // per-component SoA streams. The audit output therefore reflects the layout
 // transformation itself.
 //
-// The HUD/bench label comes from the build options (`@import("options").label`,
-// resolved in build.zig from -Dlayout/-Dstrat or the -Dstage alias).
+// The bench label comes from the build options (`@import("options").label`,
+// resolved in build.zig from -Dlayout/-Dstrat).
 
 /// The strategy harness (layout-verticals.md §4.4): generates the Sim
 /// contract for a layout strategy — init/deinit owning a `Data`, the
-/// framework-visible `n`, delegation of the storage-determined methods, and
-/// the default render (`Data.renderR0`). A strategy file supplies only its
-/// schedule hooks:
+/// framework-visible `n`, and delegation of the storage-determined methods.
+/// A strategy file supplies only its `step` (math + splat, always):
 ///
 ///   const Data = @import("data.zig").Data;
 ///   const H = struct {
-///       pub fn step(sim: *Sim, dt: f32) void { ... }
-///       (use `sim: anytype` if another strategy re-exports the step —
-///       each fw.Strategy instantiation is a distinct type)
+///       pub fn step(sim: *Sim, dt: f32, fb: []u8, w: u32, h: u32) void { ... }
+///       (use `sim: anytype` so any cell can share physics helpers)
 ///       // optional overrides/decls:
-///       // pub fn render(sim: *const Sim, fb: []u8, w: u32, h: u32) void
 ///       // pub const Extra = struct { ... }    — strategy-owned state
 ///       // pub fn initExtra(sim: *Sim) !void   — scratch allocation
 ///       // pub fn deinitExtra(sim: *Sim) void   — scratch free
@@ -279,19 +275,15 @@ pub fn Strategy(comptime Data: type, comptime H: type) type {
 
         /// step takes an optional framebuffer so fused blueprints (B5/B6/B7)
         /// can splat inside the step walk (§17.7). fb == null = step-only
-        /// mode (no splat; the step bench and golden capture use this).
-        /// Unfused cells (B1-B4) ignore fb.
-        pub fn step(self: *Self, dt: f32, fb: ?[]u8, w: u32, h: u32) void {
+        /// One call: math + decide + respawn + splat, always (§17.7 as revised).
+        /// The splat always runs — the driver always provides a real fb. The
+        /// clear is NOT here (the driver owns it: play memsets each frame, bench
+        /// memsets once before the timed loop). Unfused blueprints (B1–B4) put
+        /// the splat in a separate pass after physics; fused blueprints (B5+)
+        /// splat inline in the physics loop.
+        pub fn step(self: *Self, dt: f32, fb: []u8, w: u32, h: u32) void {
             H.step(self, dt, fb, w, h);
             self.frame +%= 1; // B1-blend hash RNG frame counter (free otherwise)
-        }
-
-        pub fn render(self: *const Self, fb: []u8, w: u32, h: u32) void {
-            if (@hasDecl(H, "render")) {
-                H.render(self, fb, w, h);
-            } else {
-                self.data.renderR0(fb, w, h);
-            }
         }
 
         pub fn deinit(self: *Self) void {

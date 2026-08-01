@@ -49,8 +49,12 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     // Bring the sim to the same state the golden check captures.
     var sim = try SimImpl.init(alloc, .{ .n = AUDIT_N, .seed = config.spawn_seed });
     defer sim.deinit();
+    // The audit doesn't render — but step always splats now (§17.7). Pass a
+    // tiny dummy fb; the splat's bounds checks skip everything (particles are
+    // at world coords, a 4x4 fb maps to a tiny region). No clear needed.
+    var dummy_fb: [64]u8 = undefined;
     var i: usize = 0;
-    while (i < AUDIT_STEPS) : (i += 1) sim.step(config.dt, null, 0, 0);
+    while (i < AUDIT_STEPS) : (i += 1) sim.step(config.dt, &dummy_fb, 4, 4);
 
     const fields = try sim.dumpFields(alloc);
     defer {

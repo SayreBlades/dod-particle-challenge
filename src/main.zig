@@ -7,18 +7,12 @@ const fw = @import("framework/sim.zig");
 
 const sim_map = std.StaticStringMap(type).initComptime(.{
     // --- the layout verticals (src/layouts/; -Dlayout=LX -Dstrat=name) ---
-    // The arc (the old src/stages/, the project's history) is relocated to
-    // .scratch/orig/stages as reference history, not a build target
-    // (optimization-framework §11/§16.1). -Dstage is retired; its cells are
-    // scavenged where useful (L1.B1.w1-naive.w2-naive == arc stage 1's step).
-    //
-    // B1 cells compose walk files (walks/w1-*, w2-*) — each cell is a thin
-    // declaration block + a composition (H.step = w1.step, H.render =
-    // w2.render). The cell name encodes the blueprint + per-walk impl.
-    .{ "L1.B1.w1-naive.w2-naive", @import("layouts/L1_aos_full/cells/B1.w1-naive.w2-naive.zig").Sim },
-    .{ "L1.B1.w1-naive.w2-opt", @import("layouts/L1_aos_full/cells/B1.w1-naive.w2-opt.zig").Sim },
-    .{ "L1.B1.w1-scalar.w2-naive", @import("layouts/L1_aos_full/cells/B1.w1-scalar.w2-naive.zig").Sim },
-    .{ "L1.B1.w1-halide.w2-naive", @import("layouts/L1_aos_full/cells/B1.w1-halide.w2-naive.zig").Sim },
+    // B1 cells are self-contained (§8 rule 2): each inlines physics + splat
+    // in `step`. The Halide cells call B1.w1-halide_api.run() for walk 1.
+    .{ "L1.B1.w1-autovec.w2-simple", @import("layouts/L1_aos_full/cells/B1.w1-autovec.w2-simple.zig").Sim },
+    .{ "L1.B1.w1-autovec.w2-opt", @import("layouts/L1_aos_full/cells/B1.w1-autovec.w2-opt.zig").Sim },
+    .{ "L1.B1.w1-scalar.w2-simple", @import("layouts/L1_aos_full/cells/B1.w1-scalar.w2-simple.zig").Sim },
+    .{ "L1.B1.w1-halide.w2-simple", @import("layouts/L1_aos_full/cells/B1.w1-halide.w2-simple.zig").Sim },
     .{ "L1.B1.w1-halide.w2-opt", @import("layouts/L1_aos_full/cells/B1.w1-halide.w2-opt.zig").Sim },
 });
 

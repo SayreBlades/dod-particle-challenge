@@ -1,16 +1,21 @@
-// Shared software rasterizer (stages 1-9 use this; stage 10 overrides).
+// layouts/common/render_simple.zig — the r0 splat pass (layout-agnostic).
 //
-// Draws particles as additive splats into an RGBA framebuffer. The sim's
-// render() method writes this buffer; the play driver uploads it to a GPU
-// texture via raylib UpdateTexture.
+// The naive per-particle additive splat into an RGBA framebuffer. The clear
+// is NOT here (the driver owns it — play memsets each frame, bench memsets
+// once before the timed loop; §17.7). This module assumes an already-allocated
+// fb and splats additively. Shared by every unfused cell's r0 walk; the r1
+// pass (render_opt.zig) is byte-identical to this and proves it in tests.
 //
 // World coordinates are in [-view_half, view_half]; the framebuffer covers the
 // same extent in both axes (square).
 
 const std = @import("std");
-const config = @import("config.zig");
+const config = @import("../../framework/config.zig");
+const fw = @import("../../framework/sim.zig");
 
-/// Clear the framebuffer to black.
+/// Clear the framebuffer to black. (Driver concern, but kept here as the
+/// canonical clear so play/bench/correctness all agree on what "cleared"
+/// means. The cell's `step` does NOT call this.)
 pub fn clear(fb: []u8) void {
     @memset(fb, 0);
 }
@@ -73,4 +78,32 @@ fn clamp255(v: f32) u8 {
 fn addClamp(a: u8, b: u8) u8 {
     const sum: u16 = @as(u16, a) + @as(u16, b);
     return if (sum > 255) 255 else @intCast(sum);
+}
+
+/// The r0 splat pass over an AoS particle array (the r0 walk for unfused
+/// cells). Additive splats; NO clear (the driver cleared the fb already).
+/// Layout-agnostic: walks `particles` by pos + color. A layout whose
+/// Particle lacks a stored color calls `passKind` instead.
+pub fn pass(fb: []u8, w: u32, h: u32, particles: anytype) void {
+    for (particles) |p| {
+        splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
+    }
+}
+
+/// The r0 splat pass for layouts that derive color from kind (no stored
+/// color field): smoke gray, spark orange, debris blue.
+pub fn passKind(fb: []u8, w: u32, h: u32, particles: anytype) void {
+    for (particles) |p| {
+        const c = kindColor(p.kind);
+        splat(fb, w, h, p.pos.x, p.pos.y, c[0], c[1], c[2]);
+    }
+}
+
+/// Per-kind colors as u8 triplets (matches the r1 LUT exactly).
+pub fn kindColor(k: fw.ParticleKind) [3]u8 {
+    return switch (k) {
+        .smoke => .{ 120, 120, 120 }, // gray
+        .spark => .{ 255, 180, 60 }, // orange
+        .debris => .{ 100, 200, 255 }, // blue
+    };
 }

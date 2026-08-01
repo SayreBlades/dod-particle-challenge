@@ -8,13 +8,13 @@ exist; this file selects the subset worth measuring.
 
 Sweep knobs (env vars to `collect.sh`):
 
-| var          | default            | meaning                                      |
-|--------------|--------------------|----------------------------------------------|
-| `NS`         | *(bench default)*  | comma-list of N (e.g. `4000,65000,1000000`)  |
-| `TRIALS`     | `3`                | trials per N (min is taken downstream)        |
-| `DEATH_RATES`| `0`                | space-list of accident rates q (competing risks) |
-| `THREADS`    | `1`                | worker count for parallel cells               |
-| `MODES`      | `step frame render`| via the 3rd positional arg to collect.sh       |
+| var           | default             | meaning                                          |
+|---------------|---------------------|--------------------------------------------------|
+| `NS`          | *(bench default)*   | comma-list of N (e.g. `4000,65000,1000000`)      |
+| `TRIALS`      | `3`                 | trials per N (min is taken downstream)           |
+| `DEATH_RATES` | `0`                 | space-list of accident rates q (competing risks) |
+| `THREADS`     | `1`                 | worker count for parallel cells                  |
+| `MODES`       | `step frame render` | via the 3rd positional arg to collect.sh         |
 
 The bench's built-in N-sweep (when `NS` is unset):
 `4000 16000 65000 262000 1000000 4000000 16000000 64000000`.

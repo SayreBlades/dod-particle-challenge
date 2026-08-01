@@ -38,6 +38,10 @@ const GOLDEN_STEPS: usize = 600;
 const GOLDEN_N: usize = 1024;
 const EPS: f32 = 1e-4;
 const GOLDEN_PATH = "golden/stage1.bin";
+// The framebuffer dimensions used by the bench sweep + record mode.
+const RENDER_W: u32 = 1024;
+const RENDER_H: u32 = 1024;
+const RENDER_SETTLE_STEPS: usize = 120; // 2s = kill_age -> steady-state spread
 const FRAME_GOLDEN_PATH = "golden/frame.sha256";
 // CSV death column (build option -Ddeath=<q>, optimization-framework §7).
 const DEATH_COL = @import("options").death;
@@ -51,8 +55,6 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     // the whole process is a clean step() region for xctrace to wrap.
     var single_n: ?usize = null;
     var single_iters: ?usize = null;
-    var render_mode = false;
-    var frame_mode = false;
     var csv_mode = false;
     var record_dir: ?[]const u8 = null;
     var threads: usize = 1;
@@ -69,10 +71,6 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
                     if (it.next()) |val| single_n = std.fmt.parseInt(usize, val, 10) catch null;
                 } else if (std.mem.eql(u8, arg, "--iters")) {
                     if (it.next()) |val| single_iters = std.fmt.parseInt(usize, val, 10) catch null;
-                } else if (std.mem.eql(u8, arg, "--render")) {
-                    render_mode = true;
-                } else if (std.mem.eql(u8, arg, "--frame")) {
-                    frame_mode = true;
                 } else if (std.mem.eql(u8, arg, "--csv")) {
                     csv_mode = true;
                 } else if (std.mem.eql(u8, arg, "--threads")) {
@@ -211,27 +209,22 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         return;
     }
 
-    // --- render benchmark (--render): times Sim.render() separately from step() ---
-    if (render_mode) {
-        try renderBench(SimImpl, alloc, io, csv_mode, threads, sweep_list, trials);
-        return;
-    }
-
-    // --- frame benchmark (--frame): times { step() + render() } as one CPU frame ---
-    if (frame_mode) {
-        try frameBench(SimImpl, alloc, io, csv_mode, threads, sweep_list, trials);
-        return;
-    }
+    // --- render/frame modes retired (§17.7): one workload, the frame ---
+    // (math + splat, always). --render/--frame are gone; the sweep below
+    // times step(dt, fb, w, h) directly.
 
     // --- benchmark sweep ---
     const sweep_t0 = Io.Timestamp.now(io, .awake);
     const iters = if (single_iters) |i| i else ITERS;
+    // The framebuffer the splat writes into (RAM-only; no GPU in bench mode).
+    const fb = try alloc.alloc(u8, @as(usize, RENDER_W) * RENDER_H * 4);
+    defer alloc.free(fb);
     std.debug.print("=== Benchmark (iters={d}, warmup={d}, trials={d} per N; reporting min){s}\n", .{ iters, WARMUP, trials, if (pmc_mode) " [PMC mode]" else "" });
-    std.debug.print("  {s:>10} | {s:>7} | {s:>9} | {s:>14} | {s:>14} | {s:>11} | {s:>8} | {s:>11}\n", .{
-        "N", "bytes/p", "mem(MB)", "ns/particle(min)", "ns/frame(min)", "frames/sec", "GB/s eff", "runtime(ms)",
+    std.debug.print("  {s:>10} | {s:>7} | {s:>9} | {s:>14} | {s:>14} | {s:>11} | {s:>11}\n", .{
+        "N", "bytes/p", "mem(MB)", "ns/particle(min)", "ns/frame(min)", "frames/sec", "runtime(ms)",
     });
-    std.debug.print("  {s:-<10}-+-{s:-<7}-+-{s:-<9}-+-{s:-<14}-+-{s:-<14}-+-{s:-<11}-+-{s:-<8}-+-{s:-<11}\n", .{
-        "", "", "", "", "", "", "", "",
+    std.debug.print("  {s:-<10}-+-{s:-<7}-+-{s:-<9}-+-{s:-<14}-+-{s:-<14}-+-{s:-<11}-+-{s:-<11}\n", .{
+        "", "", "", "", "", "", "",
     });
 
     var total_runtime_ms: f64 = 0;
@@ -249,212 +242,63 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         const working_set_mb: f64 = @as(f64, @floatFromInt(working_set_bytes)) / (1024.0 * 1024.0);
 
         // Time TRIALS independent runs of (warmup + ITERS), keep min ns/frame.
-        // Each run includes its own warmup so the min reflects a fully-primed
-        // cache state; runtime(ms) sums all trials (the real bench cost).
+        // The clear is ONCE before the timed loop (S17.7: the clear is a
+        // driver concern; the timed region is purely math + splat).
         var min_ns_frame: f64 = std.math.inf(f64);
-        var max_ns_frame: f64 = 0;
         var trial_runtime_ns: f64 = 0;
 
         var trial: usize = 0;
         while (trial < trials) : (trial += 1) {
-            // warmup
+            // warmup (step always splats; clear so the fb doesn't saturate).
+            @memset(fb, 0);
             var w: usize = 0;
-            while (w < WARMUP) : (w += 1) sim.step(config.dt, null, 0, 0);
+            while (w < WARMUP) : (w += 1) sim.step(config.dt, fb, RENDER_W, RENDER_H);
 
+            // clear once before the timed loop.
+            @memset(fb, 0);
             const t0 = Io.Timestamp.now(io, .awake);
             var it: usize = 0;
-            while (it < iters) : (it += 1) sim.step(config.dt, null, 0, 0);
+            while (it < iters) : (it += 1) sim.step(config.dt, fb, RENDER_W, RENDER_H);
             const t1 = Io.Timestamp.now(io, .awake);
             const ns: f64 = @floatFromInt(t0.durationTo(t1).nanoseconds);
             trial_runtime_ns += ns;
             const ns_frame: f64 = ns / @as(f64, @floatFromInt(iters));
             if (ns_frame < min_ns_frame) min_ns_frame = ns_frame;
-            if (ns_frame > max_ns_frame) max_ns_frame = ns_frame;
             // Per-trial CSV row (unified schema; collect.sh prefixes run/machine).
-            // step_ns/render_ns left blank for step mode (ns_frame IS the step
-            // time); gbs_eff is the clean step hot-loop bandwidth.
+            // gbs_eff/step_ns/render_ns left blank (one mode; attribution is
+            // audit + PMC, not timing-derived -- S17.7).
             if (csv_mode) {
                 const ns_p: f64 = ns_frame / @as(f64, @floatFromInt(n));
-                const gbs: f64 = @as(f64, @floatFromInt(working_set_bytes)) / ns_frame;
-                std.debug.print("csv,{s},step,{d},{d},{d},{d},{d},{d:.1},{d:.4},{d:.2},,\n", .{
-                    @import("options").name, DEATH_COL, threads, n, bytes_per_p, trial, ns_frame, ns_p, gbs,
+                std.debug.print("csv,{s},frame,{d},{d},{d},{d},{d},{d:.1},{d:.4},,,\n", .{
+                    @import("options").name, DEATH_COL, threads, n, bytes_per_p, trial, ns_frame, ns_p,
                 });
             }
         }
 
         const ns_per_particle = min_ns_frame / @as(f64, @floatFromInt(n));
         const frames_sec = 1e9 / min_ns_frame;
-        // effective hot-loop bandwidth = bytes touched per frame / time per frame.
-        // 1 byte/ns == 1e9 bytes/s == 1 GB/s, so bytes/ns is GB/s directly.
-        const gbs_eff: f64 = @as(f64, @floatFromInt(working_set_bytes)) / min_ns_frame;
         const runtime_ms: f64 = trial_runtime_ns / 1e6;
         total_runtime_ms += runtime_ms;
         total_frames += @as(u64, n) * iters * trials;
 
-        std.debug.print("  {d:>10} | {d:>7} | {d:>9.1} | {d:>14.3} | {d:>14.1} | {d:>11.1} | {d:>8.2} | {d:>11.1}\n", .{
-            n, bytes_per_p, working_set_mb, ns_per_particle, min_ns_frame, frames_sec, gbs_eff, runtime_ms,
+        std.debug.print("  {d:>10} | {d:>7} | {d:>9.1} | {d:>14.3} | {d:>14.1} | {d:>11.1} | {d:>11.1}\n", .{
+            n, bytes_per_p, working_set_mb, ns_per_particle, min_ns_frame, frames_sec, runtime_ms,
         });
     }
 
     const sweep_t1 = Io.Timestamp.now(io, .awake);
     const sweep_wall_ms: f64 = @as(f64, @floatFromInt(sweep_t0.durationTo(sweep_t1).nanoseconds)) / 1e6;
 
-    std.debug.print("  {s:-<10}-+-{s:-<7}-+-{s:-<9}-+-{s:-<14}-+-{s:-<14}-+-{s:-<11}-+-{s:-<8}-+-{s:-<11}\n", .{
-        "", "", "", "", "", "", "", "",
+    std.debug.print("  {s:-<10}-+-{s:-<7}-+-{s:-<9}-+-{s:-<14}-+-{s:-<14}-+-{s:-<11}-+-{s:-<11}\n", .{
+        "", "", "", "", "", "", "",
     });
-    std.debug.print("  {s:>10} | {s:>7} | {s:>9} | {s:>14} | {s:>14} | {s:>11} | {s:>8} | {d:>11.1}\n", .{
-        "TOTAL", "", "", "", "", "", "sweep(ms):", total_runtime_ms,
+    std.debug.print("  {s:>10} | {s:>7} | {s:>9} | {s:>14} | {s:>14} | {s:>11} | {d:>11.1}\n", .{
+        "TOTAL", "", "", "", "", "sweep(ms):", total_runtime_ms,
     });
-    std.debug.print("  {s:>10} | {s:>7} | {s:>9} | {s:>14} | {s:>14} | {s:>11} | {s:>8} | {d:>11.1}\n", .{
-        "", "", "", "", "", "", "wall(ms):", sweep_wall_ms,
+    std.debug.print("  {s:>10} | {s:>7} | {s:>9} | {s:>14} | {s:>14} | {s:>11} | {d:>11.1}\n", .{
+        "", "", "", "", "", "wall(ms):", sweep_wall_ms,
     });
     std.debug.print("\n  total particles-frames simulated: {d}\n", .{total_frames});
-}
-
-// --- render benchmark (--render) --------------------------------------------------
-
-const RENDER_W: u32 = 1024;
-const RENDER_H: u32 = 1024;
-const RENDER_SETTLE_STEPS: usize = 120; // 2s = kill_age -> steady-state spread
-
-/// Render-time benchmark (stage 10's instrument, P11): times Sim.render()
-/// exactly the way the step sweep times Sim.step() — warmup, TRIALS runs,
-/// keep min ns/frame. The step bench is firewalled from rendering; this flag
-/// is the render-side counterpart, so the rasterizer's cost is measurable
-/// separately from the sim's cost. Iters scale ~1/N so every N costs roughly
-/// the same wall time (render is O(N) splats + a fixed 4 MB clear).
-fn renderBench(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, csv: bool, threads: usize, sweep_list: []const usize, trials: usize) !void {
-    const fb = try alloc.alloc(u8, @as(usize, RENDER_W) * RENDER_H * 4);
-    defer alloc.free(fb);
-
-    std.debug.print("=== Render benchmark (framebuffer {d}x{d}, trials={d} per N; reporting min) ===\n", .{ RENDER_W, RENDER_H, trials });
-    std.debug.print("  render() timed end-to-end (clear + splat) after {d} settle steps.\n\n", .{RENDER_SETTLE_STEPS});
-    std.debug.print("  {s:>10} | {s:>6} | {s:>14} | {s:>14} | {s:>11}\n", .{ "N", "iters", "ns/frame(min)", "ns/particle", "frames/sec" });
-    std.debug.print("  {s:-<10}-+-{s:-<6}-+-{s:-<14}-+-{s:-<14}-+-{s:-<11}\n", .{ "", "", "", "", "" });
-
-    for (sweep_list) |n| {
-        var sim = SimImpl.init(alloc, .{ .n = n, .seed = config.spawn_seed, .threads = threads }) catch |e| {
-            std.debug.print("  {d:>10} | (init failed: {t})\n", .{ n, e });
-            continue;
-        };
-        defer sim.deinit();
-
-        const bytes_per_p = sim.bytesPerParticle();
-
-        // Settle to a steady-state spatial distribution (init places every
-        // particle at the origin — maximally overlapped, unrepresentative).
-        var s: usize = 0;
-        while (s < RENDER_SETTLE_STEPS) : (s += 1) sim.step(config.dt, null, 0, 0);
-
-        const iters: usize = @max(10, @min(200, 13_000_000 / @max(n, 1)));
-
-        var wu: usize = 0;
-        while (wu < 2) : (wu += 1) sim.render(fb, RENDER_W, RENDER_H);
-
-        var min_ns_frame: f64 = std.math.inf(f64);
-        var trial: usize = 0;
-        while (trial < trials) : (trial += 1) {
-            const t0 = Io.Timestamp.now(io, .awake);
-            var it: usize = 0;
-            while (it < iters) : (it += 1) sim.render(fb, RENDER_W, RENDER_H);
-            const t1 = Io.Timestamp.now(io, .awake);
-            const ns_frame = @as(f64, @floatFromInt(t0.durationTo(t1).nanoseconds)) / @as(f64, @floatFromInt(iters));
-            if (ns_frame < min_ns_frame) min_ns_frame = ns_frame;
-            if (csv) {
-                const ns_p = ns_frame / @as(f64, @floatFromInt(n));
-                std.debug.print("csv,{s},render,{d},{d},{d},{d},{d},{d:.1},{d:.4},,,\n", .{
-                    @import("options").name, DEATH_COL, threads, n, bytes_per_p, trial, ns_frame, ns_p,
-                });
-            }
-        }
-
-        std.debug.print("  {d:>10} | {d:>6} | {d:>14.1} | {d:>14.4} | {d:>11.1}\n", .{
-            n, iters, min_ns_frame, min_ns_frame / @as(f64, @floatFromInt(n)), 1e9 / min_ns_frame,
-        });
-    }
-    std.debug.print("\n", .{});
-}
-
-// --- frame benchmark (--frame): step+render timed as one CPU frame ------------
-
-/// Frame benchmark (layout-matrix.md §2.2): times { step(); render() } per
-/// frame — the way play mode actually pays it — with nested decomposition
-/// (step ns and render ns accumulated separately inside the timed loop), so a
-/// frame win is attributable to the sim side or the render side at a glance.
-/// This is the primary instrument for the matrix's winner-per-regime
-/// declarations. Iters scale ~1/N (same as --render: O(N) splats + a fixed
-/// 4 MB clear that dominates at small N — the Amdahl note of §6.2).
-fn frameBench(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, csv: bool, threads: usize, sweep_list: []const usize, trials: usize) !void {
-    const fb = try alloc.alloc(u8, @as(usize, RENDER_W) * RENDER_H * 4);
-    defer alloc.free(fb);
-
-    std.debug.print("=== Frame benchmark (step+render, framebuffer {d}x{d}, trials={d} per N; reporting min) ===\n", .{ RENDER_W, RENDER_H, trials });
-    std.debug.print("  step/render columns are per-frame averages inside the fastest trial (the 4 MB clear is inside render).\n\n", .{});
-    std.debug.print("  {s:>10} | {s:>6} | {s:>12} | {s:>12} | {s:>12} | {s:>13} | {s:>11}\n", .{ "N", "iters", "step ns/f", "render ns/f", "frame ns/f", "frame ns/p", "fps" });
-    std.debug.print("  {s:-<10}-+-{s:-<6}-+-{s:-<12}-+-{s:-<12}-+-{s:-<12}-+-{s:-<13}-+-{s:-<11}\n", .{ "", "", "", "", "", "", "" });
-
-    for (sweep_list) |n| {
-        var sim = SimImpl.init(alloc, .{ .n = n, .seed = config.spawn_seed, .threads = threads }) catch |e| {
-            std.debug.print("  {d:>10} | (init failed: {t})\n", .{ n, e });
-            continue;
-        };
-        defer sim.deinit();
-
-        const bytes_per_p = sim.bytesPerParticle();
-
-        const iters: usize = @max(10, @min(200, 13_000_000 / @max(n, 1)));
-
-        // Warmup: full frames (step+render) — reaches steady-state population
-        // and primes caches/predictors, same role as the step sweep's warmup.
-        var wu: usize = 0;
-        while (wu < WARMUP) : (wu += 1) {
-            sim.step(config.dt, fb, RENDER_W, RENDER_H);
-            sim.render(fb, RENDER_W, RENDER_H);
-        }
-
-        var min_frame_ns: f64 = std.math.inf(f64);
-        var step_ns_at_min: f64 = 0;
-        var render_ns_at_min: f64 = 0;
-        var trial: usize = 0;
-        while (trial < trials) : (trial += 1) {
-            var step_ns: u64 = 0;
-            var render_ns: u64 = 0;
-            const t0 = Io.Timestamp.now(io, .awake);
-            var it: usize = 0;
-            while (it < iters) : (it += 1) {
-                const ts0 = Io.Timestamp.now(io, .awake);
-                sim.step(config.dt, fb, RENDER_W, RENDER_H);
-                const ts1 = Io.Timestamp.now(io, .awake);
-                sim.render(fb, RENDER_W, RENDER_H);
-                const ts2 = Io.Timestamp.now(io, .awake);
-                step_ns += @intCast(ts0.durationTo(ts1).nanoseconds);
-                render_ns += @intCast(ts1.durationTo(ts2).nanoseconds);
-            }
-            const t1 = Io.Timestamp.now(io, .awake);
-            const frame_ns = @as(f64, @floatFromInt(t0.durationTo(t1).nanoseconds)) / @as(f64, @floatFromInt(iters));
-            if (frame_ns < min_frame_ns) {
-                min_frame_ns = frame_ns;
-                step_ns_at_min = @as(f64, @floatFromInt(step_ns)) / @as(f64, @floatFromInt(iters));
-                render_ns_at_min = @as(f64, @floatFromInt(render_ns)) / @as(f64, @floatFromInt(iters));
-            }
-            // Per-trial CSV: step_ns + render_ns decompose the frame (both
-            // filled for frame mode); gbs_eff blank (frame mixes step streaming
-            // with the framebuffer clear — not a clean bandwidth number).
-            if (csv) {
-                const sn = @as(f64, @floatFromInt(step_ns)) / @as(f64, @floatFromInt(iters));
-                const rn = @as(f64, @floatFromInt(render_ns)) / @as(f64, @floatFromInt(iters));
-                const ns_p = frame_ns / @as(f64, @floatFromInt(n));
-                std.debug.print("csv,{s},frame,{d},{d},{d},{d},{d},{d:.1},{d:.4},,{d:.1},{d:.1}\n", .{
-                    @import("options").name, DEATH_COL, threads, n, bytes_per_p, trial, frame_ns, ns_p, sn, rn,
-                });
-            }
-        }
-
-        std.debug.print("  {d:>10} | {d:>6} | {d:>12.1} | {d:>12.1} | {d:>12.1} | {d:>13.4} | {d:>11.1}\n", .{
-            n, iters, step_ns_at_min, render_ns_at_min, min_frame_ns, min_frame_ns / @as(f64, @floatFromInt(n)), 1e9 / min_frame_ns,
-        });
-    }
-    std.debug.print("\n", .{});
 }
 
 // --- record mode (stage 11, --record <dir>) ----------------------------------------
@@ -531,9 +375,12 @@ fn recordVideo(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, out_dir
     var frame: usize = 0;
     var step_i: usize = 0;
     while (step_i < RECORD_STEPS) : (step_i += 1) {
+        // Clear before each step so each captured frame shows exactly this
+        // step's splat on a clean fb (step always splats now, §17.7).
+        @memset(fb, 0);
         sim.step(config.dt, fb, RENDER_W, RENDER_H);
         if (step_i % 2 != 0) continue;
-        sim.render(fb, RENDER_W, RENDER_H);
+        // Stream the captured frame to ffmpeg.
         stdin_file.writeStreamingAll(io, fb) catch |e| {
             std.debug.print("  ERROR: ffmpeg stdin write failed ({t}) -- encoder likely exited early\n", .{e});
             return e;

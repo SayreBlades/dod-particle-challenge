@@ -38,8 +38,12 @@ pub fn capture(
 ) !Snapshot {
     var sim = try SimImpl.init(alloc, desc);
     defer sim.deinit();
+    // The sim golden captures pos/vel only — the splat is irrelevant. Pass a
+    // tiny dummy fb; step always splats now (§17.7) but the bounds checks skip
+    // everything at 4x4. No clear needed (we don't read the fb).
+    var dummy_fb: [64]u8 = undefined;
     var i: usize = 0;
-    while (i < steps) : (i += 1) sim.step(dt, null, 0, 0);
+    while (i < steps) : (i += 1) sim.step(dt, &dummy_fb, 4, 4);
     return try snapshotFromSim(SimImpl, sim, alloc);
 }
 
@@ -95,9 +99,15 @@ pub fn captureFrame(
     var sim = try SimImpl.init(alloc, desc);
     defer sim.deinit();
     const fb = try alloc.alloc(u8, @as(usize, w) * h * 4);
+    // Each step splats into fb; clear before each so the fb after the loop
+    // shows exactly the state after `steps` steps (the last step's splat on
+    // a cleared fb). The old code ran step(null) then render() once; the
+    // always-splat step (§17.7) makes memset+step equivalent.
     var i: usize = 0;
-    while (i < steps) : (i += 1) sim.step(dt, fb, w, h);
-    sim.render(fb, w, h);
+    while (i < steps) : (i += 1) {
+        @memset(fb, 0);
+        sim.step(dt, fb, w, h);
+    }
     return fb;
 }
 
