@@ -53,3 +53,59 @@ Read: 39 B of the 68 B struct (life/color/size/rotation/mass/flags) carries
 ~0 bits of information per frame — the indictment that drives L2 (lean field
 set). This is the reference fingerprint every later layout's audit compares
 against.
+
+## The L1 champion grid
+
+22 cells across all 8 blueprints (B1–B8) were implemented, verified
+(`--check` PASS + golden PASS for all), and swept across the probe rate set
+{0.01, 0.05, 0.25} × 6 N-bands (4K–4M) × 3 trials. The 4 champions graduated
+to the full rate set {0, 0.01, 0.05, 0.1, 0.25, 0.5, 0.75}. All numbers:
+Apple M4, ReleaseFast, min-of-3-trials.
+
+### Champion per regime × death rate (frame, ns/particle)
+
+| N-band       | q=0   | q=0.01 | q=0.05      | q=0.1       | q=0.25      | q=0.5       | q=0.75      |
+|-------------|-------|--------|-------------|-------------|-------------|-------------|-------------|
+| small ≤65K  | **autovec-opt** 3.4 | **autovec-simple** 7.7 | **B6-fused** 7.4 | **halide-opt** 7.7 | **halide-opt** 7.5 | **halide-opt** 8.2 | **halide-opt** 9.1 |
+| mid 262K–1M | **autovec-opt** 3.0 | **autovec-opt** 5.0 | **halide-opt** 5.4 | **halide-opt** 5.1 | **halide-opt** 4.7 | **halide-opt** 5.3 | **halide-opt** 6.4 |
+| large ≥4M   | **autovec-opt** 3.2 | **autovec-opt** 4.9 | **halide-opt** 5.3 | **halide-opt** 5.0 | **halide-opt** 4.7 | **halide-opt** 5.3 | **halide-opt** 6.4 |
+
+Cell key: `autovec-opt` = B1.w1-autovec.w2-opt · `autovec-simple` =
+B1.w1-autovec.w2-simple · `halide-opt` = B1.w1-halide.w2-opt · `B6-fused` =
+B6.w1-autovec.w2-fused.
+
+### What the grid says
+
+1. **At natural death (q=0)**, B1.w1-autovec.w2-opt dominates everywhere
+   (~3 ns/p, ~21 GB/s achieved vs the 5.6 GB/s streaming ceiling). The r1
+   splat's tight loop wins when the rarely-taken branch is predicted and cheap.
+
+2. **As death rate rises (q≥0.05)**, B1.w1-halide.w2-opt takes over. The
+   branchless blend (Halide, per-particle hash RNG) is death-rate-invariant —
+   its cost doesn't rise with churn, while the branchy autovec cell's
+   mispredict cost does. The crossover is at q≈0.05 (mid/large N).
+
+3. **At small N, q=0.05**, B6.w1-autovec.w2-fused wins — a surprise. The fused
+   render saves a pos re-read when the working set is cache-resident; at small
+   N the extra instruction cost of the fused loop is cheaper than the second
+   pass's memory traffic. This is the render-fusion hypothesis (§3 B5/B6)
+   confirmed at the small-N/cache-resident corner.
+
+4. **No global winner.** The champion moves autovec-opt → halide-opt as death
+   rises, and B6-fused edges in at small-N/mid-churn. Every declaration carries
+   regime + numbers (§16.9).
+
+### PMC cycle attribution (champions, N=1M, q=0)
+
+| cell              | cycles  | %useful | %processing | %discarded |
+|-------------------|--------:|--------:|------------:|-----------:|
+| B1.w1-autovec.w2-opt    | 44.8M | 60.0% | 22.0% | 17.9% |
+| B1.w1-halide.w2-opt     | 44.3M | 59.3% | 22.9% | 17.8% |
+| B1.w1-autovec.w2-simple | 46.1M | 58.9% | 23.5% | 17.5% |
+| B6.w1-autovec.w2-fused  | 45.1M | 59.1% | 23.2% | 17.7% |
+
+At natural death all four champions are ~59–60% useful cycles, ~22%
+processing-bottleneck, ~18% discarded. They share the same bottleneck — the
+AoS gather (stride-17) and memory stalls — not the blueprint. The death-rate
+differentiation (branchy vs blend) would show up in the discarded/processing
+breakdown at q>0; at q=0 the branch is rarely taken so the profiles converge.

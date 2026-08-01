@@ -27,15 +27,20 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-LAYOUT="${1:?usage: collect.sh <layout> [cells] [modes]}"
-CELLS_ARG="${2:-}"
-MODES="${3:-frame}"
 # Death rates: default to the probe set; --full-rates swaps to the champion set.
 RATES_FILE="experiments/sweeps/death_rates.txt"
-# Parse --full-rates from args (before the positional layout arg)
+# Strip --full-rates from args, then assign positionals.
+POSITIONAL=()
 for arg in "$@"; do
-    if [ "$arg" = "--full-rates" ]; then RATES_FILE="experiments/sweeps/death_rates_full.txt"; fi
+    if [ "$arg" = "--full-rates" ]; then
+        RATES_FILE="experiments/sweeps/death_rates_full.txt"
+    else
+        POSITIONAL+=("$arg")
+    fi
 done
+LAYOUT="${POSITIONAL[0]:?usage: collect.sh [--full-rates] <layout> [cells] [modes]}"
+CELLS_ARG="${POSITIONAL[1]:-}"
+MODES="${POSITIONAL[2]:-frame}"
 if [ -n "${DEATH_RATES:-}" ]; then
     : # explicit override wins
 elif [ -f "$RATES_FILE" ]; then
