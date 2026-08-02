@@ -129,7 +129,7 @@ for cell in $CELLS; do
             esac
             echo "    $cell  $mode (q=$q)..." >&2
             # bench prints csv rows to stderr; merge, filter, prefix, append.
-            ./zig-out/bin/dod-particles $flag $NS_ARG --trials "$TRIALS" \
+            ./out/bin/dod-particles $flag $NS_ARG --trials "$TRIALS" \
                 --csv --threads "$THREADS" 2>&1 \
                 | grep '^csv,' \
                 | sed "s/^csv,/${RUN_ID},${MACHINE_ID},/" \
@@ -137,7 +137,7 @@ for cell in $CELLS; do
         done
         # Invariant suite (--check): separate run, no timed-region overhead.
         echo "    $cell  --check (q=$q)..." >&2
-        check_result=$(./zig-out/bin/dod-particles --check 2>&1 | grep '^checked=' || echo 'checked=ERROR')
+        check_result=$(./out/bin/dod-particles --check 2>&1 | grep '^checked=' || echo 'checked=ERROR')
         printf '%s,%s,%s,%s,%s\n' "$RUN_ID" "$MACHINE_ID" "$cell" "$q" "$check_result" >> "$RUN_DIR/checks.csv"
     done
 done

@@ -75,8 +75,8 @@ and collect without any Python env at all.
 
 ```sh
 # Build a cell (L1 is the only layout so far; strat picks the cell):
-zig build -Dlayout=L1 -Dstrat=B1.w1-naive.w2-naive -Dmode=play -Doptimize=ReleaseFast
-./zig-out/bin/dod-particles            # interactive raylib window
+zig build -p out -Dlayout=L1 -Dstrat=B1.w1-naive.w2-naive -Dmode=play -Doptimize=ReleaseFast
+./out/bin/dod-particles            # interactive raylib window
 
 # Modes (-Dmode=):
 #   play      interactive raylib window (vsync-capped; never reports bench numbers)
@@ -100,17 +100,17 @@ The cell registry lives in [`build.zig`](build.zig) (`strat_labels`) and
 Halide cells need the Python env (`uv sync --extra halide`); the build
 runs the generator in `src/layouts/L1_aos_full/walks/w1-halide_gen.py` (via
 `HALIDE_PYTHON`, defaulting to `.venv/bin/python`) to emit
-`zig-out/halide/w1-halide.{h,a}`, then links it.
+`out/halide/w1-halide.{h,a}`, then links it.
 
 ### Bench runtime flags
 
 ```sh
-./zig-out/bin/dod-particles --csv --ns 4000,65000,1000000 --trials 5          # step sweep
-./zig-out/bin/dod-particles --frame --csv --ns 4000,65000                     # step+render per frame
-./zig-out/bin/dod-particles --render --csv --ns 4000,65000                    # render only
-./zig-out/bin/dod-particles --n 1000000 --iters 500                           # single N (PMC mode)
-./zig-out/bin/dod-particles --record out/                                     # 10s MP4 via ffmpeg
-./zig-out/bin/dod-particles --threads 8                                       # parallel cells
+./out/bin/dod-particles --csv --ns 4000,65000,1000000 --trials 5          # step sweep
+./out/bin/dod-particles --frame --csv --ns 4000,65000                     # step+render per frame
+./out/bin/dod-particles --render --csv --ns 4000,65000                    # render only
+./out/bin/dod-particles --n 1000000 --iters 500                           # single N (PMC mode)
+./out/bin/dod-particles --record                                         # 10s MP4 via ffmpeg (default: out/record/)
+./out/bin/dod-particles --threads 8                                       # parallel cells
 ```
 
 `-Ddeath=<q>` (build option) sets the competing-risks accident rate

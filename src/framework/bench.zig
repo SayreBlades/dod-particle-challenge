@@ -89,7 +89,10 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
                         }
                     }
                 } else if (std.mem.eql(u8, arg, "--record")) {
-                    if (it.next()) |val| record_dir = val;
+                    // `--record <dir>` exports a headless video; if no dir
+                    // follows, default to the build-output record dir ("out/record"),
+                    // which lives under the single `out/` prefix (refactor §2).
+                    record_dir = it.next() orelse "out/record";
                 } else if (std.mem.eql(u8, arg, "--check")) {
                     check_mode = true;
                 }

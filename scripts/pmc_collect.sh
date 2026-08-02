@@ -21,7 +21,7 @@
 #
 # Prerequisites:
 #   - Xcode installed (xctrace at /Applications/Xcode.app/Contents/Developer/usr/bin/xctrace)
-#   - The bench built: zig build -Dlayout=L1 -Dstrat=... -Dmode=bench -Doptimize=ReleaseFast
+#   - The bench built: zig build -p out -Dlayout=L1 -Dstrat=... -Dmode=bench -Doptimize=ReleaseFast
 
 set -euo pipefail
 
@@ -55,10 +55,10 @@ if [ -z "$XCTRACE" ]; then
 fi
 
 # Resolve binary to absolute path before cd-ing to temp dir.
-BIN="$(cd "$(dirname "$0")/.." && pwd)/zig-out/bin/dod-particles"
+BIN="$(cd "$(dirname "$0")/.." && pwd)/out/bin/dod-particles"
 if [ ! -x "$BIN" ]; then
     echo "error: $BIN not found. Build first:" >&2
-    echo "  zig build $BUILD_OPT -Dmode=bench -Doptimize=ReleaseFast" >&2
+    echo "  zig build -p out $BUILD_OPT -Dmode=bench -Doptimize=ReleaseFast" >&2
     exit 1
 fi
 
@@ -69,7 +69,7 @@ CSV="$OUTDIR/${TAG}_n${N}_t${TRIAL}.csv"
 
 # Build the sim if needed (silent if up-to-date).
 echo "building $CELL ($BUILD_OPT)..." >&2
-zig build "$BUILD_OPT" -Dmode=bench -Doptimize=ReleaseFast >&2 2>&1 || true
+zig build -p out "$BUILD_OPT" -Dmode=bench -Doptimize=ReleaseFast >&2 2>&1 || true
 
 # xctrace ignores --output when launching a process (known quirk); it writes
 # to Launch_<name>_<timestamp>.trace in CWD. We launch from a temp dir and

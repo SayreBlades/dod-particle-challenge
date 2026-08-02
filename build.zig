@@ -11,7 +11,7 @@ pub fn build(b: *std.Build) void {
     // (L1.B1.w1-autovec.w2-simple == arc stage 1's step).
     const layout_opt = b.option([]const u8, "layout", "layout id, e.g. L1 (needs -Dstrat)");
     const strat_opt = b.option([]const u8, "strat", "strategy name, e.g. B1.w1-autovec.w2-simple");
-    const halide_variant_opt = b.option([]const u8, "halide_variant", "Halide sweep candidate id (links a pre-generated zig-out/halide/<strat>_<id>.a)");
+    const halide_variant_opt = b.option([]const u8, "halide_variant", "Halide sweep candidate id (links a pre-generated out/halide/<strat>_<id>.a)");
     const mode_str = b.option([]const u8, "mode", "play | bench | audit") orelse "play";
     // Death model (optimization-framework.md §7): competing risks. `-Ddeath`
     // is the per-frame accident rate q (a float, default 0 = natural). The
@@ -86,7 +86,7 @@ pub fn build(b: *std.Build) void {
     });
     // --- Halide path: ONLY for cells whose walk 1 is halide (the w1-halide
     // walk). Fully gated: Zig strategies never touch python/Halide. The
-    // generator (Python bindings) emits zig-out/halide/<base>[_<variant>].{h,a}
+    // generator (Python bindings) emits out/halide/<base>[_<variant>].{h,a}
     // with the runtime bundled; the exe links the static .a. No libHalide at
     // runtime.
     if (strat_sel) |strat| {
@@ -109,7 +109,7 @@ pub fn build(b: *std.Build) void {
             // doesn't collide with the scalar .a (same generator, different schedule).
             const stem_par = if (std.mem.indexOf(u8, strat, "-par") != null) "_par" else "";
             const stem = if (halide_variant_opt) |v| b.fmt("{s}_{s}", .{ base, v }) else b.fmt("{s}{s}", .{ base, stem_par });
-            const out_prefix = b.fmt("zig-out/halide/{s}", .{stem});
+            const out_prefix = b.fmt("out/halide/{s}", .{stem});
             // Always run the generator for the derived schedule (no more
             // "pre-generated variant" expectation). A sweep can override the
             // schedule via -Dhalide_variant=<suffix> (pre-generated) if needed.

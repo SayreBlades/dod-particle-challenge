@@ -2,13 +2,13 @@
 # All local-only; not version-controlled.
 .scratch/
 
-# build artifacts
+# build artifacts — single `out/` prefix (refactor §2):
+#   out/bin, out/halide, out/lib, out/record. A bare `zig build` (no -p) would
+#   still spawn zig-out/; keep it ignored too.
+out/
 zig-out/
 .zig-cache/
 golden/
-
-# stage 11 record output (video.mp4; --record <dir>)
-out/
 
 # python venv (halide generator + analysis notebook deps)
 .venv/

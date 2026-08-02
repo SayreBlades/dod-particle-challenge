@@ -1,6 +1,6 @@
 // B1.w1-halide_api.zig — the Halide FFI binding for the B1 branchless-blend
 // step (shared by the B1 halide cells). Extern decl + buffer marshaling;
-// the generator (B1.w1-halide_gen.py) emits zig-out/halide/w1-halide.{h,a}.
+// the generator (B1.w1-halide_gen.py) emits out/halide/w1-halide.{h,a}.
 //
 // This is shared *infrastructure* (§8 rule 3): cells call `run()` like
 // calling memcpy — not imported as a walk. The cell's `step` owns the
