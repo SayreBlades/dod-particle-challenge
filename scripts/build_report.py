@@ -23,7 +23,15 @@ import duckdb
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "experiments", "data")
 REPORT = os.path.join(ROOT, "experiments", "report")
-LAYOUTS = {"L1": "L1_aos_full"}
+
+
+def layout_ids() -> list[str]:
+    """Layout ids = the L<digits> directories under src/layouts/. The folder
+    name IS the layout id, so there's no id->folder mapping to maintain."""
+    import re
+    base = os.path.join(ROOT, "src", "layouts")
+    return sorted(d for d in os.listdir(base)
+                  if re.fullmatch(r"L\d+", d) and os.path.isdir(os.path.join(base, d)))
 
 # Regime bucketing (§9): small <=65K, mid 1M, large >=16M.
 def regime(n):
@@ -182,8 +190,8 @@ ORDER BY regime, death_q"""
 def render_readme_grids(con):
     """Write the champion-grid markdown table into each layout README's
     auto-generated block (§9)."""
-    for layout, folder in LAYOUTS.items():
-        readme = os.path.join(ROOT, "src", "layouts", folder, "README.md")
+    for layout in layout_ids():
+        readme = os.path.join(ROOT, "src", "layouts", layout, "README.md")
         if not os.path.isfile(readme):
             continue
         sql = champion_grid_sql(layout)

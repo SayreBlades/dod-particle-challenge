@@ -122,7 +122,7 @@ pub const Data = struct {
         return out;
     }
 
-    // r0 render moved to layouts/common/render_simple.zig (pass/passKind).
+    // r0 render primitives in layouts/common/render_simple.zig (splat/passKind).
     // The cell's `step` calls the splat pass; the clear is the driver's job.
 };
 

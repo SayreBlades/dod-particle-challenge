@@ -59,7 +59,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 RATES_FILE = os.path.join(ROOT, "experiments", "sweeps", "death_rates.txt")
-LAYOUT_DIRS = {"L1": "L1_aos_full"}  # mirrors build.zig layoutDir
+
+
+def layout_ids() -> list[str]:
+    """Layout ids = the L<digits> directories under src/layouts/. The folder
+    name IS the layout id, so there's no id->folder mapping to maintain."""
+    import re
+    base = os.path.join(ROOT, "src", "layouts")
+    return sorted(d for d in os.listdir(base)
+                  if re.fullmatch(r"L\d+", d) and os.path.isdir(os.path.join(base, d)))
 
 # Locks: append_lock serializes JSONL writes; state_lock guards counters.
 APPEND_LOCK = threading.Lock()
@@ -85,7 +93,7 @@ def resolve_cell(name: str) -> str:
     """Validate a full cell name (L<layout>.<strat>). Bare strats are rejected —
     the same strat names recur across layouts (B1–B8 share blueprints), so a
     bare strat is ambiguous once a second layout lands."""
-    if name.split(".", 1)[0] in LAYOUT_DIRS:
+    if name.split(".", 1)[0] in layout_ids():
         return name
     sys.exit(f"error: '{name}' is not a full cell name "
             f"(expected L<layout>.<strat>, e.g. L1.B1.w1-autovec.w2-simple)")
@@ -311,18 +319,19 @@ def main() -> int:
 
     # cells: target is `all` | a layout | a cell/strat | a space-list of cells.
     target = args.target
+    known = layout_ids()
     if target in ("", "all"):
         cells = []
-        for L in LAYOUT_DIRS:
+        for L in known:
             cells.extend(read_cells(L))
-    elif target in LAYOUT_DIRS:
+    elif target in known:
         cells = read_cells(target)
     else:
         cells = [resolve_cell(c) for c in target.split()]
     if not cells:
         sys.exit("error: no cells to run.")
     for c in cells:
-        if c.split(".", 1)[0] not in LAYOUT_DIRS:
+        if c.split(".", 1)[0] not in known:
             sys.exit(f"error: cell '{c}' has an unknown layout")
 
     # provenance + host data dir

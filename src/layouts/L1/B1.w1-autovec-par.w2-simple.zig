@@ -27,7 +27,7 @@ const CHUNK_ALIGN: usize = 32; // chunk starts snap to 32 particles (17 lines)
 
 pub const H = struct {
     pub const cell_decl: fw.CellDecl = .{
-        .layout = "L1_aos_full",
+        .layout = "L1",
         .blueprint = .B1,
         .ordering = .identity,
         .intermediates = .none,
@@ -78,7 +78,9 @@ pub const H = struct {
         // walk 1 (serial tail): mask-scan + respawn in index order (bit-exact).
         phase2Respawn(sim);
         // walk 2: r0 splat pass (no clear — the driver owns it).
-        r0.pass(fb, w, h, sim.data.particles);
+        for (sim.data.particles) |p| {
+            r0.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
+        }
     }
 
     fn phase1Task(ctx: *anyopaque, worker: usize, n_workers: usize) void {

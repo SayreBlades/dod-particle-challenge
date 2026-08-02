@@ -1,4 +1,4 @@
-// layouts/common/render_simple.zig — the r0 splat pass (layout-agnostic).
+// layouts/common/render_simple.zig — the r0 splat primitives (layout-agnostic).
 //
 // The naive per-particle additive splat into an RGBA framebuffer. The clear
 // is NOT here (the driver owns it — play memsets each frame, bench memsets
@@ -80,18 +80,9 @@ fn addClamp(a: u8, b: u8) u8 {
     return if (sum > 255) 255 else @intCast(sum);
 }
 
-/// The r0 splat pass over an AoS particle array (the r0 walk for unfused
-/// cells). Additive splats; NO clear (the driver cleared the fb already).
-/// Layout-agnostic: walks `particles` by pos + color. A layout whose
-/// Particle lacks a stored color calls `passKind` instead.
-pub fn pass(fb: []u8, w: u32, h: u32, particles: anytype) void {
-    for (particles) |p| {
-        splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
-    }
-}
-
 /// The r0 splat pass for layouts that derive color from kind (no stored
-/// color field): smoke gray, spark orange, debris blue.
+/// color field): smoke gray, spark orange, debris blue. (Inlined at every
+/// call site now; this wrapper is kept for layouts without a stored color.)
 pub fn passKind(fb: []u8, w: u32, h: u32, particles: anytype) void {
     for (particles) |p| {
         const c = kindColor(p.kind);

@@ -16,7 +16,7 @@ const Data = layout.Data;
 
 pub const H = struct {
     pub const cell_decl: fw.CellDecl = .{
-        .layout = "L1_aos_full",
+        .layout = "L1",
         .blueprint = .B1,
         .ordering = .identity,
         .intermediates = .none,
@@ -33,7 +33,9 @@ pub const H = struct {
         // walk 1: Halide branchless blend (math + decide + respawn in one pipeline).
         halide.run(data, dt, sim.frame);
         // walk 2: r0 splat pass (no clear — the driver owns it).
-        r0.pass(fb, w, h, data.particles);
+        for (data.particles) |p| {
+            r0.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
+        }
     }
 };
 

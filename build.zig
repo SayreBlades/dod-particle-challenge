@@ -141,7 +141,7 @@ pub fn build(b: *std.Build) void {
             // Always run the generator for the derived schedule (no more
             // "pre-generated variant" expectation). A sweep can override the
             // schedule via -Dhalide_variant=<suffix> (pre-generated) if needed.
-            const gen_dir = b.fmt("src/layouts/{s}/{s}_gen.py", .{ layoutDir(layout), base });
+            const gen_dir = b.fmt("src/layouts/{s}/{s}_gen.py", .{ layout, base });
             const gen = b.addSystemCommand(&.{
                 python,
                 gen_dir,
@@ -272,15 +272,6 @@ fn halideGenBase(strat: []const u8) ?[]const u8 {
         return "B1.w1-halide";
     }
     return null;
-}
-
-/// Layout id -> folder name (one per vertical; extended as verticals land).
-fn layoutDir(layout: []const u8) []const u8 {
-    const map = std.StaticStringMap([]const u8).initComptime(.{
-        .{ "L1", "L1_aos_full" },
-    });
-    return map.get(layout) orelse
-        std.debug.panic("unknown layout '{s}' (see layoutDir in build.zig)", .{layout});
 }
 
 fn stratLabel(layout: []const u8, strat: []const u8) ?[]const u8 {

@@ -24,7 +24,7 @@ const Data = layout.Data;
 
 pub const H = struct {
     pub const cell_decl: fw.CellDecl = .{
-        .layout = "L1_aos_full",
+        .layout = "L1",
         .blueprint = .B5,
         .ordering = .identity,
         .intermediates = .none,
@@ -55,7 +55,7 @@ pub const H = struct {
                 data.spawn(&sim.rng, i);
             }
             // splat (inlined — reads post-respawn pos). Uses stored color
-            // (matches r0.pass; spawn sets color = kindColor(kind)).
+            // (matches the r0 splat; spawn sets color = kindColor(kind)).
             rast.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
         }
     }

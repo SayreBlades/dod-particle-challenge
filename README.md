@@ -26,16 +26,16 @@ A layout is one frozen data model (topology × field set × allocation
 policy — zero comptime knobs). Each is explored by sweeping its cells across
 the regime grid (below). Ordered by expected information-per-hour:
 
-| #  | folder                                           | data model                                     | hot B/p |   status    | priority reason                                             |
-|----|--------------------------------------------------|------------------------------------------------|--------:|:-----------:|-------------------------------------------------------------|
-| L1 | [L1_aos_full](src/layouts/L1_aos_full/README.md) | AoS, full 11-field, plain alloc                |     ~68 | ✅ complete | the strawman; re-label existing work, land the framework    |
-| L2 | [L2_aos_lean](src/layouts/L2_aos_lean/README.md) | AoS, lean 4-field, plain alloc                 |      29 |   queued    | isolates field-set with topology fixed                      |
-| L3 | [L3_hotcold](src/layouts/L3_hotcold/README.md)   | hot/cold AoS split                             | ~36 hot |   queued    | arc stage 2's first structural win                          |
-| L4 | [L4_tuple3](src/layouts/L4_tuple3/README.md)     | `[]Vec3` pos/vel + age + kind                  |      29 |   queued    | the `ld3` deinterleave experiment; interesting Halide input |
-| L5 | [L5_tuple4](src/layouts/L5_tuple4/README.md)     | `[]Vec4` pos/vel (aligned) + age + kind        |      37 |   queued    | per-particle `@Vector(4)`, zero shuffles                    |
-| L6 | [L6_soa](src/layouts/L6_soa/README.md)           | per-component `[]f32` (lean), plain alloc      |      29 |   queued    | arc home turf; richest strategy soil                        |
-| L7 | [L7_soa_al](src/layouts/L7_soa_al/README.md)     | per-component `[]f32`, 128 B-aligned, W-padded |      29 |   queued    | isolates alignment+padding                                  |
-| L8 | [L8_aosoa](src/layouts/L8_aosoa/README.md)       | blocked AoSoA                                  |  ~29–32 |   queued    | the one genuinely untried topology                          |
+| #  | data model                                     | hot B/p |   status    | priority reason                                             |
+|----|------------------------------------------------|--------:|:-----------:|-------------------------------------------------------------|
+| [L1](src/layouts/L1/README.md) | AoS, full 11-field, plain alloc                |     ~68 | ✅ complete | the strawman; re-label existing work, land the framework    |
+| [L2](src/layouts/L2/README.md) | AoS, lean 4-field, plain alloc                 |      29 |   queued    | isolates field-set with topology fixed                      |
+| [L3](src/layouts/L3/README.md) | hot/cold AoS split                             | ~36 hot |   queued    | arc stage 2's first structural win                          |
+| [L4](src/layouts/L4/README.md) | `[]Vec3` pos/vel + age + kind                  |      29 |   queued    | the `ld3` deinterleave experiment; interesting Halide input |
+| [L5](src/layouts/L5/README.md) | `[]Vec4` pos/vel (aligned) + age + kind        |      37 |   queued    | per-particle `@Vector(4)`, zero shuffles                    |
+| [L6](src/layouts/L6/README.md) | per-component `[]f32` (lean), plain alloc      |      29 |   queued    | arc home turf; richest strategy soil                        |
+| [L7](src/layouts/L7/README.md) | per-component `[]f32`, 128 B-aligned, W-padded |      29 |   queued    | isolates alignment+padding                                  |
+| [L8](src/layouts/L8/README.md) | blocked AoSoA                                  |  ~29–32 |   queued    | the one genuinely untried topology                          |
      
 ### Blueprints
 
@@ -64,13 +64,13 @@ computed. The same walk can have many interchangeable implementations that
 agree bit-for-bit (or statistically) but differ in schedule. B1's walk 1
 (`Integrate, Decide, Respawn`) alone has four in L1:
 
-- [scalar Zig](src/layouts/L1_aos_full/B1.w1-scalar.w2-simple.zig) —
+- [scalar Zig](src/layouts/L1/B1.w1-scalar.w2-simple.zig) —
   de-vectorized (asm-boxed intermediates), branchy respawn
-- [vector Zig](src/layouts/L1_aos_full/B1.w1-autovec.w2-simple.zig) —
+- [vector Zig](src/layouts/L1/B1.w1-autovec.w2-simple.zig) —
   auto-vectorized (NEON), branchy respawn
-- [blend Zig](src/layouts/L1_aos_full/B1.w1-blend.w2-simple.zig) —
+- [blend Zig](src/layouts/L1/B1.w1-blend.w2-simple.zig) —
   branchless blend respawn (the statistical-golden class)
-- [Halide](src/layouts/L1_aos_full/B1.w1-halide.w2-simple.zig) —
+- [Halide](src/layouts/L1/B1.w1-halide.w2-simple.zig) —
   AOT-compiled, per-particle hash RNG
 
 Halide is a tool that helps us to explore **schedule density** of a fixed
@@ -130,7 +130,7 @@ producing `out/bin/dod-particles`. The cell registry lives in
 `zig build manifests` → `experiments/cells/L1.md`).
 
 Halide cells need `uv sync --extra halide`; the build runs the generator in
-`src/layouts/L1_aos_full/<base>_gen.py` to emit `out/halide/<base>.{h,a}`,
+`src/layouts/L1/<base>_gen.py` to emit `out/halide/<base>.{h,a}`,
 then links it. For the full `dod-particles` bench-binary flag reference
 (`--json`, `--ns`, `--n`, `--threads`, `--check`, `--record`, `--bandwidth`,
 `-Ddeath`), see [scripts/README.md § Bench binary flags](scripts/README.md#bench-binary-flags).
@@ -169,7 +169,7 @@ make report && make serve         # build + view the dashboard
   schema (host-partitioned, append-only; every row is self-describing).
 - [`experiments/report/README.md`](experiments/report/README.md) — the
   dashboard: what each chart shows + how to serve it.
-- [`src/layouts/L1_aos_full/README.md`](src/layouts/L1_aos_full/README.md) —
+- [`src/layouts/L1/README.md`](src/layouts/L1/README.md) —
   the L1 layout itself + its auto-generated champion grid.
 
 A layout is **done** when every expressible cell is implemented and registered,
@@ -181,7 +181,7 @@ is stable.
 ```
 src/
   framework/        instruments: config, sim, bench, audit, correctness, hardware, render, ...
-  layouts/L1_aos_full/   the L1 vertical: data.zig + walks/ + cells/
+  layouts/L1/   the L1 vertical: data.zig + walks/ + cells/
   bindings/         raylib.zig (hand-written extern)
   main.zig          comptime registry: cell-name -> Sim
 experiments/

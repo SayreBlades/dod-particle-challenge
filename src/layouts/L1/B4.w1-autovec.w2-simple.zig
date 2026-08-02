@@ -22,7 +22,7 @@ const Data = layout.Data;
 
 pub const H = struct {
     pub const cell_decl: fw.CellDecl = .{
-        .layout = "L1_aos_full",
+        .layout = "L1",
         .blueprint = .B4,
         .ordering = .identity,
         .intermediates = .list,
@@ -79,7 +79,9 @@ pub const H = struct {
             data.spawn(&sim.rng, dead[k]);
         }
         // walk 3: r0 splat pass.
-        r0.pass(fb, w, h, data.particles);
+        for (data.particles) |p| {
+            r0.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
+        }
     }
 };
 

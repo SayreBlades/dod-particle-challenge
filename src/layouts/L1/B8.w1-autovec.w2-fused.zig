@@ -23,7 +23,7 @@ const Data = layout.Data;
 
 pub const H = struct {
     pub const cell_decl: fw.CellDecl = .{
-        .layout = "L1_aos_full",
+        .layout = "L1",
         .blueprint = .B8,
         .ordering = .identity,
         .intermediates = .mask_and_list,

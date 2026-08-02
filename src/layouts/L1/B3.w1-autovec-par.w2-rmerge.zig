@@ -33,7 +33,7 @@ const CHUNK_ALIGN: usize = 32; // chunk starts snap to 32 particles (17 lines)
 
 pub const H = struct {
     pub const cell_decl: fw.CellDecl = .{
-        .layout = "L1_aos_full",
+        .layout = "L1",
         .blueprint = .B3,
         .ordering = .identity,
         .intermediates = .mask,
@@ -87,7 +87,9 @@ pub const H = struct {
         // walk 2: serial mask-scan + respawn (index order = serial RNG order).
         phase2Respawn(sim);
         // walk 3: r0 splat pass (no clear — the driver owns it).
-        r0.pass(fb, w, h, sim.data.particles);
+        for (sim.data.particles) |p| {
+            r0.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
+        }
     }
 
     /// Pool task: compute this worker's chunk and run phase 1 on it.

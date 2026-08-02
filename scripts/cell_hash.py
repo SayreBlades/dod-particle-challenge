@@ -30,18 +30,14 @@ SRC = os.path.join(ROOT, "src")
 # Module imports (not files) — skip these in the closure walk.
 MODULE_IMPORTS = {"std", "options", "raylib"}
 
-# Layout id -> folder name (mirrors build.zig layoutDir).
-LAYOUT_DIRS = {"L1": "L1_aos_full"}
-
 IMPORT_RE = re.compile(r'@import\("([^"]+)"\)')
 
 
 def cell_file_path(cell_name: str) -> str:
-    """L1.B1.w1-autovec.w2-simple -> src/layouts/L1_aos_full/B1.w1-autovec.w2-simple.zig"""
+    """L1.B1.w1-autovec.w2-simple -> src/layouts/L1/B1.w1-autovec.w2-simple.zig
+    (the folder name IS the layout id)."""
     layout, strat = cell_name.split(".", 1)
-    if layout not in LAYOUT_DIRS:
-        raise SystemExit(f"unknown layout '{layout}' (known: {list(LAYOUT_DIRS)})")
-    return os.path.join(SRC, "layouts", LAYOUT_DIRS[layout], strat + ".zig")
+    return os.path.join(SRC, "layouts", layout, strat + ".zig")
 
 
 def halide_generator_path(cell_name: str) -> str | None:
@@ -57,7 +53,7 @@ def halide_generator_path(cell_name: str) -> str | None:
         base = "B3.w1-halide"
     else:
         base = "B1.w1-halide"
-    return os.path.join(SRC, "layouts", LAYOUT_DIRS[layout], base + "_gen.py")
+    return os.path.join(SRC, "layouts", layout, base + "_gen.py")
 
 
 def file_imports(path: str) -> list[str]:

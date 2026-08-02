@@ -28,8 +28,16 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LAYOUT_DIRS = {"L1": "L1_aos_full"}
 DEFAULT_CELL = "L1.B1.w1-autovec.w2-simple"
+
+
+def layout_ids() -> list[str]:
+    """Layout ids = the L<digits> directories under src/layouts/. The folder
+    name IS the layout id, so there's no id->folder mapping to maintain."""
+    import re
+    base = os.path.join(ROOT, "src", "layouts")
+    return sorted(d for d in os.listdir(base)
+                  if re.fullmatch(r"L\d+", d) and os.path.isdir(os.path.join(base, d)))
 
 
 def read_cells(layout: str) -> list[str]:
@@ -40,16 +48,17 @@ def read_cells(layout: str) -> list[str]:
 
 def resolve(target: str) -> list[str]:
     """target -> list of full cell names."""
+    known = layout_ids()
     if not target or target == "all":
         cells = []
-        for layout in LAYOUT_DIRS:
+        for layout in known:
             cells.extend(read_cells(layout))
         return cells
-    if target in LAYOUT_DIRS:
+    if target in known:
         return read_cells(target)
     if "." in target:
         layout = target.split(".", 1)[0]
-        if layout not in LAYOUT_DIRS:
+        if layout not in known:
             sys.exit(f"error: unknown layout '{layout}' in cell '{target}'")
         return [target]
     sys.exit(f"error: '{target}' is not a layout or a full cell name "

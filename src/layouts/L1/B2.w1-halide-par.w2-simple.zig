@@ -1,4 +1,4 @@
-// Cell L1.B2.w1-halide.w2-simple — B2 (math | decide+respawn | render),
+// Cell L1.B2.w1-halide-par.w2-simple — B2 (math | decide+respawn | render),
 // walk 1 Halide math, walk 2 Zig decide+respawn, walk 3 r0 splat. SERIAL.
 //
 // Golden: bit-exact. The "natural seam": Halide does the math (StrictFloat,
@@ -17,12 +17,12 @@ const Data = layout.Data;
 
 pub const H = struct {
     pub const cell_decl: fw.CellDecl = .{
-        .layout = "L1_aos_full",
+        .layout = "L1",
         .blueprint = .B2,
         .ordering = .identity,
         .intermediates = .none,
         .walks = &.{
-            .{ .impl = .halide, .schedule = .scalar, .parallel = .none, .variant = .none },
+            .{ .impl = .halide, .schedule = .scalar, .parallel = .data_parallel, .variant = .none },
             .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .branchy },
             .{ .impl = .zig, .schedule = .r0, .parallel = .none, .variant = .none },
         },
@@ -39,7 +39,9 @@ pub const H = struct {
             if (config.isDead(p.age, &sim.kill_rng)) data.spawn(&sim.rng, i);
         }
         // walk 3: r0 splat pass.
-        r0.pass(fb, w, h, data.particles);
+        for (data.particles) |p| {
+            r0.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
+        }
     }
 };
 
