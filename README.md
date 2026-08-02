@@ -36,6 +36,30 @@ the strawman, one fat `Particle` struct per particle, every field the OOP
 object would carry. Later layouts cut the dead fields, split hot from cold,
 move to structure-of-arrays — each isolating one axis of the transformation.
 
+### Layouts
+
+A layout is one frozen data model (topology × field set × allocation policy —
+zero comptime knobs; alignment/padding/field-set/topology changes are new
+layouts, not flags). Each is explored by sweeping its cells across the
+regime grid (below). Ordered by expected information-per-hour:
+
+| #  | folder        | data model                                     | hot B/p | status       | priority reason                                             |
+|----|---------------|------------------------------------------------|--------:|:------------:|-------------------------------------------------------------|
+| L1 | `L1_aos_full` | AoS, full 11-field, plain alloc                |     ~68 | ✅ complete  | the strawman; re-label existing work, land the framework    |
+| L2 | `L2_aos_lean` | AoS, lean 4-field, plain alloc                 |      29 | queued       | isolates field-set with topology fixed                      |
+| L3 | `L3_hotcold`  | hot/cold AoS split                             | ~36 hot | queued       | arc stage 2's first structural win                          |
+| L4 | `L4_tuple3`   | `[]Vec3` pos/vel + age + kind                  |      29 | queued       | the `ld3` deinterleave experiment; interesting Halide input |
+| L5 | `L5_tuple4`   | `[]Vec4` pos/vel (aligned) + age + kind        |      37 | queued       | per-particle `@Vector(4)`, zero shuffles                    |
+| L6 | `L6_soa`      | per-component `[]f32` (lean), plain alloc      |      29 | queued       | arc home turf; richest strategy soil                        |
+| L7 | `L7_soa_al`   | per-component `[]f32`, 128 B-aligned, W-padded |      29 | queued       | isolates alignment+padding                                  |
+| L8 | `L8_aosoa`    | blocked AoSoA                                  |  ~29–32 | queued       | the one genuinely untried topology                          |
+
+**Cross-layout prediction** (hypothesis to test per vertical): Halide ties
+Zig on SoA (L6/L7) and loses on AoS-family (L1/L2/L3) — the gather tax and
+the inexpressible component-lane vectorization are the mechanism; B5/B6
+render fusion wins on lean layouts at cache-resident N and loses on fat
+layouts at DRAM.
+
 [acton]: https://www.youtube.com/watch?v=rX0ItVEVjHc
 [raylib]: https://github.com/raysan5/raylib
 
@@ -119,18 +143,38 @@ runs the generator in `src/layouts/L1_aos_full/walks/w1-halide_gen.py` (via
 ## Data collection
 
 [`scripts/collect.sh`](scripts/collect.sh) is the unified sweep. It runs every
-cell in a layout (or a subset) across N × modes × death rates, capturing
-per-trial CSV rows into a run directory under `experiments/data/`:
+cell in a layout (or a subset) across the regime grid, capturing one JSONL row
+per trial into the host-partitioned data dir (`experiments/data/<machine_id>/`).
+
+### Sweep parameters (the regime grid)
+
+Every cell is swept once across **N × death rate × threads**. This is the
+*regime* — the coordinates every champion is reported at (no global winner).
+
+| axis         | values              | notes                                                       |
+|--------------|---------------------|-------------------------------------------------------------|
+| **N**        | `4K, 65K, 1M, 16M`  | the bench default `SWEEP`; override with `NS=` (comma-list) |
+| **death q**  | `0.01, 0.05, 0.25`  | competing-risks accident rate; from `death_rates.txt`       |
+| **threads**  | `1, 4, 10`          | **parallel cells only** — serial cells run T=1 (no dupes)   |
+
+- `0` (natural death, q=0) is **not** swept — it's the golden-verified
+  endpoint, checked per-cell at dev time (a q=0 build runs the bit-exact sim
+  golden), not a measured grid column.
+- Parallel cells (strat name matches `*-par*`/`*rmerge*`) auto-sweep the
+  thread set; serial cells ignore `--threads` and run T=1 only.
+- `TRIALS=3` per point; the report keeps the min (cleanest sample).
 
 ```sh
-scripts/collect.sh L1                                     # all L1 cells, default sweep
-scripts/collect.sh L1 "L1.B1.w1-naive.w2-naive"           # one cell
-NS="4000,65000" TRIALS=5 scripts/collect.sh L1            # quick subset
-DEATH_RATES="0 0.5" scripts/collect.sh L1                 # competing-risks sweep
+scripts/collect.sh L1                                     # all L1 cells, default grid
+scripts/collect.sh L1 "L1.B1.w1-autovec.w2-simple"         # one cell
+NS="4000,65000" TRIALS=5 scripts/collect.sh L1             # quick subset
+DEATH_RATES="0 0.5" scripts/collect.sh L1                   # override rate set
+THREADS="1 4" scripts/collect.sh L1 "L1.B3.w1-autovec-par.w2-rmerge"  # custom thread set
 ```
 
 **Run this on each machine you want to compare** — `machine_id` is stamped on
-every row; the full hardware facts are in a `hardware.json` sidecar.
+every row; the full hardware facts (incl. `streaming_bw_gbs`) are in a
+`hardware.json` sidecar per host.
 
 ### Run directory layout
 
