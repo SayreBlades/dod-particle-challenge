@@ -1,21 +1,22 @@
 # Python environment for this project. Two roles:
-#   1. the analysis notebook (experiments/results/analyze.ipynb — pandas +
-#      matplotlib + jupyterlab to turn collected CSVs into plots + champion grids)
+#   1. the report builder (scripts/build_report.py — duckdb reads the host
+#      JSONL + writes experiments/report/data.parquet for the duckdb-wasm page)
 #   2. the Halide pipeline generator (build-time, for halide cells only — emits
-#      zig-out/halide/*.a via src/layouts/*/walks/w1-halide_gen.py)
+#      out/halide/*.a via src/layouts/<layout>/B*.w1-halide_gen.py)
 #
 # One command sets up the env (creates .venv, installs everything):
-#   uv sync                      # analysis env (run the notebook)
+#   uv sync                      # report-builder env (build_report.py)
 #   uv sync --extra halide       # also installs halide (build the halide cells)
 #
-# This project has no importable Python package — it's scripts + a notebook —
-# so tool.uv.package = false (uv sync installs deps only, not the project itself).
+# This project has no importable Python package — it's scripts + a static
+# report — so tool.uv.package = false (uv sync installs deps only, not the
+# project itself).
 
 [project]
 name = "dod-particles"
 version = "0.1.0"
 requires-python = ">=3.9"
-dependencies = ["pandas", "matplotlib", "jupyterlab"]
+dependencies = ["duckdb"]
 
 [project.optional-dependencies]
 halide = ["halide>=21"]
