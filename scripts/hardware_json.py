@@ -156,6 +156,31 @@ def _streaming_bw_gbs_python(facts):
         return 0.0
 
 
+def write_to_host_dir(facts=None) -> str:
+    """Write hardware.json into experiments/data/<machine_id>/ (one per host,
+    refactored by §6.4 — hardware is a host-level dimension, not per-run).
+    Creates the host dir. Returns the path written. Idempotent: rewrites in
+    place (hardware changes rarely; rerun to refresh streaming_bw_gbs)."""
+    if facts is None:
+        facts = detect()
+    host_dir = os.path.join(ROOT, "experiments", "data", facts["machine_id"])
+    os.makedirs(host_dir, exist_ok=True)
+    path = os.path.join(host_dir, "hardware.json")
+    with open(path, "w") as f:
+        json.dump(facts, f, indent=2, sort_keys=True)
+        f.write("\n")
+    return path
+
+
 if __name__ == "__main__":
-    json.dump(detect(), sys.stdout, indent=2, sort_keys=True)
-    sys.stdout.write("\n")
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--write", action="store_true",
+                    help="write hardware.json into experiments/data/<machine_id>/ "
+                         "(default: emit to stdout)")
+    args = ap.parse_args()
+    if args.write:
+        print(write_to_host_dir())
+    else:
+        json.dump(detect(), sys.stdout, indent=2, sort_keys=True)
+        sys.stdout.write("\n")

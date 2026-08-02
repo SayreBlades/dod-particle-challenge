@@ -1,27 +1,29 @@
 #!/usr/bin/env bash
 # scripts/collect.sh — unified data-collection sweep for one layout.
 #
-# Runs every cell (or a subset) in a layout across the N-sweep in step + frame
-# + render modes, capturing per-trial CSV rows into a run directory under
-# experiments/data/<layout>/<run-id>/, with a hardware.json sidecar and a
-# meta.json (git sha, zig version, sweep config). Hardware is a dimension:
-# machine_id is stamped on every CSV row; the full facts live in hardware.json.
+# Runs every cell (or a subset) in a layout across the N-sweep, emitting one
+# JSONL row per (cell, death_q, threads, N, trial) into the host's
+# runs.jsonl, plus a checks.jsonl row per (cell, death_q) from the invariant
+# suite. Data is host-partitioned + append-only (refactor §6.5):
 #
-# Run this on each machine you want to compare. The analysis notebook globs
-# every experiments/data/*/*/runs.csv and groups by machine_id.
+#   experiments/data/<machine_id>/{runs.jsonl, checks.jsonl, hardware.json}
+#
+# Every run row is fully self-describing: the bench binary (--json) carries
+# build-time provenance (git_sha, source_hash, machine_id, host, run_id,
+# ts_utc) + the cell_decl axes + measurements, so collect.sh just greps
+# `^json,` and appends. Hardware is a host-level dimension written once
+# (hardware.json); the report joins on machine_id.
+#
+# Append-only by design: re-runs duplicate rows; dedup/filtering is a
+# loader/report concern (the jsonl is a historical audit of every run).
 #
 # Usage:
-#   scripts/collect.sh L1                                  # all L1 cells, default sweep
-#   scripts/collect.sh L1 "B1.w1-naive.w2-naive"           # one cell
-#   scripts/collect.sh L1 "" "step frame"                  # modes (default: step frame render)
-#   NS="4000,65000,1000000" TRIALS=5 scripts/collect.sh L1 # override N-sweep / trials
-#   DEATH_RATES="0 0.5" scripts/collect.sh L1             # competing-risks sweep
-#   THREADS=8 scripts/collect.sh L1 "B1.w1-halide.w2-naive"  # parallel cells
-#
-# Output: experiments/data/<layout>/<timestamp>-<machine_id>-<short-sha>/
-#           runs.csv       — one row per (cell, mode, death, N, trial)
-#           hardware.json  — machine facts sidecar (the machine_id dimension)
-#           meta.json      — run provenance (git sha, zig ver, sweep config)
+#   scripts/collect.sh L1                                  # all L1 cells, probe rates
+#   scripts/collect.sh L1 "B1.w1-autovec.w2-simple"        # one cell
+#   scripts/collect.sh --full-rates L1                     # champion rate set
+#   NS="4000,65000,1000000" TRIALS=5 scripts/collect.sh L1
+#   DEATH_RATES="0 0.5" scripts/collect.sh L1
+#   THREADS=8 scripts/collect.sh L1 "B1.w1-halide.w2-simple"
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -29,7 +31,6 @@ cd "$ROOT"
 
 # Death rates: default to the probe set; --full-rates swaps to the champion set.
 RATES_FILE="experiments/sweeps/death_rates.txt"
-# Strip --full-rates from args, then assign positionals.
 POSITIONAL=()
 for arg in "$@"; do
     if [ "$arg" = "--full-rates" ]; then
@@ -38,25 +39,23 @@ for arg in "$@"; do
         POSITIONAL+=("$arg")
     fi
 done
-LAYOUT="${POSITIONAL[0]:?usage: collect.sh [--full-rates] <layout> [cells] [modes]}"
+LAYOUT="${POSITIONAL[0]:?usage: collect.sh [--full-rates] <layout> [cells]}"
 CELLS_ARG="${POSITIONAL[1]:-}"
-MODES="${POSITIONAL[2]:-frame}"
 if [ -n "${DEATH_RATES:-}" ]; then
-    : # explicit override wins
+    :
 elif [ -f "$RATES_FILE" ]; then
     DEATH_RATES="$(grep -vE '^[[:space:]]*(#|$)' "$RATES_FILE" | tr '\n' ' ')"
 else
     DEATH_RATES="0.01 0.05 0.25"
 fi
-NS="${NS:-}"           # comma-list passed to bench --ns (empty = default SWEEP)
+NS="${NS:-}"
 TRIALS="${TRIALS:-3}"
 THREADS="${THREADS:-1}"
-# Halide cells need the python env; default to the project venv if it exists.
+REFRESH_HW="${REFRESH_HW:-0}"
 if [ -z "${HALIDE_PYTHON:-}" ] && [ -x ".venv/bin/python" ]; then
     export HALIDE_PYTHON=".venv/bin/python"
 fi
 
-# Default cell list for the layout (one per line; # comments allowed).
 CELLS_FILE="experiments/sweeps/${LAYOUT}.cells"
 if [ -n "$CELLS_ARG" ]; then
     CELLS="$CELLS_ARG"
@@ -68,80 +67,80 @@ else
 fi
 [ -z "$CELLS" ] && { echo "error: no cells to run for $LAYOUT." >&2; exit 1; }
 
-# --- provenance + run directory ---
+# --- provenance + host data directory (§6.5) ---
 SHORT_SHA="$(git rev-parse --short HEAD 2>/dev/null || echo nogit)"
 GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo nogit)"
-ZIG_VERSION="$(zig version 2>/dev/null || echo unknown)"
+HOST="$(python3 -c 'import platform,sys;print(platform.node().split(".")[0])')"
+# hardware.json: one per host. Write it if missing or if REFRESH_HW=1.
+HARDWARE_JSON_OUT="$(python3 scripts/hardware_json.py)"
+MACHINE_ID="$(printf '%s' "$HARDWARE_JSON_OUT" | python3 -c 'import sys,json;print(json.load(sys.stdin)["machine_id"])')"
+HOST_DIR="experiments/data/${MACHINE_ID}"
+mkdir -p "$HOST_DIR"
+HW_PATH="$HOST_DIR/hardware.json"
+if [ ! -f "$HW_PATH" ] || [ "$REFRESH_HW" = "1" ]; then
+    printf '%s\n' "$HARDWARE_JSON_OUT" > "$HW_PATH"
+    echo "  wrote $HW_PATH" >&2
+fi
 TS_UTC="$(date -u +%Y%m%dT%H%M%SZ)"
-HARDWARE_JSON="$(python3 scripts/hardware_json.py)"
-MACHINE_ID="$(printf '%s' "$HARDWARE_JSON" | python3 -c 'import sys,json;print(json.load(sys.stdin)["machine_id"])')"
 RUN_ID="${TS_UTC}-${MACHINE_ID}-${SHORT_SHA}"
-RUN_DIR="experiments/data/${LAYOUT}/${RUN_ID}"
-mkdir -p "$RUN_DIR"
-
-printf '%s\n' "$HARDWARE_JSON" > "$RUN_DIR/hardware.json"
-python3 - "$RUN_DIR/meta.json" "$RUN_ID" "$MACHINE_ID" "$LAYOUT" "$SHORT_SHA" \
-    "$GIT_BRANCH" "$ZIG_VERSION" "$TS_UTC" "$MODES" "$DEATH_RATES" "$TRIALS" \
-    "$NS" "$CELLS" << 'PYEOF'
-import sys, json
-out, run_id, mid, layout, sha, branch, zig, ts, modes, dr, tr, ns, cells = sys.argv[1:]
-json.dump({
-    "run_id": run_id, "machine_id": mid, "layout": layout,
-    "git_sha": sha, "git_branch": branch, "zig_version": zig, "timestamp_utc": ts,
-    "sweep": {"modes": modes.split(), "death_rates": dr.split(),
-              "trials": int(tr), "ns_override": ns or None,
-              "threads": 1, "cells": cells.split()},
-}, open(out, "w"), indent=2)
-print("  wrote", out)
-PYEOF
-
-# runs.csv header. collect.sh prefixes run_id,machine_id onto every bench row.
-HDR="run_id,machine_id,cell,mode,death_q,threads,N,bytes_per_particle,trial,ns_frame,ns_particle"
-printf '%s\n' "$HDR" > "$RUN_DIR/runs.csv"
-printf 'run_id,machine_id,cell,death_q,checked\n' > "$RUN_DIR/checks.csv"
 
 NS_ARG=""
 [ -n "$NS" ] && NS_ARG="--ns $NS"
 
 echo "=== collect: layout=$LAYOUT  run=$RUN_ID ===" >&2
+echo "  host_dir: $HOST_DIR" >&2
 echo "  cells:   $CELLS" >&2
-echo "  modes:   $MODES" >&2
 echo "  death:   $DEATH_RATES" >&2
 echo "  ns:      ${NS:-<default SWEEP>}  trials=$TRIALS  threads=$THREADS" >&2
-echo "  -> $RUN_DIR" >&2
+echo "  -> runs.jsonl (append)" >&2
+
+RUNS_JSONL="$HOST_DIR/runs.jsonl"
+CHECKS_JSONL="$HOST_DIR/checks.jsonl"
+# Ensure the append targets exist (so wc -l works even if every cell fails).
+touch "$RUNS_JSONL" "$CHECKS_JSONL"
 
 for cell in $CELLS; do
-    # cell is "L<layout>.<strat>"; split on the first dot.
     layout="${cell%%.*}"
     strat="${cell#*.}"
+    # source_hash: the cell's @import closure (refactor §5). One per cell.
+    SOURCE_HASH="$(python3 scripts/cell_hash.py "$cell" 2>/dev/null || echo '')"
     for q in $DEATH_RATES; do
         echo "  build $cell (q=$q)..." >&2
-        if ! zig build -Dlayout="$layout" -Dstrat="$strat" -Ddeath="$q" \
-                -Dmode=bench -Doptimize=ReleaseFast >&2 2>&1; then
+        if ! zig build -p out -Dlayout="$layout" -Dstrat="$strat" -Ddeath="$q" \
+                -Dmode=bench -Doptimize=ReleaseFast \
+                -Dsource_hash="$SOURCE_HASH" -Dmachine_id="$MACHINE_ID" \
+                -Dhost="$HOST" -Drun_id="$RUN_ID" -Dts_utc="$TS_UTC" \
+                >&2 2>&1; then
             echo "    BUILD FAILED — skipping $cell (q=$q)." >&2
             echo "    (halide cells need: uv sync --extra halide)" >&2
             continue
         fi
-        for mode in $MODES; do
-            case "$mode" in
-                frame)  flag="" ;;
-                *) echo "    unknown mode '$mode' (only 'frame' is supported) — skipping" >&2; continue ;;
-            esac
-            echo "    $cell  $mode (q=$q)..." >&2
-            # bench prints csv rows to stderr; merge, filter, prefix, append.
-            ./out/bin/dod-particles $flag $NS_ARG --trials "$TRIALS" \
-                --csv --threads "$THREADS" 2>&1 \
-                | grep '^csv,' \
-                | sed "s/^csv,/${RUN_ID},${MACHINE_ID},/" \
-                >> "$RUN_DIR/runs.csv" || true
-        done
+        echo "    $cell  bench (q=$q)..." >&2
+        # bench --json emits one `json,{...}` row per trial to stderr; grep + strip + append.
+        ./out/bin/dod-particles $NS_ARG --trials "$TRIALS" \
+            --json --threads "$THREADS" 2>&1 \
+            | grep '^json,' \
+            | sed 's/^json,//' \
+            >> "$RUNS_JSONL" || true
         # Invariant suite (--check): separate run, no timed-region overhead.
         echo "    $cell  --check (q=$q)..." >&2
         check_result=$(./out/bin/dod-particles --check 2>&1 | grep '^checked=' || echo 'checked=ERROR')
-        printf '%s,%s,%s,%s,%s\n' "$RUN_ID" "$MACHINE_ID" "$cell" "$q" "$check_result" >> "$RUN_DIR/checks.csv"
+        python3 - "$CHECKS_JSONL" "$RUN_ID" "$TS_UTC" "$MACHINE_ID" "$LAYOUT" \
+            "$cell" "$q" "$SOURCE_HASH" "$SHORT_SHA" "$check_result" << 'PYEOF'
+import sys, json
+out, run_id, ts, mid, layout, cell, q, sh, sha, checked = sys.argv[1:11]
+row = {"run_id": run_id, "ts_utc": ts, "machine_id": mid, "layout": layout,
+       "cell": cell, "death_q": float(q) if q not in ("", "n/a") else None,
+       "source_hash": sh or None, "git_sha": sha,
+       "checked": "PASS" if "PASS" in checked else "FAIL"}
+with open(out, "a") as f:
+    f.write(json.dumps(row) + "\n")
+PYEOF
     done
 done
 
-ROWS=$(( $(wc -l < "$RUN_DIR/runs.csv") - 1 ))
-echo "=== done: $ROWS data rows -> $RUN_DIR/runs.csv ===" >&2
-echo "  analyze: .venv/bin/jupyter nbconvert --execute --to notebook experiments/results/analyze.ipynb" >&2
+RUNS=$(( $(wc -l < "$RUNS_JSONL" 2>/dev/null || echo 0) ))
+CHECKS=$(( $(wc -l < "$CHECKS_JSONL" 2>/dev/null || echo 0) ))
+echo "=== done: $RUNS run rows -> $RUNS_JSONL ===" >&2
+echo "         $CHECKS check rows -> $CHECKS_JSONL" >&2
+echo "  report: scripts/build_report.py  (then serve experiments/report/)" >&2
