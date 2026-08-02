@@ -43,16 +43,16 @@ zero comptime knobs; alignment/padding/field-set/topology changes are new
 layouts, not flags). Each is explored by sweeping its cells across the
 regime grid (below). Ordered by expected information-per-hour:
 
-| #  | folder        | data model                                     | hot B/p | status       | priority reason                                             |
-|----|---------------|------------------------------------------------|--------:|:------------:|-------------------------------------------------------------|
-| L1 | `L1_aos_full` | AoS, full 11-field, plain alloc                |     ~68 | ✅ complete  | the strawman; re-label existing work, land the framework    |
-| L2 | `L2_aos_lean` | AoS, lean 4-field, plain alloc                 |      29 | queued       | isolates field-set with topology fixed                      |
-| L3 | `L3_hotcold`  | hot/cold AoS split                             | ~36 hot | queued       | arc stage 2's first structural win                          |
-| L4 | `L4_tuple3`   | `[]Vec3` pos/vel + age + kind                  |      29 | queued       | the `ld3` deinterleave experiment; interesting Halide input |
-| L5 | `L5_tuple4`   | `[]Vec4` pos/vel (aligned) + age + kind        |      37 | queued       | per-particle `@Vector(4)`, zero shuffles                    |
-| L6 | `L6_soa`      | per-component `[]f32` (lean), plain alloc      |      29 | queued       | arc home turf; richest strategy soil                        |
-| L7 | `L7_soa_al`   | per-component `[]f32`, 128 B-aligned, W-padded |      29 | queued       | isolates alignment+padding                                  |
-| L8 | `L8_aosoa`    | blocked AoSoA                                  |  ~29–32 | queued       | the one genuinely untried topology                          |
+| #  | folder                                                     | data model                                     | hot B/p | status       | priority reason                                             |
+|----|------------------------------------------------------------|------------------------------------------------|--------:|:------------:|-------------------------------------------------------------|
+| L1 | [`L1_aos_full`](src/layouts/L1_aos_full/)                 | AoS, full 11-field, plain alloc                |     ~68 | ✅ complete  | the strawman; re-label existing work, land the framework    |
+| L2 | [`L2_aos_lean`](src/layouts/L2_aos_lean/)                 | AoS, lean 4-field, plain alloc                 |      29 | queued       | isolates field-set with topology fixed                      |
+| L3 | [`L3_hotcold`](src/layouts/L3_hotcold/)                   | hot/cold AoS split                             | ~36 hot | queued       | arc stage 2's first structural win                          |
+| L4 | [`L4_tuple3`](src/layouts/L4_tuple3/)                     | `[]Vec3` pos/vel + age + kind                  |      29 | queued       | the `ld3` deinterleave experiment; interesting Halide input |
+| L5 | [`L5_tuple4`](src/layouts/L5_tuple4/)                     | `[]Vec4` pos/vel (aligned) + age + kind        |      37 | queued       | per-particle `@Vector(4)`, zero shuffles                    |
+| L6 | [`L6_soa`](src/layouts/L6_soa/)                           | per-component `[]f32` (lean), plain alloc      |      29 | queued       | arc home turf; richest strategy soil                        |
+| L7 | [`L7_soa_al`](src/layouts/L7_soa_al/)                     | per-component `[]f32`, 128 B-aligned, W-padded |      29 | queued       | isolates alignment+padding                                  |
+| L8 | [`L8_aosoa`](src/layouts/L8_aosoa/)                      | blocked AoSoA                                  |  ~29–32 | queued       | the one genuinely untried topology                          |
 
 **Cross-layout prediction** (hypothesis to test per vertical): Halide ties
 Zig on SoA (L6/L7) and loses on AoS-family (L1/L2/L3) — the gather tax and
