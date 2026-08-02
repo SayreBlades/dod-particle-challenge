@@ -56,6 +56,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     var single_n: ?usize = null;
     var single_iters: ?usize = null;
     var csv_mode = false;
+    var json_mode = false;
     var record_dir: ?[]const u8 = null;
     var check_mode = false;
     var bandwidth_mode = false;
@@ -75,6 +76,12 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
                     if (it.next()) |val| single_iters = std.fmt.parseInt(usize, val, 10) catch null;
                 } else if (std.mem.eql(u8, arg, "--csv")) {
                     csv_mode = true;
+                } else if (std.mem.eql(u8, arg, "--json")) {
+                    // JSONL output (refactor §6.6): one JSON object per trial to
+                    // stdout, carrying full provenance (git_sha, source_hash,
+                    // machine_id, cell_decl axes) + measurements. collect.sh
+                    // appends stdout directly into runs.jsonl. Replaces --csv.
+                    json_mode = true;
                 } else if (std.mem.eql(u8, arg, "--threads")) {
                     if (it.next()) |val| threads = std.fmt.parseInt(usize, val, 10) catch 1;
                 } else if (std.mem.eql(u8, arg, "--trials")) {
@@ -310,14 +317,22 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
             trial_runtime_ns += ns;
             const ns_frame: f64 = ns / @as(f64, @floatFromInt(iters));
             if (ns_frame < min_ns_frame) min_ns_frame = ns_frame;
-            // Per-trial CSV row (unified schema; collect.sh prefixes run/machine).
-            // gbs_eff/step_ns/render_ns left blank (one mode; attribution is
-            // audit + PMC, not timing-derived -- S17.7).
+            // Per-trial output (refactor §6.6):
+            //   --csv: legacy CSV row to stderr (collect.sh greps + prefixes)
+            //   --json: one JSONL row to stderr (collect.sh greps '^json,' + strips)
+            // The JSON row is fully self-describing: it carries build-time
+            // provenance (git_sha, source_hash, machine_id, host, run_id, ts_utc)
+            // + the cell_decl axes (blueprint, ordering, intermediates, golden,
+            // halide_expressible) + measurements. No collect.sh prefixing needed.
             if (csv_mode) {
                 const ns_p: f64 = ns_frame / @as(f64, @floatFromInt(n));
                 std.debug.print("csv,{s},frame,{d},{d},{d},{d},{d},{d:.1},{d:.4}\n", .{
                     @import("options").name, DEATH_COL, threads, n, bytes_per_p, trial, ns_frame, ns_p,
                 });
+            }
+            if (json_mode) {
+                const ns_p: f64 = ns_frame / @as(f64, @floatFromInt(n));
+                emitJsonRow(SimImpl, n, bytes_per_p, trial, ns_frame, ns_p, threads);
             }
         }
 
@@ -522,4 +537,56 @@ fn runBandwidthMicrobench(io: Io, alloc: std.mem.Allocator) !void {
     std.debug.print("  passes: {d}, stride: {d} B\n", .{ passes, stride });
     std.debug.print("  elapsed: {d:.3} s, bytes: {d}\n", .{ elapsed_ns / 1e9, total_bytes });
     std.debug.print("  streaming_bw_gbs = {d:.2} GB/s (single-core)\n", .{gbs});
+}
+
+// --- JSONL row emission (refactor §6.6) ----------------------------------------
+// Emits one JSON object per trial to stderr, prefixed `json,`. collect.sh
+// greps `^json,` and strips the prefix, appending the bare JSON to runs.jsonl.
+// The row is fully self-describing: build-time provenance (git_sha,
+// source_hash, machine_id, host, run_id, ts_utc from build options) + the
+// cell_decl static axes (blueprint, ordering, intermediates, golden_class,
+// halide_expressible) + the per-trial measurements. Denormalized per §6.2 so
+// duckdb GROUP BY works without joins.
+fn emitJsonRow(comptime SimImpl: type, n: usize, bytes_per_p: usize, trial: usize, ns_frame: f64, ns_particle: f64, threads: usize) void {
+    const o = @import("options");
+    // Cell_decl axes (static per cell; denormalized onto every row).
+    var blueprint: []const u8 = "";
+    var ordering: []const u8 = "";
+    var intermediates: []const u8 = "";
+    var golden_class: []const u8 = "";
+    var halide_expressible: []const u8 = "";
+    if (SimImpl.cell_decl) |cd| {
+        blueprint = @tagName(cd.blueprint);
+        ordering = @tagName(cd.ordering);
+        intermediates = @tagName(cd.intermediates);
+        golden_class = @tagName(cd.golden);
+        halide_expressible = cd.halide_expressible;
+    }
+    // Manual JSON formatting (flat object, known types). Quotes strings,
+    // escapes nothing (all our strings are identifier-like: no quotes/backslashes).
+    std.debug.print("json,{{", .{});
+    std.debug.print("\"run_id\":\"{s}\",", .{o.run_id});
+    std.debug.print("\"ts_utc\":\"{s}\",", .{o.ts_utc});
+    std.debug.print("\"host\":\"{s}\",", .{o.host});
+    std.debug.print("\"machine_id\":\"{s}\",", .{o.machine_id});
+    std.debug.print("\"layout\":\"{s}\",", .{if (SimImpl.cell_decl) |cd| cd.layout else ""});
+    std.debug.print("\"cell\":\"{s}\",", .{o.name});
+    std.debug.print("\"source_hash\":\"{s}\",", .{o.source_hash});
+    std.debug.print("\"git_sha\":\"{s}\",", .{o.git_sha});
+    std.debug.print("\"git_branch\":\"{s}\",", .{o.git_branch});
+    std.debug.print("\"zig_version\":\"{s}\",", .{@import("builtin").zig_version_string});
+    std.debug.print("\"death_q\":{d},", .{o.death});
+    std.debug.print("\"threads\":{d},", .{threads});
+    std.debug.print("\"N\":{d},", .{n});
+    std.debug.print("\"bytes_per_particle\":{d},", .{bytes_per_p});
+    std.debug.print("\"trial\":{d},", .{trial});
+    std.debug.print("\"ns_frame\":{d:.1},", .{ns_frame});
+    std.debug.print("\"ns_particle\":{d:.4},", .{ns_particle});
+    std.debug.print("\"blueprint\":\"{s}\",", .{blueprint});
+    std.debug.print("\"ordering\":\"{s}\",", .{ordering});
+    std.debug.print("\"intermediates\":\"{s}\",", .{intermediates});
+    std.debug.print("\"golden_class\":\"{s}\",", .{golden_class});
+    // halide_expressible is prose (may contain spaces/parens) — quote + escape.
+    std.debug.print("\"halide_expressible\":\"{s}\"", .{halide_expressible});
+    std.debug.print("}}\n", .{});
 }

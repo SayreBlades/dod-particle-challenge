@@ -23,6 +23,24 @@ pub fn build(b: *std.Build) void {
     if (!std.math.isFinite(death_q) or death_q < 0.0 or death_q >= 1.0)
         std.debug.panic("invalid -Ddeath={d} (expect 0 <= q < 1)", .{death_q});
 
+    // --- provenance build options (refactor §6.6) ---
+    // git_sha/git_branch computed at configure time via `git`; source_hash
+    // /machine_id/host passed by collect.sh (computed from cell_hash.py /
+    // hardware_json.py). Defaults to empty/"unknown" for ad-hoc builds.
+    const git_sha = blk: {
+        const out = b.run(&.{ "git", "rev-parse", "--short", "HEAD" });
+        break :blk std.mem.trim(u8, out, &std.ascii.whitespace);
+    };
+    const git_branch = blk: {
+        const out = b.run(&.{ "git", "rev-parse", "--abbrev-ref", "HEAD" });
+        break :blk std.mem.trim(u8, out, &std.ascii.whitespace);
+    };
+    const source_hash = b.option([]const u8, "source_hash", "cell import-closure hash (from scripts/cell_hash.py)") orelse "";
+    const machine_id = b.option([]const u8, "machine_id", "host machine id (from hardware_json.py)") orelse "";
+    const host = b.option([]const u8, "host", "hostname") orelse "";
+    const run_id = b.option([]const u8, "run_id", "collect run id (timestamp-machine_id-sha)") orelse "";
+    const ts_utc = b.option([]const u8, "ts_utc", "collect run UTC timestamp") orelse "";
+
     const mode: Mode = blk: {
         if (std.mem.eql(u8, mode_str, "play")) break :blk .play;
         if (std.mem.eql(u8, mode_str, "bench")) break :blk .bench;
@@ -70,6 +88,15 @@ pub fn build(b: *std.Build) void {
     opts.addOption(bool, "is_reference", std.mem.eql(u8, name, "L1.B1.w1-autovec.w2-simple"));
     opts.addOption(f64, "death", death_q);
     opts.addOption(Mode, "mode", mode_enum);
+    // Provenance (refactor §6.6): stamped on every JSONL bench row so a row
+    // pins the exact code + machine that produced it.
+    opts.addOption([]const u8, "git_sha", git_sha);
+    opts.addOption([]const u8, "git_branch", git_branch);
+    opts.addOption([]const u8, "source_hash", source_hash);
+    opts.addOption([]const u8, "machine_id", machine_id);
+    opts.addOption([]const u8, "host", host);
+    opts.addOption([]const u8, "run_id", run_id);
+    opts.addOption([]const u8, "ts_utc", ts_utc);
 
     // --- raylib C library (compiled directly; raylib-zig build is broken on 0.17-dev) ---
     const raylib_lib = addRaylib(b, target, optimize);
