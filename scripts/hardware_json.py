@@ -6,10 +6,12 @@ Cross-platform: `sysctl` on Darwin, `/proc/cpuinfo` + `/proc/meminfo` on Linux.
 memsize + os + arch), prefixed with the hostname — so the same machine reports
 the same id across runs, and two different machines almost never collide.
 
-Used by `scripts/collect.sh` (writes hardware.json beside runs.csv) and by the
-analysis notebook (joined as a dimension via machine_id).
+Used by `scripts/collect.sh` (writes hardware.json in the host data dir) and by
+the report (joined as a dimension via machine_id). `streaming_bw_gbs` is
+measured by shelling out to the Zig `--bandwidth` microbench (real hardware
+bandwidth, not a Python interpreter loop).
 """
-import hashlib, json, platform, subprocess, sys
+import hashlib, json, os, platform, subprocess, sys
 
 
 def sh(cmd):
@@ -86,32 +88,70 @@ def detect():
     return f
 
 
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 def _streaming_bw_gbs(facts):
-    """Measure single-core streaming bandwidth: a memset-style loop over a
-    buffer larger than LLC, single-threaded, timed. Returns GB/s (1e9 B/s).
-    This is the bandwidth-attribution home after gbs_eff retired (§17.7): the
-    notebook plots achieved_bw = bytes/p*N/frame_time vs this ceiling."""
+    """Measure single-core streaming bandwidth via the Zig --bandwidth microbench
+    (refactor §6.4). The bench binary runs a tight streaming-write loop over a
+    buffer > LLC, single-threaded, timed — real hardware bandwidth, not a Python
+    interpreter loop (which capped at ~5.56 GB/s on an M4 that streams ~24+).
+    Prints `streaming_bw_gbs=<value>` to stdout.
+
+    Falls back to a Python estimate (clearly warned) if the Zig toolchain or
+    build fails, so analysis-only hosts still produce a number."""
+    import subprocess
+    bin_path = os.path.join(ROOT, "out", "bin", "dod-particles")
+    # Build the bandwidth binary if missing (a default reference cell; the
+    # --bandwidth flag is cell-agnostic — it never touches the sim). Use the
+    # reference strat so no Halide/python env is needed.
+    if not os.path.exists(bin_path):
+        try:
+            subprocess.run(
+                ["zig", "build", "-p", "out", "-Dlayout=L1",
+                 "-Dstrat=B1.w1-autovec.w2-simple", "-Dmode=bench",
+                 "-Doptimize=ReleaseFast"],
+                cwd=ROOT, capture_output=True, timeout=120, check=True,
+            )
+        except (subprocess.SubprocessError, FileNotFoundError) as e:
+            sys.stderr.write(
+                f"warning: could not build the Zig bandwidth binary ({e}); "
+                "falling back to the Python estimate (CEILING IS UNRELIABLE)\n")
+            return _streaming_bw_gbs_python(facts)
+    try:
+        out = subprocess.run(
+            [bin_path, "--bandwidth"], cwd=ROOT,
+            capture_output=True, text=True, timeout=10,
+        ).stderr
+        for line in out.splitlines():
+            if line.startswith("streaming_bw_gbs="):
+                return float(line.split("=", 1)[1])
+    except (subprocess.SubprocessError, ValueError) as e:
+        sys.stderr.write(f"warning: bandwidth microbench failed ({e}); ")
+    sys.stderr.write("falling back to the Python estimate (CEILING IS UNRELIABLE)\n")
+    return _streaming_bw_gbs_python(facts)
+
+
+def _streaming_bw_gbs_python(facts):
+    """Fallback estimate: a Python bytearray memset loop. Interpreter-bound —
+    under-reports real bandwidth by ~4-5x — but produces a number when the
+    Zig toolchain is unavailable. The result is warned when used."""
     import time
-    # Buffer ~4x the L3 (or 256MB if L3 unknown) — bigger than LLC so we measure
-    # DRAM streaming, not cache.
     l3 = facts.get("l3cachesize", 0)
     buf_bytes = max(l3 * 4, 256 * 1024 * 1024) if l3 else 256 * 1024 * 1024
     try:
         buf = bytearray(buf_bytes)
-        # Warmup
         for i in range(0, buf_bytes, 4096):
             buf[i] = 1
         t0 = time.perf_counter()
-        # Write pass: touch every byte (memset pattern).
         for _ in range(3):
-            for i in range(0, buf_bytes, 64):  # cache-line stride
+            for i in range(0, buf_bytes, 64):
                 buf[i] = 0
         t1 = time.perf_counter()
         elapsed = t1 - t0
         if elapsed <= 0:
             return 0.0
-        total_bytes = buf_bytes * 3
-        return round(total_bytes / elapsed / 1e9, 2)
+        return round(buf_bytes * 3 / elapsed / 1e9, 2)
     except Exception:
         return 0.0
 

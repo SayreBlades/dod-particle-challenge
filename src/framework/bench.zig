@@ -58,6 +58,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     var csv_mode = false;
     var record_dir: ?[]const u8 = null;
     var check_mode = false;
+    var bandwidth_mode = false;
     var threads: usize = 1;
     var trials_arg: ?usize = null;
     var ns_buf: [32]usize = undefined;
@@ -95,6 +96,13 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
                     record_dir = it.next() orelse "out/record";
                 } else if (std.mem.eql(u8, arg, "--check")) {
                     check_mode = true;
+                } else if (std.mem.eql(u8, arg, "--bandwidth")) {
+                    // Streaming-bandwidth microbench (refactor §6.4): a tight
+                    // single-threaded streaming-write loop over a buffer > LLC,
+                    // timed. Prints `streaming_bw_gbs=<GB/s>` to stdout and exits.
+                    // This is the real hardware ceiling that hardware_json.py reads
+                    // (replaces the Python-interpreter-bound estimate).
+                    bandwidth_mode = true;
                 }
             }
         }
@@ -141,6 +149,17 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
             }
         }
         std.debug.print("checked={s}\n", .{if (inv.passed) "PASS" else "FAIL"});
+        return;
+    }
+
+    // --- streaming-bandwidth microbench (--bandwidth): early-out, no sim ---
+    // Measures the machine's single-core streaming-write bandwidth (the
+    // bandwidth-attribution ceiling, §17.7/§6.4). hardware_json.py shells out
+    // to this so the ceiling is measured in real hardware bandwidth, not a
+    // Python interpreter loop. Output: one line `streaming_bw_gbs=<value>` on
+    // stdout (machine-parseable); a human block on stderr.
+    if (bandwidth_mode) {
+        try runBandwidthMicrobench(io, alloc);
         return;
     }
 
@@ -441,4 +460,66 @@ fn recordVideo(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, out_dir
         RECORD_FPS,
         @as(f64, @floatFromInt(frame)) / @as(f64, RECORD_FPS),
     });
+}
+
+// --- streaming-bandwidth microbench (--bandwidth) -------------------------------
+// Measures single-core streaming-write bandwidth over a buffer larger than LLC,
+// single-threaded, timed for a fixed wall budget. This is the bandwidth-
+// attribution ceiling (§17.7/§6.4): hardware_json.py shells out to this so the
+// ceiling is real hardware bandwidth, not a Python interpreter loop.
+//
+// Method: allocate a buffer > LLC, run a tight `@memset`-style loop touching
+// every cache line, for a fixed ~0.7s wall budget, count bytes written, divide.
+// Single-threaded (no parallelism) so the number is the per-core streaming
+// ceiling the bandwidth plot compares `achieved_bw` against.
+const BW_BUDGET_NS: u64 = 700 * std.time.ns_per_ms; // ~0.7s
+const BW_MIN_BYTES: usize = 256 * 1024 * 1024; // 256 MB floor (> typical LLC)
+
+fn runBandwidthMicrobench(io: Io, alloc: std.mem.Allocator) !void {
+    const facts = hardware.detect();
+    // Size the buffer > LLC so we measure DRAM streaming, not cache. M4 reports
+    // l3=0 (unified memory); fall back to 4x L2, floored at 256 MB.
+    const l3 = facts.l3cachesize;
+    const l2 = facts.l2cachesize;
+    const cache_ref: u64 = if (l3 > 0) l3 else (if (l2 > 0) l2 else 64 * 1024 * 1024);
+    const buf_bytes: usize = @max(@as(usize, @intCast(cache_ref * 4)), BW_MIN_BYTES);
+
+    const buf = try alloc.alloc(u8, buf_bytes);
+    defer alloc.free(buf);
+
+    // Warmup: touch the buffer once so initial faults/page-table setup don't
+    // land in the timed region.
+    @memset(buf, 0);
+
+    // Timed loop: streaming writes, cache-line stride. Count whole passes until
+    // the wall budget elapses; the final partial pass is counted by bytes.
+    const stride: usize = if (facts.cachelinesize > 0) @intCast(facts.cachelinesize) else 64;
+    var total_bytes: u64 = 0;
+    var passes: u64 = 0;
+    const t0 = Io.Timestamp.now(io, .awake);
+    while (true) {
+        var i: usize = 0;
+        while (i < buf_bytes) : (i += stride) buf[i] = @truncate(passes + i);
+        total_bytes += @intCast(buf_bytes);
+        passes += 1;
+        const now = Io.Timestamp.now(io, .awake);
+        if (t0.durationTo(now).nanoseconds >= BW_BUDGET_NS) break;
+    }
+    const t1 = Io.Timestamp.now(io, .awake);
+    const elapsed_ns: f64 = @floatFromInt(t0.durationTo(t1).nanoseconds);
+    // bytes/ns = GB/s directly (1 GB = 1e9 bytes, 1 s = 1e9 ns, the 1e9 cancels).
+    const gbs = @as(f64, @floatFromInt(total_bytes)) / elapsed_ns;
+
+    // stdout: machine-parseable (hardware_json.py reads this).
+    std.debug.print("streaming_bw_gbs={d:.2}\n", .{gbs});
+    // stderr: human context.
+    std.debug.print("=== Streaming-bandwidth microbench ===\n", .{});
+    std.debug.print("  buffer: {d} MB ({d}x LLC/L2 ref, {s})\n", .{
+        buf_bytes / (1024 * 1024),
+        buf_bytes / @max(@as(usize, @intCast(cache_ref)), 1),
+        if (l3 > 0) "L3-based" else "L2-based (L3 reported 0)",
+    });
+    std.debug.print("  passes: {d}, stride: {d} B\n", .{ passes, stride });
+    std.debug.print("  elapsed: {d:.3} s, bytes: {d}\n", .{ elapsed_ns / 1e9, total_bytes });
+    std.debug.print("  streaming_bw_gbs = {d:.2} GB/s (single-core)\n", .{gbs});
 }
