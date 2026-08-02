@@ -8,12 +8,14 @@ server-side in duckdb; the page just renders the JSON.
 ## Build + serve
 
 ```sh
-scripts/build_report.py                  # reads experiments/data/**/*.jsonl
-                                         #   -> experiments/report/report.json
-                                         #   + refreshes layout README grids (§9)
-python3 -m http.server -d experiments/report 8000   # fetch needs http, not file://
-# open http://localhost:8000
+make report                       # = .venv/bin/python scripts/build_report.py (needs duckdb)
+make serve                        # python3 -m http.server -d experiments/report 8000
+# open http://localhost:8000  (fetch needs http, not file://)
 ```
+
+`build_report.py` needs the `duckdb` package; `make report` uses
+`.venv/bin/python` automatically (run the script under the venv otherwise).
+Re-run it after every `collect.py`.
 
 ## What it shows
 
@@ -45,4 +47,4 @@ python3 -m http.server -d experiments/report 8000   # fetch needs http, not file
   offline, vendor `echarts.min.js` locally (not done yet).
 - `report.json` is the full `report` view (runs + hardware join +
   `achieved_bw_gbs` derived + champion/landscape/bandwidth/pmc/checks
-  aggregations). Re-run `build_report.py` after every `collect.sh`.
+  aggregations). Re-run `build_report.py` after every `collect.py`.

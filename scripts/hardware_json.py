@@ -6,7 +6,7 @@ Cross-platform: `sysctl` on Darwin, `/proc/cpuinfo` + `/proc/meminfo` on Linux.
 memsize + os + arch), prefixed with the hostname — so the same machine reports
 the same id across runs, and two different machines almost never collide.
 
-Used by `scripts/collect.sh` (writes hardware.json in the host data dir) and by
+Used by `scripts/collect.py` (writes hardware.json in the host data dir) and by
 the report (joined as a dimension via machine_id). `streaming_bw_gbs` is
 measured by shelling out to the Zig `--bandwidth` microbench (real hardware
 bandwidth, not a Python interpreter loop).

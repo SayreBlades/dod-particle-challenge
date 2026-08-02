@@ -79,7 +79,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
                 } else if (std.mem.eql(u8, arg, "--json")) {
                     // JSONL output (refactor §6.6): one JSON object per trial to
                     // stdout, carrying full provenance (git_sha, source_hash,
-                    // machine_id, cell_decl axes) + measurements. collect.sh
+                    // machine_id, cell_decl axes) + measurements. collect.py
                     // appends stdout directly into runs.jsonl. Replaces --csv.
                     json_mode = true;
                 } else if (std.mem.eql(u8, arg, "--threads")) {
@@ -118,7 +118,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     const trials: usize = trials_arg orelse TRIALS;
     // The N-sweep: --ns <list> overrides; --n <one> is single-N PMC mode;
     // otherwise the default SWEEP. Passed to every bench mode so --ns applies
-    // uniformly (collect.sh uses it for quick subset runs).
+    // uniformly (collect.py uses it for quick subset runs).
     const sweep_list: []const usize = if (ns_count > 0)
         ns_buf[0..ns_count]
     else if (single_n) |n| blk: {
@@ -281,7 +281,14 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     });
 
     var total_runtime_ms: f64 = 0;
-    var total_frames: u64 = 0;
+    var sweep_total_frames: u64 = 0;
+    var sweep_total_particles: u64 = 0;
+    // Buffer per-trial records so run-level totals (sweep wall time, total
+    // frames/particles, end timestamp) can be denormalized onto every JSONL
+    // row (refactor §6.2): the row is emitted once, at sweep end, carrying
+    // both the per-trial measurement and the whole-run summary.
+    var trial_recs: std.ArrayList(TrialRec) = .empty;
+    defer trial_recs.deinit(alloc);
 
     for (sweep_list) |n| {
         var sim = SimImpl.init(alloc, .{ .n = n, .seed = config.spawn_seed, .threads = threads }) catch |e| {
@@ -318,12 +325,12 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
             const ns_frame: f64 = ns / @as(f64, @floatFromInt(iters));
             if (ns_frame < min_ns_frame) min_ns_frame = ns_frame;
             // Per-trial output (refactor §6.6):
-            //   --csv: legacy CSV row to stderr (collect.sh greps + prefixes)
-            //   --json: one JSONL row to stderr (collect.sh greps '^json,' + strips)
+            //   --csv: legacy CSV row to stderr (collect.py greps + prefixes)
+            //   --json: one JSONL row to stderr (collect.py greps '^json,' + strips)
             // The JSON row is fully self-describing: it carries build-time
             // provenance (git_sha, source_hash, machine_id, host, run_id, ts_utc)
             // + the cell_decl axes (blueprint, ordering, intermediates, golden,
-            // halide_expressible) + measurements. No collect.sh prefixing needed.
+            // halide_expressible) + measurements. No collect.py prefixing needed.
             if (csv_mode) {
                 const ns_p: f64 = ns_frame / @as(f64, @floatFromInt(n));
                 std.debug.print("csv,{s},frame,{d},{d},{d},{d},{d},{d:.1},{d:.4}\n", .{
@@ -332,7 +339,17 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
             }
             if (json_mode) {
                 const ns_p: f64 = ns_frame / @as(f64, @floatFromInt(n));
-                emitJsonRow(SimImpl, n, bytes_per_p, trial, ns_frame, ns_p, threads);
+                // Buffer; emitted at sweep end once run-level totals are known.
+                trial_recs.append(alloc, .{
+                    .n = n,
+                    .bytes_per_p = bytes_per_p,
+                    .trial = trial,
+                    .ns_frame = ns_frame,
+                    .ns_particle = ns_p,
+                    .trial_ns = ns,
+                    .frames = iters,
+                    .particles_processed = @as(u64, n) * iters,
+                }) catch {};
             }
         }
 
@@ -340,7 +357,8 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         const frames_sec = 1e9 / min_ns_frame;
         const runtime_ms: f64 = trial_runtime_ns / 1e6;
         total_runtime_ms += runtime_ms;
-        total_frames += @as(u64, n) * iters * trials;
+        sweep_total_frames += @as(u64, iters) * trials;
+        sweep_total_particles += @as(u64, n) * iters * trials;
 
         std.debug.print("  {d:>10} | {d:>7} | {d:>9.1} | {d:>14.3} | {d:>14.1} | {d:>11.1} | {d:>11.1}\n", .{
             n, bytes_per_p, working_set_mb, ns_per_particle, min_ns_frame, frames_sec, runtime_ms,
@@ -349,6 +367,28 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
 
     const sweep_t1 = Io.Timestamp.now(io, .awake);
     const sweep_wall_ms: f64 = @as(f64, @floatFromInt(sweep_t0.durationTo(sweep_t1).nanoseconds)) / 1e6;
+
+    // --- JSONL emission (refactor §6.6): one row per trial, denormalized ---
+    // with the whole-run summary so duckdb GROUP BY needs no joins. Emitted at
+    // sweep end (not per-trial) so run-level totals + end timestamp are known.
+    // collect.py greps `^json,` off stderr and strips the prefix.
+    if (json_mode and trial_recs.items.len > 0) {
+        // .real = wall clock (Unix epoch seconds); format to match ts_utc's
+        // YYYYMMDDTHHMMSSZ so a loader can diff start vs end directly.
+        const end_ts = Io.Timestamp.now(io, .real);
+        const ts_end_utc = formatUtc(@intCast(end_ts.toSeconds()));
+        const summary = RunSummary{
+            .threads = threads,
+            .iters = iters,
+            .warmup = WARMUP,
+            .trials_per_n = trials,
+            .sweep_wall_ms = sweep_wall_ms,
+            .sweep_total_frames = sweep_total_frames,
+            .sweep_total_particles = sweep_total_particles,
+            .ts_end_utc = ts_end_utc,
+        };
+        for (trial_recs.items) |rec| emitJsonRow(SimImpl, rec, summary);
+    }
 
     std.debug.print("  {s:-<10}-+-{s:-<7}-+-{s:-<9}-+-{s:-<14}-+-{s:-<14}-+-{s:-<11}-+-{s:-<11}\n", .{
         "", "", "", "", "", "", "",
@@ -359,7 +399,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     std.debug.print("  {s:>10} | {s:>7} | {s:>9} | {s:>14} | {s:>14} | {s:>11} | {d:>11.1}\n", .{
         "", "", "", "", "", "wall(ms):", sweep_wall_ms,
     });
-    std.debug.print("\n  total particles-frames simulated: {d}\n", .{total_frames});
+    std.debug.print("\n  total frames: {d}  particles-frames simulated: {d}\n", .{ sweep_total_frames, sweep_total_particles });
 }
 
 // --- record mode (stage 11, --record <dir>) ----------------------------------------
@@ -540,14 +580,69 @@ fn runBandwidthMicrobench(io: Io, alloc: std.mem.Allocator) !void {
 }
 
 // --- JSONL row emission (refactor §6.6) ----------------------------------------
-// Emits one JSON object per trial to stderr, prefixed `json,`. collect.sh
+// Emits one JSON object per trial to stderr, prefixed `json,`. collect.py
 // greps `^json,` and strips the prefix, appending the bare JSON to runs.jsonl.
 // The row is fully self-describing: build-time provenance (git_sha,
 // source_hash, machine_id, host, run_id, ts_utc from build options) + the
 // cell_decl static axes (blueprint, ordering, intermediates, golden_class,
-// halide_expressible) + the per-trial measurements. Denormalized per §6.2 so
-// duckdb GROUP BY works without joins.
-fn emitJsonRow(comptime SimImpl: type, n: usize, bytes_per_p: usize, trial: usize, ns_frame: f64, ns_particle: f64, threads: usize) void {
+// halide_expressible) + the per-trial measurements + the whole-run summary
+// (iters, warmup, trials_per_n, sweep wall time, total frames/particles, end
+// timestamp). Denormalized per §6.2 so duckdb GROUP BY works without joins.
+
+/// One measured trial. Buffered during the sweep, emitted once at sweep end.
+const TrialRec = struct {
+    n: usize,
+    bytes_per_p: usize,
+    trial: usize,
+    ns_frame: f64,
+    ns_particle: f64,
+    /// Elapsed nanoseconds of this trial's timed region (raw, = ns_frame*iters).
+    trial_ns: f64,
+    /// Frames simulated in this trial's timed region (= iters).
+    frames: usize,
+    /// Particle-frames this trial (= n * iters).
+    particles_processed: u64,
+};
+
+/// Whole-run summary, constant across every trial row of one bench invocation.
+/// Denormalized onto every emitted row.
+const RunSummary = struct {
+    threads: usize,
+    iters: usize,
+    warmup: usize,
+    trials_per_n: usize,
+    /// Wall time of the entire sweep (all N, all trials, including warmup).
+    sweep_wall_ms: f64,
+    /// Total frames simulated across the whole sweep (timed region only).
+    sweep_total_frames: u64,
+    /// Total particle-frames across the whole sweep (timed region only).
+    sweep_total_particles: u64,
+    /// Wall-clock end time of the sweep, YYYYMMDDTHHMMSSZ (matches ts_utc).
+    ts_end_utc: [16]u8,
+};
+
+/// Format Unix epoch seconds (UTC) as YYYYMMDDTHHMMSSZ — the same shape as the
+/// build-time `ts_utc` — so a loader can compute run duration as end - start.
+fn formatUtc(unix_secs: u64) [16]u8 {
+    const epoch = std.time.epoch;
+    const es = epoch.EpochSeconds{ .secs = unix_secs };
+    const ed = es.getEpochDay();
+    const ds = es.getDaySeconds();
+    const yd = ed.calculateYearDay();
+    const md = yd.calculateMonthDay();
+    var buf: [16]u8 = undefined;
+    _ = std.fmt.bufPrint(&buf, "{d:0>4}{d:0>2}{d:0>2}T{d:0>2}{d:0>2}{d:0>2}Z", .{
+        @as(u32, yd.year),
+        @as(u32, md.month.numeric()),
+        @as(u32, md.day_index) + 1,
+        @as(u32, ds.getHoursIntoDay()),
+        @as(u32, ds.getMinutesIntoHour()),
+        @as(u32, ds.getSecondsIntoMinute()),
+    }) catch unreachable;
+    return buf;
+}
+
+fn emitJsonRow(comptime SimImpl: type, rec: TrialRec, summary: RunSummary) void {
     const o = @import("options");
     // Cell_decl axes (static per cell; denormalized onto every row).
     var blueprint: []const u8 = "";
@@ -576,17 +671,29 @@ fn emitJsonRow(comptime SimImpl: type, n: usize, bytes_per_p: usize, trial: usiz
     std.debug.print("\"git_branch\":\"{s}\",", .{o.git_branch});
     std.debug.print("\"zig_version\":\"{s}\",", .{@import("builtin").zig_version_string});
     std.debug.print("\"death_q\":{d},", .{o.death});
-    std.debug.print("\"threads\":{d},", .{threads});
-    std.debug.print("\"N\":{d},", .{n});
-    std.debug.print("\"bytes_per_particle\":{d},", .{bytes_per_p});
-    std.debug.print("\"trial\":{d},", .{trial});
-    std.debug.print("\"ns_frame\":{d:.1},", .{ns_frame});
-    std.debug.print("\"ns_particle\":{d:.4},", .{ns_particle});
+    std.debug.print("\"threads\":{d},", .{summary.threads});
+    std.debug.print("\"N\":{d},", .{rec.n});
+    std.debug.print("\"bytes_per_particle\":{d},", .{rec.bytes_per_p});
+    std.debug.print("\"trial\":{d},", .{rec.trial});
+    std.debug.print("\"ns_frame\":{d:.1},", .{rec.ns_frame});
+    std.debug.print("\"ns_particle\":{d:.4},", .{rec.ns_particle});
+    // Per-trial workload + raw timing (so totals are derivable per row).
+    std.debug.print("\"iters\":{d},", .{summary.iters});
+    std.debug.print("\"warmup\":{d},", .{summary.warmup});
+    std.debug.print("\"trial_ns\":{d:.0},", .{rec.trial_ns});
+    std.debug.print("\"frames\":{d},", .{rec.frames});
+    std.debug.print("\"particles_processed\":{d},", .{rec.particles_processed});
     std.debug.print("\"blueprint\":\"{s}\",", .{blueprint});
     std.debug.print("\"ordering\":\"{s}\",", .{ordering});
     std.debug.print("\"intermediates\":\"{s}\",", .{intermediates});
     std.debug.print("\"golden_class\":\"{s}\",", .{golden_class});
     // halide_expressible is prose (may contain spaces/parens) — quote + escape.
-    std.debug.print("\"halide_expressible\":\"{s}\"", .{halide_expressible});
+    std.debug.print("\"halide_expressible\":\"{s}\",", .{halide_expressible});
+    // Whole-run summary (constant across every row of this bench invocation).
+    std.debug.print("\"trials_per_n\":{d},", .{summary.trials_per_n});
+    std.debug.print("\"sweep_wall_ms\":{d:.1},", .{summary.sweep_wall_ms});
+    std.debug.print("\"sweep_total_frames\":{d},", .{summary.sweep_total_frames});
+    std.debug.print("\"sweep_total_particles\":{d},", .{summary.sweep_total_particles});
+    std.debug.print("\"ts_end_utc\":\"{s}\"", .{summary.ts_end_utc});
     std.debug.print("}}\n", .{});
 }

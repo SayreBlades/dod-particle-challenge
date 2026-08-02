@@ -13,7 +13,7 @@ cell_decl axes (blueprint, ordering, intermediates, golden_class,
 halide_expressible) parsed from the generated manifest
 (experiments/cells/L1.md). source_hash is null for migrated rows
 (historical; recomputing against the old git sha is fiddly — new rows from
-collect.sh carry the real hash).
+collect.py carry the real hash).
 
 Append-only: safe to re-run (will duplicate rows unless --clean is passed
 to first remove the host jsonl targets). Default: append, warn on duplicates.

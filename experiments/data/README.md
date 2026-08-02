@@ -28,7 +28,7 @@ halide_expressible
   `hardware.json` (joined on `machine_id`).
 - `source_hash` is the cell's `@import`-closure SHA-256 (`scripts/cell_hash.py`);
   it pins the exact cell code that ran (catches uncommitted edits). `null` for
-  migrated historical rows (pre-refactor); new rows from `collect.sh` carry it.
+  migrated historical rows (pre-refactor); new rows from `collect.py` carry it.
 - `trial` indexes the bench's repeated runs per N; the report keeps the min
   (cleanest sample) and reports spread.
 - Static cell facts (`blueprint`, `ordering`, `intermediates`, `golden_class`,
@@ -38,5 +38,6 @@ halide_expressible
   not stored — it compares against the host's `streaming_bw_gbs`.
 
 Append-only by design: re-runs duplicate rows; dedup/filtering is a
-loader/report concern. The report (`experiments/report/`) reads these via a
-parquet built by `scripts/build_report.py`.
+loader/report concern. The report (`experiments/report/`) reads these JSONL
+files directly with duckdb (no intermediate parquet) via
+[`scripts/build_report.py`](../../scripts/README.md#build_reportpy).

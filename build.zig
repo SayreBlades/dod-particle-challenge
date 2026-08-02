@@ -12,6 +12,7 @@ pub fn build(b: *std.Build) void {
     const layout_opt = b.option([]const u8, "layout", "layout id, e.g. L1 (needs -Dstrat)");
     const strat_opt = b.option([]const u8, "strat", "strategy name, e.g. B1.w1-autovec.w2-simple");
     const halide_variant_opt = b.option([]const u8, "halide_variant", "Halide sweep candidate id (links a pre-generated out/halide/<strat>_<id>.a)");
+    const halide_prefix_opt = b.option([]const u8, "halide_prefix", "Halide generator output base dir (default out/halide; per-worker when collect.py parallelizes)") orelse "out/halide";
     const mode_str = b.option([]const u8, "mode", "play | bench | audit") orelse "play";
     // Death model (optimization-framework.md §7): competing risks. `-Ddeath`
     // is the per-frame accident rate q (a float, default 0 = natural). The
@@ -25,7 +26,7 @@ pub fn build(b: *std.Build) void {
 
     // --- provenance build options (refactor §6.6) ---
     // git_sha/git_branch computed at configure time via `git`; source_hash
-    // /machine_id/host passed by collect.sh (computed from cell_hash.py /
+    // /machine_id/host passed by collect.py (computed from cell_hash.py /
     // hardware_json.py). Defaults to empty/"unknown" for ad-hoc builds.
     const git_sha = blk: {
         const out = b.run(&.{ "git", "rev-parse", "--short", "HEAD" });
@@ -136,7 +137,7 @@ pub fn build(b: *std.Build) void {
             // doesn't collide with the scalar .a (same generator, different schedule).
             const stem_par = if (std.mem.indexOf(u8, strat, "-par") != null) "_par" else "";
             const stem = if (halide_variant_opt) |v| b.fmt("{s}_{s}", .{ base, v }) else b.fmt("{s}{s}", .{ base, stem_par });
-            const out_prefix = b.fmt("out/halide/{s}", .{stem});
+            const out_prefix = b.fmt("{s}/{s}", .{ halide_prefix_opt, stem });
             // Always run the generator for the derived schedule (no more
             // "pre-generated variant" expectation). A sweep can override the
             // schedule via -Dhalide_variant=<suffix> (pre-generated) if needed.

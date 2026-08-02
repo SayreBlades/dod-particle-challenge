@@ -86,7 +86,7 @@ Zig-only by construction.
 | [raylib] | the play-mode renderer (git submodule, built)       | (pinned)   |
 | [uv]     | python env management (Halide generator + analysis) | any        |
 | [ffmpeg] | `--record` video export (raw RGBA pipe)             | any        |
-| Xcode    | optional: PMC cycle-attribution (`pmc_*.sh`)        | macOS only |
+| Xcode    | optional: PMC cycle-attribution (`pmc_collect.py`)  | macOS only |
 
 [Zig]: https://ziglang.org
 [raylib]: https://github.com/raysan5/raylib
@@ -100,225 +100,99 @@ git clone --recurse-submodules <this-repo>
 cd dod-particle-lab-zig
 
 # Python env (one command — creates .venv, installs deps, writes uv.lock):
-uv sync                      # analysis env: pandas + matplotlib + jupyterlab
+uv sync                      # analysis env: duckdb (for build_report.py)
 uv sync --extra halide       # also installs halide (needed to build the halide cells)
 ```
 
-The Python env serves two roles: the **analysis notebook** (`pandas` +
-`matplotlib` + `jupyterlab`) and the **Halide pipeline generator** (build-time,
-for halide cells only). `uv sync` gives you the analysis env; add `--extra
-halide` if you'll build the two halide cells. The three Zig-only cells build
-and collect without any Python env at all.
+`uv sync` gives you the analysis env; add `--extra halide` for the halide
+cells. The Zig-only cells build and collect without any Python env at all.
 
 ## Build & run
 
-```sh
-# Build a cell (L1 is the only layout so far; strat picks the cell):
-zig build -p out -Dlayout=L1 -Dstrat=B1.w1-naive.w2-naive -Dmode=play -Doptimize=ReleaseFast
-./out/bin/dod-particles            # interactive raylib window
-
-# Modes (-Dmode=):
-#   play      interactive raylib window (vsync-capped; never reports bench numbers)
-#   bench     headless sweep over N, prints a results table + optional --csv rows
-#   audit     Acton zip-test data-density audit (gzip oracle per field)
-#   manifest  regenerate experiments/cells/L1.md from the cell declarations
-```
-
-The cell registry lives in [`build.zig`](build.zig) (`strat_labels`) and
-[`src/main.zig`](src/main.zig) (`sim_map`) — both must list every buildable
-`(layout, strat)`. The current L1 cells:
-
-| strat                   | walk 1     | walk 2 | golden                |
-|-------------------------|------------|--------|-----------------------|
-| `B1.w1-naive.w2-naive`  | zig auto   | zig r0 | bit-exact (reference) |
-| `B1.w1-naive.w2-opt`    | zig auto   | zig r1 | bit-exact             |
-| `B1.w1-scalar.w2-naive` | zig scalar | zig r0 | bit-exact             |
-| `B1.w1-halide.w2-naive` | halide     | zig r0 | statistical           |
-| `B1.w1-halide.w2-opt`   | halide     | zig r1 | statistical           |
-
-Halide cells need the Python env (`uv sync --extra halide`); the build
-runs the generator in `src/layouts/L1_aos_full/walks/w1-halide_gen.py` (via
-`HALIDE_PYTHON`, defaulting to `.venv/bin/python`) to emit
-`out/halide/w1-halide.{h,a}`, then links it.
-
-### Bench runtime flags
+The common actions are `make` targets ([Makefile](Makefile));
+[`scripts/run.py`](scripts/run.py) is the dispatcher underneath:
 
 ```sh
-./out/bin/dod-particles --csv --ns 4000,65000,1000000 --trials 5          # step sweep
-./out/bin/dod-particles --frame --csv --ns 4000,65000                     # step+render per frame
-./out/bin/dod-particles --render --csv --ns 4000,65000                    # render only
-./out/bin/dod-particles --n 1000000 --iters 500                           # single N (PMC mode)
-./out/bin/dod-particles --record                                         # 10s MP4 via ffmpeg (default: out/record/)
-./out/bin/dod-particles --threads 8                                       # parallel cells
+make build                                # build every cell into out/   (target: cell | layout | all)
+make build L1                             #   …every cell of layout L1
+make build L1.B1.w1-autovec.w2-simple     #   …one cell (use the full L1.<strat> name)
+make play  L1.B1.w1-autovec.w2-simple      # open the interactive raylib window
+make profile L1.B1.w1-autovec.w2-simple   # PMC cycle-attribution (macOS + Xcode)
+make report && make serve                 # build + serve the report on http://localhost:8000
 ```
 
-`-Ddeath=<q>` (build option) sets the competing-risks accident rate
-(`0` = natural, the golden-checked sim; `0.5` = high-churn regime).
+Under the hood each target shells out to
+`zig build -p out -Dlayout=<L> -Dstrat=<strat> -Dmode=<play|bench|audit> -Doptimize=ReleaseFast`,
+producing `out/bin/dod-particles`. The cell registry lives in
+[`build.zig`](build.zig) (`strat_labels`) and [`src/main.zig`](src/main.zig)
+(`sim_map`); the buildable L1 cells are listed in
+[`experiments/sweeps/L1.cells`](experiments/sweeps/L1.cells) (or
+`zig build manifests` → `experiments/cells/L1.md`).
 
-## Data collection
+Halide cells need `uv sync --extra halide`; the build runs the generator in
+`src/layouts/L1_aos_full/<base>_gen.py` to emit `out/halide/<base>.{h,a}`,
+then links it. For the full `dod-particles` bench-binary flag reference
+(`--json`, `--ns`, `--n`, `--threads`, `--check`, `--record`, `--bandwidth`,
+`-Ddeath`), see [scripts/README.md § Bench binary flags](scripts/README.md#bench-binary-flags).
 
-[`scripts/collect.sh`](scripts/collect.sh) is the unified sweep. It runs every
-cell in a layout (or a subset) across the regime grid, capturing one JSONL row
-per trial into the host-partitioned data dir (`experiments/data/<machine_id>/`).
+## Collect & analyze
 
-### Sweep parameters (the regime grid)
+One loop powers the whole lab: **sweep → report → (optional) PMC**.
 
-Every cell is swept once across **N × death rate × threads**. This is the
-*regime* — the coordinates every champion is reported at (no global winner).
-
-| axis         | values              | notes                                                       |
-|--------------|---------------------|-------------------------------------------------------------|
-| **N**        | `4K, 65K, 1M, 16M`  | the bench default `SWEEP`; override with `NS=` (comma-list) |
-| **death q**  | `0.01, 0.05, 0.25`  | competing-risks accident rate; from `death_rates.txt`       |
-| **threads**  | `1, 4, 10`          | **parallel cells only** — serial cells run T=1 (no dupes)   |
-
-- `0` (natural death, q=0) is **not** swept — it's the golden-verified
-  endpoint, checked per-cell at dev time (a q=0 build runs the bit-exact sim
-  golden), not a measured grid column.
-- Parallel cells (strat name matches `*-par*`/`*rmerge*`) auto-sweep the
-  thread set; serial cells ignore `--threads` and run T=1 only.
-- `TRIALS=3` per point; the report keeps the min (cleanest sample).
+- **Sweep** — [`scripts/collect.py`](scripts/collect.py) runs every cell across
+  the **regime grid** (N × death-rate q × threads), appending one
+  self-describing JSONL row per trial into the host-partitioned data dir
+  (`experiments/data/<machine_id>/`). Knobs include `PARALLEL=N` (concurrent
+  tasks), `SKIP_DONE=1` (resume), `VERBOSE=0`.
+- **Report** — [`scripts/build_report.py`](scripts/build_report.py) joins the
+  JSONL + `hardware.json` and renders a static [ECharts dashboard](experiments/report/)
+  (performance landscapes, champion grid, achieved-vs-ceiling bandwidth, PMC
+  breakdown).
+- **PMC** (optional, macOS + Xcode) — [`scripts/pmc_collect.py`](scripts/pmc_collect.py) /
+  [`scripts/pmc_sweep.py`](scripts/pmc_sweep.py) add per-process
+  cycle-saturation — the *why* behind a bandwidth- or compute-bound result.
 
 ```sh
-scripts/collect.sh L1                                     # all L1 cells, default grid
-scripts/collect.sh L1 "L1.B1.w1-autovec.w2-simple"         # one cell
-NS="4000,65000" TRIALS=5 scripts/collect.sh L1             # quick subset
-DEATH_RATES="0 0.5" scripts/collect.sh L1                   # override rate set
-THREADS="1 4" scripts/collect.sh L1 "L1.B3.w1-autovec-par.w2-rmerge"  # custom thread set
+make collect L1                   # sweep  (`make collect` = all; `make collect <strat>` = one cell)
+make report && make serve         # build + view the dashboard
 ```
 
-**Run this on each machine you want to compare** — `machine_id` is stamped on
-every row; the full hardware facts (incl. `streaming_bw_gbs`) are in a
-`hardware.json` sidecar per host.
+**Deeper docs** (the top-level README intentionally stays a map):
 
-### Where the data lands
+- [`scripts/README.md`](scripts/README.md) — every script's usage, the full
+  knob list, the bench-binary flag reference, and the complete
+  sweep → report → PMC workflow.
+- [`experiments/sweeps/README.md`](experiments/sweeps/README.md) — the regime
+  grid + all sweep env-vars (`NS`, `TRIALS`, `DEATH_RATES`, `THREADS`,
+  `PARALLEL`, `SKIP_DONE`, `VERBOSE`).
+- [`experiments/data/README.md`](experiments/data/README.md) — the JSONL
+  schema (host-partitioned, append-only; every row is self-describing).
+- [`experiments/report/README.md`](experiments/report/README.md) — the
+  dashboard: what each chart shows + how to serve it.
+- [`src/layouts/L1_aos_full/README.md`](src/layouts/L1_aos_full/README.md) —
+  the L1 layout itself + its auto-generated champion grid.
 
-Data is **host-partitioned + append-only JSONL** — one directory per machine
-(`experiments/data/<machine_id>/`), tracked in git (JSONL + JSON are small and
-runs from different machines combine in one repo):
-
-```
-experiments/data/<machine_id>/
-  hardware.json   # machine facts (one per host; machine_id is the join key)
-  runs.jsonl      # one JSON object per (cell, death_q, threads, N, trial)
-  checks.jsonl    # one JSON object per (cell, death_q) --check (invariant suite)
-  pmc.jsonl       # one per (cell, N, death_q, trial) PMC row (optional, macOS)
-```
-
-Every `runs.jsonl` row is **self-describing (denormalized)** so duckdb loads it
-with no joins — build-time provenance + the cell's static axes + the
-per-trial measurement all on one row:
-
-```
-run_id, ts_utc, host, machine_id, layout, cell, source_hash, git_sha,
-git_branch, zig_version, death_q, threads, N, bytes_per_particle, trial,
-ns_frame, ns_particle, blueprint, ordering, intermediates, golden_class,
-halide_expressible
-```
-
-- `machine_id` — the hardware dimension (full facts in `hardware.json`).
-- `source_hash` — the cell's `@import`-closure SHA-256 (`scripts/cell_hash.py`);
-  pins the exact cell code that ran. `null` for migrated historical rows.
-- Static cell facts (`blueprint`, `ordering`, `intermediates`, `golden_class`,
-  `halide_expressible`) are denormalized onto every row, so `GROUP BY
-  blueprint` works without a join.
-- Append-only: re-runs duplicate rows; dedup/filtering is a loader/report
-  concern (the jsonl is a historical audit of every run).
-- `achieved_bw_gbs` is **derived in the report** (`bytes/p × N / ns_frame`),
-  not stored — it compares against the host's `streaming_bw_gbs`.
-
-Full schema details live in [`experiments/data/README.md`](experiments/data/README.md).
-
-## Full layout sweep
-
-One pass — sweep, build the report, (optional) PMC, commit. This is the
-complete workflow for closing a layout vertical:
-
-```sh
-# 1. Sweep — all cells × {0.01,0.05,0.25} × {4K,65K,1M,16M} × {1,4,10}
-#    (parallel only); appends JSONL into experiments/data/<machine_id>/:
-scripts/collect.sh L1
-
-# 2. Build the report + read the champion grid (also auto-written into the
-#    layout README, §9):
-scripts/build_report.py
-python3 -m http.server -d experiments/report 8000   # open http://localhost:8000
-
-# 3. (Mac + Xcode) PMC cycle-attribution for the champions (appends pmc.jsonl):
-scripts/pmc_sweep.sh L1 "L1.<champ1> L1.<champ2> ..."
-
-# 4. Rebuild the report; commit the data + report + layout README:
-scripts/build_report.py
-git add experiments/data/<machine_id> experiments/report/{index.html,report.js,queries.sql,style.css} \
-        experiments/cells/L1.md src/layouts/L1_aos_full/README.md
-git commit -m "L1: sweep + PMC + champion grid"
-```
-
-A layout is **done** when: every expressible cell is implemented and
-registered; the sweep is committed; the invariant suite (`--check`) passes for
-every committed run; the champion grid is stable; and the layout's README
-carries the blueprint table + parallel expressibility + champion grid.
-
-## Analysis
-
-The analysis artifact is a static **duckdb-wasm** HTML page
-([`experiments/report/`](experiments/report/)) that fetches `report.json`
-(built by [`scripts/build_report.py`](scripts/build_report.py) from the host
-JSONL + `hardware.json`) and renders a charted dashboard with ECharts.
-
-It produces:
-
-1. **Performance landscapes** — ns/particle vs N, one curve per cell,
-   faceted by death rate.
-2. **Champion grid** — the fastest cell per (regime × death_q), grouped by
-   `machine_id × regime × death_q` (regime: small ≤65K / mid 1M / large
-   ≥16M). Also auto-written into each layout README's AUTO-GENERATED block.
-3. **Achieved-vs-ceiling bandwidth** — `achieved_bw = bytes/p × N / ns_frame`
-   vs the host's measured `streaming_bw_gbs` (the honest-ceiling comparison).
-4. **PMC bottleneck breakdown** — useful / delivery / processing / discarded
-   cycles, when `pmc.jsonl` is present (degrades gracefully otherwise).
-
-```sh
-scripts/build_report.py                          # jsonl -> experiments/report/report.json + README grids
-python3 -m http.server -d experiments/report 8000   # open http://localhost:8000
-```
-
-### Optional: PMC cycle-attribution (macOS + Xcode)
-
-[`scripts/pmc_collect.sh`](scripts/pmc_collect.sh) /
-[`scripts/pmc_sweep.sh`](scripts/pmc_sweep.sh) run the bench under xctrace's
-CPU Counters template to capture per-process cycle saturation (useful /
-delivery / processing / discarded cycles) — the *why* behind a bandwidth-
-bound or compute-bound result. Appends one row per `(cell, N, death_q,
-trial)` to `experiments/data/<machine_id>/pmc.jsonl`; raw `.trace` files stay
-local under `.scratch/` (gitignored). This is a separate opt-in layer; the
-unified `collect.sh` does timing + hardware everywhere.
+A layout is **done** when every expressible cell is implemented and registered,
+the sweep is committed, `--check` passes for every run, and the champion grid
+is stable.
 
 ## Project layout
 
 ```
 src/
   framework/        instruments: config, sim, bench, audit, correctness, hardware, render, ...
-  layouts/
-    L1_aos_full/    the L1 vertical: data.zig + walks/ + cells/
+  layouts/L1_aos_full/   the L1 vertical: data.zig + walks/ + cells/
   bindings/         raylib.zig (hand-written extern)
   main.zig          comptime registry: cell-name -> Sim
 experiments/
   cells/            cell manifests (generated by `zig build manifests`)
-  sweeps/           <layout>.cells lists + death_rates.txt + sweep-knob docs
+  sweeps/           <layout>.cells lists + death_rates.txt + regime-grid docs
   data/             host-partitioned JSONL: <machine_id>/{runs,checks,pmc}.jsonl + hardware.json
   golden/           stage1.bin + frame.sha256 (the byte-exact reference; tracked)
-  report/           static ECharts dashboard (index.html, report.js, queries.sql; fetches report.json)
-scripts/
-  collect.sh        unified data-collection sweep (appends JSONL into experiments/data/<machine_id>/)
-  cell_hash.py      cell @import-closure SHA-256 -> source_hash on every run row
-  build_report.py   jsonl -> experiments/report/report.json + layout README champion grids
-  hardware_json.py  machine profile -> JSON (machine_id + streaming_bw_gbs via Zig --bandwidth); --write
-  hardware_profile.sh  human-readable counterpart
-  pmc_collect.sh    optional PMC wrapper (xctrace, macOS); appends pmc.jsonl
-  pmc_sweep.sh      optional PMC sweep
-  migrate_data.py   one-time: old per-run-dir CSV -> host JSONL
-experiments/golden/ stage1.bin + frame.sha256 (the byte-exact reference; tracked, regenerated from the reference cell)
+  report/           static ECharts dashboard (fetches report.json)
+scripts/            all Python — run.py, collect.py, build_report.py, cell_hash.py,
+                    hardware_json.py, hardware_profile.py, pmc_collect.py, pmc_sweep.py
+Makefile            make build|play|profile|report|serve (target: cell|layout|all)
 vendor/raylib/      git submodule (the renderer)
 ```
 
