@@ -4,7 +4,8 @@
 # Runs every cell (or a subset) in a layout across the N-sweep, emitting one
 # JSONL row per (cell, death_q, threads, N, trial) into the host's
 # runs.jsonl, plus a checks.jsonl row per (cell, death_q) from the invariant
-# suite. Data is host-partitioned + append-only (refactor §6.5):
+# suite. Parallel cells are swept across the THREADS set; serial cells run
+# T=1 only (no duplicate rows). Data is host-partitioned + append-only (§6.5):
 #
 #   experiments/data/<machine_id>/{runs.jsonl, checks.jsonl, hardware.json}
 #
@@ -18,29 +19,22 @@
 # loader/report concern (the jsonl is a historical audit of every run).
 #
 # Usage:
-#   scripts/collect.sh L1                                  # all L1 cells, probe rates
+#   scripts/collect.sh L1                                  # all L1 cells, single rate set
 #   scripts/collect.sh L1 "B1.w1-autovec.w2-simple"        # one cell
-#   scripts/collect.sh --full-rates L1                     # champion rate set
 #   NS="4000,65000,1000000" TRIALS=5 scripts/collect.sh L1
 #   DEATH_RATES="0 0.5" scripts/collect.sh L1
-#   THREADS=8 scripts/collect.sh L1 "B1.w1-halide.w2-simple"
+#   THREADS="1 4 10" scripts/collect.sh L1                 # parallel cells sweep T (default)
+#   THREADS=8 scripts/collect.sh L1 "B1.w1-halide.w2-simple"  # single T override
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-# Death rates: default to the probe set; --full-rates swaps to the champion set.
+# Death rates: the single rate set (§17.5 — one-pass workflow; the champion
+# pass was retired). DEATH_RATES overrides the file.
 RATES_FILE="experiments/sweeps/death_rates.txt"
-POSITIONAL=()
-for arg in "$@"; do
-    if [ "$arg" = "--full-rates" ]; then
-        RATES_FILE="experiments/sweeps/death_rates_full.txt"
-    else
-        POSITIONAL+=("$arg")
-    fi
-done
-LAYOUT="${POSITIONAL[0]:?usage: collect.sh [--full-rates] <layout> [cells]}"
-CELLS_ARG="${POSITIONAL[1]:-}"
+LAYOUT="${1:?usage: collect.sh <layout> [cells]}"
+CELLS_ARG="${2:-}"
 if [ -n "${DEATH_RATES:-}" ]; then
     :
 elif [ -f "$RATES_FILE" ]; then
@@ -50,7 +44,10 @@ else
 fi
 NS="${NS:-}"
 TRIALS="${TRIALS:-3}"
-THREADS="${THREADS:-1}"
+# THREADS is a space-separated list, swept for parallel cells only; serial
+# cells always run T=1 (a serial cell ignores --threads, so looping it would
+# just emit duplicate rows). Default: the regime thread set {1, 4, 10}.
+THREADS="${THREADS:-1 4 10}"
 REFRESH_HW="${REFRESH_HW:-0}"
 if [ -z "${HALIDE_PYTHON:-}" ] && [ -x ".venv/bin/python" ]; then
     export HALIDE_PYTHON=".venv/bin/python"
@@ -91,7 +88,7 @@ echo "=== collect: layout=$LAYOUT  run=$RUN_ID ===" >&2
 echo "  host_dir: $HOST_DIR" >&2
 echo "  cells:   $CELLS" >&2
 echo "  death:   $DEATH_RATES" >&2
-echo "  ns:      ${NS:-<default SWEEP>}  trials=$TRIALS  threads=$THREADS" >&2
+echo "  ns:      ${NS:-<default SWEEP>}  trials=$TRIALS  threads=$THREADS (parallel only)" >&2
 echo "  -> runs.jsonl (append)" >&2
 
 RUNS_JSONL="$HOST_DIR/runs.jsonl"
@@ -102,6 +99,13 @@ touch "$RUNS_JSONL" "$CHECKS_JSONL"
 for cell in $CELLS; do
     layout="${cell%%.*}"
     strat="${cell#*.}"
+    # Parallel cells (strat name carries -par / rmerge) sweep the THREADS set;
+    # serial cells run T=1 only (no duplicate rows).
+    case "$strat" in
+        *-par*|*rmerge*) cell_threads="$THREADS" ;;
+        *) cell_threads="1" ;;
+    esac
+    check_t="${cell_threads##* }"   # max T — exercise the parallel path under --check
     # source_hash: the cell's @import closure (refactor §5). One per cell.
     SOURCE_HASH="$(python3 scripts/cell_hash.py "$cell" 2>/dev/null || echo '')"
     for q in $DEATH_RATES; do
@@ -115,16 +119,18 @@ for cell in $CELLS; do
             echo "    (halide cells need: uv sync --extra halide)" >&2
             continue
         fi
-        echo "    $cell  bench (q=$q)..." >&2
-        # bench --json emits one `json,{...}` row per trial to stderr; grep + strip + append.
-        ./out/bin/dod-particles $NS_ARG --trials "$TRIALS" \
-            --json --threads "$THREADS" 2>&1 \
-            | grep '^json,' \
-            | sed 's/^json,//' \
-            >> "$RUNS_JSONL" || true
+        for t in $cell_threads; do
+            echo "    $cell  bench (q=$q, T=$t)..." >&2
+            # bench --json emits one `json,{...}` row per trial to stderr; grep + strip + append.
+            ./out/bin/dod-particles $NS_ARG --trials "$TRIALS" \
+                --json --threads "$t" 2>&1 \
+                | grep '^json,' \
+                | sed 's/^json,//' \
+                >> "$RUNS_JSONL" || true
+        done
         # Invariant suite (--check): separate run, no timed-region overhead.
-        echo "    $cell  --check (q=$q)..." >&2
-        check_result=$(./out/bin/dod-particles --check 2>&1 | grep '^checked=' || echo 'checked=ERROR')
+        echo "    $cell  --check (q=$q, T=$check_t)..." >&2
+        check_result=$(./out/bin/dod-particles --check --threads "$check_t" 2>&1 | grep '^checked=' || echo 'checked=ERROR')
         python3 - "$CHECKS_JSONL" "$RUN_ID" "$TS_UTC" "$MACHINE_ID" "$LAYOUT" \
             "$cell" "$q" "$SOURCE_HASH" "$SHORT_SHA" "$check_result" << 'PYEOF'
 import sys, json

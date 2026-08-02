@@ -30,7 +30,7 @@ const config = @import("config.zig");
 const hardware = @import("hardware.zig");
 const correctness = @import("correctness.zig");
 
-const SWEEP = [_]usize{ 4_000, 16_000, 65_000, 262_000, 1_000_000, 4_000_000, 16_000_000, 64_000_000 };
+const SWEEP = [_]usize{ 4_000, 65_000, 1_000_000, 16_000_000 };
 const ITERS: usize = 200;
 const WARMUP: usize = 10;
 const TRIALS: usize = 3;
