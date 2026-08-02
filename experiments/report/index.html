@@ -9,59 +9,51 @@
 <body>
 <header>
   <h1>dod-particles — experiment report</h1>
-  <p>Data-driven via <a href="https://duckdb.org/docs/guides/python/wasm.html">duckdb-wasm</a>.
-     Serves <code>data.parquet</code> (built by <code>scripts/build_report.py</code>).
-     Swap the parquet, the page updates.</p>
+  <div id="meta" class="meta"></div>
   <p id="status">loading…</p>
 </header>
 
-<section id="champions">
-  <h2>Champion grid</h2>
-  <p>Fastest cell per (regime, death_q), min ns/particle across trials.
-     regime: small ≤65K, mid 262K–1M, large ≥4M.</p>
-  <div id="champions-table"></div>
+<section id="champions-section">
+  <h2>Champion grid <span class="sub">fastest cell per regime × death rate</span></h2>
+  <p class="hint">Lower ns/particle is better. Cell color = the champion's ns/particle
+     (greener = faster). One heatmap per layout.</p>
+  <div id="champions"></div>
 </section>
 
-<section id="landscape">
-  <h2>Performance landscape</h2>
-  <p>ns/particle vs N per cell, faceted by death_q (min across trials).</p>
-  <div id="landscape-table"></div>
+<section id="landscape-section">
+  <h2>Performance landscape <span class="sub">ns/particle vs N, faceted by death rate</span></h2>
+  <p class="hint">One small multiple per death rate; a line per cell. Log x-axis.
+     Click a legend cell to isolate it.</p>
+  <div id="landscape" class="facet-grid"></div>
 </section>
 
-<section id="bandwidth">
-  <h2>Achieved vs ceiling bandwidth</h2>
-  <p><code>achieved_bw_gbs = bytes/p × N / ns_frame</code> vs the host's measured
-     <code>streaming_bw_gbs</code> (the single-core ceiling).</p>
-  <div id="bandwidth-table"></div>
+<section id="bandwidth-section">
+  <h2>Achieved vs ceiling bandwidth <span class="sub">bytes/p × N / ns_frame</span></h2>
+  <p class="hint">Each line is a cell's achieved streaming bandwidth vs N. The dashed
+     red line is the host's measured single-core ceiling (<code>streaming_bw_gbs</code>).
+     Cells near the ceiling at large N are bandwidth-bound.</p>
+  <div id="bandwidth"></div>
 </section>
 
-<section id="checks">
-  <h2>Invariant suite</h2>
-  <div id="checks-table"></div>
+<section id="pmc-section" hidden>
+  <h2>PMC bottleneck breakdown <span class="sub">cycle attribution (macOS + xctrace)</span></h2>
+  <p class="hint">Stacked cycle fractions per champion: useful / processing / delivery /
+     discarded. Available only when <code>pmc.jsonl</code> is present.</p>
+  <div id="pmc"></div>
 </section>
 
-<section id="pmc">
-  <h2>PMC bottleneck breakdown</h2>
-  <div id="pmc-table"></div>
+<section id="checks-section" hidden>
+  <h2>Invariant suite <span class="sub">--check verdicts</span></h2>
+  <div id="checks"></div>
 </section>
 
-<section id="sql">
-  <h2>SQL console</h2>
-  <p>Run arbitrary SQL against the loaded <code>report</code> table
-     (+ <code>hardware</code>, <code>checks</code>, <code>pmc</code> when present).</p>
-  <textarea id="sql-input" rows="8" spellcheck="false">-- champion grid (all layouts/hosts)
-SELECT regime, death_q, cell, round(min(ns_particle),3) AS ns_particle
-FROM (
-  SELECT *, CASE WHEN N<=65000 THEN 'small' WHEN N<=1000000 THEN 'mid' ELSE 'large' END AS regime
-  FROM report
-)
-GROUP BY regime, death_q, cell
-ORDER BY regime, death_q, ns_particle;</textarea>
-  <div><button id="sql-run">Run</button> <span id="sql-status"></span></div>
-  <div id="sql-result"></div>
-</section>
+<footer>
+  <p>Built by <code>scripts/build_report.py</code> from <code>experiments/data/<machine_id>/</code>.
+     Charts: <a href="https://echarts.apache.org/">ECharts</a>. Re-run the builder
+     after every <code>collect.sh</code>.</p>
+</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.0/dist/duckdb-browser.mjs" type="module"></script>
-<script type="module" src="report.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<script src="report.js"></script>
 </body>
 </html>

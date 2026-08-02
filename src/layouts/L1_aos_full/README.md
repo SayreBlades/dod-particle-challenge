@@ -117,7 +117,7 @@ The fastest cell per (regime, death_q), min ns/particle across trials. The canon
 
 ```sql
 -- Champion grid for L1: the fastest cell per (regime, death_q).
--- regime: small <=65K, mid 262K-1M, large >=4M. min ns/particle across trials.
+-- regime: small <=65K, mid 262K-1M, large >=16M. min ns/particle across trials.
 WITH ranked AS (
   SELECT cell, death_q,
     CASE WHEN N <= 65000 THEN 'small' WHEN N <= 1000000 THEN 'mid' ELSE 'large' END AS regime,
@@ -165,4 +165,6 @@ ORDER BY regime, death_q
 | small | 0.5 | L1.B1.w1-halide.w2-opt | 5.313 | 6.5 | 25.22 |
 | small | 0.75 | L1.B1.w1-halide.w2-opt | 6.396 | 5.75 | 25.22 |
 <!-- /AUTO-GENERATED -->
+
+
 

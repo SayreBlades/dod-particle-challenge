@@ -228,10 +228,9 @@ carries the blueprint table + parallel expressibility + champion grid.
 ## Analysis
 
 The analysis artifact is a static **duckdb-wasm** HTML page
-([`experiments/report/`](experiments/report/)) that fetches `data.parquet`
+([`experiments/report/`](experiments/report/)) that fetches `report.json`
 (built by [`scripts/build_report.py`](scripts/build_report.py) from the host
-JSONL + `hardware.json`) and runs all SQL client-side. Fully data-driven —
-swap the parquet, the page updates; includes an interactive SQL console.
+JSONL + `hardware.json`) and renders a charted dashboard with ECharts.
 
 It produces:
 
@@ -246,7 +245,7 @@ It produces:
    cycles, when `pmc.jsonl` is present (degrades gracefully otherwise).
 
 ```sh
-scripts/build_report.py                          # jsonl -> experiments/report/data.parquet + README grids
+scripts/build_report.py                          # jsonl -> experiments/report/report.json + README grids
 python3 -m http.server -d experiments/report 8000   # open http://localhost:8000
 ```
 
@@ -275,11 +274,11 @@ experiments/
   sweeps/           <layout>.cells lists + death_rates.txt + sweep-knob docs
   data/             host-partitioned JSONL: <machine_id>/{runs,checks,pmc}.jsonl + hardware.json
   golden/           stage1.bin + frame.sha256 (the byte-exact reference; tracked)
-  report/           static duckdb-wasm report (index.html, report.js, queries.sql; fetches data.parquet)
+  report/           static ECharts dashboard (index.html, report.js, queries.sql; fetches report.json)
 scripts/
   collect.sh        unified data-collection sweep (appends JSONL into experiments/data/<machine_id>/)
   cell_hash.py      cell @import-closure SHA-256 -> source_hash on every run row
-  build_report.py   jsonl -> experiments/report/data.parquet + layout README champion grids
+  build_report.py   jsonl -> experiments/report/report.json + layout README champion grids
   hardware_json.py  machine profile -> JSON (machine_id + streaming_bw_gbs via Zig --bandwidth); --write
   hardware_profile.sh  human-readable counterpart
   pmc_collect.sh    optional PMC wrapper (xctrace, macOS); appends pmc.jsonl
