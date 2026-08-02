@@ -1,7 +1,7 @@
 # L1 — Array-of-Structs (AoS), full field set
 
 > The frozen data model for L1. The cell/blueprint story lives in
-> `experiments/cells/L1-B1.md` and the optimization-framework plan; this
+> `experiments/cells/L1.md` and the optimization-framework plan; this
 > README documents only the layout itself. All numbers: Apple M4,
 > ReleaseFast, min-of-3-trials.
 
