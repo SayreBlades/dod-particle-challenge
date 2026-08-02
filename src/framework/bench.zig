@@ -37,12 +37,12 @@ const TRIALS: usize = 3;
 const GOLDEN_STEPS: usize = 600;
 const GOLDEN_N: usize = 1024;
 const EPS: f32 = 1e-4;
-const GOLDEN_PATH = "golden/stage1.bin";
+const GOLDEN_PATH = "experiments/golden/stage1.bin";
 // The framebuffer dimensions used by the bench sweep + record mode.
 const RENDER_W: u32 = 1024;
 const RENDER_H: u32 = 1024;
 const RENDER_SETTLE_STEPS: usize = 120; // 2s = kill_age -> steady-state spread
-const FRAME_GOLDEN_PATH = "golden/frame.sha256";
+const FRAME_GOLDEN_PATH = "experiments/golden/frame.sha256";
 // CSV death column (build option -Ddeath=<q>, optimization-framework §7).
 const DEATH_COL = @import("options").death;
 

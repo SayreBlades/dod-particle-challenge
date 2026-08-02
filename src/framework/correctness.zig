@@ -122,7 +122,7 @@ pub fn hashFrame(fb: []const u8) FrameHash {
 
 pub fn writeFrameGolden(path: []const u8, hash: FrameHash, io: Io) !void {
     var dir = std.Io.Dir.cwd();
-    dir.createDirPath(io, "golden") catch {};
+    dir.createDirPath(io, "experiments/golden") catch {};
     var f = try dir.createFile(io, path, .{});
     var io_buf: [256]u8 = undefined;
     var w = f.writer(io, &io_buf);
@@ -149,7 +149,7 @@ pub fn loadFrameGolden(path: []const u8, io: Io) !FrameHash {
 
 pub fn writeGolden(path: []const u8, snap: Snapshot, io: Io) !void {
     var dir = std.Io.Dir.cwd();
-    dir.createDirPath(io, "golden") catch {};
+    dir.createDirPath(io, "experiments/golden") catch {};
     var f = try dir.createFile(io, path, .{});
     var io_buf: [4096]u8 = undefined;
     var w = f.writer(io, &io_buf);

@@ -1,7 +1,7 @@
 // Cell L1.B1.w1-autovec.w2-simple — B1 (math+decide+respawn | render),
 // walk 1 autovec branchy, walk 2 r0 splat.
 //
-// The reference sim (generates golden/stage1.bin + golden/frame.sha256).
+// The reference sim (generates experiments/golden/stage1.bin + experiments/golden/frame.sha256).
 // Golden: bit-exact. Same blueprint as the other B1 cells; differs only in
 // walk attributes (read the declaration diff for the attribution).
 //

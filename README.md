@@ -202,7 +202,7 @@ scripts/
   hardware_profile.sh  human-readable counterpart
   pmc_collect.sh    optional PMC wrapper (xctrace, macOS)
   pmc_sweep.sh      optional PMC sweep
-golden/             stage1.bin + frame.sha256 (regenerated from the reference cell)
+experiments/golden/ stage1.bin + frame.sha256 (the byte-exact reference; tracked, regenerated from the reference cell)
 vendor/raylib/      git submodule (the renderer; stb_image_write is no longer a dependency)
 ```
 
