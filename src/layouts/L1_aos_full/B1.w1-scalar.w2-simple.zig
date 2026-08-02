@@ -8,10 +8,10 @@
 // (NEON fmul.s and fmul.4s lanes are both IEEE single — same ops, same order.)
 
 const std = @import("std");
-const fw = @import("../../../framework/sim.zig");
-const config = @import("../../../framework/config.zig");
-const layout = @import("../data.zig");
-const r0 = @import("../../common/render_simple.zig");
+const fw = @import("../../framework/sim.zig");
+const config = @import("../../framework/config.zig");
+const layout = @import("data.zig");
+const r0 = @import("../common/render_simple.zig");
 
 const Data = layout.Data;
 

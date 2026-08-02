@@ -5,10 +5,10 @@
 // w2-simple's r0 splat, proven by `zig build test`).
 
 const std = @import("std");
-const fw = @import("../../../framework/sim.zig");
-const layout = @import("../data.zig");
-const halide = @import("../B1.w1-halide_api.zig");
-const r1 = @import("../../common/render_opt.zig");
+const fw = @import("../../framework/sim.zig");
+const layout = @import("data.zig");
+const halide = @import("B1.w1-halide_api.zig");
+const r1 = @import("../common/render_opt.zig");
 
 const Data = layout.Data;
 

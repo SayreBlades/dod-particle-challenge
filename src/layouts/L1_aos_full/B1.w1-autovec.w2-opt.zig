@@ -6,10 +6,10 @@
 // `zig build test`).
 
 const std = @import("std");
-const fw = @import("../../../framework/sim.zig");
-const config = @import("../../../framework/config.zig");
-const layout = @import("../data.zig");
-const r1 = @import("../../common/render_opt.zig");
+const fw = @import("../../framework/sim.zig");
+const config = @import("../../framework/config.zig");
+const layout = @import("data.zig");
+const r1 = @import("../common/render_opt.zig");
 
 const Data = layout.Data;
 

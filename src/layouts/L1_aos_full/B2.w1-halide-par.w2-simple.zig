@@ -1,4 +1,4 @@
-// Cell L1.B2.w1-halide.w2-simple — B2 (math | decide+respawn | render),
+// Cell L1.B2.w1-halide-par.w2-simple — B2 (math | decide+respawn | render),
 // walk 1 Halide math, walk 2 Zig decide+respawn, walk 3 r0 splat. SERIAL.
 //
 // Golden: bit-exact. The "natural seam": Halide does the math (StrictFloat,
@@ -7,11 +7,11 @@
 // B2.w1-autovec.w2-simple: walk-1 impl zig → halide (isolates impl, math-only).
 
 const std = @import("std");
-const fw = @import("../../../framework/sim.zig");
-const config = @import("../../../framework/config.zig");
-const layout = @import("../data.zig");
-const halide = @import("../B2.w1-halide_api.zig");
-const r0 = @import("../../common/render_simple.zig");
+const fw = @import("../../framework/sim.zig");
+const config = @import("../../framework/config.zig");
+const layout = @import("data.zig");
+const halide = @import("B2.w1-halide_api.zig");
+const r0 = @import("../common/render_simple.zig");
 
 const Data = layout.Data;
 
@@ -22,7 +22,7 @@ pub const H = struct {
         .ordering = .identity,
         .intermediates = .none,
         .walks = &.{
-            .{ .impl = .halide, .schedule = .scalar, .parallel = .none, .variant = .none },
+            .{ .impl = .halide, .schedule = .scalar, .parallel = .data_parallel, .variant = .none },
             .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .branchy },
             .{ .impl = .zig, .schedule = .r0, .parallel = .none, .variant = .none },
         },

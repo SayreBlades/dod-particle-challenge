@@ -13,11 +13,11 @@
 // splat calls the shared r0 pass. The clear is the driver's job.
 
 const std = @import("std");
-const fw = @import("../../../framework/sim.zig");
-const config = @import("../../../framework/config.zig");
-const layout = @import("../data.zig");
-const hash = @import("../hash_rng.zig");
-const r0 = @import("../../common/render_simple.zig");
+const fw = @import("../../framework/sim.zig");
+const config = @import("../../framework/config.zig");
+const layout = @import("data.zig");
+const hash = @import("hash_rng.zig");
+const r0 = @import("../common/render_simple.zig");
 
 const Data = layout.Data;
 const Particle = layout.Particle;

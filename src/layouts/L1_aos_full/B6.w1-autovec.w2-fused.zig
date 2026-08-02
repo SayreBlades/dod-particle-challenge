@@ -7,10 +7,10 @@
 // decide+respawn+render, without fusing math, still wins).
 
 const std = @import("std");
-const fw = @import("../../../framework/sim.zig");
-const config = @import("../../../framework/config.zig");
-const layout = @import("../data.zig");
-const rast = @import("../../common/render_simple.zig");
+const fw = @import("../../framework/sim.zig");
+const config = @import("../../framework/config.zig");
+const layout = @import("data.zig");
+const rast = @import("../common/render_simple.zig");
 
 const Data = layout.Data;
 

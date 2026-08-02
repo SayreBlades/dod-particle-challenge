@@ -8,11 +8,11 @@
 // Halide baseline. Diff vs B3.w1-autovec.w2-simple: walk-1 impl zig → halide.
 
 const std = @import("std");
-const fw = @import("../../../framework/sim.zig");
-const config = @import("../../../framework/config.zig");
-const layout = @import("../data.zig");
-const halide = @import("../B3.w1-halide_api.zig");
-const r0 = @import("../../common/render_simple.zig");
+const fw = @import("../../framework/sim.zig");
+const config = @import("../../framework/config.zig");
+const layout = @import("data.zig");
+const halide = @import("B3.w1-halide_api.zig");
+const r0 = @import("../common/render_simple.zig");
 
 const Data = layout.Data;
 

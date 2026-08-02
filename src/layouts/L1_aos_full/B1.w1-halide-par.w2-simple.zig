@@ -7,10 +7,10 @@
 // impl+variant axes; the statistical golden is the cost of that isolation).
 
 const std = @import("std");
-const fw = @import("../../../framework/sim.zig");
-const layout = @import("../data.zig");
-const halide = @import("../B1.w1-halide_api.zig");
-const r0 = @import("../../common/render_simple.zig");
+const fw = @import("../../framework/sim.zig");
+const layout = @import("data.zig");
+const halide = @import("B1.w1-halide_api.zig");
+const r0 = @import("../common/render_simple.zig");
 
 const Data = layout.Data;
 

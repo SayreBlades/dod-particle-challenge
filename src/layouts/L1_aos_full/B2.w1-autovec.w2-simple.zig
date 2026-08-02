@@ -10,10 +10,10 @@
 // Self-contained (§8 rule 2): both walks inlined; the splat calls r0.
 
 const std = @import("std");
-const fw = @import("../../../framework/sim.zig");
-const config = @import("../../../framework/config.zig");
-const layout = @import("../data.zig");
-const r0 = @import("../../common/render_simple.zig");
+const fw = @import("../../framework/sim.zig");
+const config = @import("../../framework/config.zig");
+const layout = @import("data.zig");
+const r0 = @import("../common/render_simple.zig");
 
 const Data = layout.Data;
 const Particle = layout.Particle;

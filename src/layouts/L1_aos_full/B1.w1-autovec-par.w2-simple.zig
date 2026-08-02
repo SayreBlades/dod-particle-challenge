@@ -16,11 +16,11 @@
 // Self-contained (§8 rule 2). Scavenges the B3-par pool discipline.
 
 const std = @import("std");
-const fw = @import("../../../framework/sim.zig");
-const config = @import("../../../framework/config.zig");
-const pool_mod = @import("../../../framework/pool.zig");
-const layout = @import("../data.zig");
-const r0 = @import("../../common/render_simple.zig");
+const fw = @import("../../framework/sim.zig");
+const config = @import("../../framework/config.zig");
+const pool_mod = @import("../../framework/pool.zig");
+const layout = @import("data.zig");
+const r0 = @import("../common/render_simple.zig");
 
 const Data = layout.Data;
 const CHUNK_ALIGN: usize = 32; // chunk starts snap to 32 particles (17 lines)

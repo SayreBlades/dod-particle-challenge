@@ -15,10 +15,10 @@
 // Self-contained (§8 rule 2): one loop, physics + splat interleaved.
 
 const std = @import("std");
-const fw = @import("../../../framework/sim.zig");
-const config = @import("../../../framework/config.zig");
-const layout = @import("../data.zig");
-const rast = @import("../../common/render_simple.zig");
+const fw = @import("../../framework/sim.zig");
+const config = @import("../../framework/config.zig");
+const layout = @import("data.zig");
+const rast = @import("../common/render_simple.zig");
 
 const Data = layout.Data;
 
