@@ -6,54 +6,35 @@ scattering) — rendered live with [raylib] in Zig on Apple Silicon:
 
 ![three particle streams: smoke, sparks, debris](docs/fountain.gif)
 
-It runs at a steady 60 fps in play mode, but the interesting number is how
-*cheaply* each frame can be computed. That question — what does a frame of
-65,000 particles *cost*, and how low can that cost go — is what this lab is
-about. It's a hands-on laboratory for *feeling* the cache/perf lessons from
-Mike Acton's CppCon 2014 talk, ["Data-Oriented Design and C++"][acton].
 
-The thesis under test: a particle simulator is not one job, it's a handful of
-loops over the same particles — integrate physics, decide which died, respawn
-the dead, rasterize the survivors. Each loop touches a different subset of a
-particle's fields. Lay out memory for the loops (the hot fields contiguous,
-the cold ones out of the way) instead of for the object (one fat `Particle`
-struct), and the loops get dramatically faster — *if* you're paying for the
-bytes you actually stream. The number of particles N decides whether that
-matters at all: at small N everything fits in cache and layout is noise; at
-large N the sim is bandwidth-bound and layout *is* the ceiling.
+It's a hands-on laboratory for *feeling* the cache/perf lessons from Mike
+Acton's CppCon 2014 talk, ["Data-Oriented Design and C++"][acton].
 
 This lab explores that transformation across several **memory layout
 strategies** — each a different answer to how the particle data is arranged in
 RAM. The physics (the math, the seed, the death model) never changes between
 them; only the data layout and access pattern do. Each layout is explored by
-sweeping its **cells** (strategy variants) across particle counts N, death
-rates q, and thread counts, collecting per-trial timing into a run directory,
-then analyzing the aggregated data to find the **champion cell per regime**
-(no global winner — every champion carries regime + numbers + blueprint).
-
-The first layout is [L1 — AoS full-field](src/layouts/L1_aos_full/README.md):
-the strawman, one fat `Particle` struct per particle, every field the OOP
-object would carry. Later layouts cut the dead fields, split hot from cold,
-move to structure-of-arrays — each isolating one axis of the transformation.
+sweeping its **cells** (strategy variants) across particle counts N, death rates
+q, and thread counts, collecting per-trial timing into a run directory, then
+analyzing the aggregated data to find the **champion cell per regime** (no
+global winner — every champion carries regime + numbers + blueprint).
 
 ### Layouts
 
-A layout is one frozen data model (topology × field set × allocation policy —
-zero comptime knobs; alignment/padding/field-set/topology changes are new
-layouts, not flags). Each is explored by sweeping its cells across the
+A layout is one frozen data model Each model is explored by sweeping its cells across the
 regime grid (below). Ordered by expected information-per-hour:
 
-| #  | folder                                                     | data model                                     | hot B/p | status       | priority reason                                             |
-|----|------------------------------------------------------------|------------------------------------------------|--------:|:------------:|-------------------------------------------------------------|
-| L1 | [`L1_aos_full`](src/layouts/L1_aos_full/)                 | AoS, full 11-field, plain alloc                |     ~68 | ✅ complete  | the strawman; re-label existing work, land the framework    |
-| L2 | [`L2_aos_lean`](src/layouts/L2_aos_lean/)                 | AoS, lean 4-field, plain alloc                 |      29 | queued       | isolates field-set with topology fixed                      |
-| L3 | [`L3_hotcold`](src/layouts/L3_hotcold/)                   | hot/cold AoS split                             | ~36 hot | queued       | arc stage 2's first structural win                          |
-| L4 | [`L4_tuple3`](src/layouts/L4_tuple3/)                     | `[]Vec3` pos/vel + age + kind                  |      29 | queued       | the `ld3` deinterleave experiment; interesting Halide input |
-| L5 | [`L5_tuple4`](src/layouts/L5_tuple4/)                     | `[]Vec4` pos/vel (aligned) + age + kind        |      37 | queued       | per-particle `@Vector(4)`, zero shuffles                    |
-| L6 | [`L6_soa`](src/layouts/L6_soa/)                           | per-component `[]f32` (lean), plain alloc      |      29 | queued       | arc home turf; richest strategy soil                        |
-| L7 | [`L7_soa_al`](src/layouts/L7_soa_al/)                     | per-component `[]f32`, 128 B-aligned, W-padded |      29 | queued       | isolates alignment+padding                                  |
-| L8 | [`L8_aosoa`](src/layouts/L8_aosoa/)                      | blocked AoSoA                                  |  ~29–32 | queued       | the one genuinely untried topology                          |
-
+| #  | folder                                           | data model                                     | hot B/p |   status    | priority reason                                             |
+|----|--------------------------------------------------|------------------------------------------------|--------:|:-----------:|-------------------------------------------------------------|
+| L1 | [L1_aos_full](src/layouts/L1_aos_full/README.md) | AoS, full 11-field, plain alloc                |     ~68 | ✅ complete | the strawman; re-label existing work, land the framework    |
+| L2 | [L2_aos_lean](src/layouts/L2_aos_lean/README.md) | AoS, lean 4-field, plain alloc                 |      29 |   queued    | isolates field-set with topology fixed                      |
+| L3 | [L3_hotcold](src/layouts/L3_hotcold/README.md)   | hot/cold AoS split                             | ~36 hot |   queued    | arc stage 2's first structural win                          |
+| L4 | [L4_tuple3](src/layouts/L4_tuple3/README.md)     | `[]Vec3` pos/vel + age + kind                  |      29 |   queued    | the `ld3` deinterleave experiment; interesting Halide input |
+| L5 | [L5_tuple4](src/layouts/L5_tuple4/README.md)     | `[]Vec4` pos/vel (aligned) + age + kind        |      37 |   queued    | per-particle `@Vector(4)`, zero shuffles                    |
+| L6 | [L6_soa](src/layouts/L6_soa/README.md)           | per-component `[]f32` (lean), plain alloc      |      29 |   queued    | arc home turf; richest strategy soil                        |
+| L7 | [L7_soa_al](src/layouts/L7_soa_al/README.md)     | per-component `[]f32`, 128 B-aligned, W-padded |      29 |   queued    | isolates alignment+padding                                  |
+| L8 | [L8_aosoa](src/layouts/L8_aosoa/README.md)       | blocked AoSoA                                  |  ~29–32 |   queued    | the one genuinely untried topology                          |
+     
 **Cross-layout prediction** (hypothesis to test per vertical): Halide ties
 Zig on SoA (L6/L7) and loses on AoS-family (L1/L2/L3) — the gather tax and
 the inexpressible component-lane vectorization are the mechanism; B5/B6
@@ -176,55 +157,109 @@ THREADS="1 4" scripts/collect.sh L1 "L1.B3.w1-autovec-par.w2-rmerge"  # custom t
 every row; the full hardware facts (incl. `streaming_bw_gbs`) are in a
 `hardware.json` sidecar per host.
 
-### Run directory layout
+### Where the data lands
+
+Data is **host-partitioned + append-only JSONL** — one directory per machine
+(`experiments/data/<machine_id>/`), tracked in git (JSONL + JSON are small and
+runs from different machines combine in one repo):
 
 ```
-experiments/data/<layout>/<timestamp>-<machine_id>-<short-sha>/
-  runs.csv        # one row per (cell, mode, death_q, N, trial) — the data
-  hardware.json   # machine facts sidecar (machine_id is the join key)
-  meta.json       # run provenance (git sha, zig version, sweep config)
+experiments/data/<machine_id>/
+  hardware.json   # machine facts (one per host; machine_id is the join key)
+  runs.jsonl      # one JSON object per (cell, death_q, threads, N, trial)
+  checks.jsonl    # one JSON object per (cell, death_q) --check (invariant suite)
+  pmc.jsonl       # one per (cell, N, death_q, trial) PMC row (optional, macOS)
 ```
 
-### `runs.csv` schema
+Every `runs.jsonl` row is **self-describing (denormalized)** so duckdb loads it
+with no joins — build-time provenance + the cell's static axes + the
+per-trial measurement all on one row:
 
 ```
-run_id,machine_id,cell,mode,death_q,threads,N,bytes_per_particle,trial,ns_frame,ns_particle,gbs_eff,step_ns,render_ns
+run_id, ts_utc, host, machine_id, layout, cell, source_hash, git_sha,
+git_branch, zig_version, death_q, threads, N, bytes_per_particle, trial,
+ns_frame, ns_particle, blueprint, ordering, intermediates, golden_class,
+halide_expressible
 ```
 
 - `machine_id` — the hardware dimension (full facts in `hardware.json`).
-- `trial` — indexes repeated runs per N; analysis keeps the min (cleanest sample).
-- `gbs_eff` — clean step hot-loop bandwidth (step mode only).
-- `step_ns` / `render_ns` — frame decomposition (frame mode only).
+- `source_hash` — the cell's `@import`-closure SHA-256 (`scripts/cell_hash.py`);
+  pins the exact cell code that ran. `null` for migrated historical rows.
+- Static cell facts (`blueprint`, `ordering`, `intermediates`, `golden_class`,
+  `halide_expressible`) are denormalized onto every row, so `GROUP BY
+  blueprint` works without a join.
+- Append-only: re-runs duplicate rows; dedup/filtering is a loader/report
+  concern (the jsonl is a historical audit of every run).
+- `achieved_bw_gbs` is **derived in the report** (`bytes/p × N / ns_frame`),
+  not stored — it compares against the host's `streaming_bw_gbs`.
+
+Full schema details live in [`experiments/data/README.md`](experiments/data/README.md).
+
+## Full layout sweep
+
+One pass — sweep, build the report, (optional) PMC, commit. This is the
+complete workflow for closing a layout vertical:
+
+```sh
+# 1. Sweep — all cells × {0.01,0.05,0.25} × {4K,65K,1M,16M} × {1,4,10}
+#    (parallel only); appends JSONL into experiments/data/<machine_id>/:
+scripts/collect.sh L1
+
+# 2. Build the report + read the champion grid (also auto-written into the
+#    layout README, §9):
+scripts/build_report.py
+python3 -m http.server -d experiments/report 8000   # open http://localhost:8000
+
+# 3. (Mac + Xcode) PMC cycle-attribution for the champions (appends pmc.jsonl):
+scripts/pmc_sweep.sh L1 "L1.<champ1> L1.<champ2> ..."
+
+# 4. Rebuild the report; commit the data + report + layout README:
+scripts/build_report.py
+git add experiments/data/<machine_id> experiments/report/{index.html,report.js,queries.sql,style.css} \
+        experiments/cells/L1.md src/layouts/L1_aos_full/README.md
+git commit -m "L1: sweep + PMC + champion grid"
+```
+
+A layout is **done** when: every expressible cell is implemented and
+registered; the sweep is committed; the invariant suite (`--check`) passes for
+every committed run; the champion grid is stable; and the layout's README
+carries the blueprint table + parallel expressibility + champion grid.
 
 ## Analysis
 
-[`experiments/results/analyze.ipynb`](experiments/results/analyze.ipynb) loads
-every `runs.csv`, joins `hardware.json` on `machine_id`, and produces:
+The analysis artifact is a static **duckdb-wasm** HTML page
+([`experiments/report/`](experiments/report/)) that fetches `data.parquet`
+(built by [`scripts/build_report.py`](scripts/build_report.py) from the host
+JSONL + `hardware.json`) and runs all SQL client-side. Fully data-driven —
+swap the parquet, the page updates; includes an interactive SQL console.
 
-1. **Performance landscapes** — ns/particle vs N, one curve per cell.
-2. **Effective bandwidth** — `gbs_eff` vs the DRAM ceiling.
-3. **Champion grid** — best cell per regime (small/mid/large N) per mode.
-4. **Cross-machine comparison** — the same cell overlaid across machines.
-5. **Hardware facts** — the cache/memory anchors.
+It produces:
+
+1. **Performance landscapes** — ns/particle vs N, one curve per cell,
+   faceted by death rate.
+2. **Champion grid** — the fastest cell per (regime × death_q), grouped by
+   `machine_id × regime × death_q` (regime: small ≤65K / mid 1M / large
+   ≥16M). Also auto-written into each layout README's AUTO-GENERATED block.
+3. **Achieved-vs-ceiling bandwidth** — `achieved_bw = bytes/p × N / ns_frame`
+   vs the host's measured `streaming_bw_gbs` (the honest-ceiling comparison).
+4. **PMC bottleneck breakdown** — useful / delivery / processing / discarded
+   cycles, when `pmc.jsonl` is present (degrades gracefully otherwise).
 
 ```sh
-.venv/bin/jupyter nbconvert --execute --to notebook --inplace experiments/results/analyze.ipynb
-# or open in JupyterLab and Run All
+scripts/build_report.py                          # jsonl -> experiments/report/data.parquet + README grids
+python3 -m http.server -d experiments/report 8000   # open http://localhost:8000
 ```
-
-The notebook is the "we've fully explored this layout" deliverable: once a
-layout's champion grid is stable across machines + death rates, the layout is
-done.
 
 ### Optional: PMC cycle-attribution (macOS + Xcode)
 
 [`scripts/pmc_collect.sh`](scripts/pmc_collect.sh) /
 [`scripts/pmc_sweep.sh`](scripts/pmc_sweep.sh) run the bench under xctrace's
-CPU Counters template to capture per-process cycle saturation (frontend /
-backend / branch-mispredict bottlenecks) — the *why* behind a bandwidth-bound
-or compute-bound result. Output is local (`.scratch/pmc/`, gitignored) since
-`.trace` files are large. This is a separate opt-in layer; the unified
-`collect.sh` does timing + hardware everywhere.
+CPU Counters template to capture per-process cycle saturation (useful /
+delivery / processing / discarded cycles) — the *why* behind a bandwidth-
+bound or compute-bound result. Appends one row per `(cell, N, death_q,
+trial)` to `experiments/data/<machine_id>/pmc.jsonl`; raw `.trace` files stay
+local under `.scratch/` (gitignored). This is a separate opt-in layer; the
+unified `collect.sh` does timing + hardware everywhere.
 
 ## Project layout
 
@@ -237,17 +272,21 @@ src/
   main.zig          comptime registry: cell-name -> Sim
 experiments/
   cells/            cell manifests (generated by `zig build manifests`)
-  sweeps/           <layout>.cells lists + sweep-knob docs
-  data/             collected runs (tracked: runs.csv + hardware.json + meta.json)
-  results/          analyze.ipynb (the analysis artifact)
+  sweeps/           <layout>.cells lists + death_rates.txt + sweep-knob docs
+  data/             host-partitioned JSONL: <machine_id>/{runs,checks,pmc}.jsonl + hardware.json
+  golden/           stage1.bin + frame.sha256 (the byte-exact reference; tracked)
+  report/           static duckdb-wasm report (index.html, report.js, queries.sql; fetches data.parquet)
 scripts/
-  collect.sh        unified data-collection sweep
-  hardware_json.py  machine profile -> JSON (machine_id dimension)
+  collect.sh        unified data-collection sweep (appends JSONL into experiments/data/<machine_id>/)
+  cell_hash.py      cell @import-closure SHA-256 -> source_hash on every run row
+  build_report.py   jsonl -> experiments/report/data.parquet + layout README champion grids
+  hardware_json.py  machine profile -> JSON (machine_id + streaming_bw_gbs via Zig --bandwidth); --write
   hardware_profile.sh  human-readable counterpart
-  pmc_collect.sh    optional PMC wrapper (xctrace, macOS)
+  pmc_collect.sh    optional PMC wrapper (xctrace, macOS); appends pmc.jsonl
   pmc_sweep.sh      optional PMC sweep
+  migrate_data.py   one-time: old per-run-dir CSV -> host JSONL
 experiments/golden/ stage1.bin + frame.sha256 (the byte-exact reference; tracked, regenerated from the reference cell)
-vendor/raylib/      git submodule (the renderer; stb_image_write is no longer a dependency)
+vendor/raylib/      git submodule (the renderer)
 ```
 
 The design plan (cells, blueprints, the death model, the sweep/analysis
