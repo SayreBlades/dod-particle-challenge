@@ -41,6 +41,7 @@ pub fn build(b: *std.Build) void {
     const host = b.option([]const u8, "host", "hostname") orelse "";
     const run_id = b.option([]const u8, "run_id", "collect run id (timestamp-machine_id-sha)") orelse "";
     const ts_utc = b.option([]const u8, "ts_utc", "collect run UTC timestamp") orelse "";
+    const keep_debug = b.option(bool, "keep-debug", "keep debug info (strip=false; same ReleaseFast codegen — for godbolt source↔asm attribution)") orelse false;
 
     const mode: Mode = blk: {
         if (std.mem.eql(u8, mode_str, "play")) break :blk .play;
@@ -109,6 +110,7 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
+            .strip = if (keep_debug) false else null,
             .link_libc = true,
         }),
     });
@@ -185,12 +187,12 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run unit tests (render_opt rasterizer equivalence)");
     test_step.dependOn(&run_tests.step);
 
-    // --- manifest regeneration (optimization-framework §14/§17.4) ---
+    // --- manifest diagnostic (reporting-and-analysis.md §9.5) ---
     // The declaration blocks in strategy files are the single source of truth;
-    // experiments/cells/<layout>.md is a parser-generated artifact. This step
-    // builds the exe in manifest mode and runs it, writing the manifest to
-    // experiments/cells/L1.md. Check in the output; regenerate after editing
-    // any cell_decl.
+    // `zig build manifests` prints the registered roster to stdout as a
+    // diagnostic (what's in sim_map). There is no checked-in manifest file
+    // (experiments/cells/ was retired); run this to inspect the registry
+    // after editing any cell_decl.
     const manifest_exe = b.addExecutable(.{
         .name = "dod-manifest",
         .root_module = b.createModule(.{
@@ -223,7 +225,7 @@ pub fn build(b: *std.Build) void {
         break :raylib_module rl_mod;
     });
     const run_manifest = b.addRunArtifact(manifest_exe);
-    const manifest_step = b.step("manifests", "Regenerate experiments/cells/L1.md from cell declarations");
+    const manifest_step = b.step("manifests", "Print the registered cell roster to stdout (diagnostic)");
     manifest_step.dependOn(&run_manifest.step);
 }
 

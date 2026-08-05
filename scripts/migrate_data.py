@@ -2,6 +2,10 @@
 """One-time migration: convert the old per-run-dir CSV data layout into the
 new host-partitioned JSONL layout (refactor §6.7).
 
+[HISTORICAL — already run for L1; do not re-run. The manifest it parsed
+(`experiments/cells/L1.md`) was subsequently retired per
+reporting-and-analysis.md §9.5; this script is kept as the as-built record.]
+
 Old:  experiments/data/L1/<run-id>/{runs.csv, checks.csv, pmc_rollup.csv,
                                 hardware.json, meta.json}
 New:  experiments/data/<machine_id>/{runs.jsonl, checks.jsonl, pmc.jsonl,

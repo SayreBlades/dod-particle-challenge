@@ -15,7 +15,8 @@ when you need the full knobs.
 | [`cell_hash.py`](#cell_hashpy) | a cell's `@import`-closure SHA-256 → `source_hash` |
 | [`hardware_json.py`](#hardware_jsonpy) | machine profile → JSON (`machine_id` + measured bandwidth) |
 | [`hardware_profile.py`](#hardware_profilepy) | human-readable counterpart to `hardware_json.py` |
-| [`build_report.py`](#build_reportpy) | JSONL + hardware → `experiments/report/report.json` + README grids |
+| [`build_report.py`](#build_reportpy) | JSONL + hardware → the `experiments/analysis/` tree + the `--verify` gate |
+| [`analyze_cell.py`](#analyze_cellpy) | per-cell: rebuild+disassemble (cached) → evidence `<cell>.json` + LLM narrative `<cell>.md` |
 | [`pmc_collect.py`](#pmc_collectpy) | one-shot PMC cycle-attribution (macOS + Xcode) |
 | [`pmc_sweep.py`](#pmc_sweeppy) | PMC across cells × N × trials + rollup |
 | [`migrate_data.py`](#migrate_datapy) | one-time: old per-run CSV → host JSONL |
@@ -180,20 +181,66 @@ python3 scripts/hardware_profile.py
 
 ## build_report.py
 
-Reads the host-partitioned JSONL + `hardware.json`, joins runs ↔ hardware,
-derives `achieved_bw_gbs`, and emits the chart-ready
-`experiments/report/report.json` fetched by the static ECharts dashboard. Also
-writes the champion-grid markdown tables into each layout README's
-auto-generated block. Re-run after every collect.
+Builds the full derived analysis tree under `experiments/analysis/` from the
+host-partitioned JSONL + `hardware.json`. It is the orchestrator:
+
+- **per-cell bundles** — delegated to [`analyze_cell.py`](#analyze_cellpy) via
+  subprocess: the evidence `<cell>.json` + the LLM narrative `<cell>.md` for
+  every measured cell.
+- **aggregation bundles** — `analysis/machines.json`, per-machine
+  `overview.json`, per-layout `layout.json` (champions partitioned by thread
+  group), a browsable markdown tree (a README at every level), + `queries.sql`.
+- **the `--verify` gate** — every narrative is checked; a failure is retried
+  once (at a higher token budget), then the cell is marked `verified: false`
+  (the SPA banners it). The build always finishes; the **exit code is nonzero
+  if any cell remains unverified** — loud, but never blocks the deterministic
+  aggregation.
+
+Re-run after every collect. Needs duckdb — run under the venv
+(`.venv/bin/python`, or `make report`).
 
 ```sh
-python3 scripts/build_report.py            # report.json + refresh README grids
-python3 scripts/build_report.py --no-readme  # just the json
-python3 scripts/build_report.py --no-json    # just the README grids (debug)
+.venv/bin/python scripts/build_report.py            # full build: generate + verify + aggregate
+.venv/bin/python scripts/build_report.py --no-cells # aggregation only (skip per-cell generation)
+.venv/bin/python scripts/build_report.py --force    # force-regenerate all narratives
+.venv/bin/python scripts/build_report.py --verify-only
 ```
 
-Then `python3 -m http.server -d experiments/report 8000` and open
-`http://localhost:8000`.
+Then serve the SPA from the `experiments/` root and open `report.html`:
+
+```sh
+python3 -m http.server -d experiments 8000   # open http://localhost:8000/report.html
+```
+
+## analyze_cell.py
+
+The per-cell generator (the Tier-2 narrative, `reporting-and-analysis.md`
+decision 2). For one cell (or a whole layout): rebuilds the cell's ReleaseFast
+binary into `.scratch/asm_cache/<source_hash>/` (cached, so re-runs are
+cheap), disassembles the `step` symbol (`otool`/`objdump`), and writes the
+structured evidence `<cell>.json` (cell_decl + cache hierarchy + measured
+series + PMC + the asm histogram/excerpt). Then calls the z.ai GLM-5.2 LLM
+(`zai-sdk`) to write the 5-section narrative `<cell>.md` (Intent / Cache
+saturation / Bandwidth / Assembly / Verdict) from that evidence.
+
+The narrative is **verified**: `--verify` checks every cited instruction's
+mnemonic against the asm histogram + that all five sections are present (hard
+gate; nonzero exit). Prose numbers are advisory (the model legitimately
+derives stride/footprint/% values not 1:1 in the json). `build_report.py` runs
+this as its gate.
+
+```sh
+.venv/bin/python scripts/analyze_cell.py L1.B1.w1-autovec.w2-opt        # full: json + md
+.venv/bin/python scripts/analyze_cell.py L1                           # whole layout (resume-skips existing .md; --force regenerates)
+.venv/bin/python scripts/analyze_cell.py L1 --verify                   # integrity gate (0 FAIL = green)
+.venv/bin/python scripts/analyze_cell.py L1.B1.w1-autovec.w2-opt --json-only    # evidence only, no LLM call
+.venv/bin/python scripts/analyze_cell.py L1.B1.w1-autovec.w2-opt --prompt-only  # print the LLM prompt
+```
+
+LLM key: `ZAI_API_KEY` env or `.scratch/zai_api_key`; optional `ZAI_BASE_URL`
+/ `.scratch/zai_base_url` for a dedicated endpoint. `MAX_TOKENS` (default
+16000) overrides the reasoning-token budget — GLM-5.2 is a reasoning model,
+so the budget must cover reasoning + the visible narrative.
 
 ## pmc_collect.py
 
@@ -243,17 +290,17 @@ python3 scripts/collect.py L1
 #    (resume an interrupted sweep without duplicating completed units:)
 PARALLEL=4 SKIP_DONE=1 python3 scripts/collect.py L1
 
-# 2. Build the report + serve:
-python3 scripts/build_report.py
-python3 -m http.server -d experiments/report 8000   # open http://localhost:8000
+# 2. Build the analysis tree + serve the SPA:
+.venv/bin/python scripts/build_report.py
+python3 -m http.server -d experiments 8000   # open http://localhost:8000/report.html
 
 # 3. (Mac + Xcode) PMC cycle-attribution for the champions:
 python3 scripts/pmc_sweep.py L1 "L1.<champ1> L1.<champ2> ..."
 
 # 4. Rebuild the report; commit the data + report:
-python3 scripts/build_report.py
-git add experiments/data/<machine_id> experiments/report/
-git commit -m "L1: sweep + PMC + champion grid"
+.venv/bin/python scripts/build_report.py
+git add experiments/data/<machine_id> experiments/analysis experiments/report.html experiments/report.js experiments/style.css
+git commit -m "L1: sweep + PMC + analysis tree"
 ```
 
 Or via the Makefile shortcuts: `make collect` (all), `make collect L1`,

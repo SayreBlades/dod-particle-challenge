@@ -10,8 +10,8 @@
 #   make build L1.B1.w1-autovec.w2-simple   # build one cell (full name; layouts share strat names)
 #   make play L1.B1.w1-autovec.w2-simple    # open the interactive raylib window
 #   make profile L1.B1.w1-autovec.w2-simple # PMC cycle-attribution (macOS+Xcode)
-#   make report                             # build the report dashboard JSON
-#   make serve                              # serve experiments/report/ on :8000
+#   make report                             # build the analysis tree + verify gate
+#   make serve                              # serve experiments/ on :8000 (open report.html)
 #   make clean                              # remove out/ and worker build dirs
 #
 # Heavy data-collection sweeps (with parallelism, resume, JSONL append) use
@@ -46,8 +46,8 @@ report:
 	$(PY_REPORT) scripts/build_report.py
 
 serve:
-	@echo "serving experiments/report/ on http://localhost:8000"
-	$(PY) -m http.server -d experiments/report 8000
+	@echo "serving experiments/ on http://localhost:8000 (open report.html)"
+	$(PY) -m http.server -d experiments 8000
 
 clean:
 	rm -rf out out.w*
@@ -63,8 +63,8 @@ help:
 	@echo "  make build [target]     build cells into out/ (target: cell|layout|all)"
 	@echo "  make play  [cell]       open the interactive raylib window"
 	@echo "  make profile [cell]     PMC cycle-attribution (macOS + Xcode)"
-	@echo "  make report             build experiments/report/report.json"
-	@echo "  make serve              serve the report on http://localhost:8000"
+	@echo "  make report             build experiments/analysis/ + run the verify gate"
+	@echo "  make serve              serve experiments/ (open report.html)"
 	@echo "  make clean              rm -rf out out.w*"
 	@echo ""
 	@echo "  make collect [target]       data-collection sweep (target: cell|layout|all)"

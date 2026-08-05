@@ -38,6 +38,9 @@ halide_expressible
   not stored — it compares against the host's `streaming_bw_gbs`.
 
 Append-only by design: re-runs duplicate rows; dedup/filtering is a
-loader/report concern. The report (`experiments/report/`) reads these JSONL
-files directly with duckdb (no intermediate parquet) via
+loader/report concern. **Nothing else is written here** — `collect.py` is the
+only writer. The derived analysis (champion grids, per-cell bundles, the
+LLM narratives) lives in [`../analysis/`](../analysis/); the interactive
+report is [`../report.html`](../report.html) (served from the `experiments/`
+root). Both are built by
 [`scripts/build_report.py`](../../scripts/README.md#build_reportpy).

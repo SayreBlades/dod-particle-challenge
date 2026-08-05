@@ -1,0 +1,1071 @@
+{
+  "cell": "L1.B2.w1-halide-par.w2-simple",
+  "machine_id": "minibits-b7641c0e",
+  "source_hash": "68bbffd64fc2e7404710665ecdc6aed60018f5be8d86f29156210f718a50d3ee",
+  "git_sha": "7e59438",
+  "layout": "L1",
+  "bytes_per_particle": 68,
+  "cell_decl": {
+    "blueprint": "B2",
+    "ordering": "identity",
+    "intermediates": "none",
+    "golden_class": "bit_exact",
+    "halide_expressible": "walk1 yes (math); walk2 no (RNG-order); walk3 n/a"
+  },
+  "hardware": {
+    "cpu": "Apple M4",
+    "l1dcachesize": 65536,
+    "l2cachesize": 4194304,
+    "l3cachesize": 0,
+    "cachelinesize": 128,
+    "streaming_bw_gbs": 25.22,
+    "logicalcpu": 10
+  },
+  "cache_transitions": [
+    [
+      "L1d",
+      963
+    ],
+    [
+      "L2",
+      61680
+    ]
+  ],
+  "series": {
+    "0.01": [
+      {
+        "N": 4000,
+        "threads": 1,
+        "ns_particle": 40.063,
+        "ns_frame": 160253.1,
+        "achieved_bw_gbs": 1.7
+      },
+      {
+        "N": 16000,
+        "threads": 1,
+        "ns_particle": 32.288,
+        "ns_frame": 516613.8,
+        "achieved_bw_gbs": 2.11
+      },
+      {
+        "N": 65000,
+        "threads": 1,
+        "ns_particle": 28.911,
+        "ns_frame": 1879215.0,
+        "achieved_bw_gbs": 2.35
+      },
+      {
+        "N": 262000,
+        "threads": 1,
+        "ns_particle": 30.603,
+        "ns_frame": 8017958.5,
+        "achieved_bw_gbs": 2.22
+      },
+      {
+        "N": 1000000,
+        "threads": 1,
+        "ns_particle": 30.474,
+        "ns_frame": 30473972.5,
+        "achieved_bw_gbs": 2.23
+      },
+      {
+        "N": 4000000,
+        "threads": 1,
+        "ns_particle": 31.428,
+        "ns_frame": 125711837.3,
+        "achieved_bw_gbs": 2.16
+      }
+    ],
+    "0.05": [
+      {
+        "N": 4000,
+        "threads": 1,
+        "ns_particle": 40.623,
+        "ns_frame": 162494.0,
+        "achieved_bw_gbs": 1.67
+      },
+      {
+        "N": 16000,
+        "threads": 1,
+        "ns_particle": 31.514,
+        "ns_frame": 504228.1,
+        "achieved_bw_gbs": 2.16
+      },
+      {
+        "N": 65000,
+        "threads": 1,
+        "ns_particle": 30.023,
+        "ns_frame": 1951478.8,
+        "achieved_bw_gbs": 2.26
+      },
+      {
+        "N": 262000,
+        "threads": 1,
+        "ns_particle": 32.496,
+        "ns_frame": 8514000.8,
+        "achieved_bw_gbs": 2.09
+      },
+      {
+        "N": 1000000,
+        "threads": 1,
+        "ns_particle": 34.687,
+        "ns_frame": 34686992.9,
+        "achieved_bw_gbs": 1.96
+      },
+      {
+        "N": 4000000,
+        "threads": 1,
+        "ns_particle": 29.003,
+        "ns_frame": 116013135.6,
+        "achieved_bw_gbs": 2.34
+      }
+    ],
+    "0.25": [
+      {
+        "N": 4000,
+        "threads": 1,
+        "ns_particle": 37.561,
+        "ns_frame": 150245.2,
+        "achieved_bw_gbs": 1.81
+      },
+      {
+        "N": 16000,
+        "threads": 1,
+        "ns_particle": 32.718,
+        "ns_frame": 523496.0,
+        "achieved_bw_gbs": 2.08
+      },
+      {
+        "N": 65000,
+        "threads": 1,
+        "ns_particle": 32.633,
+        "ns_frame": 2121125.0,
+        "achieved_bw_gbs": 2.08
+      },
+      {
+        "N": 262000,
+        "threads": 1,
+        "ns_particle": 34.734,
+        "ns_frame": 9100286.0,
+        "achieved_bw_gbs": 1.96
+      },
+      {
+        "N": 1000000,
+        "threads": 1,
+        "ns_particle": 32.581,
+        "ns_frame": 32580662.9,
+        "achieved_bw_gbs": 2.09
+      },
+      {
+        "N": 4000000,
+        "threads": 1,
+        "ns_particle": 29.583,
+        "ns_frame": 118330603.8,
+        "achieved_bw_gbs": 2.3
+      }
+    ]
+  },
+  "pmc": [],
+  "asm": {
+    "source_hash": "68bbffd64fc2e7404710665ecdc6aed60018f5be8d86f29156210f718a50d3ee",
+    "symbol": "_framework.sim.Strategy(layouts.L1.data.Data,layouts.L1.B2.w1-halide-par.w2-simple.H).step",
+    "n_instructions": 291,
+    "histogram": {
+      "add": 52,
+      "stp": 39,
+      "mov": 18,
+      "cmp": 18,
+      "csel": 18,
+      "str": 16,
+      "b": 16,
+      "strb": 16,
+      "ldr": 13,
+      "ldrb": 12,
+      "ldp": 9,
+      "fcmp": 7,
+      "ccmp": 6,
+      "fmov": 5,
+      "fcvtzs": 5,
+      "adrp": 4,
+      "bfi": 4,
+      "fmul": 4,
+      "tbnz": 4,
+      "lsl": 4,
+      "sub": 3,
+      "stur": 2,
+      "bl": 2,
+      "cbz": 2,
+      "ucvtf": 2,
+      "cmn": 2,
+      "mul": 2,
+      "movk": 1,
+      "subs": 1,
+      "fadd": 1,
+      "fsub": 1,
+      "sxtw": 1,
+      "ret": 1
+    },
+    "vector_insns": 0,
+    "excerpt": "000000010005b5ac\tstp\td9, d8, [sp, #-0x70]!\n000000010005b5b0\tstp\tx28, x27, [sp, #0x10]\n000000010005b5b4\tstp\tx26, x25, [sp, #0x20]\n000000010005b5b8\tstp\tx24, x23, [sp, #0x30]\n000000010005b5bc\tstp\tx22, x21, [sp, #0x40]\n000000010005b5c0\tstp\tx20, x19, [sp, #0x50]\n000000010005b5c4\tstp\tx29, x30, [sp, #0x60]\n000000010005b5c8\tadd\tx29, sp, #0x60\n000000010005b5cc\tsub\tsp, sp, #0x250\n000000010005b5d0\tmov\tx19, x4\n000000010005b5d4\tmov\tx21, x3\n000000010005b5d8\tmov\tx22, x2\n000000010005b5dc\tmov\tx23, x1\n000000010005b5e0\tmov\tx20, x0\n000000010005b5e4\tmov\tx24, x0\n000000010005b5e8\tldr\tx9, [x24, #0x10]!\n000000010005b5ec\tldr\tw8, [x24, #0x10]\n000000010005b5f0\tadrp\tx10, 11 ; 0x100066000\n000000010005b5f4\tadd\tx10, x10, #0xbf8\n000000010005b5f8\tldr\tq0, [x10]\n000000010005b5fc\tstr\tq0, [sp]\n000000010005b600\tstp\twzr, w8, [sp, #0x10]\n000000010005b604\tadrp\tx10, 4 ; 0x10005f000\n000000010005b608\tldr\td0, [x10, #0xf60]\n000000010005b60c\tstr\td0, [sp, #0x18]\n000000010005b610\tadrp\tx10, 5 ; 0x100060000\n000000010005b614\tldr\td1, [x10, #0x618]\n000000010005b618\tstr\td1, [sp, #0x40]\n000000010005b61c\tmov\tx10, sp\n000000010005b620\tstp\tx9, xzr, [sp, #0x30]\n000000010005b624\tstp\tx10, xzr, [sp, #0x48]\n000000010005b628\tstp\txzr, xzr, [sp, #0x20]\n000000010005b62c\tstp\twzr, w8, [sp, #0x58]\n000000010005b630\tstr\td0, [sp, #0x60]\n000000010005b634\tstp\txzr, xzr, [sp, #0xc8]\n000000010005b638\tstp\tx9, xzr, [sp, #0xd8]\n000000010005b63c\tadrp\tx10, 5 ; 0x100060000\n000000010005b640\tldr\td1, [x10, #0x620]\n000000010005b644\tstr\td1, [sp, #0xe8]\n000000010005b648\tadd\tx10, sp, #0x58\n000000010005b64c\tstp\tx10, xzr, [sp, #0xf0]\n000000010005b650\tadd\tx10, x9, #0xc\n000000010005b654\tstp\twzr, w8, [sp, #0x68]\n000000010005b658\tstr\td0, [sp, #0x70]\n000000010005b65c\tstp\txzr, xzr, [sp, #0x100]\n000000010005b660\tstp\tx10, xzr, [sp, #0x110]\n000000010005b664\tstr\td1, [sp, #0x120]\n000000010005b668\tadd\tx10, sp, #0x68\n000000010005b66c\tstp\tx10, xzr, [sp, #0x128]\n000000010005b670\tadd\tx10, x9, #0x4\n000000010005b674\tstp\twzr, w8, [sp, #0x78]\n000000010005b678\tstr\td0, [sp, #0x80]\n000000010005b67c\tstp\txzr, xzr, [sp, #0x138]\n000000010005b680\tstp\tx10, xzr, [sp, #0x148]\n000000010005b684\tstr\td1, [sp, #0x158]\n000000010005b688\tadd\tx10, sp, #0x78\n000000010005b68c\tstp\tx10, xzr, [sp, #0x160]\n000000010005b690\tadd\tx10, x9, #0x10\n000000010005b694\tstp\twzr, w8, [sp, #0x88]\n000000010005b698\tstr\td0, [sp, #0x90]\n000000010005b69c\tstp\txzr, xzr, [sp, #0x170]\n000000010005b6a0\tstp\tx10, xzr, [sp, #0x180]\n000000010005b6a4\tstr\td1, [sp, #0x190]\n000000010005b6a8\tadd\tx10, sp, #0x88\n000000010005b6ac\tstp\tx10, xzr, [sp, #0x198]\n000000010005b6b0\tadd\tx10, x9, #0x8\n000000010005b6b4\tstp\twzr, w8, [sp, #0x98]\n000000010005b6b8\tstr\td0, [sp, #0xa0]\n000000010005b6bc\tstp\txzr, xzr, [sp, #0x1a8]\n000000010005b6c0\tstp\tx10, xzr, [sp, #0x1b8]\n000000010005b6c4\tstr\td1, [sp, #0x1c8]\n000000010005b6c8\tadd\tx10, sp, #0x98\n000000010005b6cc\tstp\tx10, xzr, [sp, #0x1d0]\n000000010005b6d0\tadd\tx10, x9, #0x14\n000000010005b6d4\tstp\twzr, w8, [sp, #0xa8]\n000000010005b6d8\tstr\td0, [sp, #0xb0]\n000000010005b6dc\tstp\txzr, xzr, [x29, #-0xd0]\n000000010005b6e0\tstp\tx10, xzr, [x29, #-0xc0]\n000000010005b6e4\tstur\td1, [x29, #-0xb0]\n000000010005b6e8\tadd\tx10, sp, #0xa8\n000000010005b6ec\tstp\tx10, xzr, [x29, #-0xa8]\n000000010005b6f0\tadd\tx9, x9, #0x1c\n000000010005b6f4\tstp\twzr, w8, [sp, #0xb8]\n000000010005b6f8\tstr\td0, [sp, #0xc0]\n000000010005b6fc\tstp\txzr, xzr, [x29, #-0x98]\n000000010005b700\tstp\tx9, xzr, [x29, #-0x88]\n000000010005b704\tstur\td1, [x29, #-0x78]\n000000010005b708\tadd\tx8, sp, #0xb8\n000000010005b70c\tstp\tx8, xzr, [x29, #-0x70]\n000000010005b710\tmov\tw8, #0x8889\n000000010005b714\tmovk\tw8, #0x3c88, lsl #16\n000000010005b718\tfmov\ts0, w8\n000000010005b71c\tadd\tx0, sp, #0x20\n000000010005b720\tadd\tx1, sp, #0xc8\n000000010005b724\tadd\tx2, sp, #0x100\n000000010005b728\tadd\tx3, sp, #0x138\n000000010005b72c\tadd\tx4, sp, #0x170\n000000010005b730\tadd\tx5, sp, #0x1a8\n000000010005b734\tsub\tx6, x29, #0xd0\n000000010005b738\tsub\tx7, x29, #0x98\n000000010005b73c\tbl\t_halide_b2_math\n000000010005b740\tldr\tx26, [x24, #0x8]\n000000010005b744\tcbz\tx26, 0x10005ba08\n000000010005b748\tmov\tx25, #0x0\n000000010005b74c\tldr\tx8, [x24]\n000000010005b750\tadd\tx27, x8, #0x1c\n000000010005b754\tfmov\ts8, #2.00000000\n000000010005b758\tb\t0x10005b768\n000000010005b75c\tadd\tx25, x25, #0x1\n000000010005b760\tcmp\tx26, x25\n000000010005b764\tb.eq\t0x10005b788\n000000010005b768\tldr\ts0, [x27], #0x44\n000000010005b76c\tfcmp\ts0, s8\n000000010005b770\tb.lt\t0x10005b75c\n000000010005b774\tadd\tx1, x20, #0x28\n000000010005b778\tmov\tx0, x24\n000000010005b77c\tmov\tx2, x25\n000000010005b780\tbl\t_layouts.L1.data.Data.spawn\n000000010005b784\tb\t0x10005b75c\n000000010005b788\tldr\tx8, [x20, #0x18]\n000000010005b78c\tcbz\tx8, 0x10005ba08\n000000010005b790\tldr\tx10, [x20, #0x10]\n000000010005b794\tucvtf\ts0, w21\n000000010005b798\tucvtf\ts1, w19\n000000010005b79c\tmov\tw9, w21\n000000010005b7a0\tadd\tx10, x10, #0x28\n000000010005b7a4\tmov\tw11, #0xff\n000000010005b7a8\tmov\tw12, #0x437f0000\n000000010005b7ac\tfmov\ts2, w12\n000000010005b7b0\tfmov\ts3, #2.00000000\n000000010005b7b4\tfmov\ts4, #0.25000000\n000000010005b7b8\tb\t0x10005b7e8\n000000010005b7bc\tadd\tx17, x15, #0x1\n000000010005b7c0\tcmn\tw15, #0x1\n000000010005b7c4\tccmp\tx17, x9, #0x0, ge\n000000010005b7c8\tadd\tx16, x17, x16\n000000010005b7cc\tmov\tw15, #0x3\n000000010005b7d0\tbfi\tx15, x16, #2, #61\n000000010005b7d4\tccmp\tx15, x22, #0x2, lt\n000000010005b7d8\tb.lo\t0x10005b964\n000000010005b7dc\tadd\tx10, x10, #0x44\n000000010005b7e0\tsubs\tx8, x8, #0x1\n000000010005b7e4\tb.eq\t0x10005ba08\n000000010005b7e8\tldp\ts5, s6, [x10, #-0x28]\n000000010005b7ec\tldp\ts7, s16, [x10, #-0x8]\n000000010005b7f0\tldr\ts17, [x10]\n000000010005b7f4\tfcmp\ts7, s2\n000000010005b7f8\tfcvtzs\tw12, s7\n000000010005b7fc\tcsel\tw12, w11, w12, ge\n000000010005b800\tfcmp\ts7, #0.0\n000000010005b804\tcsel\tw12, wzr, w12, ls\n000000010005b808\tfcmp\ts16, s2\n000000010005b80c\tfcvtzs\tw13, s16\n000000010005b810\tcsel\tw13, w11, w13, ge\n000000010005b814\tfcmp\ts16, #0.0\n000000010005b818\tcsel\tw13, wzr, w13, ls\n000000010005b81c\tfcmp\ts17, s2\n000000010005b820\tfcvtzs\tw14, s17\n000000010005b824\tcsel\tw14, w11, w14, ge\n000000010005b828\tfcmp\ts17, #0.0\n000000010005b82c\tcsel\tw14, wzr, w14, ls\n000000010005b830\tfadd\ts5, s5, s3\n000000010005b834\tfmul\ts5, s5, s4\n000000010005b838\tfmul\ts5, s5, s0\n000000010005b83c\tfcvtzs\tw15, s5\n000000010005b840\tfsub\ts5, s3, s6\n000000010005b844\tfmul\ts5, s5, s4\n000000010005b848\tfmul\ts5, s5, s1\n000000010005b84c\tfcvtzs\tw16, s5\n000000010005b850\tsxtw\tx15, w15\n000000010005b854\tcmp\tw16, w19\n000000010005b858\tb.ge\t0x10005b8e8\n000000010005b85c\ttbnz\tw16, #0x1f, 0x10005b8e8\n000000010005b860\tmul\tw17, w16, w21\n000000010005b864\ttbnz\tw15, #0x1f, 0x10005b8c8\n000000010005b868\tcmp\tw21, w15\n000000010005b86c\tadd\tx1, x17, x15\n000000010005b870\tmov\tw0, #0x3\n000000010005b874\tbfi\tx0, x1, #2, #61\n000000010005b878\tccmp\tx0, x22, #0x2, gt\n000000010005b87c\tb.hs\t0x10005b8c8\n000000010005b880\tlsl\tx1, x1, #2\n000000010005b884\tadd\tx1, x23, x1\n000000010005b888\tldrb\tw2, [x1]\n000000010005b88c\tadd\tw2, w2, w12\n000000010005b890\tcmp\tw2, #0xff\n000000010005b894\tcsel\tw2, w2, w11, lo\n000000010005b898\tstrb\tw2, [x1]\n000000010005b89c\tldrb\tw2, [x1, #0x1]\n000000010005b8a0\tadd\tw2, w2, w13\n000000010005b8a4\tcmp\tw2, #0xff\n000000010005b8a8\tcsel\tw2, w2, w11, lo\n000000010005b8ac\tstrb\tw2, [x1, #0x1]\n000000010005b8b0\tldrb\tw2, [x1, #0x2]\n000000010005b8b4\tadd\tw2, w2, w14\n000000010005b8b8\tcmp\tw2, #0xff\n000000010005b8bc\tcsel\tw2, w2, w11, lo\n000000010005b8c0\tstrb\tw2, [x1, #0x2]\n000000010005b8c4\tstrb\tw11, [x23, x0]\n000000010005b8c8\tadd\tx0, x15, #0x1\n000000010005b8cc\tcmn\tw15, #0x1\n000000010005b8d0\tccmp\tx0, x9, #0x0, ge\n000000010005b8d4\tadd\tx0, x0, x17\n000000010005b8d8\tmov\tw17, #0x3\n000000010005b8dc\tbfi\tx17, x0, #2, #61\n000000010005b8e0\tccmp\tx17, x22, #0x2, lt\n000000010005b8e4\tb.lo\t0x10005b9b0\n000000010005b8e8\tadd\tw16, w16, #0x1\n000000010005b8ec\tcmp\tw16, w19\n000000010005b8f0\tb.ge\t0x10005b7dc\n000000010005b8f4\ttbnz\tw16, #0x1f, 0x10005b7dc\n000000010005b8f8\tmul\tw16, w16, w21\n000000010005b8fc\ttbnz\tw15, #0x1f, 0x10005b7bc\n000000010005b900\tcmp\tw21, w15\n000000010005b904\tadd\tx0, x16, x15\n000000010005b908\tmov\tw17, #0x3\n000000010005b90c\tbfi\tx17, x0, #2, #61\n000000010005b910\tccmp\tx17, x22, #0x2, gt\n000000010005b914\tb.hs\t0x10005b7bc\n000000010005b918\tlsl\tx0, x0, #2\n000000010005b91c\tadd\tx0, x23, x0\n000000010005b920\tldrb\tw1, [x0]\n000000010005b924\tadd\tw1, w1, w12\n000000010005b928\tcmp\tw1, #0xff\n000000010005b92c\tcsel\tw1, w1, w11, lo\n000000010005b930\tstrb\tw1, [x0]\n000000010005b934\tldrb\tw1, [x0, #0x1]\n000000010005b938\tadd\tw1, w1, w13\n000000010005b93c\tcmp\tw1, #0xff\n000000010005b940\tcsel\tw1, w1, w11, lo\n000000010005b944\tstrb\tw1, [x0, #0x1]\n000000010005b948\tldrb\tw1, [x0, #0x2]\n000000010005b94c\tadd\tw1, w1, w14\n000000010005b950\tcmp\tw1, #0xff\n000000010005b954\tcsel\tw1, w1, w11, lo\n000000010005b958\tstrb\tw1, [x0, #0x2]\n000000010005b95c\tstrb\tw11, [x23, x17]\n000000010005b960\tb\t0x10005b7bc\n000000010005b964\tlsl\tx16, x16, #2\n000000010005b968\tadd\tx16, x23, x16\n000000010005b96c\tldrb\tw17, [x16]\n000000010005b970\tadd\tw12, w17, w12\n000000010005b974\tcmp\tw12, #0xff\n000000010005b978\tcsel\tw12, w12, w11, lo\n000000010005b97c\tstrb\tw12, [x16]\n000000010005b980\tldrb\tw12, [x16, #0x1]\n000000010005b984\tadd\tw12, w12, w13\n000000010005b988\tcmp\tw12, #0xff\n000000010005b98c\tcsel\tw12, w12, w11, lo\n000000010005b990\tstrb\tw12, [x16, #0x1]\n000000010005b994\tldrb\tw12, [x16, #0x2]\n000000010005b998\tadd\tw12, w12, w14\n000000010005b99c\tcmp\tw12, #0xff\n000000010005b9a0\tcsel\tw12, w12, w11, lo\n000000010005b9a4\tstrb\tw12, [x16, #0x2]\n000000010005b9a8\tstrb\tw11, [x23, x15]\n000000010005b9ac\tb\t0x10005b7dc\n000000010005b9b0\tlsl\tx0, x0, #2\n000000010005b9b4\tadd\tx0, x23, x0\n000000010005b9b8\tldrb\tw1, [x0]\n000000010005b9bc\tadd\tw1, w1, w12\n000000010005b9c0\tcmp\tw1, #0xff\n000000010005b9c4\tcsel\tw1, w1, w11, lo\n000000010005b9c8\tstrb\tw1, [x0]\n000000010005b9cc\tldrb\tw1, [x0, #0x1]\n000000010005b9d0\tadd\tw1, w1, w13\n000000010005b9d4\tcmp\tw1, #0xff\n000000010005b9d8\tcsel\tw1, w1, w11, lo\n000000010005b9dc\tstrb\tw1, [x0, #0x1]\n000000010005b9e0\tldrb\tw1, [x0, #0x2]\n000000010005b9e4\tadd\tw1, w1, w14\n000000010005b9e8\tcmp\tw1, #0xff\n000000010005b9ec\tcsel\tw1, w1, w11, lo\n000000010005b9f0\tstrb\tw1, [x0, #0x2]\n000000010005b9f4\tstrb\tw11, [x23, x17]\n000000010005b9f8\tadd\tw16, w16, #0x1\n000000010005b9fc\tcmp\tw16, w19\n000000010005ba00\tb.lt\t0x10005b8f4\n000000010005ba04\tb\t0x10005b7dc\n000000010005ba08\tldr\tx8, [x20, #0x68]\n000000010005ba0c\tadd\tx8, x8, #0x1\n000000010005ba10\tstr\tx8, [x20, #0x68]\n000000010005ba14\tadd\tsp, sp, #0x250\n000000010005ba18\tldp\tx29, x30, [sp, #0x60]\n000000010005ba1c\tldp\tx20, x19, [sp, #0x50]\n000000010005ba20\tldp\tx22, x21, [sp, #0x40]\n000000010005ba24\tldp\tx24, x23, [sp, #0x30]\n000000010005ba28\tldp\tx26, x25, [sp, #0x20]\n000000010005ba2c\tldp\tx28, x27, [sp, #0x10]\n000000010005ba30\tldp\td9, d8, [sp], #0x70\n000000010005ba34\tret",
+    "source_attributed": [
+      {
+        "source": "        pub fn step(self: *Self, dt: f32, fb: []u8, w: u32, h: u32) void {",
+        "asm": [
+          "stp\td9, d8, [sp, #-0x70]!",
+          "stp\tx28, x27, [sp, #0x10]",
+          "stp\tx26, x25, [sp, #0x20]",
+          "stp\tx24, x23, [sp, #0x30]",
+          "stp\tx22, x21, [sp, #0x40]",
+          "stp\tx20, x19, [sp, #0x50]",
+          "stp\tx29, x30, [sp, #0x60]",
+          "add\tx29, sp, #0x60",
+          "sub\tsp, sp, #0x250",
+          "mov\tx19, x4",
+          "mov\tx21, x3",
+          "mov\tx22, x2",
+          "mov\tx23, x1",
+          "mov\tx20, x0"
+        ]
+      },
+      {
+        "source": "        halide.run(data, dt);",
+        "asm": [
+          "mov\tx24, x0",
+          "ldr\tx9, [x24, #0x10]!",
+          "ldr\tw8, [x24, #0x10]"
+        ]
+      },
+      {
+        "source": "        .{ .min = 0, .extent = @intCast(n), .stride = stride_floats, .flags = 0 },",
+        "asm": [
+          "adrp\tx10, 11 ; 0x100066000",
+          "add\tx10, x10, #0xbf8",
+          "ldr\tq0, [x10]",
+          "str\tq0, [sp]",
+          "stp\twzr, w8, [sp, #0x10]",
+          "adrp\tx10, 4 ; 0x10005f000",
+          "ldr\td0, [x10, #0xf60]",
+          "str\td0, [sp, #0x18]",
+          "adrp\tx10, 5 ; 0x100060000",
+          "ldr\td1, [x10, #0x618]",
+          "str\td1, [sp, #0x40]",
+          "mov\tx10, sp",
+          "stp\tx9, xzr, [sp, #0x30]",
+          "stp\tx10, xzr, [sp, #0x48]"
+        ]
+      },
+      {
+        "source": "    var buf_in: halide_buffer_t = .{ .host = base, .type = FLOAT32, .dimensions = 2, .dim = &in_dims };",
+        "asm": [
+          "stp\txzr, xzr, [sp, #0x20]"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "stp\twzr, w8, [sp, #0x58]",
+          "str\td0, [sp, #0x60]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = FLOAT32, .dimensions = 1, .dim = d };",
+        "asm": [
+          "stp\txzr, xzr, [sp, #0xc8]"
+        ]
+      },
+      {
+        "source": "    var buf_px = out1d(base + pos_off + 0, n, stride_floats, &dpx);",
+        "asm": [
+          "stp\tx9, xzr, [sp, #0xd8]",
+          "adrp\tx10, 5 ; 0x100060000",
+          "ldr\td1, [x10, #0x620]",
+          "str\td1, [sp, #0xe8]",
+          "add\tx10, sp, #0x58",
+          "stp\tx10, xzr, [sp, #0xf0]",
+          "add\tx10, x9, #0xc",
+          "stp\twzr, w8, [sp, #0x68]"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "str\td0, [sp, #0x70]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = FLOAT32, .dimensions = 1, .dim = d };",
+        "asm": [
+          "stp\txzr, xzr, [sp, #0x100]"
+        ]
+      },
+      {
+        "source": "    var buf_vx = out1d(base + vel_off + 0, n, stride_floats, &dvx);",
+        "asm": [
+          "stp\tx10, xzr, [sp, #0x110]",
+          "str\td1, [sp, #0x120]",
+          "add\tx10, sp, #0x68",
+          "stp\tx10, xzr, [sp, #0x128]"
+        ]
+      },
+      {
+        "source": "    var buf_py = out1d(base + pos_off + 4, n, stride_floats, &dpy);",
+        "asm": [
+          "add\tx10, x9, #0x4",
+          "stp\twzr, w8, [sp, #0x78]",
+          "str\td0, [sp, #0x80]",
+          "stp\txzr, xzr, [sp, #0x138]",
+          "stp\tx10, xzr, [sp, #0x148]",
+          "str\td1, [sp, #0x158]",
+          "add\tx10, sp, #0x78",
+          "stp\tx10, xzr, [sp, #0x160]"
+        ]
+      },
+      {
+        "source": "    var buf_vy = out1d(base + vel_off + 4, n, stride_floats, &dvy);",
+        "asm": [
+          "add\tx10, x9, #0x10"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "stp\twzr, w8, [sp, #0x88]",
+          "str\td0, [sp, #0x90]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = FLOAT32, .dimensions = 1, .dim = d };",
+        "asm": [
+          "stp\txzr, xzr, [sp, #0x170]"
+        ]
+      },
+      {
+        "source": "    var buf_vy = out1d(base + vel_off + 4, n, stride_floats, &dvy);",
+        "asm": [
+          "stp\tx10, xzr, [sp, #0x180]",
+          "str\td1, [sp, #0x190]",
+          "add\tx10, sp, #0x88",
+          "stp\tx10, xzr, [sp, #0x198]",
+          "add\tx10, x9, #0x8",
+          "stp\twzr, w8, [sp, #0x98]"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "str\td0, [sp, #0xa0]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = FLOAT32, .dimensions = 1, .dim = d };",
+        "asm": [
+          "stp\txzr, xzr, [sp, #0x1a8]"
+        ]
+      },
+      {
+        "source": "    var buf_pz = out1d(base + pos_off + 8, n, stride_floats, &dpz);",
+        "asm": [
+          "stp\tx10, xzr, [sp, #0x1b8]",
+          "str\td1, [sp, #0x1c8]",
+          "add\tx10, sp, #0x98",
+          "stp\tx10, xzr, [sp, #0x1d0]"
+        ]
+      },
+      {
+        "source": "    var buf_vz = out1d(base + vel_off + 8, n, stride_floats, &dvz);",
+        "asm": [
+          "add\tx10, x9, #0x14",
+          "stp\twzr, w8, [sp, #0xa8]",
+          "str\td0, [sp, #0xb0]",
+          "stp\txzr, xzr, [x29, #-0xd0]",
+          "stp\tx10, xzr, [x29, #-0xc0]",
+          "stur\td1, [x29, #-0xb0]",
+          "add\tx10, sp, #0xa8",
+          "stp\tx10, xzr, [x29, #-0xa8]"
+        ]
+      },
+      {
+        "source": "    var buf_age = out1d(base + @offsetOf(Particle, \"age\"), n, stride_floats, &dag);",
+        "asm": [
+          "add\tx9, x9, #0x1c"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "stp\twzr, w8, [sp, #0xb8]",
+          "str\td0, [sp, #0xc0]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = FLOAT32, .dimensions = 1, .dim = d };",
+        "asm": [
+          "stp\txzr, xzr, [x29, #-0x98]"
+        ]
+      },
+      {
+        "source": "    var buf_age = out1d(base + @offsetOf(Particle, \"age\"), n, stride_floats, &dag);",
+        "asm": [
+          "stp\tx9, xzr, [x29, #-0x88]",
+          "stur\td1, [x29, #-0x78]",
+          "add\tx8, sp, #0xb8",
+          "stp\tx8, xzr, [x29, #-0x70]",
+          "mov\tw8, #0x8889",
+          "movk\tw8, #0x3c88, lsl #16",
+          "fmov\ts0, w8"
+        ]
+      },
+      {
+        "source": "    const rc = halide_b2_math(&buf_in, dt, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age);",
+        "asm": [
+          "add\tx0, sp, #0x20",
+          "add\tx1, sp, #0xc8",
+          "add\tx2, sp, #0x100",
+          "add\tx3, sp, #0x138",
+          "add\tx4, sp, #0x170",
+          "add\tx5, sp, #0x1a8",
+          "sub\tx6, x29, #0xd0",
+          "sub\tx7, x29, #0x98",
+          "bl\t_halide_b2_math",
+          "ldr\tx26, [x24, #0x8]",
+          "cbz\tx26, 0x10005ba08",
+          "mov\tx25, #0x0",
+          "ldr\tx8, [x24]"
+        ]
+      },
+      {
+        "source": "        for (data.particles, 0..) |*p, i| {",
+        "asm": [
+          "add\tx27, x8, #0x1c",
+          "fmov\ts8, #2.00000000",
+          "b\t0x10005b768"
+        ]
+      },
+      {
+        "source": "}",
+        "asm": [
+          "add\tx25, x25, #0x1"
+        ]
+      },
+      {
+        "source": "        for (data.particles, 0..) |*p, i| {",
+        "asm": [
+          "cmp\tx26, x25",
+          "b.eq\t0x10005b788",
+          "ldr\ts0, [x27], #0x44",
+          "fcmp\ts0, s8",
+          "b.lt\t0x10005b75c",
+          "add\tx1, x20, #0x28"
+        ]
+      },
+      {
+        "source": "            if (config.isDead(p.age, &sim.kill_rng)) data.spawn(&sim.rng, i);",
+        "asm": [
+          "mov\tx0, x24",
+          "mov\tx2, x25",
+          "bl\t_layouts.L1.data.Data.spawn",
+          "b\t0x10005b75c"
+        ]
+      },
+      {
+        "source": "        for (data.particles) |p| {",
+        "asm": [
+          "ldr\tx8, [x20, #0x18]",
+          "cbz\tx8, 0x10005ba08",
+          "ldr\tx10, [x20, #0x10]",
+          "ucvtf\ts0, w21",
+          "ucvtf\ts1, w19",
+          "mov\tw9, w21",
+          "add\tx10, x10, #0x28",
+          "mov\tw11, #0xff",
+          "mov\tw12, #0x437f0000",
+          "fmov\ts2, w12",
+          "fmov\ts3, #2.00000000",
+          "fmov\ts4, #0.25000000",
+          "b\t0x10005b7e8"
+        ]
+      },
+      {
+        "source": "            const fx = px + dx;",
+        "asm": [
+          "add\tx17, x15, #0x1"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "cmn\tw15, #0x1",
+          "ccmp\tx17, x9, #0x0, ge"
+        ]
+      },
+      {
+        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
+        "asm": [
+          "add\tx16, x17, x16"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "mov\tw15, #0x3",
+          "bfi\tx15, x16, #2, #61",
+          "ccmp\tx15, x22, #0x2, lt",
+          "b.lo\t0x10005b964",
+          "add\tx10, x10, #0x44",
+          "subs\tx8, x8, #0x1",
+          "b.eq\t0x10005ba08"
+        ]
+      },
+      {
+        "source": "        for (data.particles) |p| {",
+        "asm": [
+          "ldp\ts5, s6, [x10, #-0x28]",
+          "ldp\ts7, s16, [x10, #-0x8]",
+          "ldr\ts17, [x10]"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "fcmp\ts7, s2"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(v);",
+        "asm": [
+          "fcvtzs\tw12, s7"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "csel\tw12, w11, w12, ge"
+        ]
+      },
+      {
+        "source": "    if (v <= 0) return 0;",
+        "asm": [
+          "fcmp\ts7, #0.0",
+          "csel\tw12, wzr, w12, ls",
+          "fcmp\ts16, s2",
+          "fcvtzs\tw13, s16",
+          "csel\tw13, w11, w13, ge",
+          "fcmp\ts16, #0.0",
+          "csel\tw13, wzr, w13, ls"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "fcmp\ts17, s2"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(v);",
+        "asm": [
+          "fcvtzs\tw14, s17"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "csel\tw14, w11, w14, ge"
+        ]
+      },
+      {
+        "source": "    if (v <= 0) return 0;",
+        "asm": [
+          "fcmp\ts17, #0.0",
+          "csel\tw14, wzr, w14, ls"
+        ]
+      },
+      {
+        "source": "    const norm = (x + config.view_half) / (2.0 * config.view_half); // [0,1)",
+        "asm": [
+          "fadd\ts5, s5, s3",
+          "fmul\ts5, s5, s4",
+          "fmul\ts5, s5, s0",
+          "fcvtzs\tw15, s5",
+          "fsub\ts5, s3, s6",
+          "fmul\ts5, s5, s4"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(norm * half);",
+        "asm": [
+          "fmul\ts5, s5, s1",
+          "fcvtzs\tw16, s5"
+        ]
+      },
+      {
+        "source": "    while (dy < 2) : (dy += 1) {",
+        "asm": [
+          "sxtw\tx15, w15",
+          "cmp\tw16, w19",
+          "b.ge\t0x10005b8e8",
+          "tbnz\tw16, #0x1f, 0x10005b8e8",
+          "mul\tw17, w16, w21",
+          "tbnz\tw15, #0x1f, 0x10005b8c8",
+          "cmp\tw21, w15",
+          "add\tx1, x17, x15",
+          "mov\tw0, #0x3",
+          "bfi\tx0, x1, #2, #61"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "ccmp\tx0, x22, #0x2, gt",
+          "b.hs\t0x10005b8c8",
+          "lsl\tx1, x1, #2"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "add\tx1, x23, x1",
+          "ldrb\tw2, [x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw2, w2, w12"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw2, #0xff",
+          "csel\tw2, w2, w11, lo",
+          "strb\tw2, [x1]",
+          "ldrb\tw2, [x1, #0x1]",
+          "add\tw2, w2, w13",
+          "cmp\tw2, #0xff",
+          "csel\tw2, w2, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "strb\tw2, [x1, #0x1]"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "ldrb\tw2, [x1, #0x2]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw2, w2, w14"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw2, #0xff",
+          "csel\tw2, w2, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "strb\tw2, [x1, #0x2]"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "strb\tw11, [x23, x0]"
+        ]
+      },
+      {
+        "source": "            const fx = px + dx;",
+        "asm": [
+          "add\tx0, x15, #0x1"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "cmn\tw15, #0x1",
+          "ccmp\tx0, x9, #0x0, ge",
+          "add\tx0, x0, x17",
+          "mov\tw17, #0x3",
+          "bfi\tx17, x0, #2, #61",
+          "ccmp\tx17, x22, #0x2, lt",
+          "b.lo\t0x10005b9b0",
+          "add\tw16, w16, #0x1",
+          "cmp\tw16, w19",
+          "b.ge\t0x10005b7dc",
+          "tbnz\tw16, #0x1f, 0x10005b7dc",
+          "mul\tw16, w16, w21",
+          "tbnz\tw15, #0x1f, 0x10005b7bc",
+          "cmp\tw21, w15"
+        ]
+      },
+      {
+        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
+        "asm": [
+          "add\tx0, x16, x15"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "mov\tw17, #0x3",
+          "bfi\tx17, x0, #2, #61",
+          "ccmp\tx17, x22, #0x2, gt",
+          "b.hs\t0x10005b7bc",
+          "lsl\tx0, x0, #2"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "add\tx0, x23, x0",
+          "ldrb\tw1, [x0]",
+          "add\tw1, w1, w12",
+          "cmp\tw1, #0xff",
+          "csel\tw1, w1, w11, lo",
+          "strb\tw1, [x0]",
+          "ldrb\tw1, [x0, #0x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw1, w1, w13"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw1, #0xff",
+          "csel\tw1, w1, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "strb\tw1, [x0, #0x1]"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "ldrb\tw1, [x0, #0x2]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw1, w1, w14"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw1, #0xff",
+          "csel\tw1, w1, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "strb\tw1, [x0, #0x2]"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "strb\tw11, [x23, x17]",
+          "b\t0x10005b7bc",
+          "lsl\tx16, x16, #2",
+          "add\tx16, x23, x16",
+          "ldrb\tw17, [x16]",
+          "add\tw12, w17, w12",
+          "cmp\tw12, #0xff"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "csel\tw12, w12, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "strb\tw12, [x16]"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "ldrb\tw12, [x16, #0x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw12, w12, w13"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw12, #0xff",
+          "csel\tw12, w12, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "strb\tw12, [x16, #0x1]",
+          "ldrb\tw12, [x16, #0x2]",
+          "add\tw12, w12, w14",
+          "cmp\tw12, #0xff",
+          "csel\tw12, w12, w11, lo",
+          "strb\tw12, [x16, #0x2]"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "strb\tw11, [x23, x15]",
+          "b\t0x10005b7dc",
+          "lsl\tx0, x0, #2"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "add\tx0, x23, x0",
+          "ldrb\tw1, [x0]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw1, w1, w12"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw1, #0xff",
+          "csel\tw1, w1, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "strb\tw1, [x0]"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "ldrb\tw1, [x0, #0x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw1, w1, w13"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw1, #0xff",
+          "csel\tw1, w1, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "strb\tw1, [x0, #0x1]"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "ldrb\tw1, [x0, #0x2]",
+          "add\tw1, w1, w14",
+          "cmp\tw1, #0xff",
+          "csel\tw1, w1, w11, lo",
+          "strb\tw1, [x0, #0x2]",
+          "strb\tw11, [x23, x17]",
+          "add\tw16, w16, #0x1",
+          "cmp\tw16, w19",
+          "b.lt\t0x10005b8f4",
+          "b\t0x10005b7dc"
+        ]
+      },
+      {
+        "source": "            self.frame +%= 1; // B1-blend hash RNG frame counter (free otherwise)",
+        "asm": [
+          "ldr\tx8, [x20, #0x68]",
+          "add\tx8, x8, #0x1",
+          "str\tx8, [x20, #0x68]",
+          "add\tsp, sp, #0x250",
+          "ldp\tx29, x30, [sp, #0x60]",
+          "ldp\tx20, x19, [sp, #0x50]",
+          "ldp\tx22, x21, [sp, #0x40]",
+          "ldp\tx24, x23, [sp, #0x30]",
+          "ldp\tx26, x25, [sp, #0x20]",
+          "ldp\tx28, x27, [sp, #0x10]",
+          "ldp\td9, d8, [sp], #0x70",
+          "ret"
+        ]
+      }
+    ],
+    "cell_source": {
+      "file": "src/layouts/L1/B2.w1-halide-par.w2-simple.zig",
+      "lines": [
+        "// Cell L1.B2.w1-halide-par.w2-simple \u2014 B2 (math | decide+respawn | render),",
+        "// walk 1 Halide math, walk 2 Zig decide+respawn, walk 3 r0 splat. SERIAL.",
+        "//",
+        "// Golden: bit-exact. The \"natural seam\": Halide does the math (StrictFloat,",
+        "// bit-identical to the Zig cells), Zig keeps decide+respawn (RNG-order). The",
+        "// cost on AoS is the second walk (the seam), not Halide's codegen. Diff vs",
+        "// B2.w1-autovec.w2-simple: walk-1 impl zig \u2192 halide (isolates impl, math-only).",
+        "",
+        "const std = @import(\"std\");",
+        "const fw = @import(\"../../framework/sim.zig\");",
+        "const config = @import(\"../../framework/config.zig\");",
+        "const layout = @import(\"data.zig\");",
+        "const halide = @import(\"B2.w1-halide_api.zig\");",
+        "const r0 = @import(\"../common/render_simple.zig\");",
+        "",
+        "const Data = layout.Data;",
+        "",
+        "pub const H = struct {",
+        "    pub const cell_decl: fw.CellDecl = .{",
+        "        .layout = \"L1\",",
+        "        .blueprint = .B2,",
+        "        .ordering = .identity,",
+        "        .intermediates = .none,",
+        "        .walks = &.{",
+        "            .{ .impl = .halide, .schedule = .scalar, .parallel = .data_parallel, .variant = .none },",
+        "            .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .branchy },",
+        "            .{ .impl = .zig, .schedule = .r0, .parallel = .none, .variant = .none },",
+        "        },",
+        "        .golden = .bit_exact,",
+        "        .halide_expressible = \"walk1 yes (math); walk2 no (RNG-order); walk3 n/a\",",
+        "    };",
+        "",
+        "    pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {",
+        "        const data = &sim.data;",
+        "        // walk 1: Halide math (integrate pos/vel/age; no decide).",
+        "        halide.run(data, dt);",
+        "        // walk 2: Zig decide + respawn (branchy, RNG-order).",
+        "        for (data.particles, 0..) |*p, i| {",
+        "            if (config.isDead(p.age, &sim.kill_rng)) data.spawn(&sim.rng, i);",
+        "        }",
+        "        // walk 3: r0 splat pass.",
+        "        for (data.particles) |p| {",
+        "            r0.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);",
+        "        }",
+        "    }",
+        "};",
+        "",
+        "pub const Sim = fw.Strategy(Data, H);"
+      ],
+      "group_lines": [
+        null,
+        36,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        38,
+        40,
+        38,
+        39,
+        42,
+        null,
+        null,
+        null,
+        null,
+        42,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  },
+  "verified": true,
+  "verify_errors": []
+}
