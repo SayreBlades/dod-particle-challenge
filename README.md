@@ -1,4 +1,4 @@
-# DOD Particle Lab — Zig
+# DOD Particle Lab (Zig + Halide)
 
 A **visual particle simulator** — a fountain of 65,000 particles in three
 streams (gray **smoke** rising, orange **sparks** arcing, blue **debris**
@@ -8,6 +8,8 @@ scattering) — rendered live with [raylib] in Zig on Apple Silicon:
 
 It's a hands-on laboratory for *feeling* the cache/perf lessons from Mike
 Acton's CppCon 2014 talk, ["Data-Oriented Design and C++"][acton].
+
+**[Live report →](https://sayreblades.github.io/dod-particle-lab/)**
 
 This lab explores that transformation across several **memory layout
 strategies** — each a different answer to how the particle data is arranged in
@@ -76,7 +78,7 @@ agree bit-for-bit (or statistically) but differ in schedule. B1's walk 1
 Halide is a tool that helps us to explore **schedule density** of a fixed
 walk but not the blueprint structure itself — the list intermediate
 (B4/B8), branchy respawn (B1-branchy), and fused-render scatter (B5+) are
-Zig-only by construction. 
+Zig-only by construction (no Halide equivalent exists for these patterns).
 
 ## Prerequisites
 
@@ -97,7 +99,7 @@ Zig-only by construction.
 
 ```sh
 git clone --recurse-submodules <this-repo>
-cd dod-particle-lab-zig
+cd dod-particle-lab
 
 # Python env (one command — creates .venv, installs deps, writes uv.lock):
 uv sync                      # analysis env: duckdb (for build_report.py)
@@ -105,7 +107,8 @@ uv sync --extra halide       # also installs halide (needed to build the halide 
 ```
 
 `uv sync` gives you the analysis env; add `--extra halide` for the halide
-cells. The Zig-only cells build and collect without any Python env at all.
+cells. The Zig + Halide cells need this; pure-Zig cells build and collect
+without any Python env at all.
 
 ## Build & run
 
