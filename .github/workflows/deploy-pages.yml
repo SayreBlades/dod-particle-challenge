@@ -1,0 +1,55 @@
+name: deploy-pages
+
+# Publish the static report (experiments/report.html + analysis/) to GitHub
+# Pages whenever the SPA or the analysis tree changes on main. No build step —
+# the SPA is static and the analysis bundles are committed. report.html is
+# served as index.html at the site root.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'experiments/report.html'
+      - 'experiments/report.js'
+      - 'experiments/style.css'
+      - 'experiments/analysis/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One in-flight deploy at a time; new pushes cancel stale runs.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble site
+        run: |
+          mkdir site
+          cp experiments/report.html site/index.html
+          cp experiments/report.js  site/
+          cp experiments/style.css  site/
+          cp -r experiments/analysis site/
+          touch site/.nojekyll     # skip Jekyll (dotted/special filenames)
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
