@@ -1,4 +1,4 @@
-# DOD Particle Lab (Zig + Halide)
+# DoD Particle Challenge (Zig + Halide)
 
 A **visual particle simulator** — a fountain of 65,000 particles in three
 streams (gray **smoke** rising, orange **sparks** arcing, blue **debris**
@@ -8,10 +8,10 @@ scattering) — rendered live with [raylib] in Zig on Apple Silicon:
   <img src="docs/fountain.gif" alt="three particle streams: smoke, sparks, debris">
 </p>
 
-It's a hands-on laboratory for *feeling* the cache/perf lessons from Mike
+It's a hands-on challenge for *feeling* the cache/perf lessons from Mike
 Acton's CppCon 2014 talk, ["Data-Oriented Design and C++"][acton].
 
-**[Live report →](https://sayreblades.github.io/dod-particle-lab/)**
+**[Live report →](https://sayreblades.github.io/dod-particle-challenge/)**
 
 This lab explores that transformation across several **memory layout
 strategies** — each a different answer to how the particle data is arranged in
@@ -101,7 +101,7 @@ Zig-only by construction (no Halide equivalent exists for these patterns).
 
 ```sh
 git clone --recurse-submodules <this-repo>
-cd dod-particle-lab
+cd dod-particle-challenge
 
 # Python env (one command — creates .venv, installs deps, writes uv.lock):
 uv sync                      # analysis env: duckdb (for build_report.py)

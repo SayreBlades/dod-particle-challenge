@@ -1,4 +1,4 @@
-# Makefile — common actions for the DOD Particle Lab.
+# Makefile — common actions for the DoD Particle Challenge.
 #
 # Each target accepts an optional positional target: a full cell name
 # (L1.B1.w1-autovec.w2-simple), a layout (L1), or `all` (default). It's read
@@ -37,7 +37,7 @@ build:
 	$(PY) scripts/run.py build $(TARGET)
 
 play:
-	$(PY) scripts/run.py play $(TARGET)
+	$(PY) scripts/run.py play $(TARGET) $(if $(N),--n $(N))
 
 profile:
 	$(PY) scripts/run.py profile $(TARGET)
@@ -58,10 +58,10 @@ collect:
 	$(PY) scripts/collect.py $(TARGET)
 
 help:
-	@echo "DOD Particle Lab — common actions"
+	@echo "DoD Particle Challenge — common actions"
 	@echo ""
 	@echo "  make build [target]     build cells into out/ (target: cell|layout|all)"
-	@echo "  make play  [cell]       open the interactive raylib window"
+	@echo "  make play  [cell]       open the interactive raylib window (N=<count> to size particles)"
 	@echo "  make profile [cell]     PMC cycle-attribution (macOS + Xcode)"
 	@echo "  make report             build experiments/analysis/ + run the verify gate"
 	@echo "  make serve              serve experiments/ (open report.html)"
