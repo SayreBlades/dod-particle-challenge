@@ -1,56 +1,54 @@
-# DoD Particle Challenge (Zig + Halide)
+# DoD Particle Challenge
 
-A **visual particle simulator** — a fountain of 65,000 particles in three
-streams (gray **smoke** rising, orange **sparks** arcing, blue **debris**
-scattering) — rendered live with [raylib] in Zig on Apple Silicon:
+A fountain of 1M particles in three color streams — rendered live with [raylib].
+Let's tune the heck out of this!
 
+<br>
 <p align="center">
   <img src="docs/fountain.gif" alt="three particle streams: smoke, sparks, debris">
 </p>
 
-It's a hands-on challenge for *feeling* the cache/perf lessons from Mike
+It's a hands-on challenge *inspired* by the cache/perf lessons from Mike
 Acton's CppCon 2014 talk, ["Data-Oriented Design and C++"][acton].
 
-**[Live report →](https://sayreblades.github.io/dod-particle-challenge/)**
-
-This lab explores that transformation across several **memory layout
-strategies** — each a different answer to how the particle data is arranged in
-RAM. The physics (the math, the seed, the death model) never changes between
-them; only the data layout and access pattern do. Each layout is explored by
-sweeping its **cells** (strategy variants) across particle counts N, death rates
-q, and thread counts, collecting per-trial timing into a run directory, then
-analyzing the aggregated data to find the **champion cell per regime** (no
-global winner — every champion carries regime + numbers + blueprint).
+This challenge explores the performance optimization space across several
+**memory layout strategies** — each a different answer to how the particle data
+is arranged in memory. To optimize the rendering loop for a particular hardware
+target, it will require exploring various implementations of the same four
+logical stages of processing a given particle — **Integrate, Decide, Respawn,
+Render**. The physics (the math, the seed, the death model) never changes
+between them; only the data layout and access pattern do.
 
 [acton]: https://www.youtube.com/watch?v=rX0ItVEVjHc
 
+Here are some current findings:
+**[Live report →](https://sayreblades.github.io/dod-particle-challenge/)**
+
 ### Layouts
 
-A layout is one frozen data model (topology × field set × allocation
-policy — zero comptime knobs). Each is explored by sweeping its cells across
-the regime grid (below). Ordered by expected information-per-hour:
+A (memory) layout is a particular approach to the particle representation.
 
-| #  | data model                                     | hot B/p |   status    | priority reason                                             |
-|----|------------------------------------------------|--------:|:-----------:|-------------------------------------------------------------|
-| [L1](src/layouts/L1/README.md) | AoS, full 11-field, plain alloc                |     ~68 | ✅ complete | the strawman; re-label existing work, land the framework    |
-| [L2](src/layouts/L2/README.md) | AoS, lean 4-field, plain alloc                 |      29 |   queued    | isolates field-set with topology fixed                      |
-| [L3](src/layouts/L3/README.md) | hot/cold AoS split                             | ~36 hot |   queued    | arc stage 2's first structural win                          |
-| [L4](src/layouts/L4/README.md) | `[]Vec3` pos/vel + age + kind                  |      29 |   queued    | the `ld3` deinterleave experiment; interesting Halide input |
-| [L5](src/layouts/L5/README.md) | `[]Vec4` pos/vel (aligned) + age + kind        |      37 |   queued    | per-particle `@Vector(4)`, zero shuffles                    |
-| [L6](src/layouts/L6/README.md) | per-component `[]f32` (lean), plain alloc      |      29 |   queued    | arc home turf; richest strategy soil                        |
-| [L7](src/layouts/L7/README.md) | per-component `[]f32`, 128 B-aligned, W-padded |      29 |   queued    | isolates alignment+padding                                  |
-| [L8](src/layouts/L8/README.md) | blocked AoSoA                                  |  ~29–32 |   queued    | the one genuinely untried topology                          |
+> Layouts and Blueprints below are the design reference — the frozen spec of what varies. Just here to build and run? Skip to [Prerequisites](#prerequisites).
+
+
+| #  | data model                                     | hot B/p |   status    |
+|----|------------------------------------------------|--------:|:-----------:|
+| [L1](src/layouts/L1/README.md) | AoS, full 11-field, plain alloc                |     ~68 | ✅ complete |
+| [L2](src/layouts/L2/README.md) | AoS, lean 4-field, plain alloc                 |      29 |   queued    |
+| [L3](src/layouts/L3/README.md) | hot/cold AoS split                             | ~36 hot |   queued    |
+| [L4](src/layouts/L4/README.md) | `[]Vec3` pos/vel + age + kind                  |      29 |   queued    |
+| [L5](src/layouts/L5/README.md) | `[]Vec4` pos/vel (aligned) + age + kind        |      37 |   queued    |
+| [L6](src/layouts/L6/README.md) | per-component `[]f32` (lean), plain alloc      |      29 |   queued    |
+| [L7](src/layouts/L7/README.md) | per-component `[]f32`, 128 B-aligned, W-padded |      29 |   queued    |
+| [L8](src/layouts/L8/README.md) | blocked AoSoA                                  |  ~29–32 |   queued    |
      
 ### Blueprints
 
 A **blueprint** is how the four logical stages — **Integrate, Decide, Respawn,
 Render** — fuse into one or more **walks** (sequential passes over the
 particles), plus the **intermediate** (none / mask / list) that carries the
-death decision between walks. (Reading particle data is implied — every walk
-loads what it needs.) It's pure data flow: a blueprint says nothing about who
-computes a walk, how parallel, or the RNG model. There are exactly eight,
-generated by a rule (Decide rides with Integrate or Respawn; pick an
-intermediate; fuse {Integrate+Decide, Respawn, Render} contiguously):
+death decision between walks. It's pure data flow. There are exactly eight
+different blueprints to explore:
 
 | BP | walk 1                      | walk 2                      | walk 3                      | note                                                          |
 |----|-----------------------------|-----------------------------|-----------------------------|---------------------------------------------------------------|
@@ -76,11 +74,6 @@ agree bit-for-bit (or statistically) but differ in schedule. B1's walk 1
   branchless blend respawn (the statistical-golden class)
 - [Halide](src/layouts/L1/B1.w1-halide.w2-simple.zig) —
   AOT-compiled, per-particle hash RNG
-
-Halide is a tool that helps us to explore **schedule density** of a fixed
-walk but not the blueprint structure itself — the list intermediate
-(B4/B8), branchy respawn (B1-branchy), and fused-render scatter (B5+) are
-Zig-only by construction (no Halide equivalent exists for these patterns).
 
 ## Prerequisites
 
@@ -121,7 +114,7 @@ The common actions are `make` targets ([Makefile](Makefile));
 make build                                # build every cell into out/   (target: cell | layout | all)
 make build L1                             #   …every cell of layout L1
 make build L1.B1.w1-autovec.w2-simple     #   …one cell (use the full L1.<strat> name)
-make play  L1.B1.w1-autovec.w2-simple      # open the interactive raylib window
+make play  L1.B1.w1-autovec.w2-simple     # open the interactive raylib window
 make profile L1.B1.w1-autovec.w2-simple   # PMC cycle-attribution (macOS + Xcode)
 make report && make serve                 # build + serve the report on http://localhost:8000
 ```
@@ -163,25 +156,6 @@ One loop powers the whole lab: **sweep → report → (optional) PMC**.
 make collect L1                   # sweep  (`make collect` = all; `make collect <strat>` = one cell)
 make report && make serve         # build + view the dashboard
 ```
-
-**Deeper docs** (the top-level README intentionally stays a map):
-
-- [`scripts/README.md`](scripts/README.md) — every script's usage, the full
-  knob list, the bench-binary flag reference, and the complete
-  sweep → report → PMC workflow.
-- [`experiments/sweeps/README.md`](experiments/sweeps/README.md) — the regime
-  grid + all sweep env-vars (`NS`, `TRIALS`, `DEATH_RATES`, `THREADS`,
-  `PARALLEL`, `SKIP_DONE`, `VERBOSE`).
-- [`experiments/data/README.md`](experiments/data/README.md) — the JSONL
-  schema (host-partitioned, append-only; every row is self-describing).
-- [`experiments/README.md`](experiments/README.md) — the analysis tree +
-  SPA: what each chart shows + how to serve it.
-- [`src/layouts/L1/README.md`](src/layouts/L1/README.md) —
-  the L1 layout itself + its auto-generated champion grid.
-
-A layout is **done** when every expressible cell is implemented and registered,
-the sweep is committed, `--check` passes for every run, and the champion grid
-is stable.
 
 ## Project layout
 
