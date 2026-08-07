@@ -33,10 +33,34 @@ h3 { margin: 0 0 10px; font-size: 14px; color: #cfcfcf; }
 .hint { color: #888; font-size: 12px; margin: -4px 0 8px; }
 
 /* podium grid */
-table.podium { border-collapse: collapse; width: 100%; font-size: 12px; }
-.podium th, .podium td { border: 1px solid #2c2c2c; padding: 6px 8px; vertical-align: top; text-align: left; }
+table.podium { border-collapse: separate; border-spacing: 5px; width: 100%; font-size: 12px; }
+.podium th, .podium td { border: 1px solid #2c2c2c; padding: 10px 12px; vertical-align: top; text-align: left; background: #23262b; border-radius: 5px; }
 .podium thead th, .podium tbody th { background: #23262b; color: #aaa; font-weight: 600; white-space: nowrap; }
-.podium td .prow { display: flex; justify-content: space-between; gap: 8px; padding: 1px 0; }
+.podium td .prow { display: flex; justify-content: space-between; gap: 10px; padding: 2px 0; }
+.podium td[data-n] { cursor: pointer; transition: border-color .12s; }
+.podium td[data-n]:hover { border-color: #5dade2; }
+table.alg td.n, table.alg th.n { text-align: right; font-variant-numeric: tabular-nums; color: #bbb; }
+
+/* intersection popover: click a winners cell to see all cells ranked, in place */
+.ixpop { position: fixed; display: none; width: 332px; max-width: calc(100vw - 16px); max-height: min(72vh, 540px);
+  background: #1c1f23; border: 1px solid #3a3a3a; border-radius: 8px; box-shadow: 0 10px 34px rgba(0,0,0,.55);
+  z-index: 50; padding: 11px 13px 9px; font-size: 12px; }
+.ixpop-close { position: absolute; top: 6px; right: 9px; background: none; border: none; color: #888; font-size: 17px; line-height: 1; cursor: pointer; }
+.ixpop-close:hover { color: #fff; }
+.ixpop-head { color: #cfcfcf; font-weight: 600; margin-bottom: 8px; padding-right: 18px; }
+.ixpop-cnt { color: #888; font-weight: 400; margin-left: 4px; }
+.ixpop-body { display: flex; flex-direction: column; gap: 1px; max-height: 58vh; overflow-y: auto; }
+.ixrow { display: flex; align-items: center; gap: 8px; padding: 3px 5px; border-radius: 4px; color: #ccc; }
+.ixrow:hover { background: #23262b; text-decoration: none; }
+.ixrk { color: #666; width: 18px; text-align: right; font-variant-numeric: tabular-nums; flex: 0 0 auto; }
+.ixname { flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+.ixbar { flex: 0 0 72px; height: 7px; background: #2a2d33; border-radius: 3px; overflow: hidden; }
+.ixbar i { display: block; height: 100%; background: #5dade2; border-radius: 3px; }
+.ixns { color: #9aa; width: 44px; text-align: right; font-variant-numeric: tabular-nums; flex: 0 0 auto; }
+.ixpop-full { display: block; margin-top: 9px; padding-top: 8px; border-top: 1px solid #33363b; color: #7fb3ff; text-align: right; }
+.ixpop-full:hover { text-decoration: underline; }
+.ixpop-empty { color: #888; padding: 6px 0; }
 .podium .n { color: #999; font-variant-numeric: tabular-nums; }
 
 /* featured + cell lists */

@@ -104,7 +104,7 @@ per host (the report joins on `machine_id`).
 |------|---------|---------|
 | `NS` | bench default SWEEP | comma-list of N, e.g. `4000,65000,1000000` |
 | `TRIALS` | `3` | trials per N (the report keeps the min) |
-| `DEATH_RATES` | `0.01 0.05 0.25` (from `death_rates.txt`) | space-list of accident rates q |
+| `DEATH_RATES` | `0.01 0.05 0.1 0.25 0.5` (from `death_rates.txt`) | space-list of accident rates q |
 | `THREADS` | `1 4 10` | space-list; **parallel cells only** (serial cells run T=1) |
 | `PARALLEL` | `1` | up to N `(cell, q)` tasks concurrently (own build dir each) |
 | `SKIP_DONE` | `0` | skip `(cell, q)` whose runs.jsonl already covers all threads (resume) |
@@ -284,7 +284,7 @@ python3 scripts/migrate_data.py --dry-run  # show counts, write nothing
 ## The full layout-sweep workflow
 
 ```sh
-# 1. Sweep — all cells × {0.01,0.05,0.25} × {4K,65K,1M,16M} × {1,4,10}
+# 1. Sweep — all cells × {0.01,0.05,0.1,0.25,0.5} × {4K,65K,1M,16M} × {1,4,10}
 #    (parallel only); appends JSONL into experiments/data/<machine_id>/:
 python3 scripts/collect.py L1
 #    (resume an interrupted sweep without duplicating completed units:)

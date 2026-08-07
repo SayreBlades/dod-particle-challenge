@@ -13,7 +13,7 @@ Every cell is swept once across:
 | axis         | values                  | how it's set                                   |
 |--------------|-------------------------|------------------------------------------------|
 | **N**        | `4K, 65K, 1M, 16M`      | bench default `SWEEP` (override with `NS=`)   |
-| **death q**  | `0.01, 0.05, 0.25`      | `death_rates.txt` (override with `DEATH_RATES=`) |
+| **death q**  | `0.01, 0.05, 0.1, 0.25, 0.5`      | `death_rates.txt` (override with `DEATH_RATES=`) |
 | **threads**  | `1, 4, 10`              | parallel cells only (override with `THREADS=`)  |
 
 Serial cells run T=1 only (a serial cell ignores `--threads`, so looping it
@@ -29,7 +29,7 @@ measure; **the run knobs** (`PARALLEL`, `SKIP_DONE`, `VERBOSE`) select *how*.
 |-----|---------|---------|
 | `NS` | *(bench default)* | comma-list of N (e.g. `4000,65000,1000000`) |
 | `TRIALS` | `3` | trials per N (the report keeps the min) |
-| `DEATH_RATES` | `0.01 0.05 0.25` | space-list of accident rates q (competing risks) |
+| `DEATH_RATES` | `0.01 0.05 0.1 0.25 0.5` | space-list of accident rates q (competing risks) |
 | `THREADS` | `1 4 10` | space-list of worker counts (parallel cells only) |
 | `PARALLEL` | `1` | run up to N `(cell, q)` tasks concurrently (own build dir each). **Caveat:** concurrent bench runs contend for cores and can skew `ns_frame` — keep `1` for publication-grade data. |
 | `SKIP_DONE` | `0` | skip a `(cell, q)` whose `runs.jsonl` already covers every thread — resume an interrupted sweep without duplicating. |

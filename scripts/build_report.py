@@ -41,6 +41,12 @@ PY = os.path.join(ROOT, ".venv", "bin", "python")
 ANALYZE = os.path.join(ROOT, "scripts", "analyze_cell.py")
 RETRY_MAX_TOKENS = "24000"   # bump on verify-fail retry (reasoning model headroom)
 
+# Death-rate points EXCLUDED from the report. Legacy sweep values not in
+# experiments/sweeps/death_rates.txt; raw data retains them. Both the duckdb
+# aggregation (here) and the per-cell bundles (analyze_cell.py) drop them so the
+# SPA never surfaces them. Keep in sync with analyze_cell.py.
+EXCLUDE_DEATH_Q = (0.0, 0.75)
+
 # Per-layout struct diagram shown atop the cell page (the data-model identity).
 # TODO: read from the layout README spec; hardcoded per-layout for now (L1 only).
 LAYOUT_MEMORY = {
@@ -61,6 +67,10 @@ def load(con):
         sys.exit(f"no runs.jsonl under {DATA}; run collect.py first")
     con.execute("CREATE TABLE runs AS " +
                 " UNION ALL ".join(f"SELECT * FROM read_json_auto('{p}')" for p in paths))
+    if EXCLUDE_DEATH_Q:
+        qmarks = ",".join(map(str, EXCLUDE_DEATH_Q))
+        con.execute(f"DELETE FROM runs WHERE death_q IN ({qmarks})")
+        print(f"  excluded death_q in ({qmarks}) from the report", file=sys.stderr)
     hws = sorted(glob.glob(os.path.join(DATA, "*", "hardware.json")))
     con.execute("CREATE TABLE hardware AS " +
                 " UNION ALL ".join(f"SELECT * FROM read_json_auto('{p}')" for p in hws))
@@ -91,24 +101,23 @@ def distinct(con, col, machine, layout=None):
 
 
 def champs_sql(machine, layout=None):
-    """Top-3 cells per (regime × death_q × threads). Partitioned by threads
+    """Top-3 cells per (N × death_q × threads). Partitioned by threads
     (decision 8): a parallel cell's T=10 and a serial cell's T=1 never share a
     podium. min ns_particle across trials."""
     where = "machine_id = ?" + (" AND layout = ?" if layout else "")
     params = [machine] + ([layout] if layout else [])
     sql = f"""
       SELECT * FROM (
-        SELECT cell, layout, death_q, threads, regime, ns_particle, achieved_bw_gbs,
-               row_number() OVER (PARTITION BY regime, death_q, threads
+        SELECT cell, layout, death_q, threads, N, ns_particle, achieved_bw_gbs,
+               row_number() OVER (PARTITION BY N, death_q, threads
                                    ORDER BY ns_particle) AS rk
         FROM (
-          SELECT cell, layout, death_q, threads,
-            CASE WHEN N<=65000 THEN 'small' WHEN N<=1000000 THEN 'mid' ELSE 'large' END AS regime,
+          SELECT cell, layout, death_q, threads, N,
             min(ns_particle) AS ns_particle, min(achieved_bw_gbs) AS achieved_bw_gbs
           FROM report WHERE {where}
-          GROUP BY cell, layout, death_q, threads, regime
+          GROUP BY cell, layout, death_q, threads, N
         )
-      ) WHERE rk <= 3 ORDER BY threads, regime, death_q, rk"""
+      ) WHERE rk <= 3 ORDER BY threads, N, death_q, rk"""
     return sql, params
 
 
@@ -285,9 +294,9 @@ def build_overview(con, mid):
     lines.append("")
     lines.append(f"Layouts measured: {', '.join(f'[{L}]({L}/)' for L in layouts)}.")
     lines.append("")
-    lines.append(f"## Global top-3 (T={default_t})")
+    lines.append(f"## Winners (top-3) (T={default_t})")
     lines.append("")
-    lines.append(_grid_md([c for c in champs if c["threads"] == default_t], deaths))
+    lines.append(_grid_md([c for c in champs if c["threads"] == default_t], nvals, deaths))
     open(os.path.join(OUT, mid, "README.md"), "w").write("\n".join(lines) + "\n")
     print(f"  wrote analysis/{mid}/README.md + overview.json", file=sys.stderr)
 
@@ -319,7 +328,7 @@ def build_layout_bundle(con, mid, L):
     lines = [f"# Layout {L} on {hw['cpu']} (`{mid}`)", ""]
     lines.append(f"## Champion grid (T={default_t})")
     lines.append("")
-    lines.append(_grid_md([c for c in champs if c["threads"] == default_t], deaths))
+    lines.append(_grid_md([c for c in champs if c["threads"] == default_t], nvals, deaths))
     lines.append("")
     lines.append("## Featured cells")
     lines.append("")
@@ -341,20 +350,27 @@ def build_layout_bundle(con, mid, L):
           f"({len(cells_all)} cells)", file=sys.stderr)
 
 
-def _grid_md(champs, deaths):
-    """Render the top-3 podium grid as a markdown table."""
-    regimes = ["small", "mid", "large"]
+def _fmt_n(n):
+    if n >= 1_000_000:
+        return f"{n // 1_000_000}M" if n % 1_000_000 == 0 else f"{n / 1_000_000:.1f}M"
+    if n >= 1_000:
+        return f"{n // 1_000}K" if n % 1_000 == 0 else f"{n / 1_000:.1f}K"
+    return str(n)
+
+
+def _grid_md(champs, nvals, deaths):
+    """Render the top-3 podium grid as a markdown table (rows = N, cols = death_q)."""
     byk = {}
     for c in champs:
-        byk[(c["regime"], c["death_q"], c["rk"])] = c
-    out = ["| regime＼death | " + " | ".join(str(d) for d in deaths) + " |",
+        byk[(c["N"], c["death_q"], c["rk"])] = c
+    out = ["| num-particles＼death | " + " | ".join(str(d) for d in deaths) + " |",
            "|" + "---|" * (len(deaths) + 1)]
-    for rg in regimes:
-        row = [rg]
+    for n in nvals:
+        row = [_fmt_n(n)]
         for d in deaths:
             celltxt = []
             for rk in (1, 2, 3):
-                c = byk.get((rg, d, rk))
+                c = byk.get((n, d, rk))
                 if c:
                     strat = c["cell"].split(".", 1)[1]
                     celltxt.append(f"[{strat}]({strat}.md) {c['ns_particle']:.2f}")
@@ -363,30 +379,53 @@ def _grid_md(champs, deaths):
     return "\n".join(out)
 
 
+def build_grid(con, mid):
+    """grid.json — every cell's best (min-ns) trial per (N, death_q, threads).
+    Lets the SPA rank ALL cells at any (machine, threads, N, death_q) intersection
+    with one fetch, instead of loading each per-cell bundle."""
+    hw = json.load(open(os.path.join(DATA, mid, "hardware.json")))
+    nvals = distinct(con, "N", mid)
+    deaths = distinct(con, "death_q", mid)
+    tgroups = distinct(con, "threads", mid)
+    cells = [r[0] for r in con.execute(
+        "SELECT DISTINCT cell FROM report WHERE machine_id=? ORDER BY cell", [mid]).fetchall()]
+    pts = rows(con, """
+        SELECT cell, N, death_q, threads, ns_particle, achieved_bw_gbs FROM (
+          SELECT cell, N, death_q, threads, ns_particle, achieved_bw_gbs,
+                 row_number() OVER (PARTITION BY cell, N, death_q, threads
+                                    ORDER BY ns_particle) AS rn
+          FROM report WHERE machine_id = ?
+        ) WHERE rn = 1
+        ORDER BY cell, N, death_q, threads""", [mid])
+    grid = {"machine_id": mid, "streaming_bw_gbs": hw["streaming_bw_gbs"],
+            "n_values": nvals, "death_rates": deaths, "thread_groups": tgroups,
+            "cells": cells, "points": pts}
+    json.dump(grid, open(os.path.join(OUT, mid, "grid.json"), "w"), indent=2)
+    print(f"  wrote analysis/{mid}/grid.json ({len(pts)} points, {len(cells)} cells)",
+          file=sys.stderr)
+
+
 def render_queries(con):
     """The canonical SQL (documentary): the global top-3 + the layout top-K,
     both partitioned by threads (decision 8)."""
     sql = """-- Canonical queries for the analysis bundles.
 -- Champions are partitioned by `threads` (decision 8): a parallel cell's
 -- T=10 run and a serial cell's T=1 run never share a podium. min ns_particle
--- across trials; regime = small (N<=65K) / mid (<=1M) / large (>1M).
+-- across trials; one row per (N, death_q, threads).
 
--- Global top-3 per (regime, death_q, threads) on ONE machine:
+-- Global top-3 per (N, death_q, threads) on ONE machine:
 WITH ranked AS (
-  SELECT cell, layout, death_q, threads,
-    CASE WHEN N<=65000 THEN 'small' WHEN N<=1000000 THEN 'mid' ELSE 'large' END AS regime,
+  SELECT cell, layout, death_q, threads, N,
     min(ns_particle) AS ns_particle, min(achieved_bw_gbs) AS achieved_bw_gbs,
-    row_number() OVER (PARTITION BY
-      CASE WHEN N<=65000 THEN 'small' WHEN N<=1000000 THEN 'mid' ELSE 'large' END,
-      death_q, threads ORDER BY min(ns_particle)) AS rk
+    row_number() OVER (PARTITION BY N, death_q, threads ORDER BY min(ns_particle)) AS rk
   FROM report
   WHERE machine_id = '<machine_id>'           -- :scope
-  GROUP BY cell, layout, death_q, threads, regime
+  GROUP BY cell, layout, death_q, threads, N
 )
-SELECT regime, death_q, threads, rk, cell, layout,
+SELECT N, death_q, threads, rk, cell, layout,
        round(ns_particle, 3) AS ns_particle,
        round(achieved_bw_gbs, 2) AS achieved_bw_gbs
-FROM ranked WHERE rk <= 3 ORDER BY threads, regime, death_q, rk;
+FROM ranked WHERE rk <= 3 ORDER BY threads, N, death_q, rk;
 
 -- Same, scoped to ONE layout (add: AND layout = '<L>').
 """
@@ -432,6 +471,7 @@ def main():
     build_machines_index(con)
     for mid in mids:
         build_overview(con, mid)
+        build_grid(con, mid)
         for L in distinct(con, "layout", mid):
             if only_layout and L != only_layout:
                 continue

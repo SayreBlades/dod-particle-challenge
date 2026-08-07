@@ -32,50 +32,6 @@
     ]
   ],
   "series": {
-    "0.0": [
-      {
-        "N": 4000,
-        "threads": 1,
-        "ns_particle": 3.381,
-        "ns_frame": 13526.0,
-        "achieved_bw_gbs": 20.11
-      },
-      {
-        "N": 16000,
-        "threads": 1,
-        "ns_particle": 3.255,
-        "ns_frame": 52080.2,
-        "achieved_bw_gbs": 20.89
-      },
-      {
-        "N": 65000,
-        "threads": 1,
-        "ns_particle": 3.056,
-        "ns_frame": 198614.8,
-        "achieved_bw_gbs": 22.25
-      },
-      {
-        "N": 262000,
-        "threads": 1,
-        "ns_particle": 3.001,
-        "ns_frame": 786332.3,
-        "achieved_bw_gbs": 22.66
-      },
-      {
-        "N": 1000000,
-        "threads": 1,
-        "ns_particle": 3.134,
-        "ns_frame": 3134339.0,
-        "achieved_bw_gbs": 21.7
-      },
-      {
-        "N": 4000000,
-        "threads": 1,
-        "ns_particle": 3.227,
-        "ns_frame": 12909188.3,
-        "achieved_bw_gbs": 21.07
-      }
-    ],
     "0.01": [
       {
         "N": 4000,
@@ -295,64 +251,9 @@
         "ns_frame": 109379730.8,
         "achieved_bw_gbs": 2.49
       }
-    ],
-    "0.75": [
-      {
-        "N": 4000,
-        "threads": 1,
-        "ns_particle": 15.255,
-        "ns_frame": 61022.1,
-        "achieved_bw_gbs": 4.46
-      },
-      {
-        "N": 16000,
-        "threads": 1,
-        "ns_particle": 11.203,
-        "ns_frame": 179244.8,
-        "achieved_bw_gbs": 6.07
-      },
-      {
-        "N": 65000,
-        "threads": 1,
-        "ns_particle": 11.351,
-        "ns_frame": 737797.3,
-        "achieved_bw_gbs": 5.99
-      },
-      {
-        "N": 262000,
-        "threads": 1,
-        "ns_particle": 11.361,
-        "ns_frame": 2976571.7,
-        "achieved_bw_gbs": 5.99
-      },
-      {
-        "N": 1000000,
-        "threads": 1,
-        "ns_particle": 11.463,
-        "ns_frame": 11462859.6,
-        "achieved_bw_gbs": 5.93
-      },
-      {
-        "N": 4000000,
-        "threads": 1,
-        "ns_particle": 11.457,
-        "ns_frame": 45829249.4,
-        "achieved_bw_gbs": 5.94
-      }
     ]
   },
-  "pmc": [
-    {
-      "N": 1000000,
-      "death_q": 0.0,
-      "trial": 1,
-      "cycles": 44818345,
-      "useful_pct": 60.0,
-      "processing_pct": 22.0,
-      "delivery_pct": 0.1,
-      "discarded_pct": 17.9
-    }
-  ],
+  "pmc": [],
   "asm": {
     "source_hash": "40149e144f9efca5491716657f11209a5a24d7f648dc9f1830586bd0f2334483",
     "symbol": "_framework.sim.Strategy(layouts.L1.data.Data,layouts.L1.B1.w1-autovec.w2-opt.H).step",
@@ -625,7 +526,7 @@
         ]
       },
       {
-        "source": "        while (dy < 2) : (dy += 1) {",
+        "source": "    while (dy < 2) : (dy += 1) {",
         "asm": [
           "sxtw\tx17, w0",
           "umov.b\tw14, v4[2]",
@@ -680,7 +581,7 @@
         ]
       },
       {
-        "source": "                const fx = px + dx;",
+        "source": "            const fx = px + dx;",
         "asm": [
           "add\tx3, x17, #0x1"
         ]
@@ -761,7 +662,7 @@
         ]
       },
       {
-        "source": "                const fx = px + dx;",
+        "source": "            const fx = px + dx;",
         "asm": [
           "add\tx17, x17, #0x1"
         ]
@@ -826,7 +727,7 @@
         ]
       },
       {
-        "source": "            }",
+        "source": "}",
         "asm": [
           "b\t0x100055650",
           "lsl\tx3, x3, #2"

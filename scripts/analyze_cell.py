@@ -29,6 +29,11 @@ ASM_CACHE = os.path.join(ROOT, ".scratch", "asm_cache")
 DEFAULT_MODEL = "glm-5.2"
 ADDR = re.compile(r"^[0-9a-f]{16}$")
 
+# Death-rate points EXCLUDED from per-cell bundles (legacy sweep values not in
+# experiments/sweeps/death_rates.txt). Raw data retains them. Keep in sync with
+# build_report.py.
+EXCLUDE_DEATH_Q = (0.0, 0.75)
+
 
 def sh(cmd):
     return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True).stdout
@@ -55,8 +60,11 @@ def load_jsonl(path, cell):
             r = json.loads(line)
         except Exception:
             continue
-        if r.get("cell") == cell:
-            out.append(r)
+        if r.get("cell") != cell:
+            continue
+        if r.get("death_q") in EXCLUDE_DEATH_Q:
+            continue
+        out.append(r)
     return out
 
 

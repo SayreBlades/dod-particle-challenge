@@ -4,6 +4,7 @@ const $ = (id) => document.getElementById(id);
 const status = (m) => ($("status").textContent = m);
 const short = (cell) => cell.split(".").slice(1).join(".");
 const fmtq = (d) => (d === 0 ? "0" : String(d));
+const fmtN = (n) => n >= 1e6 ? `${n / 1e6}M` : n >= 1e3 ? `${n / 1e3}K` : `${n}`;
 const charts = [];
 window.addEventListener("resize", () => charts.forEach((c) => c.resize()));
 const AX = { axisLine: { lineStyle: { color: "#666" } }, axisLabel: { color: "#aaa" },
@@ -17,6 +18,9 @@ const fetchText = (u) => fetch(u).then((r) => r.ok ? r.text() : "");
 function getOverview(m)   { return ovCache[m]   ?? (ovCache[m]   = fetchJSON(`analysis/${m}/overview.json`)); }
 function getLayout(m, L)  { return layCache[m+L]?? (layCache[m+L]= fetchJSON(`analysis/${m}/${L}/layout.json`)); }
 function getCellJson(m, c){ return cellCache[c] ?? (cellCache[c]= (async()=>{const L=c.split(".")[0],s=short(c);return fetchJSON(`analysis/${m}/${L}/${s}.json`);})()); }
+const gridCache = {};
+const getGrid = (m) => gridCache[m] ?? (gridCache[m] = fetchJSON(`analysis/${m}/grid.json`));
+let ixGrid = null;   // last-loaded grid.json (set by renderOverview) for the intersection popover
 
 function cellColor(cell) { let h = 0; for (let i = 0; i < cell.length; i++) h = (h * 31 + cell.charCodeAt(i)) >>> 0; return `hsl(${h % 360} 65% 62%)`; }
 function pickThreads(rows) { const t = rows.filter((r) => r.threads === threads); return t.length ? t : rows.filter((r) => r.threads === 1); }
@@ -47,6 +51,9 @@ function machineCard() {
   return `<section class="cellhead machinecard"><h2>${m.cpu}</h2><div class="machinfo"><div><b>Mem Bandwidth</b> <code>${m.streaming_bw_gbs ?? "?"} GB/s</code></div><div><b>Mem Cache</b> L1d <code>${(m.l1dcachesize / 1024) | 0} KB</code></div><div><b>Mem Cache</b> L2 <code>${(m.l2cachesize / 1048576) | 0} MB</code></div><div><b>DRAM</b> <code>${(m.memsize_bytes / 1073741824) | 0} GB</code></div></div></section>`;
 }
 
+// persistent machine card above the banner; refreshed on every route
+function renderTopCard() { const el = $("topcard"); if (el) el.innerHTML = machineCard(); }
+
 // ---------------- overview ----------------
 async function renderOverview() {
   const ov = await getOverview(machine);
@@ -55,24 +62,24 @@ async function renderOverview() {
   const champs = ov.champions.filter((c) => c.threads === threads);
   const ns = champs.map((c) => c.ns_particle);
   const lo = Math.min(...ns), hi = Math.max(...ns);
-  const regimes = ["small", "mid", "large"], deaths = ov.death_rates;
-  const cell = (rg, d, rk) => champs.find((c) => c.regime === rg && Math.abs(c.death_q - d) < 1e-9 && c.rk === rk);
-  let html = machineCard() + `<section><h2>Global top-3 <span class="sub">per regime × death · T=${threads}</span></h2>`;
+  const nvals = ov.n_values, deaths = ov.death_rates;
+  const cell = (n, d, rk) => champs.find((c) => c.N === n && Math.abs(c.death_q - d) < 1e-9 && c.rk === rk);
+  ixGrid = await getGrid(machine);
+  let html = `<section><h2>Winners (top-3) <span class="sub">per num-particles × death · T=${threads}</span></h2>`;
   html += `<p class="hint">Green = faster. Click a cell to drill into its analysis.</p>`;
-  html += `<table class="podium"><thead><tr><th>regime＼death</th>${deaths.map((d) => `<th>${fmtq(d)}</th>`).join("")}</tr></thead><tbody>`;
-  for (const rg of regimes) {
-    html += `<tr><th>${rg}</th>`;
+  html += `<table class="podium"><thead><tr><th>num-particles＼death</th>${deaths.map((d) => `<th>${fmtq(d)}</th>`).join("")}</tr></thead><tbody>`;
+  for (const n of nvals) {
+    html += `<tr><th>${fmtN(n)}</th>`;
     for (const d of deaths) {
-      const top3 = [1, 2, 3].map((rk) => cell(rg, d, rk)).filter(Boolean);
+      const top3 = [1, 2, 3].map((rk) => cell(n, d, rk)).filter(Boolean);
       const best = top3.length ? top3[0].ns_particle : null;
       const tint = best != null ? `hsla(${120 * (1 - Math.min(1, (best - lo) / (hi - lo)))},60%,45%,0.20)` : null;
-      html += `<td${tint ? ` style="background:${tint}"` : ""}>${
+      html += `<td${tint ? ` style="background:${tint}"` : ""} data-n="${n}" data-q="${d}">${
         top3.map((c) => `<div class="prow"><a href="#/cell/${c.cell}">${short(c.cell)}</a><span class="n">${c.ns_particle.toFixed(2)}</span></div>`).join("") || "—"}</td>`;
     }
     html += `</tr>`;
   }
   html += `</tbody></table></section>`;
-  html += `<section><h3>Layouts</h3>${ov.layouts.map((L) => `<a class="celllink" href="#/layout/${L}">${L}</a>`).join(" ")}</section>`;
   $("page").innerHTML = html;
   status(`overview · ${ov.layouts.length} layout(s) · T=${threads}`);
 }
@@ -85,13 +92,13 @@ async function renderLayout(L) {
   const champs = lb.champions.filter((c) => c.threads === threads);
   const ns = champs.map((c) => c.ns_particle);
   const lo = Math.min(...ns), hi = Math.max(...ns);
-  const regimes = ["small", "mid", "large"], deaths = lb.death_rates;
-  const cell = (rg, d, rk) => champs.find((c) => c.regime === rg && Math.abs(c.death_q - d) < 1e-9 && c.rk === rk);
-  let podium = `<table class="podium"><thead><tr><th>regime＼death</th>${deaths.map((d) => `<th>${fmtq(d)}</th>`).join("")}</tr></thead><tbody>`;
-  for (const rg of regimes) {
-    podium += `<tr><th>${rg}</th>`;
+  const nvals = lb.n_values, deaths = lb.death_rates;
+  const cell = (n, d, rk) => champs.find((c) => c.N === n && Math.abs(c.death_q - d) < 1e-9 && c.rk === rk);
+  let podium = `<table class="podium"><thead><tr><th>num-particles＼death</th>${deaths.map((d) => `<th>${fmtq(d)}</th>`).join("")}</tr></thead><tbody>`;
+  for (const n of nvals) {
+    podium += `<tr><th>${fmtN(n)}</th>`;
     for (const d of deaths) {
-      const top3 = [1, 2, 3].map((rk) => cell(rg, d, rk)).filter(Boolean);
+      const top3 = [1, 2, 3].map((rk) => cell(n, d, rk)).filter(Boolean);
       const best = top3.length ? top3[0].ns_particle : null;
       const tint = best != null ? `hsla(${120 * (1 - Math.min(1, (best - lo) / (hi - lo)))},60%,45%,0.20)` : null;
       podium += `<td${tint ? ` style="background:${tint}"` : ""}>${top3.map((c) => `<div class="prow"><a href="#/cell/${c.cell}">${short(c.cell)}</a><span class="n">${c.ns_particle.toFixed(2)}</span></div>`).join("") || "—"}</td>`;
@@ -102,8 +109,7 @@ async function renderLayout(L) {
   const feat = lb.featured.map((f) => `<div class="feat"><a href="#/cell/${f.cell}"><b>${short(f.cell)}</b> <span class="n">${f.ns} ns/p</span></a><div class="tease">${f.teaser}${f.teaser ? `…` : ""}</div></div>`).join("");
   const cells = lb.cells.map((c) => `<a class="celllink" href="#/cell/${c}">${short(c)}</a>`).join(" ");
   $("page").innerHTML = `
-    ${machineCard()}
-    <section><h2>${L} <span class="sub">top-3 per regime × death · T=${threads}</span></h2>${podium}</section>
+    <section><h2>${L} <span class="sub">top-3 per num-particles × death · T=${threads}</span></h2>${podium}</section>
     <section><h3>Featured</h3>${feat || "<p class=hint>(no champions featured)</p>"}</section>
     <section><h3>All cells</h3><div class="cellrow">${cells}</div></section>
     <section><h3>Performance landscape <span class="sub">ns/p vs N · q=${lb.death_rates.includes(0.01) ? 0.01 : lb.death_rates[0]}</span></h3><div id="landscape" class="chart"></div></section>
@@ -330,7 +336,6 @@ async function renderCell(cell) {
     ? `<div class="unverified">⚠ <b>narrative failed verification</b> — the prose cites evidence not in the bundle. Regenerate with <code>scripts/analyze_cell.py ${cell} --force</code>${j.verify_errors?.length ? `<br><span class=hint>${j.verify_errors.join("; ")}</span>` : ""}</div>`
     : "";
   $("page").innerHTML = `
-    ${machineCard()}
     ${banner}
     ${mem}
     <section class="cellhead"><h2>${short(cell)}</h2><div class="cellfull">${cell}</div>${decl}${wtable}${hypo}${verdict}</section>
@@ -409,14 +414,85 @@ function drawAsm(j) {
   });
 }
 
+// ---------------- rank: every cell at one (N, death_q, threads) ----------------
+async function renderRank(N, q) {
+  const g = await getGrid(machine);
+  const ment = (MACHINES.machines.find((m) => m.machine_id === machine) || {});
+  if (g) renderMeta(ment);
+  if (!g) { status("no grid.json for " + machine); return; }
+  const ceil = g.streaming_bw_gbs;
+  const pts = g.points
+    .filter((p) => p.N === N && Math.abs(p.death_q - q) < 1e-9 && p.threads === threads)
+    .sort((a, b) => a.ns_particle - b.ns_particle);
+  const title = `All cells · N=${fmtN(N)} · q=${fmtq(q)} · T=${threads}`;
+  let html = `<section class="cellhead"><h2>${title}</h2>`
+    + `<p class="hint"><a href="#/">← winners</a> · ranked by ns/particle (best trial). `
+    + `Click a row or bar for the cell deep-dive.</p></section>`;
+  if (!pts.length) {
+    html += `<section><p class="hint">No cells measured at this intersection.</p></section>`;
+  } else {
+    html += `<section><table class="alg"><thead><tr><th>#</th><th>cell</th>`
+      + `<th class="n">ns/particle</th><th class="n">GB/s</th><th class="n">% ceiling</th></tr></thead><tbody>`;
+    pts.forEach((p, i) => {
+      const pct = ceil ? (p.achieved_bw_gbs / ceil * 100).toFixed(1) : "—";
+      html += `<tr${i === 0 ? ` style="color:#8ab4f8"` : ""}><td>${i + 1}</td>`
+        + `<td><a href="#/cell/${p.cell}">${short(p.cell)}</a></td>`
+        + `<td class="n">${p.ns_particle.toFixed(3)}</td>`
+        + `<td class="n">${(p.achieved_bw_gbs ?? 0).toFixed(2)}</td>`
+        + `<td class="n">${pct}%</td></tr>`;
+    });
+    html += `</tbody></table></section>`;
+    html += `<section><h3>Latency · ns/particle <span class="sub">lower is better</span></h3><div id="ranklat" class="chart"></div></section>`;
+    html += `<section><h3>Bandwidth · GB/s <span class="sub">higher is better · dashed = streaming ceiling</span></h3><div id="rankbw" class="chart"></div></section>`;
+  }
+  $("page").innerHTML = html;
+  status(`${title} · ${pts.length} cells`);
+  if (pts.length) drawRankCharts(pts, ceil);
+}
+
+function drawRankCharts(pts, ceil) {
+  const h = Math.max(260, pts.length * 26 + 40);
+  $("ranklat").style.height = h + "px";
+  $("rankbw").style.height = h + "px";
+  // ECharts plots category data[0] at the BOTTOM, so sort desc-by-ns to put the
+  // fastest (lowest ns) at the top; bandwidth sorts asc so the highest sits on top.
+  const lat = [...pts].sort((a, b) => b.ns_particle - a.ns_particle);
+  chart("ranklat", {
+    tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, valueFormatter: (v) => (v == null ? "" : v.toFixed(3)) },
+    grid: { left: 16, right: 72, top: 10, bottom: 30, containLabel: true },
+    xAxis: { type: "value", name: "ns/particle", ...AX },
+    yAxis: { type: "category", data: lat.map((p) => short(p.cell)),
+             axisLabel: { color: "#bbb", fontSize: 11 }, axisLine: { lineStyle: { color: "#666" } }, axisTick: { show: false } },
+    series: [{ type: "bar", data: lat.map((p) => p.ns_particle), barMaxWidth: 18,
+               label: { show: true, position: "right", color: "#ccc", fontSize: 11, formatter: (o) => o.value.toFixed(2) },
+               itemStyle: { color: "#5dade2" } }],
+  });
+  const bw = [...pts].sort((a, b) => (a.achieved_bw_gbs ?? 0) - (b.achieved_bw_gbs ?? 0));
+  chart("rankbw", {
+    tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, valueFormatter: (v) => (v == null ? "" : v.toFixed(2)) },
+    grid: { left: 16, right: 72, top: 24, bottom: 30, containLabel: true },
+    xAxis: { type: "value", name: "GB/s", max: Math.ceil((ceil || 1) * 1.1), ...AX },
+    yAxis: { type: "category", data: bw.map((p) => short(p.cell)),
+             axisLabel: { color: "#bbb", fontSize: 11 }, axisLine: { lineStyle: { color: "#666" } }, axisTick: { show: false } },
+    series: [{ type: "bar", data: bw.map((p) => (p.achieved_bw_gbs ?? 0)), barMaxWidth: 18,
+               label: { show: true, position: "right", color: "#ccc", fontSize: 11, formatter: (o) => o.value.toFixed(2) },
+               itemStyle: { color: "#2ecc71" },
+               markLine: { silent: true, symbol: "none", data: [{ xAxis: ceil, lineStyle: { type: "dashed", color: "#e74c3c", width: 2 },
+                 label: { formatter: `ceiling ${ceil}`, color: "#e74c3c", position: "insideEndTop" } }] } }],
+  });
+}
+
 // ---------------- router ----------------
 function route() {
   charts.length = 0;
   $("page").innerHTML = "";
-  const h = location.hash.replace(/^#\/?/, "");
-  const [r, a] = h.split("/");
+  hidePop();
+  renderTopCard();
+  const parts = location.hash.replace(/^#\/?/, "").split("/");
+  const [r, a, b] = parts;
   status("loading…");
-  if (!r || r === "layout" && !a) renderOverview();
+  if (r === "rank" && a != null && b != null) renderRank(parseInt(a, 10), parseFloat(b));
+  else if (!r || (r === "layout" && !a)) renderOverview();
   else if (r === "layout") renderLayout(a);
   else if (r === "cell") renderCell(decodeURIComponent(a));
   else renderOverview();
@@ -426,6 +502,50 @@ function route() {
 // source↔asm group (delegated; survives page rebuilds).
 document.addEventListener("mouseover", (e) => { const el = e.target.closest?.("[data-g]"); if (el) document.querySelectorAll(`[data-g="${el.dataset.g}"]`).forEach(n => n.classList.add("hl")); });
 document.addEventListener("mouseout",  (e) => { const el = e.target.closest?.("[data-g]"); if (el) document.querySelectorAll(`[data-g="${el.dataset.g}"]`).forEach(n => n.classList.remove("hl")); });
+
+// ---- intersection popover: click a winners cell → all cells ranked, in place ----
+const ixpop = document.createElement("div");
+ixpop.id = "ixpop";
+ixpop.className = "ixpop";
+ixpop.innerHTML = `<button class="ixpop-close" aria-label="close">×</button>`;
+document.body.appendChild(ixpop);
+let ixCell = null;
+function hidePop() { ixpop.style.display = "none"; ixCell = null; }
+function showPop(td) {
+  const N = +td.dataset.n, q = +td.dataset.q;
+  const pts = ((ixGrid && ixGrid.points) || [])
+    .filter((p) => p.N === N && Math.abs(p.death_q - q) < 1e-9 && p.threads === threads)
+    .sort((a, b) => a.ns_particle - b.ns_particle);
+  const minNs = pts.length ? pts[0].ns_particle : 1;
+  const rows = pts.length
+    ? pts.map((p, i) => {
+        const w = Math.max(5, Math.round(minNs / p.ns_particle * 100));   // bar ∝ speedup vs best
+        return `<a class="ixrow" href="#/cell/${p.cell}"><span class="ixrk">${i + 1}</span>`
+          + `<span class="ixname">${short(p.cell)}</span><span class="ixbar"><i style="width:${w}%"></i></span>`
+          + `<span class="ixns">${p.ns_particle.toFixed(2)}</span></a>`;
+      }).join("")
+    : `<div class="ixpop-empty">no data at this intersection</div>`;
+  ixpop.innerHTML = `<button class="ixpop-close" aria-label="close">×</button>`
+    + `<div class="ixpop-head">N=${fmtN(N)} · q=${fmtq(q)} · T=${threads} <span class="ixpop-cnt">${pts.length} cells</span></div>`
+    + `<div class="ixpop-body">${rows}</div>`
+    + `<a class="ixpop-full" href="#/rank/${N}/${q}">full charts →</a>`;
+  const r = td.getBoundingClientRect();
+  ixpop.style.display = "block";
+  const pw = ixpop.offsetWidth, ph = ixpop.offsetHeight;
+  let left = Math.min(r.left, innerWidth - 8 - pw);  if (left < 8) left = 8;
+  let top = r.bottom + 6;
+  if (top + ph > innerHeight - 8) top = Math.max(8, r.top - 6 - ph);
+  ixpop.style.left = left + "px";  ixpop.style.top = top + "px";
+  ixCell = td;
+}
+function togglePop(td) { ixCell === td ? hidePop() : showPop(td); }
+document.addEventListener("click", (e) => {
+  if (e.target.closest("#ixpop")) { if (e.target.classList.contains("ixpop-close")) hidePop(); return; }
+  const td = e.target.closest("td[data-n]");
+  if (td && !e.target.closest("a")) togglePop(td);   // click the box (not a name) → toggle
+  else hidePop();                                   // anything else → close
+});
+addEventListener("keydown", (e) => { if (e.key === "Escape") hidePop(); });
 
 (async () => {
   try {

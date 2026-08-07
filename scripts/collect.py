@@ -315,7 +315,7 @@ def main() -> int:
     elif os.path.exists(RATES_FILE):
         rates = [l.strip() for l in open(RATES_FILE) if l.strip() and not l.strip().startswith("#")]
     else:
-        rates = ["0.01", "0.05", "0.25"]
+        rates = ["0.01", "0.05", "0.1", "0.25", "0.5"]
 
     # cells: target is `all` | a layout | a cell/strat | a space-list of cells.
     target = args.target
