@@ -4,7 +4,9 @@ A **visual particle simulator** — a fountain of 65,000 particles in three
 streams (gray **smoke** rising, orange **sparks** arcing, blue **debris**
 scattering) — rendered live with [raylib] in Zig on Apple Silicon:
 
-![three particle streams: smoke, sparks, debris](docs/fountain.gif)
+<p align="center">
+  <img src="docs/fountain.gif" alt="three particle streams: smoke, sparks, debris">
+</p>
 
 It's a hands-on laboratory for *feeling* the cache/perf lessons from Mike
 Acton's CppCon 2014 talk, ["Data-Oriented Design and C++"][acton].
