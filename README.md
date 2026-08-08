@@ -1,4 +1,4 @@
-# DoD Particle Challenge
+# DoD (Data-Oriented Design) Particle Challenge
 
 A fountain of 1M particles in three color streams — rendered live with [raylib].
 Let's tune the heck out of this!
