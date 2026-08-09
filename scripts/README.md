@@ -25,25 +25,33 @@ when you need the full knobs.
 
 ## Bench binary flags
 
-Reference for the `out/bin/dod-particles` flags (bench mode). `collect.py` uses
-these under the hood; you can also run the binary directly for an ad-hoc
-measurement (see [`run.py bench`](#runpy)).
+One binary per `(cell, mode)`, flat-named `out/bin/<layout>.<strat>.<mode>`
+(e.g. `L1.B3.w1-halide.w2-simple.bench`). Behavior is configured at the command
+line — **`q` is runtime**, so one binary sweeps the whole death axis (zig *and*
+halide). `collect.py` uses these under the hood; run a binary directly for an
+ad-hoc measurement. `--help` prints the cell's declaration + every flag.
 
 ```sh
-./out/bin/dod-particles --json --ns 4000,65000,1000000 --trials 5  # sweep, JSONL rows to stderr (collect.py greps `^json,`)
-./out/bin/dod-particles --n 1000000 --iters 500                    # single N (PMC mode — clean step() region for xctrace)
-./out/bin/dod-particles --threads 8                                # parallel cells only (serial cells ignore this)
-./out/bin/dod-particles --check                                    # invariant suite (PASS/FAIL)
-./out/bin/dod-particles --record                                   # 10s MP4 via ffmpeg (default: out/record/)
-./out/bin/dod-particles --bandwidth                                # streaming-BW microbench (reads `streaming_bw_gbs=` for hardware.json)
+./out/bin/L1.B3.w1-halide.w2-simple.bench --help            # cell_decl + options
+./out/bin/L1.B1.w1-unroll.w2-simple.bench -q 0.1 -N 4000    # single N at q=0.1
+./out/bin/L1.B1.w1-unroll.w2-simple.bench --json --ns 4000,65000,1000000 --trials 5  # sweep (collect.py greps `^json,`)
+./out/bin/L1.B1.w1-unroll.w2-simple.bench -N 1000000 --iters 500  # single N (PMC mode — clean step() region for xctrace)
+./out/bin/L1.B1.w1-unroll.w2-simple.bench --threads 8       # parallel cells only (serial cells ignore this)
+./out/bin/L1.B1.w1-unroll.w2-simple.bench --check           # invariant suite (PASS/FAIL)
+./out/bin/L1.B1.w1-unroll.w2-simple.bench --record          # 10s MP4 via ffmpeg (default: out/record/)
+./out/bin/L1.B1.w1-unroll.w2-simple.bench --bandwidth       # streaming-BW microbench (reads `streaming_bw_gbs=` for hardware.json)
 ```
 
+- `-q`/`--death <q>` is a **runtime flag**: the competing-risks accident rate
+  (`0` = natural, the golden-checked sim; `0.5` = high-churn). Same binary,
+  every `q`. (`-Ddeath=<q>` still exists as the build-time default.)
+- `-N`/`--n <N>` single particle count; `--ns <a,b,c>` the sweep list.
+- `-Dmode=<play|bench|audit|manifest>` is a **build option** (it's the `.mode`
+  suffix in the filename). bench/audit/manifest link **no raylib** (headless,
+  portable to Linux/CI); play links raylib. See the top-level README's
+  [Build & run](../README.md#build--run).
 - `--csv` is the legacy row format; `--json` (default for collection) is what
   `collect.py` greps.
-- `-Ddeath=<q>` is a **build option** (not a runtime flag): the competing-risks
-  accident rate (`0` = natural, the golden-checked sim; `0.5` = high-churn).
-- `-Dmode=<play|bench|audit|manifest>` is also a build option; see the top-level
-  README's [Build & run](../README.md#build--run).
 
 ---
 
@@ -70,9 +78,9 @@ python3 scripts/run.py profile L1.B1.w1-autovec.w2-simple   # PMC (one cell, one
 python3 scripts/run.py bench L1.B1.w1-autovec.w2-simple
 ```
 
-`build` and `bench` accept a layout or `all` (each cell is built in turn,
-overwriting `out/`); `play` and `profile` need a single cell (default: the L1
-reference `L1.B1.w1-autovec.w2-simple`). To customize the raw bench (N, trials,
+`build` and `bench` accept a layout or `all` (each cell builds to its own flat
+`out/bin/<cell>.bench` — they coexist, no overwriting); `play` and `profile`
+need a single cell (default: the L1 reference `L1.B1.w1-autovec.w2-simple`). To customize the raw bench (N, trials,
 threads, JSON output) pass flags to the binary directly — see
 [Bench binary flags](#bench-binary-flags). The Makefile wraps the make-backed
 subcommands so you can pass the target positionally — `make build L1` — see
@@ -106,7 +114,7 @@ per host (the report joins on `machine_id`).
 | `TRIALS` | `3` | trials per N (the report keeps the min) |
 | `DEATH_RATES` | `0.01 0.05 0.1 0.25 0.5` (from `death_rates.txt`) | space-list of accident rates q |
 | `THREADS` | `1 4 10` | space-list; **parallel cells only** (serial cells run T=1) |
-| `PARALLEL` | `1` | up to N `(cell, q)` tasks concurrently (own build dir each) |
+| `PARALLEL` | `1` | reserved — builds are serial into flat `out/` (parallelizing risks `.zig-cache` contention); benches always serial |
 | `SKIP_DONE` | `0` | skip `(cell, q)` whose runs.jsonl already covers all threads (resume) |
 | `VERBOSE` | `1` | `0` = progress bar only (per-step log suppressed) |
 | `REFRESH_HW` | `0` | rewrite `hardware.json` (re-measure `streaming_bw_gbs`) |
@@ -121,26 +129,29 @@ DEATH_RATES="0 0.5" python3 scripts/collect.py L1               # override rate 
 THREADS="1 4" python3 scripts/collect.py L1.B3.w1-autovec-par.w2-rmerge
 ```
 
-### Concurrency, resume, and the progress bar
+### Phases, resume, and the progress bar
+
+Two phases: **(1) build** one binary per cell into the flat `out/bin/` (serial
+— `q` is runtime, so zig *and* halide are one binary each, no per-`q` fan-out);
+**(2) bench+check** every `(cell, q)` serially for clean timing.
 
 ```sh
-PARALLEL=4 python3 scripts/collect.py L1                       # 4-way sweep (own build dir each)
-PARALLEL=4 SKIP_DONE=1 python3 scripts/collect.py L1           # resume an interrupted sweep
-VERBOSE=0 python3 scripts/collect.py                           # quiet: live bar only
+SKIP_DONE=1 python3 scripts/collect.py L1           # resume an interrupted sweep (skip done units)
+VERBOSE=0 python3 scripts/collect.py                # quiet: live bar only
 ```
 
-A live progress bar prints to stderr, one line per completed task:
+A live progress bar prints to stderr, one line per completed unit:
 `[##########--------------------] 2/6 (33%) L1.B1.w1-autovec.w2-simple q=0.05`.
 
-**Caveat (parallel bench):** concurrent bench runs contend for cores and can
-skew `ns_frame`. Keep `PARALLEL=1` (the default) for publication-grade data;
-use `PARALLEL>1` for "collect everything" passes you intend to re-run clean.
+Benches always run serially (concurrent runs contend for cores and skew
+`ns_frame`); builds are serial too, into the shared `out/` prefix — with one
+binary per cell the build count is small enough that serial is fine, and
+parallelizing flat builds risks `.zig-cache` contention.
 
-**Halide cells:** `import halide` is the generator's first line and is
-q-independent, so if the module is missing (`uv sync --extra halide` to fix)
-collect.py skips every halide cell with one notice instead of N×q failed
-builds. A cell that fails to build at one `death_q` is skipped at its
-remaining rates (build failures are almost always q-independent).
+**Halide cells:** `q` is runtime now, so each halide cell is one binary (not one
+per `q`). If `import halide` is missing (`uv sync --extra halide` to fix)
+collect.py skips every halide cell with one notice. A cell that fails to build
+is skipped at all its death rates.
 
 ## cell_hash.py
 
@@ -284,11 +295,11 @@ python3 scripts/migrate_data.py --dry-run  # show counts, write nothing
 ## The full layout-sweep workflow
 
 ```sh
-# 1. Sweep — all cells × {0.01,0.05,0.1,0.25,0.5} × {4K,65K,1M,16M} × {1,4,10}
+# 1. Sweep — all cells × {0.01,0.05,0.1,0.25,0.5} × {4K,65K,262K,1M,16M} × {1,4,10}
 #    (parallel only); appends JSONL into experiments/data/<machine_id>/:
 python3 scripts/collect.py L1
 #    (resume an interrupted sweep without duplicating completed units:)
-PARALLEL=4 SKIP_DONE=1 python3 scripts/collect.py L1
+SKIP_DONE=1 python3 scripts/collect.py L1
 
 # 2. Build the analysis tree + serve the SPA:
 .venv/bin/python scripts/build_report.py

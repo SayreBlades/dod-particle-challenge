@@ -5,7 +5,7 @@ Let's tune the heck out of this!
 
 <br>
 <p align="center">
-  <img src="docs/fountain.gif" alt="three particle streams: smoke, sparks, debris">
+  <img src="assets/fountain.gif" alt="three particle streams: smoke, sparks, debris">
 </p>
 
 It's a hands-on challenge *inspired* by the cache/perf lessons from Mike
@@ -112,9 +112,9 @@ The common actions are `make` targets ([Makefile](Makefile));
 
 ```sh
 make build                                # build every cell into out/   (target: cell | layout | all)
-make build L1                             #   …every cell of layout L1
-make build L1.B1.w1-autovec.w2-simple     #   …one cell (use the full L1.<strat> name)
-make play  L1.B1.w1-autovec.w2-simple     # open the interactive raylib window
+make build   L1                           #   …every cell of layout L1
+make build   L1.B1.w1-autovec.w2-simple   #   …one cell (use the full L1.<strat> name)
+make play    L1.B1.w1-autovec.w2-simple   # open the interactive raylib window
 make profile L1.B1.w1-autovec.w2-simple   # PMC cycle-attribution (macOS + Xcode)
 make report && make serve                 # build + serve the report on http://localhost:8000
 ```
