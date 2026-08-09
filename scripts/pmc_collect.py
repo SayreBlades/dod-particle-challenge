@@ -52,7 +52,7 @@ def split_cell(cell: str) -> tuple[str, str]:
 def build(cell: str) -> str:
     """Build the bench binary for `cell` into out/ and return its path."""
     layout, strat = split_cell(cell)
-    bin_path = os.path.join(ROOT, "out", "bin", "dod-particles")
+    bin_path = os.path.join(ROOT, "out", "bin", f"{cell}.bench")
     if not os.path.exists(bin_path):
         print(f"building {cell}...", file=sys.stderr)
         subprocess.run(

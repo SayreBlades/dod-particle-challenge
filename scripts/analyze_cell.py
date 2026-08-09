@@ -77,7 +77,7 @@ def source_hash(cell):
 def ensure_binary(cell, shash):
     layout, strat = split_cell(cell)
     cache = os.path.join(ASM_CACHE, shash)
-    binp = os.path.join(cache, "bin", "dod-particles")
+    binp = os.path.join(cache, "bin", f"{cell}.bench")
     if os.path.exists(binp):
         return binp, cache
     os.makedirs(cache, exist_ok=True)
@@ -141,8 +141,8 @@ def ensure_debug_binary(cell, shash):
     layout, _ = split_cell(cell)
     cache = os.path.join(ASM_CACHE, shash)
     dbgprefix = os.path.join(cache, "bin-debug")
-    binp = os.path.join(dbgprefix, "bin", "dod-particles")
-    dwarffile = os.path.join(dbgprefix, "dod.dSYM", "Contents", "Resources", "DWARF", "dod-particles")
+    binp = os.path.join(dbgprefix, "bin", f"{cell}.bench")
+    dwarffile = os.path.join(dbgprefix, "dod.dSYM", "Contents", "Resources", "DWARF", f"{cell}.bench")
     if os.path.exists(dwarffile):
         return binp, dwarffile
     cmd = ["zig", "build", "-p", dbgprefix, f"-Dlayout={layout}", f"-Dstrat={cell.split('.',1)[1]}",
@@ -512,9 +512,14 @@ def process_cell(cell, m, hw, model, json_only, prompt_only, force=False):
     os.makedirs(outdir, exist_ok=True)
     jpath = os.path.join(outdir, f"{strat}.json")
     mpath = os.path.join(outdir, f"{strat}.md")
-    with open(jpath, "w") as f:
-        json.dump(evidence, f, indent=2)
-    print(f"  wrote {jpath}  ({len(body)} insn, {len(runs)} runs)", file=sys.stderr)
+    new_json = json.dumps(evidence, indent=2)
+    old_json = open(jpath).read() if os.path.exists(jpath) else None
+    if old_json != new_json:
+        with open(jpath, "w") as f:
+            f.write(new_json)
+        print(f"  wrote {jpath}  ({len(body)} insn, {len(runs)} runs)", file=sys.stderr)
+    else:
+        print(f"  {os.path.basename(jpath)} unchanged — skip write", file=sys.stderr)
     prompt = evidence_to_prompt(evidence)
     if prompt_only:
         print(prompt)

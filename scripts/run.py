@@ -74,6 +74,11 @@ def zig_build(cell: str, mode: str, prefix: str = "out") -> bool:
     return r.returncode == 0
 
 
+def bin_path(cell: str, mode: str) -> str:
+    """Flat-name binary: out/bin/<layout>.<strat>.<mode>"""
+    return os.path.join(ROOT, "out", "bin", f"{cell}.{mode}")
+
+
 def cmd_build(cells: list[str]) -> int:
     for c in cells:
         print(f"  build {c}...", file=sys.stderr)
@@ -88,7 +93,7 @@ def cmd_bench(cells: list[str]) -> int:
         if not zig_build(c, "bench"):
             print(f"    BUILD FAILED — {c}", file=sys.stderr)
             continue
-        bin_path = os.path.join(ROOT, "out", "bin", "dod-particles")
+        bin_path = bin_path(c, "bench")
         subprocess.run([bin_path], cwd=ROOT)
     return 0
 
@@ -100,8 +105,7 @@ def cmd_play(cells: list[str]) -> int:
     print(f"=== play {c} ===", file=sys.stderr)
     if not zig_build(c, "play"):
         sys.exit(f"BUILD FAILED — {c}")
-    bin_path = os.path.join(ROOT, "out", "bin", "dod-particles")
-    return subprocess.run([bin_path], cwd=ROOT).returncode
+    return subprocess.run([bin_path(c, "play")], cwd=ROOT).returncode
 
 
 def cmd_profile(cells: list[str]) -> int:

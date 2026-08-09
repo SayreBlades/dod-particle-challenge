@@ -18,18 +18,17 @@ Append-only by design: re-runs duplicate rows; dedup/filtering is a
 loader/report concern (the jsonl is a historical audit of every run).
 
 Concurrency / resume:
-  PARALLEL=N    run up to N (cell, q) tasks concurrently. Each worker gets
-                its own build prefix (out.w0..) so builds don't collide; the
-                Halide generator output is partitioned via -Dhalide_prefix.
-                NOTE: concurrent bench runs contend for cores and can skew
-                ns_frame — keep N<=1 for publication-grade data, use N>1
-                only for throughput "collect everything" passes you intend
-                to re-run clean.
-  SKIP_DONE=1   skip a (cell, q) task whose run rows already cover every
-                thread in the cell's THREADS set in runs.jsonl (resume an
-                interrupted sweep without duplicating completed units).
-  VERBOSE=0     suppress per-step build/bench/check log lines and show only
-                a live progress bar (default 1 = keep the classic chatter).
+  Two phases: (1) BUILD one binary per cell in PARALLEL (q is runtime, so zig
+               AND halide are one binary each — no per-q fan-out) into flat
+               out/bin/. (2) BENCH+check SERIAL, always, for clean timing.
+  PARALLEL=N    phase-1 build workers (default = cpu count). zig's content-
+               addressed .zig-cache is concurrency-safe and the flat binaries
+               have unique names, so parallel builds into shared out/ are sound.
+  SKIP_DONE=1   (default) skip a (cell, q) unit whose CURRENT-source data
+                already covers every thread in runs.jsonl. A source change
+                (different source_hash) forces a re-bench; SKIP_DONE=0 re-benches all.
+  VERBOSE=0     (default) fancy live progress bar (phase · fill · % · ETA).
+                VERBOSE=1 = per-step build/bench/check chatter instead.
   HALIDE_FORCE=1  attempt halide cells even if `import halide` fails.
 
 Env knobs (all optional; override the regime grid):
@@ -42,7 +41,7 @@ Usage:
     scripts/collect.py "B1.w1-x B1.w1-y"     # a space-list of cells
     NS=4000,65000 TRIALS=5 scripts/collect.py L1
     DEATH_RATES="0 0.5" scripts/collect.py L1
-    THREADS="1 4" scripts/collect.py L1.B3.w1-autovec-par.w2-rmerge
+    THREADS="1 2 4 8" scripts/collect.py L1   # T is the OUTER loop: all cells@T=1, then -par cells @T=2,4,8
     PARALLEL=4 SKIP_DONE=1 scripts/collect.py L1
 """
 from __future__ import annotations
@@ -54,6 +53,7 @@ import shutil
 import subprocess
 import sys
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -99,12 +99,10 @@ def resolve_cell(name: str) -> str:
             f"(expected L<layout>.<strat>, e.g. L1.B1.w1-autovec.w2-simple)")
 
 
-def parallel_threads(strat: str, threads_set: list[int]) -> list[int]:
+def is_parallel(strat: str) -> bool:
     """Parallel cells (strat carries -par / rmerge) sweep the thread set;
-    serial cells run T=1 only (no duplicate rows)."""
-    if "-par" in strat or "rmerge" in strat:
-        return threads_set
-    return [1]
+    serial cells run T=1 only."""
+    return "-par" in strat or "rmerge" in strat
 
 
 def cell_source_hash(cell: str) -> str:
@@ -131,8 +129,10 @@ def halide_available(halide_python: str | None) -> bool:
         return False
 
 
-def is_done(runs_jsonl: str, cell: str, q: float, threads: list[int]) -> bool:
-    """runs.jsonl already has every thread in `threads` for (cell, death_q)?"""
+def is_done(runs_jsonl: str, cell: str, q: float, threads: list[int], source_hash: str = "") -> bool:
+    """runs.jsonl already has every thread in `threads` for (cell, death_q),
+    measured against the CURRENT source? If source_hash is given, rows from a
+    prior source version don't count — a source change forces a re-bench."""
     if not os.path.exists(runs_jsonl):
         return False
     have: set[str] = set()
@@ -147,6 +147,8 @@ def is_done(runs_jsonl: str, cell: str, q: float, threads: list[int]) -> bool:
             dq = r.get("death_q")
             if dq is None or abs(float(dq) - q) > 1e-12:
                 continue
+            if source_hash and r.get("source_hash") != source_hash:
+                continue  # stale: measured against a prior source — must re-bench
             t = r.get("threads")
             if t is None:
                 continue
@@ -184,7 +186,7 @@ def run_zig_build(prefix, layout, strat, q, source_hash, machine_id, host,
         f"-Dlayout={layout}", f"-Dstrat={strat}", f"-Ddeath={q}",
         "-Dmode=bench", "-Doptimize=ReleaseFast",
         f"-Dsource_hash={source_hash}", f"-Dmachine_id={machine_id}",
-        f"-Dhost={host}", f"-Drun_id={run_id}", f"-Dts_utc={ts_utc}",
+        f"-Dhost={host}",
         f"-Dhalide_prefix={halide_prefix}",
     ]
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, env=env)
@@ -196,11 +198,13 @@ def run_zig_build(prefix, layout, strat, q, source_hash, machine_id, host,
     return r.returncode == 0
 
 
-def run_bench(bin_path, ns_arg, trials, threads, runs_jsonl) -> None:
+def run_bench(bin_path, ns_arg, trials, threads, runs_jsonl, extra_args=None) -> None:
     cmd = [bin_path]
     if ns_arg:
         cmd += ["--ns", ns_arg]
     cmd += ["--trials", str(trials), "--json", "--threads", str(threads)]
+    if extra_args:
+        cmd += extra_args
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
     rows = []
     for stream in (r.stdout, r.stderr):
@@ -210,79 +214,113 @@ def run_bench(bin_path, ns_arg, trials, threads, runs_jsonl) -> None:
     append_jsonl(runs_jsonl, rows)
 
 
-def run_check(bin_path, threads) -> str:
-    r = subprocess.run([bin_path, "--check", "--threads", str(threads)],
-                       cwd=ROOT, capture_output=True, text=True)
+def run_check(bin_path, threads, extra_args=None) -> str:
+    cmd = [bin_path, "--check", "--threads", str(threads)]
+    if extra_args:
+        cmd += extra_args
+    r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
     for line in (r.stdout + r.stderr).splitlines():
         if line.startswith("checked="):
             return line
     return "checked=ERROR"
 
 
-def run_task(cell, q, args, ctx, wid: int) -> str:
-    """One (cell, q) unit: build, bench across threads, invariant check.
-    Returns OK | SKIP | FAIL."""
-    layout = cell.split(".", 1)[0]
-    strat = cell.split(".", 1)[1]
-    threads = parallel_threads(strat, args.threads)
-    check_t = max(threads)
-    prefix = f"out.w{wid}" if args.parallel > 1 else "out"
-    hprefix = f"{prefix}/halide"
-    bin_path = os.path.join(ROOT, prefix, "bin", "dod-particles")
+def bin_path_for(cell: str) -> str:
+    """Flat-name binary: out/bin/<cell>.bench (one per cell; q is runtime)."""
+    return os.path.join(ROOT, "out", "bin", f"{cell}.bench")
 
+
+def build_one(cell, args, ctx) -> bool:
+    """Build one cell's bench binary into out/bin/<cell>.bench (flat). q is runtime
+    now (config.q defaults to 0; --death overrides at run time), so ONE binary
+    per cell — no per-q rebuilds, zig or halide. Built with -p out so every
+    binary lands in the flat out/bin/ tree."""
+    layout, strat = cell.split(".", 1)
+    source_hash = cell_source_hash(cell)
+    return run_zig_build("out", layout, strat, "0", source_hash,
+                         ctx["machine_id"], ctx["host"], ctx["run_id"],
+                         ctx["ts_utc"], "out/halide", ctx["halide_python"], args.verbose)
+
+
+def bench_check_one(cell, q, T, args, ctx) -> str:
+    """Bench (at thread count T) + invariant check for one (cell, q, T) unit,
+    SERIAL. Runs out/bin/<cell>.bench --death q --threads T. Works for zig AND
+    halide — q is a runtime Param (the wrapper passes config.q)."""
+    layout, strat = cell.split(".", 1)
+    bin_path = bin_path_for(cell)
     log = (lambda *a: print(*a, file=sys.stderr)) if args.verbose else (lambda *a: None)
+    source_hash = cell_source_hash(cell)
 
-    # 1. skip-done (resume)
-    if args.skip_done and is_done(ctx["runs_jsonl"], cell, float(q), threads):
-        log(f"  skip {cell} (q={q}) — already in {ctx['runs_jsonl']}")
+    if args.skip_done and is_done(ctx["runs_jsonl"], cell, float(q), [T], source_hash):
+        log(f"  skip {cell} (q={q}, T={T}) — current-source data already in runs.jsonl")
         return "SKIP"
-
-    # 2. halide unavailable → skip (one notice at startup, none here)
     if not ctx["halide_ok"] and "w1-halide" in strat:
         return "SKIP"
-
-    # 3. short-circuit cells that failed to build at an earlier death_q
     with STATE_LOCK:
         if cell in FAILED:
-            log(f"  skip {cell} (q={q}) — build failed at an earlier death_q")
+            log(f"  skip {cell} (q={q}, T={T}) — build failed earlier")
             return "SKIP"
 
-    source_hash = cell_source_hash(cell)
-    log(f"  build {cell} (q={q})...")
-    if not run_zig_build(prefix, layout, strat, q, source_hash,
-                         ctx["machine_id"], ctx["host"], ctx["run_id"],
-                         ctx["ts_utc"], hprefix, ctx["halide_python"], args.verbose):
-        log(f"    BUILD FAILED — skipping {cell} (q={q}).")
-        with STATE_LOCK:
-            FAILED.add(cell)
-        return "FAIL"
-
-    for t in threads:
-        log(f"    {cell}  bench (q={q}, T={t})...")
-        run_bench(bin_path, args.ns_arg, args.trials, t, ctx["runs_jsonl"])
-
-    log(f"    {cell}  --check (q={q}, T={check_t})...")
-    checked = run_check(bin_path, check_t)
+    extra = ["--death", str(q), "--run-id", ctx["run_id"], "--ts-utc", ctx["ts_utc"]]
+    log(f"    {cell}  bench (q={q}, T={T})...")
+    run_bench(bin_path, args.ns_arg, args.trials, T, ctx["runs_jsonl"], extra)
+    log(f"    {cell}  --check (q={q}, T={T})...")
+    checked = run_check(bin_path, T, extra)
     write_check(ctx["checks_jsonl"], ctx["run_id"], ctx["ts_utc"],
                 ctx["machine_id"], layout, cell, q,
                 source_hash, ctx["short_sha"], checked)
     return "OK"
 
 
-def bar(done: int, total: int, label: str, verbose: bool, final: bool = False) -> None:
-    w = 30
-    filled = min(w, done * w // total) if total else 0
-    b = "#" * filled + "-" * (w - filled)
-    pct = done * 100 // total if total else 0
-    line = f"[{b}] {done}/{total} ({pct}%){' ' + label if label else ''}"
-    if verbose:
-        print(line, file=sys.stderr)
-    else:
-        # single live line, overwritten each tick
-        sys.stderr.write("\r" + line + " " * 4)
+def _fmt_dur(s: float) -> str:
+    m, sec = divmod(int(s), 60)
+    return f"{m}:{sec:02d}"
+
+
+class Bar:
+    """Fancy single-line progress bar: phase · fill · n/total · % · task ·
+    elapsed · ETA. Live \\r update on a TTY (non-verbose); per-line otherwise.
+    In verbose mode it's silent (the per-step chatter IS the progress) but
+    prints a one-line summary on finish()."""
+
+    def __init__(self, total: int, phase: str, verbose: bool):
+        self.total = total
+        self.phase = phase
+        self.verbose = verbose
+        self.done = 0
+        self.t0 = time.monotonic()
+        self.tty = sys.stderr.isatty()
+
+    def _render(self, label: str) -> str:
+        pct = (self.done / self.total * 100) if self.total else 100.0
+        w = 24
+        filled = int(w * self.done / self.total) if self.total else w
+        bar = "█" * filled + "░" * (w - filled)
+        el = time.monotonic() - self.t0
+        eta = (el / self.done * (self.total - self.done)) if self.done else 0.0
+        lbl = label if len(label) <= 38 else label[:35] + "..."
+        return (f"{self.phase:<5} ▕{bar}▏ {self.done}/{self.total} {pct:3.0f}%"
+                f"  · {lbl:<38} · {_fmt_dur(el)} elapsed · ~{_fmt_dur(eta)} left")
+
+    def update(self, label: str) -> None:
+        self.done += 1
+        if self.verbose:
+            return
+        line = self._render(label)
+        if self.tty:
+            sys.stderr.write("\r" + line + " ")
+            sys.stderr.flush()
+        else:
+            sys.stderr.write(line + "\n")
+
+    def finish(self, label: str = "") -> None:
+        el = time.monotonic() - self.t0
+        if self.verbose:
+            sys.stderr.write(f"  {self.phase}: {self.done}/{self.total} in {_fmt_dur(el)}\n")
+            return
+        line = self._render(label)
+        sys.stderr.write(("\r" if self.tty else "") + line + "\n")
         sys.stderr.flush()
-        if final:
-            sys.stderr.write("\n")
 
 
 def main() -> int:
@@ -295,12 +333,14 @@ def main() -> int:
     ap.add_argument("--trials", type=int, default=int(env("TRIALS", "3")))
     ap.add_argument("--death-rates", default=env("DEATH_RATES"),
                     help="space-list of accident rates q (default: death_rates.txt)")
-    ap.add_argument("--threads", default=env("THREADS", "1 4 10"),
+    ap.add_argument("--threads", default=env("THREADS", "1 2 4 8"),
                     help="space-list of worker counts (parallel cells only)")
-    ap.add_argument("--parallel", type=int, default=int(env("PARALLEL", "1")))
-    ap.add_argument("--skip-done", action="store_true",
-                    default=env("SKIP_DONE", "0") == "1")
-    ap.add_argument("--verbose", default=env("VERBOSE", "1"),
+    ap.add_argument("--parallel", type=int, default=int(env("PARALLEL", str(os.cpu_count() or 4))))
+    ap.add_argument("--skip-done", action=argparse.BooleanOptionalAction,
+                    default=env("SKIP_DONE", "1") == "1",
+                    help="skip (cell,q) whose current-source data is already in runs.jsonl "
+                         "(default on; --no-skip-done or SKIP_DONE=0 re-benches all)")
+    ap.add_argument("--verbose", default=env("VERBOSE", "0"),
                     help="1 (default) per-step chatter; 0 = progress bar only")
     ap.add_argument("--refresh-hw", action="store_true",
                     default=env("REFRESH_HW", "0") == "1")
@@ -386,52 +426,72 @@ def main() -> int:
                checks_jsonl=checks_jsonl, halide_ok=halide_ok,
                halide_python=halide_python)
 
-    # task list: (cell, q), cell-major then q-minor
-    tasks = [(c, q) for c in cells for q in rates]
-    total = len(tasks)
+    # run units: T-MAJOR — all cells at T=1 first, then the -par cells at T=2,
+    # T=4, … (serial cells only ever run at T=1). A sweep completes a full T=1
+    # pass before any T>1 work, so comparisons group cleanly by thread count and
+    # a re-run with a larger THREADS set resumes at the new T values.
+    units = []
+    for T in args.threads:
+        for cell in cells:
+            if T != 1 and not is_parallel(cell.split(".", 1)[1]):
+                continue
+            for q in rates:
+                units.append((T, cell, q))
 
-    # clean per-worker build dirs (stale strat leak guard)
-    if args.parallel > 1:
-        for d in os.listdir(ROOT):
-            if d.startswith("out.w"):
-                shutil.rmtree(os.path.join(ROOT, d), ignore_errors=True)
+    # ---- PHASE 1: build one binary per cell into the flat out/bin/ (PARALLEL) ----
+    # q is runtime (zig AND halide), so ONE binary per cell — no per-q rebuilds.
+    # Builds run concurrently into the shared out/ prefix (zig's content-
+    # addressed .zig-cache is concurrency-safe; binaries have unique flat names).
+    to_build = [c for c in cells
+                if not (not ctx["halide_ok"] and "w1-halide" in c.split(".", 1)[1])]
+    build_workers = max(1, min(len(to_build), args.parallel))
+    print(f"  phase 1: build {len(to_build)} binaries ({build_workers} parallel) -> out/bin/",
+          file=sys.stderr)
 
-    counts = {"OK": 0, "SKIP": 0, "FAIL": 0}
-    done = 0
+    def _build(cell):
+        ok = build_one(cell, args, ctx)
+        if not ok:
+            with STATE_LOCK:
+                FAILED.add(cell)
+        return cell, ok
 
+    build_bar = Bar(len(to_build), "build", args.verbose)
+    build_failures = []
     try:
-        if args.parallel <= 1:
-            for i, (cell, q) in enumerate(tasks):
-                status = run_task(cell, q, args, ctx, 0)
-                counts[status] += 1
-                done += 1
-                bar(done, total, f"{cell} q={q}", args.verbose)
-        else:
-            with ThreadPoolExecutor(max_workers=args.parallel) as ex:
-                futs = {ex.submit(run_task, cell, q, args, ctx, w % args.parallel): (cell, q)
-                        for w, (cell, q) in enumerate(tasks)}
-                for fut in as_completed(futs):
-                    cell, q = futs[fut]
-                    try:
-                        status = fut.result()
-                    except Exception:
-                        status = "FAIL"
-                    counts[status] += 1
-                    done += 1
-                    bar(done, total, f"{cell} q={q}", args.verbose)
+        with ThreadPoolExecutor(max_workers=build_workers) as ex:
+            futs = [ex.submit(_build, c) for c in to_build]
+            for fut in as_completed(futs):
+                cell, ok = fut.result()
+                if not ok:
+                    build_failures.append(cell)
+                build_bar.update(cell)
+        build_bar.finish(f"{len(to_build)} binaries")
     except KeyboardInterrupt:
-        sys.stderr.write("\ninterrupted\n")
+        sys.stderr.write("\ninterrupted (phase 1)\n")
         return 130
+    for c in build_failures:
+        print(f"    BUILD FAILED — {c}", file=sys.stderr)
 
-    if not args.verbose:
-        bar(done, total, "", False, final=True)
+    # ---- PHASE 2: bench + check, SERIAL (clean timing — no core contention) ----
+    print(f"  phase 2: bench+check {len(units)} units serially...", file=sys.stderr)
+    bench_bar = Bar(len(units), "bench", args.verbose)
+    counts = {"OK": 0, "SKIP": 0, "FAIL": 0}
+    try:
+        for T, cell, q in units:
+            status = bench_check_one(cell, q, T, args, ctx)
+            counts[status] += 1
+            bench_bar.update(f"T={T} {cell} q={q}")
+        bench_bar.finish()
+    except KeyboardInterrupt:
+        sys.stderr.write("\ninterrupted (phase 2)\n")
+        return 130
 
     runs_n = sum(1 for _ in open(runs_jsonl, encoding="utf-8"))
     checks_n = sum(1 for _ in open(checks_jsonl, encoding="utf-8"))
     print(f"=== done: {runs_n} run rows -> {runs_jsonl} ===", file=sys.stderr)
     print(f"         {checks_n} check rows -> {checks_jsonl}", file=sys.stderr)
     print(f"  tasks: ok={counts['OK']} skip={counts['SKIP']} "
-          f"fail={counts['FAIL']} (of {total})", file=sys.stderr)
+          f"fail={counts['FAIL']} (of {len(units)})", file=sys.stderr)
     if counts["FAIL"]:
         print("  failures:", file=sys.stderr)
         with STATE_LOCK:
