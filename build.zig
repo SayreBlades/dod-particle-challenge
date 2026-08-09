@@ -39,8 +39,9 @@ pub fn build(b: *std.Build) void {
     const source_hash = b.option([]const u8, "source_hash", "cell import-closure hash (from scripts/cell_hash.py)") orelse "";
     const machine_id = b.option([]const u8, "machine_id", "host machine id (from hardware_json.py)") orelse "";
     const host = b.option([]const u8, "host", "hostname") orelse "";
-    const run_id = b.option([]const u8, "run_id", "collect run id (timestamp-machine_id-sha)") orelse "";
-    const ts_utc = b.option([]const u8, "ts_utc", "collect run UTC timestamp") orelse "";
+    // (run_id / ts_utc are RUNTIME flags now — --run-id / --ts-utc, stamped on
+    // each JSONL row. They were build options, which invalidated zig's cache
+    // every collect (the timestamp changed) and forced a full recompile.)
     const keep_debug = b.option(bool, "keep-debug", "keep debug info (strip=false; same ReleaseFast codegen — for godbolt source↔asm attribution)") orelse false;
 
     const mode: Mode = blk: {
@@ -51,6 +52,9 @@ pub fn build(b: *std.Build) void {
         std.debug.panic("invalid -Dmode='{s}' (play|bench|audit|manifest)", .{mode_str});
     };
     const mode_enum: Mode = mode;
+    // raylib (GUI) is needed only for play. bench/audit/manifest are headless —
+    // linking no GUI library makes them portable (no Cocoa/OpenGL) and smaller.
+    const link_raylib = (mode == .play);
 
     // Resolve the selection to a canonical sim name + display label.
     // Names are "L<layout>.<strat>"; main.zig's comptime registry must have
@@ -90,6 +94,7 @@ pub fn build(b: *std.Build) void {
     opts.addOption(bool, "is_reference", std.mem.eql(u8, name, "L1.B1.w1-autovec.w2-simple"));
     opts.addOption(f64, "death", death_q);
     opts.addOption(Mode, "mode", mode_enum);
+    opts.addOption(bool, "link_raylib", link_raylib);
     // Provenance (refactor §6.6): stamped on every JSONL bench row so a row
     // pins the exact code + machine that produced it.
     opts.addOption([]const u8, "git_sha", git_sha);
@@ -97,15 +102,18 @@ pub fn build(b: *std.Build) void {
     opts.addOption([]const u8, "source_hash", source_hash);
     opts.addOption([]const u8, "machine_id", machine_id);
     opts.addOption([]const u8, "host", host);
-    opts.addOption([]const u8, "run_id", run_id);
-    opts.addOption([]const u8, "ts_utc", ts_utc);
+    // (run_id / ts_utc moved to runtime --run-id / --ts-utc — see above.)
 
     // --- raylib C library (compiled directly; raylib-zig build is broken on 0.17-dev) ---
-    const raylib_lib = addRaylib(b, target, optimize);
+    // Only built for play (bench/audit/manifest are headless — no GUI link).
+    const raylib_lib: ?*std.Build.Step.Compile = if (link_raylib) addRaylib(b, target, optimize) else null;
 
     // --- main exe ---
+    // Flat name: <layout>.<strat>.<mode>  →  out/bin/L1.B3.w1-halide.w2-simple.bench
+    // One binary per (cell, mode); behavior (q, N, …) is runtime config.
+    const exe_name = b.fmt("{s}.{s}", .{ name, mode_str });
     const exe = b.addExecutable(.{
-        .name = "dod-particles",
+        .name = exe_name,
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/main.zig"),
             .target = target,
@@ -128,6 +136,10 @@ pub fn build(b: *std.Build) void {
             const python = b.graph.environ_map.get("HALIDE_PYTHON") orelse ".venv/bin/python";
             // Derive the Halide schedule from the strat name: a strat containing
             // "-par" gets {"parallel":true}; the plain strat gets the default.
+            // NOTE: this BAKES parallelism into the kernel at build time — the
+            // runtime --threads flag does NOT govern it (Halide's runtime pool
+            // defaults to all cores). Making it a runtime variant is tracked in
+            // https://github.com/SayreBlades/dod-particle-challenge/issues/4
             // (-Dhalide_variant still works for ad-hoc sweep variants; it adds
             // a suffix to the stem and is expected to be pre-generated.)
             const sched_json: []const u8 = if (std.mem.indexOf(u8, strat, "-par") != null)
@@ -149,7 +161,8 @@ pub fn build(b: *std.Build) void {
                 gen_dir,
                 out_prefix,
                 sched_json,
-                b.fmt("{d}", .{death_q}), // generators that need q read argv[3] as a float
+                // q is now a runtime Halide Param (the Zig wrapper passes config.q
+                // to the kernel), so the generator no longer takes it on argv.
             });
             exe.step.dependOn(&gen.step);
             exe.root_module.addObjectFile(b.path(b.fmt("{s}.a", .{out_prefix})));
@@ -157,16 +170,20 @@ pub fn build(b: *std.Build) void {
     }
 
     exe.root_module.addOptions("options", opts);
-    exe.root_module.addImport("raylib", raylib_module: {
-        const rl_mod = b.createModule(.{
-            .root_source_file = b.path("src/bindings/raylib.zig"),
-            .target = target,
-            .optimize = optimize,
-            .link_libc = true,
+    // raylib binding + link ONLY when link_raylib (play). bench/audit/manifest
+    // builds skip this entirely — no raylib module, no GUI frameworks linked.
+    if (raylib_lib) |rl| {
+        exe.root_module.addImport("raylib", raylib_module: {
+            const rl_mod = b.createModule(.{
+                .root_source_file = b.path("src/bindings/raylib.zig"),
+                .target = target,
+                .optimize = optimize,
+                .link_libc = true,
+            });
+            rl_mod.linkLibrary(rl);
+            break :raylib_module rl_mod;
         });
-        rl_mod.linkLibrary(raylib_lib);
-        break :raylib_module rl_mod;
-    });
+    }
 
     b.installArtifact(exe);
 
@@ -211,19 +228,10 @@ pub fn build(b: *std.Build) void {
     manifest_opts.addOption(bool, "is_reference", false);
     manifest_opts.addOption(f64, "death", 0.0);
     manifest_opts.addOption(Mode, "mode", .manifest);
+    manifest_opts.addOption(bool, "link_raylib", false); // manifest is headless
     manifest_exe.root_module.addOptions("options", manifest_opts);
-    manifest_exe.root_module.addImport("raylib", raylib_module: {
-        const rl_mod = b.createModule(.{
-            .root_source_file = b.path("src/bindings/raylib.zig"),
-            .target = target,
-            .optimize = optimize,
-            .link_libc = true,
-        });
-        // raylib is linked so main.zig compiles (it imports the binding), but
-        // manifest mode never touches it — no window, no rendering.
-        rl_mod.linkLibrary(raylib_lib);
-        break :raylib_module rl_mod;
-    });
+    // No raylib: main.zig gates the play/raylib import behind (mode == .play),
+    // so manifest mode compiles with no GUI library at all.
     const run_manifest = b.addRunArtifact(manifest_exe);
     const manifest_step = b.step("manifests", "Print the registered cell roster to stdout (diagnostic)");
     manifest_step.dependOn(&run_manifest.step);
@@ -240,6 +248,7 @@ const strat_labels = [_]StratEntry{
     .{ .layout = "L1", .strat = "B1.w1-autovec.w2-simple", .label = "L1.B1.w1-autovec.w2-simple (B1: autovec branchy step + r0 render; reference sim)" },
     .{ .layout = "L1", .strat = "B1.w1-autovec.w2-opt", .label = "L1.B1.w1-autovec.w2-opt (B1: autovec branchy step + optimized r1 render)" },
     .{ .layout = "L1", .strat = "B1.w1-scalar.w2-simple", .label = "L1.B1.w1-scalar.w2-simple (B1: scalar-forced step + r0 render; de-vec control)" },
+    .{ .layout = "L1", .strat = "B1.w1-unroll.w2-simple", .label = "L1.B1.w1-unroll.w2-simple (B1: unroll-by-4 branchy step + r0 render; isolates the unroll knob)" },
     .{ .layout = "L1", .strat = "B1.w1-autovec-par.w2-simple", .label = "L1.B1.w1-autovec-par.w2-simple (B1: parallel branchy math+decide | serial respawn | r0 render)" },
     .{ .layout = "L1", .strat = "B1.w1-blend.w2-simple", .label = "L1.B1.w1-blend.w2-simple (B1: Zig branchless blend + r0 render; STATISTICAL)" },
     .{ .layout = "L1", .strat = "B1.w1-blend-par.w2-simple", .label = "L1.B1.w1-blend-par.w2-simple (B1: parallel Zig blend + r0 render; STATISTICAL)" },
@@ -331,6 +340,10 @@ fn addRaylib(
     lib.root_module.linkFramework("CoreFoundation", .{});
     lib.root_module.linkFramework("OpenGL", .{});
 
-    b.installArtifact(lib);
+    // raylib is statically linked into the exe via linkLibrary (above) — do NOT
+    // installArtifact(lib). The installed libraylib.a is never read at runtime
+    // (the exe already linked it), and installing it would copy the identical
+    // 4.8 MB .a into EVERY -p prefix (out/lib, out/{strat}/lib, ...) — pure
+    // duplication across cells. Build it + link it, but don't stage the .a.
     return lib;
 }

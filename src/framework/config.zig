@@ -48,16 +48,27 @@ pub const view_half: f32 = 2.0;
 // age-ignoring) is replaced by the competing-risks family; age stays
 // load-bearing at every rate (death axis orthogonal to field-set, §7).
 
-/// The per-frame accident rate q (comptime). natural ≡ q = 0.
-pub const q: f32 = @floatCast(@import("options").death);
+/// The per-frame accident rate q. natural ≡ q = 0. Runtime-settable via
+/// `--death <q>` (bench.zig) so one binary sweeps the whole death axis;
+/// `-Ddeath=<q>` sets the default for runs that don't pass --death. isDead
+/// short-circuits before the kill-RNG draw when q==0 (no spawn-sequence
+/// perturbation) — identical behavior at q=0 whether set comptime or runtime,
+/// so the golden holds either way.
+pub var q: f32 = @floatCast(@import("options").death);
+
+/// Set the accident rate at runtime (call once at startup; isDead reads `q` live).
+pub fn setDeathRate(qv: f32) void {
+    q = qv;
+}
 
 /// The kill decision for particle `i` this frame. `kill_rng` is a DEDICATED
 /// stream (never the spawn RNG); drawn only when q > 0 and the particle has
-/// not aged out (short-circuit). Comptime-known q, so isDead prunes to
-/// exactly `age >= kill_age` in natural builds: zero cost, zero RNG draw.
+/// not aged out (short-circuit). At q==0 (natural) the kill-RNG is never
+/// drawn, so the spawn sequence stays comparable across rates. Set once at
+/// startup (build default or --death); the `q == 0` test is one predicted op.
 pub inline fn isDead(age: f32, kill_rng: *std.Random.DefaultPrng) bool {
     if (age >= kill_age) return true;
-    if (q == 0) return false; // comptime-pruned in natural builds
+    if (q == 0) return false; // runtime short-circuit; no kill-RNG draw at q=0
     return kill_rng.random().float(f32) < q;
 }
 

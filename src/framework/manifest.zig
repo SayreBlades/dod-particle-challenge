@@ -68,7 +68,7 @@ fn printCell(name: []const u8, cd: fw.CellDecl, w: anytype) !void {
 /// Print a single cell's declaration to stderr (for the bench run header).
 /// Uses std.debug.print (always stderr) — every bench run shows its axes.
 pub fn printCellHeader(name: []const u8, cd: fw.CellDecl) void {
-    std.debug.print("=== Cell ===\n", .{});
+    std.debug.print("=== Cell ===\n\n", .{});
     std.debug.print("  name:          {s}\n", .{name});
     std.debug.print("  layout:        {s}\n", .{cd.layout});
     std.debug.print("  blueprint:     {s} ({s})\n", .{ @tagName(cd.blueprint), cd.blueprint.structure() });

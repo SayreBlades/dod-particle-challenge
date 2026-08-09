@@ -12,6 +12,7 @@ const sim_map = std.StaticStringMap(type).initComptime(.{
     .{ "L1.B1.w1-autovec.w2-simple", @import("layouts/L1/B1.w1-autovec.w2-simple.zig").Sim },
     .{ "L1.B1.w1-autovec.w2-opt", @import("layouts/L1/B1.w1-autovec.w2-opt.zig").Sim },
     .{ "L1.B1.w1-scalar.w2-simple", @import("layouts/L1/B1.w1-scalar.w2-simple.zig").Sim },
+    .{ "L1.B1.w1-unroll.w2-simple", @import("layouts/L1/B1.w1-unroll.w2-simple.zig").Sim },
     .{ "L1.B1.w1-autovec-par.w2-simple", @import("layouts/L1/B1.w1-autovec-par.w2-simple.zig").Sim },
     .{ "L1.B1.w1-blend.w2-simple", @import("layouts/L1/B1.w1-blend.w2-simple.zig").Sim },
     .{ "L1.B1.w1-blend-par.w2-simple", @import("layouts/L1/B1.w1-blend-par.w2-simple.zig").Sim },
@@ -37,11 +38,19 @@ const SimImpl = sim_map.get(opts.name) orelse
     @compileError("unknown sim '" ++ opts.name ++ "' (see strat_labels in build.zig / sim_map in main.zig)");
 
 pub fn main(init: std.process.Init) !void {
+    // play pulls in raylib (windowing); gate it so bench/audit/manifest builds
+    // link no GUI library at all. The condition is comptime-known (opts.mode is
+    // a build option), so Zig does NOT analyze the play @import for non-play
+    // builds — raylib stays entirely out of the bench binary.
+    if (opts.mode == .play) {
+        if (!opts.link_raylib) @compileError("play mode requires -Dmode=play (sets link_raylib)");
+        return @import("framework/play.zig").run(SimImpl, init);
+    }
     return switch (opts.mode) {
-        .play => @import("framework/play.zig").run(SimImpl, init),
         .bench => @import("framework/bench.zig").run(SimImpl, init),
         .audit => @import("framework/audit.zig").run(SimImpl, init),
         .manifest => emitManifest(init),
+        .play => unreachable, // handled above
     };
 }
 

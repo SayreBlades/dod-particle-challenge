@@ -17,7 +17,7 @@ import json, sys, os
 out = sys.argv[1]
 os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
 sched = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
-q = float(sys.argv[3]) if len(sys.argv) > 3 else 0.0
+q = hl.Param(hl.Float(32), "q")  # runtime scalar param (Zig wrapper passes config.q)
 vw = int(sched.get("vector_width", 1))
 par = bool(sched.get("parallel", False))
 
@@ -61,10 +61,11 @@ outs += [age_out]
 
 # --- decide → dead mask (competing risks) ---
 dead = age_new >= kill_age
-if q > 0:
-    h_kill = splitmix64(SEED ^ hl.u64(0xDEAD) ^ (hl.cast(U64, i) * hl.u64(0x9E3779B1)))
-    h_kill_f = hl.cast(hl.Float(32), h_kill >> 40) * (1.0 / 16777216.0)
-    dead = dead | (h_kill_f < hl.f32(q))
+# kill hash always computed; at runtime q=0 it's a no-op (h_kill_f >= 0, so
+# `h_kill_f < 0` never holds — dead unchanged).
+h_kill = splitmix64(SEED ^ hl.u64(0xDEAD) ^ (hl.cast(U64, i) * hl.u64(0x9E3779B1)))
+h_kill_f = hl.cast(hl.Float(32), h_kill >> 40) * (1.0 / 16777216.0)
+dead = dead | (h_kill_f < q)
 
 dead_out = hl.Func("dead_out")
 dead_out[i] = hl.cast(hl.UInt(8), hl.select(dead, 1, 0))
@@ -83,5 +84,5 @@ if par:
         f.parallel(i)
 
 hl.Pipeline(outs).compile_to_static_library(
-    out, [data, dt, kill_age], "halide_b3_mask", target)
-print(f"emitted {out}.h {out}.a (vw={vw} parallel={par} q={q} B3-math+mask)")
+    out, [data, dt, kill_age, q], "halide_b3_mask", target)
+print(f"emitted {out}.h {out}.a (vw={vw} parallel={par} q=runtime B3-math+mask)")

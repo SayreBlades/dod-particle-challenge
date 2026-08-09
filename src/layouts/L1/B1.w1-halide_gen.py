@@ -40,7 +40,7 @@ import os
 os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
 
 sched = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
-q = float(sys.argv[3]) if len(sys.argv) > 3 else 0.0
+q = hl.Param(hl.Float(32), "q")  # runtime scalar param (Zig wrapper passes config.q)
 vw = int(sched.get("vector_width", 1))
 par = bool(sched.get("parallel", False))
 
@@ -85,19 +85,16 @@ h_kind = hl.cast(hl.UInt(8), (u16(48) * 3) >> 16)                    # Lemire
 h_jx = (hl.cast(hl.Float(32), u16(32)) * (1.0 / 65536.0) - hl.f32(0.5)) * hl.f32(0.1)
 h_jy = (hl.cast(hl.Float(32), u16(16)) * (1.0 / 65536.0) - hl.f32(0.5)) * hl.f32(0.1)
 h_age = hl.cast(hl.Float(32), u16(0)) * (1.0 / 65536.0) * kill_age
-if q > 0:
-    # dedicated kill stream (drawn only when q>0 — spawn-hash work stays
-    # comparable across regimes). short-circuit: aged-out particles would
-    # consume no draw in the Zig path; here the hash is computed branchlessly
-    # regardless (the branchless tax), but only factored in when age < kill_age.
-    h_kill = splitmix64(SEED ^ hl.u64(0xDEAD) ^ (frame * hl.u64(0x100000001B3)) ^ (hl.cast(U64, i) * hl.u64(0x9E3779B1)))
-    h_kill_f = hl.cast(hl.Float(32), h_kill >> 40) * (1.0 / 16777216.0)
+# dedicated kill stream (always computed; at runtime q=0 it's a no-op since
+# h_kill_f >= 0, so `h_kill_f < 0` never holds — dead is unchanged). The hash
+# is computed branchlessly regardless (the branchless tax).
+h_kill = splitmix64(SEED ^ hl.u64(0xDEAD) ^ (frame * hl.u64(0x100000001B3)) ^ (hl.cast(U64, i) * hl.u64(0x9E3779B1)))
+h_kill_f = hl.cast(hl.Float(32), h_kill >> 40) * (1.0 / 16777216.0)
 
 # --- kill test (competing risks, build-time q) ---
 age_new = data[7, i] + dt
 dead = age_new >= kill_age
-if q > 0:
-    dead = dead | (h_kill_f < hl.f32(q))
+dead = dead | (h_kill_f < q)  # runtime q; at q=0 always false (no-op)
 
 # --- impulse LUT (config.impulse) as select chains on the drawn kind ---
 def impulse(comp):
@@ -162,8 +159,8 @@ if par:
 
 hl.Pipeline(outs).compile_to_static_library(
     out,
-    [data, kind_in, dt, gx, gy, gz, drag, kill_age, frame],
+    [data, kind_in, dt, gx, gy, gz, drag, kill_age, frame, q],
     "halide_b1",
     target,
 )
-print(f"emitted {out}.h {out}.a (vw={vw} parallel={par} q={q} branchless-B1)")
+print(f"emitted {out}.h {out}.a (vw={vw} parallel={par} q=runtime branchless-B1)")

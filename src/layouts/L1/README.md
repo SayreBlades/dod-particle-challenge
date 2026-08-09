@@ -66,9 +66,9 @@ against.
 ## The L1 cell space
 
 A **cell** is one frozen assignment of the per-walk axes
-(impl · schedule · variant · parallel) to a blueprint. L1 has **22 built
+(impl · schedule · variant · parallel) to a blueprint. L1 has **23 built
 cells** — one self-contained `.zig` file each, verified `--check` PASS +
-golden PASS — spanning all 8 blueprints. The table below lists those 22
+golden PASS — spanning all 8 blueprints. The table below lists those 23
 plus every other expressible cell in the search space.
 Existing cells link to their source.
 
@@ -111,7 +111,8 @@ Each walk carries four attributes (declared in the cell's `cell_decl`):
   irregular list appends (B4/B8 list walks), fused framebuffer scatter
   (B5–B8 fused walks), or branchy respawn (`select` is branchless).
 - **schedule** — for compute walks: `scalar` (asm-boxed de-vec control),
-  `auto` (let LLVM vectorize), `vw4` (explicit `@Vector`); for Halide
+  `auto` (let LLVM vectorize), `unroll` (manual loop unroll-by-4 via `inline for`;
+  isolates the unroll knob — see B1.w1-unroll), `vw4` (explicit `@Vector`); for Halide
   compute walks: `vw{1,2,4,8}` (vector width over the particle dim); for
   render walks: `simple` or `opt`; for fused walks: `fused`.
 - **variant** — only respawn-bearing walks: `branchy` (if-dead → respawn,
@@ -130,7 +131,7 @@ Each walk is written `impl·sched·variant·parallel`; walks separated by ` | `.
 | symbol | meaning |
 |---|---|
 | **impl** | `z`=zig  `h`=halide |
-| **sched** | `S`=scalar  `A`=auto  `V4`=explicit-@Vector  `1/2/4/8`=halide vector-width  `simple`/`opt`=render  `F`=fused |
+| **sched** | `S`=scalar  `A`=auto  `U`=unroll-by-4  `V4`=explicit-@Vector  `1/2/4/8`=halide vector-width  `simple`/`opt`=render  `F`=fused |
 | **variant** | `by`=branchy  `br`=blend  `or`=ordered  `·`=none |
 | **parallel** | `·`=none  `dp`=data_parallel  `rm`=ranked_merge  `rr`=render_reduce |
 
@@ -139,6 +140,7 @@ Each walk is written `impl·sched·variant·parallel`; walks separated by ` | `.
 | cell | ex | walks |
 |---|---|---|
 | [B1.w1-scalar.w2-simple](B1.w1-scalar.w2-simple.zig) | ✓ | z·S·by·· \| z·simple·· |
+| [B1.w1-unroll.w2-simple](B1.w1-unroll.w2-simple.zig) | ✓ | z·U·by·· \| z·simple·· |
 | [B1.w1-autovec.w2-simple](B1.w1-autovec.w2-simple.zig) | ✓ | z·A·by·· \| z·simple·· |
 | [B1.w1-autovec.w2-opt](B1.w1-autovec.w2-opt.zig) | ✓ | z·A·by·· \| z·opt·· |
 | [B1.w1-autovec-par.w2-simple](B1.w1-autovec-par.w2-simple.zig) | ✓ | z·A·by·dp \| z·simple·· |

@@ -45,6 +45,7 @@ extern fn halide_b1(
     drag: f32,
     kill_age: f32,
     frame: u64,
+    q: f32,
     pos_x_out: *halide_buffer_t,
     vel_x_out: *halide_buffer_t,
     pos_y_out: *halide_buffer_t,
@@ -68,7 +69,7 @@ fn out1d(host: [*]u8, n: usize, stride: i32, t: halide_type_t, d: *[1]halide_dim
 
 /// Run the Halide B1 branchless-blend step over the whole particle array
 /// in place. `frame` is the sim's frame counter (the per-particle hash RNG
-/// uses it). Competing-risks death (config.q) is baked into the emitted .a.
+/// uses it). Competing-risks death uses runtime q (config.q passed to the kernel).
 pub fn run(data: *Data, dt: f32, frame: u64) void {
     const n = data.n;
     const base: [*]u8 = @ptrCast(&data.particles[0]);
@@ -111,6 +112,6 @@ pub fn run(data: *Data, dt: f32, frame: u64) void {
     var buf_cg = out1d(base + color_off + 4, n, stride_floats, FLOAT32, &dcg);
     var buf_cb = out1d(base + color_off + 8, n, stride_floats, FLOAT32, &dcb);
 
-    const rc = halide_b1(&buf_in, &buf_kind_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, config.kill_age, frame, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_kind, &buf_cr, &buf_cg, &buf_cb);
+    const rc = halide_b1(&buf_in, &buf_kind_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, config.kill_age, frame, config.q, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_kind, &buf_cr, &buf_cg, &buf_cb);
     std.debug.assert(rc == 0);
 }

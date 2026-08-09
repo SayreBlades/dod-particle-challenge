@@ -29,6 +29,7 @@ extern fn halide_b3_mask(
     data: *halide_buffer_t,
     dt: f32,
     kill_age: f32,
+    q: f32,
     pos_x_out: *halide_buffer_t,
     vel_x_out: *halide_buffer_t,
     pos_y_out: *halide_buffer_t,
@@ -79,6 +80,6 @@ pub fn run(data: *Data, dt: f32, dead: []u8) void {
     var buf_age = out1d(base + @offsetOf(Particle, "age"), n, stride_floats, FLOAT32, &dag);
     var buf_dead = out1d(dead.ptr, n, 1, UINT8, &ddd);
 
-    const rc = halide_b3_mask(&buf_in, dt, config.kill_age, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_dead);
+    const rc = halide_b3_mask(&buf_in, dt, config.kill_age, config.q, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_dead);
     std.debug.assert(rc == 0);
 }

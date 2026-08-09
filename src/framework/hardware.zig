@@ -35,7 +35,7 @@ pub fn detect() Facts {
 }
 
 pub fn print(f: Facts) void {
-    std.debug.print("=== Hardware ===\n", .{});
+    std.debug.print("=== Hardware ===\n\n", .{});
     std.debug.print("  cpu              : {s}\n", .{f.cpu[0..f.cpu_len]});
     std.debug.print("  cores            : physical={d} logical={d}\n", .{ f.physicalcpu, f.logicalcpu });
     std.debug.print("  hw.cachelinesize = {d}\n", .{f.cachelinesize});

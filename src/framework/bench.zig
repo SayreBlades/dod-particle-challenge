@@ -30,9 +30,38 @@ const config = @import("config.zig");
 const hardware = @import("hardware.zig");
 const correctness = @import("correctness.zig");
 
-const SWEEP = [_]usize{ 4_000, 65_000, 1_000_000, 16_000_000 };
-const ITERS: usize = 200;
-const WARMUP: usize = 10;
+// N-sweep: ~×4 geometric, chosen to straddle this machine's cache knees
+// (L1d @ N≈963, L2 @ N≈61_680 for bpp=68). 65k sits ON the L2 transition;
+// 262k/1M resolve the post-knee RAM ramp; 16M is the clean out-of-cache
+// asymptote (proves bandwidth-bound). 4k is the L2-resident baseline.
+// (commit 97f2541 trimmed this to a 4-point sparse grid for speed; the
+// cache-curve shape — what analyze_cell's cache_transitions overlay reads —
+// is the study's payoff, so the resolution was restored.)
+const SWEEP = [_]usize{ 4_000, 65_000, 262_000, 1_000_000, 16_000_000 };
+// Timed frames per trial, per N (min over TRIALS is reported). NON-UNIFORM by
+// design: small N is cheap + noisy (wants many samples); large N is expensive
+// + stable. But the bias isn't uniform — it concentrates at MID-N (1M/262k run
+// too short a trial to settle), so those get bumped above the pure ×4 curve
+// (100/60 instead of 50/30): ~halves their drift for +1s. 16M stays at 20 —
+// it's the cost giant and its only job is asymptote confirmation. Override
+// uniformly with `--iters K`; custom `--ns` falls back to the _DEFAULT consts.
+const ITERS_PER_N = [_]usize{ 200, 100, 100, 60, 20 }; // parallel to SWEEP
+const WARMUP_PER_N = [_]usize{ 20, 10, 5, 3, 2 }; // parallel to SWEEP
+const ITERS_DEFAULT: usize = 50;
+const WARMUP_DEFAULT: usize = 5;
+
+/// Timed frames for N: the --iters override if set, else the per-N schedule
+/// (lookup by N value so a custom --ns still resolves), else ITERS_DEFAULT.
+fn itersForN(n: usize, override: ?usize) usize {
+    if (override) |i| return i;
+    for (SWEEP, ITERS_PER_N) |sn, it| if (n == sn) return it;
+    return ITERS_DEFAULT;
+}
+/// Warmup frames for N (per-N schedule; WARMUP_DEFAULT for custom N).
+fn warmupForN(n: usize) usize {
+    for (SWEEP, WARMUP_PER_N) |sn, w| if (n == sn) return w;
+    return WARMUP_DEFAULT;
+}
 const TRIALS: usize = 3;
 const GOLDEN_STEPS: usize = 600;
 const GOLDEN_N: usize = 1024;
@@ -43,8 +72,8 @@ const RENDER_W: u32 = 1024;
 const RENDER_H: u32 = 1024;
 const RENDER_SETTLE_STEPS: usize = 120; // 2s = kill_age -> steady-state spread
 const FRAME_GOLDEN_PATH = "experiments/golden/frame.sha256";
-// CSV death column (build option -Ddeath=<q>, optimization-framework §7).
-const DEATH_COL = @import("options").death;
+// (death is runtime now — config.q, set via --death or the -Ddeath default.
+// The CSV + JSONL rows read config.q directly.)
 
 pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     const io = init.io;
@@ -56,10 +85,14 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     var single_n: ?usize = null;
     var single_iters: ?usize = null;
     var csv_mode = false;
+    var runtime_death: ?f64 = null;
+    var runtime_run_id: []const u8 = "";
+    var runtime_ts_utc: []const u8 = "";
     var json_mode = false;
     var record_dir: ?[]const u8 = null;
     var check_mode = false;
     var bandwidth_mode = false;
+    var show_help = false;
     var threads: usize = 1;
     var trials_arg: ?usize = null;
     var ns_buf: [32]usize = undefined;
@@ -70,10 +103,16 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
             defer it.deinit();
             _ = it.next(); // skip program name
             while (it.next()) |arg| {
-                if (std.mem.eql(u8, arg, "--n")) {
+                if (std.mem.eql(u8, arg, "--n") or std.mem.eql(u8, arg, "-N")) {
                     if (it.next()) |val| single_n = std.fmt.parseInt(usize, val, 10) catch null;
                 } else if (std.mem.eql(u8, arg, "--iters")) {
                     if (it.next()) |val| single_iters = std.fmt.parseInt(usize, val, 10) catch null;
+                } else if (std.mem.eql(u8, arg, "--death") or std.mem.eql(u8, arg, "-q")) {
+                    if (it.next()) |val| runtime_death = std.fmt.parseFloat(f64, val) catch null;
+                } else if (std.mem.eql(u8, arg, "--run-id")) {
+                    if (it.next()) |val| runtime_run_id = val;
+                } else if (std.mem.eql(u8, arg, "--ts-utc")) {
+                    if (it.next()) |val| runtime_ts_utc = val;
                 } else if (std.mem.eql(u8, arg, "--csv")) {
                     csv_mode = true;
                 } else if (std.mem.eql(u8, arg, "--json")) {
@@ -110,9 +149,41 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
                     // This is the real hardware ceiling that hardware_json.py reads
                     // (replaces the Python-interpreter-bound estimate).
                     bandwidth_mode = true;
+                } else if (std.mem.eql(u8, arg, "--help") or std.mem.eql(u8, arg, "-h")) {
+                    show_help = true;
                 }
             }
         }
+    }
+    // -h/--help: print usage + this cell's declaration, then exit.
+    if (show_help) {
+        const manifest = @import("manifest.zig");
+        std.debug.print("Usage: {s} [options]\n\n", .{@import("options").name});
+        if (SimImpl.cell_decl) |cd|
+            manifest.printCellHeader(@import("options").name, cd);
+        std.debug.print(
+            \\Options:
+            \\  -q, --death <q>     per-frame accident rate (0 = natural/golden)
+            \\  -N, --n <N>         single particle count (PMC mode: no sweep)
+            \\      --ns <a,b,c>    comma-list of N (overrides the default sweep)
+            \\      --iters <K>     timed frames per trial (default: per-N schedule)
+            \\      --trials <T>    trials per N (min reported)
+            \\      --threads <T>   worker count (parallel cells)
+            \\      --check         invariant suite only (PASS/FAIL), then exit
+            \\      --json          JSONL provenance rows to stdout (collect.py)
+            \\      --csv           legacy CSV table
+            \\      --record <dir>  headless render → PNG → ffmpeg
+            \\      --bandwidth     streaming-BW microbench, then exit
+            \\  -h, --help          this message
+            \\
+        , .{});
+        return;
+    }
+    // Apply runtime --death override (before any golden/invariant use of config.q).
+    if (runtime_death) |qv| {
+        if (!std.math.isFinite(qv) or qv < 0.0 or qv >= 1.0)
+            std.debug.panic("invalid --death={d} (expect 0 <= q < 1)", .{qv});
+        config.setDeathRate(@floatCast(qv));
     }
     const pmc_mode = single_n != null;
     const trials: usize = trials_arg orelse TRIALS;
@@ -135,14 +206,14 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     if (SimImpl.cell_decl) |cd| {
         manifest.printCellHeader(@import("options").name, cd);
     } else {
-        std.debug.print("=== Cell ===\n  name: {s}\n  (pending — cell_decl not declared)\n\n", .{@import("options").name});
+        std.debug.print("=== Cell ===\n\n  name: {s}\n  (pending — cell_decl not declared)\n\n", .{@import("options").name});
     }
 
     // --- invariant suite (--check): separate invocation, no timed-region overhead ---
     if (check_mode) {
-        const death_q = @import("options").death;
-        std.debug.print("=== Invariant suite (--check, q={d:.2}) ===\n", .{death_q});
-        var inv = correctness.checkInvariants(SimImpl, alloc, .{ .n = 1024, .seed = config.spawn_seed, .threads = threads }, 600, config.dt, @floatCast(death_q)) catch |e| {
+        const death_q = config.q;
+        std.debug.print("=== Invariant suite (--check, q={d:.2}) ===\n\n", .{death_q});
+        var inv = correctness.checkInvariants(SimImpl, alloc, .{ .n = 1024, .seed = config.spawn_seed, .threads = threads }, 600, config.dt, death_q) catch |e| {
             std.debug.print("  ERROR: invariant suite failed to run: {t}\n", .{e});
             return e;
         };
@@ -177,8 +248,8 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     // (optimization-framework.md §7: competing risks, q=0 = natural).
     // q>0 is a different sim — goldens skipped loudly; the invariant suite
     // (§10.6, Phase 1) is the correctness floor at q>0.
-    const death_q = @import("options").death;
-    const death_natural = comptime death_q == 0.0;
+    const death_q = config.q;
+    const death_natural = death_q == 0.0;
     if (!pmc_mode and !death_natural) {
         std.debug.print("=== Correctness: SKIPPED (death q={d} — churn regime, golden N/A; invariants: Phase 1) ===\n\n", .{death_q});
         std.debug.print("=== Frame golden: SKIPPED (death q={d}) ===\n\n", .{death_q});
@@ -268,11 +339,10 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
 
     // --- benchmark sweep ---
     const sweep_t0 = Io.Timestamp.now(io, .awake);
-    const iters = if (single_iters) |i| i else ITERS;
     // The framebuffer the splat writes into (RAM-only; no GPU in bench mode).
     const fb = try alloc.alloc(u8, @as(usize, RENDER_W) * RENDER_H * 4);
     defer alloc.free(fb);
-    std.debug.print("=== Benchmark (iters={d}, warmup={d}, trials={d} per N; reporting min){s}\n", .{ iters, WARMUP, trials, if (pmc_mode) " [PMC mode]" else "" });
+    std.debug.print("=== Benchmark (iters/warmup per-N schedule; trials={d} per N; reporting min){s}\n\n", .{ trials, if (pmc_mode) " [PMC mode]" else "" });
     std.debug.print("  {s:>10} | {s:>7} | {s:>9} | {s:>14} | {s:>14} | {s:>11} | {s:>11}\n", .{
         "N", "bytes/p", "mem(MB)", "ns/particle(min)", "ns/frame(min)", "frames/sec", "runtime(ms)",
     });
@@ -291,6 +361,8 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     defer trial_recs.deinit(alloc);
 
     for (sweep_list) |n| {
+        const iters = itersForN(n, single_iters);
+        const warmup = warmupForN(n);
         var sim = SimImpl.init(alloc, .{ .n = n, .seed = config.spawn_seed, .threads = threads }) catch |e| {
             std.debug.print("  {d:>10} | (init failed: {t})\n", .{ n, e });
             continue;
@@ -312,7 +384,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
             // warmup (step always splats; clear so the fb doesn't saturate).
             @memset(fb, 0);
             var w: usize = 0;
-            while (w < WARMUP) : (w += 1) sim.step(config.dt, fb, RENDER_W, RENDER_H);
+            while (w < warmup) : (w += 1) sim.step(config.dt, fb, RENDER_W, RENDER_H);
 
             // clear once before the timed loop.
             @memset(fb, 0);
@@ -334,7 +406,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
             if (csv_mode) {
                 const ns_p: f64 = ns_frame / @as(f64, @floatFromInt(n));
                 std.debug.print("csv,{s},frame,{d},{d},{d},{d},{d},{d:.1},{d:.4}\n", .{
-                    @import("options").name, DEATH_COL, threads, n, bytes_per_p, trial, ns_frame, ns_p,
+                    @import("options").name, config.q, threads, n, bytes_per_p, trial, ns_frame, ns_p,
                 });
             }
             if (json_mode) {
@@ -379,13 +451,15 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         const ts_end_utc = formatUtc(@intCast(end_ts.toSeconds()));
         const summary = RunSummary{
             .threads = threads,
-            .iters = iters,
-            .warmup = WARMUP,
+            .iters = single_iters orelse ITERS_DEFAULT,
+            .warmup = WARMUP_DEFAULT,
             .trials_per_n = trials,
             .sweep_wall_ms = sweep_wall_ms,
             .sweep_total_frames = sweep_total_frames,
             .sweep_total_particles = sweep_total_particles,
             .ts_end_utc = ts_end_utc,
+            .run_id = runtime_run_id,
+            .ts_utc = runtime_ts_utc,
         };
         for (trial_recs.items) |rec| emitJsonRow(SimImpl, rec, summary);
     }
@@ -617,8 +691,13 @@ const RunSummary = struct {
     sweep_total_frames: u64,
     /// Total particle-frames across the whole sweep (timed region only).
     sweep_total_particles: u64,
-    /// Wall-clock end time of the sweep, YYYYMMDDTHHMMSSZ (matches ts_utc).
+    /// Wall-clock end time of the sweep, YYYYMMDDTHHMMSSZ (same format as ts_utc).
     ts_end_utc: [16]u8,
+    /// Collect run identity + start timestamp (runtime --run-id / --ts-utc),
+    /// denormalized onto every JSONL row. NOT a build option — a build-time
+    /// timestamp would invalidate zig's cache every collect.
+    run_id: []const u8,
+    ts_utc: []const u8,
 };
 
 /// Format Unix epoch seconds (UTC) as YYYYMMDDTHHMMSSZ — the same shape as the
@@ -660,8 +739,8 @@ fn emitJsonRow(comptime SimImpl: type, rec: TrialRec, summary: RunSummary) void 
     // Manual JSON formatting (flat object, known types). Quotes strings,
     // escapes nothing (all our strings are identifier-like: no quotes/backslashes).
     std.debug.print("json,{{", .{});
-    std.debug.print("\"run_id\":\"{s}\",", .{o.run_id});
-    std.debug.print("\"ts_utc\":\"{s}\",", .{o.ts_utc});
+    std.debug.print("\"run_id\":\"{s}\",", .{summary.run_id});
+    std.debug.print("\"ts_utc\":\"{s}\",", .{summary.ts_utc});
     std.debug.print("\"host\":\"{s}\",", .{o.host});
     std.debug.print("\"machine_id\":\"{s}\",", .{o.machine_id});
     std.debug.print("\"layout\":\"{s}\",", .{if (SimImpl.cell_decl) |cd| cd.layout else ""});
@@ -670,7 +749,7 @@ fn emitJsonRow(comptime SimImpl: type, rec: TrialRec, summary: RunSummary) void 
     std.debug.print("\"git_sha\":\"{s}\",", .{o.git_sha});
     std.debug.print("\"git_branch\":\"{s}\",", .{o.git_branch});
     std.debug.print("\"zig_version\":\"{s}\",", .{@import("builtin").zig_version_string});
-    std.debug.print("\"death_q\":{d},", .{o.death});
+    std.debug.print("\"death_q\":{d},", .{config.q});
     std.debug.print("\"threads\":{d},", .{summary.threads});
     std.debug.print("\"N\":{d},", .{rec.n});
     std.debug.print("\"bytes_per_particle\":{d},", .{rec.bytes_per_p});
