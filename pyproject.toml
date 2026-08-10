@@ -1,12 +1,11 @@
-# Python environment for this project. Two roles:
+# Python environment for this project. Two roles, one env:
 #   1. the report builder (scripts/build_report.py — duckdb reads the host
-#      JSONL + writes experiments/report/data.parquet for the duckdb-wasm page)
-#   2. the Halide pipeline generator (build-time, for halide cells only — emits
-#      out/halide/*.a via src/layouts/<layout>/B*.w1-halide_gen.py)
+#      JSONL + builds the analysis tree; zai-sdk for the LLM narratives)
+#   2. the Halide pipeline generator (build-time, for halide algorithms — emits
+#      out/halide/*.a via src/layouts/<memory layout>/AF*.LP1-halide_gen.py)
 #
 # One command sets up the env (creates .venv, installs everything):
-#   uv sync                      # report-builder env (build_report.py)
-#   uv sync --extra halide       # also installs halide (build the halide cells)
+#   uv sync                      # duckdb + halide + zai-sdk (all of it)
 #
 # This project has no importable Python package — it's scripts + a static
 # report — so tool.uv.package = false (uv sync installs deps only, not the
@@ -18,11 +17,9 @@ version = "0.1.0"
 requires-python = ">=3.9"
 dependencies = [
     "duckdb",
+    "halide>=21",
     "zai-sdk>=0.2.3",
 ]
-
-[project.optional-dependencies]
-halide = ["halide>=21"]
 
 [tool.uv]
 package = false

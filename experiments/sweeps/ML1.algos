@@ -1,0 +1,42 @@
+# ML1 algorithms to sweep (one per line; lines starting with # are ignored).
+# Full algorithm names (ML1.<algo>) — collect.py splits on the first dot.
+# Source of truth: the algo_meta in each strategy file (§8); `zig build manifests`
+# prints the registered roster.
+# Halide algorithms need `uv sync`; collect.py skips any algorithm
+# whose build fails, so a missing venv degrades gracefully (the Zig algorithms
+# still run).
+# Parallel algorithms (algos containing -par / rmerge) are auto-swept across
+# THREADS (default {1,4,10}) by collect.py; serial algorithms run T=1 only.
+
+# --- AF1 (math+decide+respawn | render) ---
+ML1.AF1.LP1-autovec.LP2-simple
+ML1.AF1.LP1-autovec.LP2-opt
+ML1.AF1.LP1-scalar.LP2-simple
+ML1.AF1.LP1-unroll.LP2-simple
+ML1.AF1.LP1-autovec-par.LP2-simple
+ML1.AF1.LP1-blend.LP2-simple
+ML1.AF1.LP1-blend-par.LP2-simple
+ML1.AF1.LP1-halide.LP2-simple
+ML1.AF1.LP1-halide.LP2-opt
+ML1.AF1.LP1-halide-par.LP2-simple
+
+# --- AF2 (math | decide+respawn | render) ---
+ML1.AF2.LP1-autovec.LP2-simple
+ML1.AF2.LP1-autovec-par.LP2-simple
+ML1.AF2.LP1-halide.LP2-simple
+ML1.AF2.LP1-halide-par.LP2-simple
+
+# --- AF3 (math+decide→mask | scan+respawn | render) ---
+ML1.AF3.LP1-autovec.LP2-simple
+ML1.AF3.LP1-autovec-par.LP2-rmerge
+ML1.AF3.LP1-halide.LP2-simple
+
+# --- AF4 (math+decide→list | respawn-dead | render) ---
+ML1.AF4.LP1-autovec.LP2-simple
+ML1.AF4.LP1-autovec-par.LP2-rmerge
+
+# --- AF5–AF8 (fused render; framebuffer-only golden) ---
+ML1.AF5.LP1-fused
+ML1.AF6.LP1-autovec.LP2-fused
+ML1.AF7.LP1-autovec.LP2-fused
+ML1.AF8.LP1-autovec.LP2-fused

@@ -118,7 +118,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
                 } else if (std.mem.eql(u8, arg, "--json")) {
                     // JSONL output (refactor §6.6): one JSON object per trial to
                     // stdout, carrying full provenance (git_sha, source_hash,
-                    // machine_id, cell_decl axes) + measurements. collect.py
+                    // machine_id, algo_meta axes) + measurements. collect.py
                     // appends stdout directly into runs.jsonl. Replaces --csv.
                     json_mode = true;
                 } else if (std.mem.eql(u8, arg, "--threads")) {
@@ -159,8 +159,8 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     if (show_help) {
         const manifest = @import("manifest.zig");
         std.debug.print("Usage: {s} [options]\n\n", .{@import("options").name});
-        if (SimImpl.cell_decl) |cd|
-            manifest.printCellHeader(@import("options").name, cd);
+        if (SimImpl.algo_meta) |cd|
+            manifest.printAlgoHeader(@import("options").name, cd);
         std.debug.print(
             \\Options:
             \\  -q, --death <q>     per-frame accident rate (0 = natural/golden)
@@ -201,12 +201,12 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     const facts = hardware.detect();
     hardware.print(facts);
 
-    // --- cell declaration (§8): print every axis on every run, never silent ---
+    // --- algorithm meta (§8): print every axis on every run, never silent ---
     const manifest = @import("manifest.zig");
-    if (SimImpl.cell_decl) |cd| {
-        manifest.printCellHeader(@import("options").name, cd);
+    if (SimImpl.algo_meta) |cd| {
+        manifest.printAlgoHeader(@import("options").name, cd);
     } else {
-        std.debug.print("=== Cell ===\n\n  name: {s}\n  (pending — cell_decl not declared)\n\n", .{@import("options").name});
+        std.debug.print("=== Algorithm ===\n\n  name: {s}\n  (pending — algo_meta not declared)\n\n", .{@import("options").name});
     }
 
     // --- invariant suite (--check): separate invocation, no timed-region overhead ---
@@ -401,7 +401,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
             //   --json: one JSONL row to stderr (collect.py greps '^json,' + strips)
             // The JSON row is fully self-describing: it carries build-time
             // provenance (git_sha, source_hash, machine_id, host, run_id, ts_utc)
-            // + the cell_decl axes (blueprint, ordering, intermediates, golden,
+            // + the algo_meta axes (blueprint, ordering, intermediates, golden,
             // halide_expressible) + measurements. No collect.py prefixing needed.
             if (csv_mode) {
                 const ns_p: f64 = ns_frame / @as(f64, @floatFromInt(n));
@@ -658,7 +658,7 @@ fn runBandwidthMicrobench(io: Io, alloc: std.mem.Allocator) !void {
 // greps `^json,` and strips the prefix, appending the bare JSON to runs.jsonl.
 // The row is fully self-describing: build-time provenance (git_sha,
 // source_hash, machine_id, host, run_id, ts_utc from build options) + the
-// cell_decl static axes (blueprint, ordering, intermediates, golden_class,
+// algo_meta static axes (algo_fam, ordering, intermediates, golden_class,
 // halide_expressible) + the per-trial measurements + the whole-run summary
 // (iters, warmup, trials_per_n, sweep wall time, total frames/particles, end
 // timestamp). Denormalized per §6.2 so duckdb GROUP BY works without joins.
@@ -723,14 +723,14 @@ fn formatUtc(unix_secs: u64) [16]u8 {
 
 fn emitJsonRow(comptime SimImpl: type, rec: TrialRec, summary: RunSummary) void {
     const o = @import("options");
-    // Cell_decl axes (static per cell; denormalized onto every row).
-    var blueprint: []const u8 = "";
+    // algo_meta axes (static per algorithm; denormalized onto every row).
+    var algo_fam: []const u8 = "";
     var ordering: []const u8 = "";
     var intermediates: []const u8 = "";
     var golden_class: []const u8 = "";
     var halide_expressible: []const u8 = "";
-    if (SimImpl.cell_decl) |cd| {
-        blueprint = @tagName(cd.blueprint);
+    if (SimImpl.algo_meta) |cd| {
+        algo_fam = @tagName(cd.algo_fam);
         ordering = @tagName(cd.ordering);
         intermediates = @tagName(cd.intermediates);
         golden_class = @tagName(cd.golden);
@@ -743,8 +743,8 @@ fn emitJsonRow(comptime SimImpl: type, rec: TrialRec, summary: RunSummary) void 
     std.debug.print("\"ts_utc\":\"{s}\",", .{summary.ts_utc});
     std.debug.print("\"host\":\"{s}\",", .{o.host});
     std.debug.print("\"machine_id\":\"{s}\",", .{o.machine_id});
-    std.debug.print("\"layout\":\"{s}\",", .{if (SimImpl.cell_decl) |cd| cd.layout else ""});
-    std.debug.print("\"cell\":\"{s}\",", .{o.name});
+    std.debug.print("\"mem_layout\":\"{s}\",", .{if (SimImpl.algo_meta) |cd| cd.mem_layout else ""});
+    std.debug.print("\"algo\":\"{s}\",", .{o.name});
     std.debug.print("\"source_hash\":\"{s}\",", .{o.source_hash});
     std.debug.print("\"git_sha\":\"{s}\",", .{o.git_sha});
     std.debug.print("\"git_branch\":\"{s}\",", .{o.git_branch});
@@ -762,7 +762,7 @@ fn emitJsonRow(comptime SimImpl: type, rec: TrialRec, summary: RunSummary) void 
     std.debug.print("\"trial_ns\":{d:.0},", .{rec.trial_ns});
     std.debug.print("\"frames\":{d},", .{rec.frames});
     std.debug.print("\"particles_processed\":{d},", .{rec.particles_processed});
-    std.debug.print("\"blueprint\":\"{s}\",", .{blueprint});
+    std.debug.print("\"algo_fam\":\"{s}\",", .{algo_fam});
     std.debug.print("\"ordering\":\"{s}\",", .{ordering});
     std.debug.print("\"intermediates\":\"{s}\",", .{intermediates});
     std.debug.print("\"golden_class\":\"{s}\",", .{golden_class});

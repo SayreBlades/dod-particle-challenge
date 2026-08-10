@@ -12,34 +12,34 @@ when you need the full knobs.
 |-------|------|
 | [`run.py`](#runpy) | build / play / profile dispatcher (backing `make`) + raw `bench` |
 | [`collect.py`](#collectpy) | the unified data-collection sweep (JSONL append) |
-| [`cell_hash.py`](#cell_hashpy) | a cell's `@import`-closure SHA-256 → `source_hash` |
+| [`algo_hash.py`](#algo_hashpy) | an algorithm's `@import`-closure SHA-256 → `source_hash` |
 | [`hardware_json.py`](#hardware_jsonpy) | machine profile → JSON (`machine_id` + measured bandwidth) |
 | [`hardware_profile.py`](#hardware_profilepy) | human-readable counterpart to `hardware_json.py` |
 | [`build_report.py`](#build_reportpy) | JSONL + hardware → the `experiments/analysis/` tree + the `--verify` gate |
-| [`analyze_cell.py`](#analyze_cellpy) | per-cell: rebuild+disassemble (cached) → evidence `<cell>.json` + LLM narrative `<cell>.md` |
+| [`analyze_algo.py`](#analyze_algopy) | per-algorithm: rebuild+disassemble (cached) → evidence `<algorithm>.json` + LLM narrative `<algorithm>.md` |
 | [`pmc_collect.py`](#pmc_collectpy) | one-shot PMC cycle-attribution (macOS + Xcode) |
-| [`pmc_sweep.py`](#pmc_sweeppy) | PMC across cells × N × trials + rollup |
+| [`pmc_sweep.py`](#pmc_sweeppy) | PMC across algorithms × N × trials + rollup |
 | [`migrate_data.py`](#migrate_datapy) | one-time: old per-run CSV → host JSONL |
 
 ---
 
 ## Bench binary flags
 
-One binary per `(cell, mode)`, flat-named `out/bin/<layout>.<strat>.<mode>`
-(e.g. `L1.B3.w1-halide.w2-simple.bench`). Behavior is configured at the command
+One binary per `(algorithm, mode)`, flat-named `out/bin/<memory layout>.<algo>.<mode>`
+(e.g. `ML1.AF3.LP1-halide.LP2-simple.bench`). Behavior is configured at the command
 line — **`q` is runtime**, so one binary sweeps the whole death axis (zig *and*
 halide). `collect.py` uses these under the hood; run a binary directly for an
-ad-hoc measurement. `--help` prints the cell's declaration + every flag.
+ad-hoc measurement. `--help` prints the algorithm's declaration + every flag.
 
 ```sh
-./out/bin/L1.B3.w1-halide.w2-simple.bench --help            # cell_decl + options
-./out/bin/L1.B1.w1-unroll.w2-simple.bench -q 0.1 -N 4000    # single N at q=0.1
-./out/bin/L1.B1.w1-unroll.w2-simple.bench --json --ns 4000,65000,1000000 --trials 5  # sweep (collect.py greps `^json,`)
-./out/bin/L1.B1.w1-unroll.w2-simple.bench -N 1000000 --iters 500  # single N (PMC mode — clean step() region for xctrace)
-./out/bin/L1.B1.w1-unroll.w2-simple.bench --threads 8       # parallel cells only (serial cells ignore this)
-./out/bin/L1.B1.w1-unroll.w2-simple.bench --check           # invariant suite (PASS/FAIL)
-./out/bin/L1.B1.w1-unroll.w2-simple.bench --record          # 10s MP4 via ffmpeg (default: out/record/)
-./out/bin/L1.B1.w1-unroll.w2-simple.bench --bandwidth       # streaming-BW microbench (reads `streaming_bw_gbs=` for hardware.json)
+./out/bin/ML1.AF3.LP1-halide.LP2-simple.bench --help            # algo_meta + options
+./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench -q 0.1 -N 4000    # single N at q=0.1
+./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench --json --ns 4000,65000,1000000 --trials 5  # sweep (collect.py greps `^json,`)
+./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench -N 1000000 --iters 500  # single N (PMC mode — clean step() region for xctrace)
+./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench --threads 8       # parallel algorithms only (serial algorithms ignore this)
+./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench --check           # invariant suite (PASS/FAIL)
+./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench --record          # 10s MP4 via ffmpeg (default: out/record/)
+./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench --bandwidth       # streaming-BW microbench (reads `streaming_bw_gbs=` for hardware.json)
 ```
 
 - `-q`/`--death <q>` is a **runtime flag**: the competing-risks accident rate
@@ -57,36 +57,36 @@ ad-hoc measurement. `--help` prints the cell's declaration + every flag.
 
 ## run.py
 
-Build / play / profile for a **target** — a full cell name
-(`L1.B1.w1-autovec.w2-simple`), a layout (`L1`), or `all`. (Bare strats are
-rejected: the B1–B8 strat names recur across layouts, so they're ambiguous
-once a second layout lands.) `build`, `play`, and `profile` are what `make build`,
+Build / play / profile for a **target** — a full algorithm name
+(`ML1.AF1.LP1-autovec.LP2-simple`), a memory layout (`ML1`), or `all`. (Bare algos are
+rejected: the AF1–AF8 algo names recur across memory layouts, so they're ambiguous
+once a second memory layout lands.) `build`, `play`, and `profile` are what `make build`,
 `make play`, and `make profile` call. There's also a `bench` subcommand for a
-**raw one-cell measurement** (build + run the table, nothing appended) — it's
+**raw one-algorithm measurement** (build + run the table, nothing appended) — it's
 intentionally *not* a make target, because at the make level the measurement
 workflow is [`collect.py`](#collectpy) (or `make collect`).
 
 ```sh
-python3 scripts/run.py build                       # build every cell (L1 assumed) into out/
-python3 scripts/run.py build L1                    # build every cell of layout L1
-python3 scripts/run.py build L1.B1.w1-halide.w2-simple
-python3 scripts/run.py play L1.B1.w1-autovec.w2-simple # open the interactive raylib window
-python3 scripts/run.py profile L1.B1.w1-autovec.w2-simple   # PMC (one cell, one N)
+uv run python scripts/run.py build                       # build every algorithm (ML1 assumed) into out/
+uv run python scripts/run.py build ML1                    # build every algorithm of memory layout ML1
+uv run python scripts/run.py build ML1.AF1.LP1-halide.LP2-simple
+uv run python scripts/run.py play ML1.AF1.LP1-autovec.LP2-simple # open the interactive raylib window
+uv run python scripts/run.py profile ML1.AF1.LP1-autovec.LP2-simple   # PMC (one algorithm, one N)
 
-# Raw one-cell benchmark — build + run the bench table to stderr; no JSONL,
+# Raw one-algorithm benchmark — build + run the bench table to stderr; no JSONL,
 # no death/threads sweep, no provenance. For a quick local number only:
-python3 scripts/run.py bench L1.B1.w1-autovec.w2-simple
+uv run python scripts/run.py bench ML1.AF1.LP1-autovec.LP2-simple
 ```
 
-`build` and `bench` accept a layout or `all` (each cell builds to its own flat
-`out/bin/<cell>.bench` — they coexist, no overwriting); `play` and `profile`
-need a single cell (default: the L1 reference `L1.B1.w1-autovec.w2-simple`). To customize the raw bench (N, trials,
+`build` and `bench` accept a memory layout or `all` (each algorithm builds to its own flat
+`out/bin/<algorithm>.bench` — they coexist, no overwriting); `play` and `profile`
+need a single algorithm (default: the ML1 reference `ML1.AF1.LP1-autovec.LP2-simple`). To customize the raw bench (N, trials,
 threads, JSON output) pass flags to the binary directly — see
 [Bench binary flags](#bench-binary-flags). The Makefile wraps the make-backed
-subcommands so you can pass the target positionally — `make build L1` — see
+subcommands so you can pass the target positionally — `make build ML1` — see
 the [Makefile](../Makefile).
 
-> **`bench` vs `collect.py`** — `run.py bench` builds one cell at the default
+> **`bench` vs `collect.py`** — `run.py bench` builds one algorithm at the default
 > death=0 and prints a table; it does **not** sweep death rates/threads and
 > appends **nothing**. `collect.py` is the real measurement: the full regime
 > grid (N × death q × threads) into `runs.jsonl`. Use `bench` for a quick
@@ -94,15 +94,15 @@ the [Makefile](../Makefile).
 
 ## collect.py
 
-The unified sweep. Runs every cell in a layout (or a subset) across the
+The unified sweep. Runs every algorithm in a memory layout (or a subset) across the
 **regime grid** — N × death rate × threads — appending one JSONL row per
 trial into `experiments/data/<machine_id>/runs.jsonl`, plus one invariant
-`--check` row per `(cell, death_q)` into `checks.jsonl`. Data is
+`--check` row per `(algorithm, death_q)` into `checks.jsonl`. Data is
 host-partitioned + append-only (re-runs duplicate rows; dedup is a
 report concern).
 
 Every row is self-describing: the bench binary (`--json`) carries
-build-time provenance + the cell's static axes + the measurement, so
+build-time provenance + the algorithm's static axes + the measurement, so
 `collect.py` just greps `^json,` and appends. `hardware.json` is written once
 per host (the report joins on `machine_id`).
 
@@ -113,57 +113,57 @@ per host (the report joins on `machine_id`).
 | `NS` | bench default SWEEP | comma-list of N, e.g. `4000,65000,1000000` |
 | `TRIALS` | `3` | trials per N (the report keeps the min) |
 | `DEATH_RATES` | `0.01 0.05 0.1 0.25 0.5` (from `death_rates.txt`) | space-list of accident rates q |
-| `THREADS` | `1 4 10` | space-list; **parallel cells only** (serial cells run T=1) |
+| `THREADS` | `1 4 10` | space-list; **parallel algorithms only** (serial algorithms run T=1) |
 | `PARALLEL` | `1` | reserved — builds are serial into flat `out/` (parallelizing risks `.zig-cache` contention); benches always serial |
-| `SKIP_DONE` | `0` | skip `(cell, q)` whose runs.jsonl already covers all threads (resume) |
+| `SKIP_DONE` | `0` | skip `(algorithm, q)` whose runs.jsonl already covers all threads (resume) |
 | `VERBOSE` | `1` | `0` = progress bar only (per-step log suppressed) |
 | `REFRESH_HW` | `0` | rewrite `hardware.json` (re-measure `streaming_bw_gbs`) |
-| `HALIDE_FORCE` | unset | attempt halide cells even if `import halide` fails |
+| `HALIDE_FORCE` | unset | attempt halide algorithms even if `import halide` fails |
 
 ```sh
-python3 scripts/collect.py                       # every cell of every layout (all)
-python3 scripts/collect.py L1                    # every cell of layout L1
-python3 scripts/collect.py L1.B1.w1-autovec.w2-simple   # one cell (full name)
-NS=4000,65000 TRIALS=5 python3 scripts/collect.py L1           # quick subset
-DEATH_RATES="0 0.5" python3 scripts/collect.py L1               # override rate set
-THREADS="1 4" python3 scripts/collect.py L1.B3.w1-autovec-par.w2-rmerge
+uv run python scripts/collect.py                       # every algorithm of every memory layout (all)
+uv run python scripts/collect.py ML1                    # every algorithm of memory layout ML1
+uv run python scripts/collect.py ML1.AF1.LP1-autovec.LP2-simple   # one algorithm (full name)
+NS=4000,65000 TRIALS=5 uv run python scripts/collect.py ML1           # quick subset
+DEATH_RATES="0 0.5" uv run python scripts/collect.py ML1               # override rate set
+THREADS="1 4" uv run python scripts/collect.py ML1.AF3.LP1-autovec-par.LP2-rmerge
 ```
 
 ### Phases, resume, and the progress bar
 
-Two phases: **(1) build** one binary per cell into the flat `out/bin/` (serial
+Two phases: **(1) build** one binary per algorithm into the flat `out/bin/` (serial
 — `q` is runtime, so zig *and* halide are one binary each, no per-`q` fan-out);
-**(2) bench+check** every `(cell, q)` serially for clean timing.
+**(2) bench+check** every `(algorithm, q)` serially for clean timing.
 
 ```sh
-SKIP_DONE=1 python3 scripts/collect.py L1           # resume an interrupted sweep (skip done units)
-VERBOSE=0 python3 scripts/collect.py                # quiet: live bar only
+SKIP_DONE=1 uv run python scripts/collect.py ML1           # resume an interrupted sweep (skip done units)
+VERBOSE=0 uv run python scripts/collect.py                # quiet: live bar only
 ```
 
 A live progress bar prints to stderr, one line per completed unit:
-`[##########--------------------] 2/6 (33%) L1.B1.w1-autovec.w2-simple q=0.05`.
+`[##########--------------------] 2/6 (33%) ML1.AF1.LP1-autovec.LP2-simple q=0.05`.
 
 Benches always run serially (concurrent runs contend for cores and skew
 `ns_frame`); builds are serial too, into the shared `out/` prefix — with one
-binary per cell the build count is small enough that serial is fine, and
+binary per algorithm the build count is small enough that serial is fine, and
 parallelizing flat builds risks `.zig-cache` contention.
 
-**Halide cells:** `q` is runtime now, so each halide cell is one binary (not one
-per `q`). If `import halide` is missing (`uv sync --extra halide` to fix)
-collect.py skips every halide cell with one notice. A cell that fails to build
+**Halide algorithms:** `q` is runtime now, so each halide algorithm is one binary (not one
+per `q`). If `import halide` is missing (`uv sync` to fix)
+collect.py skips every halide algorithm with one notice. An algorithm that fails to build
 is skipped at all its death rates.
 
-## cell_hash.py
+## algo_hash.py
 
-A cell's `@import`-closure SHA-256 — every transitively-imported `.zig` file
-plus, for halide cells, the generator `.py`. Stamped on every `runs.jsonl`
+An algorithm's `@import`-closure SHA-256 — every transitively-imported `.zig` file
+plus, for halide algorithms, the generator `.py`. Stamped on every `runs.jsonl`
 row as `source_hash` so a row pins the exact code that ran (catches
 uncommitted edits).
 
 ```sh
-python3 scripts/cell_hash.py L1.B1.w1-autovec.w2-simple        # prints the hash
-python3 scripts/cell_hash.py L1.B1.w1-halide.w2-simple         # includes the gen .py
-python3 scripts/cell_hash.py L1.B1.w1-autovec.w2-simple --files  # also list the closure
+uv run python scripts/algo_hash.py ML1.AF1.LP1-autovec.LP2-simple        # prints the hash
+uv run python scripts/algo_hash.py ML1.AF1.LP1-halide.LP2-simple         # includes the gen .py
+uv run python scripts/algo_hash.py ML1.AF1.LP1-autovec.LP2-simple --files  # also list the closure
 ```
 
 ## hardware_json.py
@@ -175,8 +175,8 @@ of the near-immutable facts) + cache/memory/cpu facts + `streaming_bw_gbs`
 the report.
 
 ```sh
-python3 scripts/hardware_json.py                  # JSON to stdout
-python3 scripts/hardware_json.py --write           # write experiments/data/<machine_id>/hardware.json
+uv run python scripts/hardware_json.py                  # JSON to stdout
+uv run python scripts/hardware_json.py --write           # write experiments/data/<machine_id>/hardware.json
 ```
 
 ## hardware_profile.py
@@ -187,7 +187,7 @@ streaming bandwidth, SIMD flags). The bench (`src/framework/hardware.zig`)
 prints the same facts at the start of every run; this is the standalone CLI.
 
 ```sh
-python3 scripts/hardware_profile.py
+uv run python scripts/hardware_profile.py
 ```
 
 ## build_report.py
@@ -195,43 +195,42 @@ python3 scripts/hardware_profile.py
 Builds the full derived analysis tree under `experiments/analysis/` from the
 host-partitioned JSONL + `hardware.json`. It is the orchestrator:
 
-- **per-cell bundles** — delegated to [`analyze_cell.py`](#analyze_cellpy) via
-  subprocess: the evidence `<cell>.json` + the LLM narrative `<cell>.md` for
-  every measured cell.
+- **per-algorithm bundles** — delegated to [`analyze_algo.py`](#analyze_algopy) via
+  subprocess: the evidence `<algorithm>.json` + the LLM narrative `<algorithm>.md` for
+  every measured algorithm.
 - **aggregation bundles** — `analysis/machines.json`, per-machine
-  `overview.json`, per-layout `layout.json` (champions partitioned by thread
+  `overview.json`, per-memory layout `mem_layout.json` (champions partitioned by thread
   group), a browsable markdown tree (a README at every level), + `queries.sql`.
 - **the `--verify` gate** — every narrative is checked; a failure is retried
-  once (at a higher token budget), then the cell is marked `verified: false`
+  once (at a higher token budget), then the algorithm is marked `verified: false`
   (the SPA banners it). The build always finishes; the **exit code is nonzero
-  if any cell remains unverified** — loud, but never blocks the deterministic
+  if any algorithm remains unverified** — loud, but never blocks the deterministic
   aggregation.
 
-Re-run after every collect. Needs duckdb — run under the venv
-(`.venv/bin/python`, or `make report`).
+Re-run after every collect. Needs duckdb — run via `uv run` (or `make report`).
 
 ```sh
-.venv/bin/python scripts/build_report.py            # full build: generate + verify + aggregate
-.venv/bin/python scripts/build_report.py --no-cells # aggregation only (skip per-cell generation)
-.venv/bin/python scripts/build_report.py --force    # force-regenerate all narratives
-.venv/bin/python scripts/build_report.py --verify-only
+uv run python scripts/build_report.py            # full build: generate + verify + aggregate
+uv run python scripts/build_report.py --no-algos # aggregation only (skip per-algorithm generation)
+uv run python scripts/build_report.py --force    # force-regenerate all narratives
+uv run python scripts/build_report.py --verify-only
 ```
 
 Then serve the SPA from the `experiments/` root and open `report.html`:
 
 ```sh
-python3 -m http.server -d experiments 8000   # open http://localhost:8000/report.html
+uv run python -m http.server -d experiments 8000   # open http://localhost:8000/report.html
 ```
 
-## analyze_cell.py
+## analyze_algo.py
 
-The per-cell generator (the Tier-2 narrative, `reporting-and-analysis.md`
-decision 2). For one cell (or a whole layout): rebuilds the cell's ReleaseFast
+The per-algorithm generator (the Tier-2 narrative, `reporting-and-analysis.md`
+decision 2). For one algorithm (or a whole memory layout): rebuilds the algorithm's ReleaseFast
 binary into `.scratch/asm_cache/<source_hash>/` (cached, so re-runs are
 cheap), disassembles the `step` symbol (`otool`/`objdump`), and writes the
-structured evidence `<cell>.json` (cell_decl + cache hierarchy + measured
+structured evidence `<algorithm>.json` (algo_meta + cache hierarchy + measured
 series + PMC + the asm histogram/excerpt). Then calls the z.ai GLM-5.2 LLM
-(`zai-sdk`) to write the 5-section narrative `<cell>.md` (Intent / Cache
+(`zai-sdk`) to write the 5-section narrative `<algorithm>.md` (Intent / Cache
 saturation / Bandwidth / Assembly / Verdict) from that evidence.
 
 The narrative is **verified**: `--verify` checks every cited instruction's
@@ -241,11 +240,11 @@ derives stride/footprint/% values not 1:1 in the json). `build_report.py` runs
 this as its gate.
 
 ```sh
-.venv/bin/python scripts/analyze_cell.py L1.B1.w1-autovec.w2-opt        # full: json + md
-.venv/bin/python scripts/analyze_cell.py L1                           # whole layout (resume-skips existing .md; --force regenerates)
-.venv/bin/python scripts/analyze_cell.py L1 --verify                   # integrity gate (0 FAIL = green)
-.venv/bin/python scripts/analyze_cell.py L1.B1.w1-autovec.w2-opt --json-only    # evidence only, no LLM call
-.venv/bin/python scripts/analyze_cell.py L1.B1.w1-autovec.w2-opt --prompt-only  # print the LLM prompt
+uv run python scripts/analyze_algo.py ML1.AF1.LP1-autovec.LP2-opt        # full: json + md
+uv run python scripts/analyze_algo.py ML1                           # whole memory layout (resume-skips existing .md; --force regenerates)
+uv run python scripts/analyze_algo.py ML1 --verify                   # integrity gate (0 FAIL = green)
+uv run python scripts/analyze_algo.py ML1.AF1.LP1-autovec.LP2-opt --json-only    # evidence only, no LLM call
+uv run python scripts/analyze_algo.py ML1.AF1.LP1-autovec.LP2-opt --prompt-only  # print the LLM prompt
 ```
 
 LLM key: `ZAI_API_KEY` env or `.scratch/zai_api_key`; optional `ZAI_BASE_URL`
@@ -261,58 +260,58 @@ context that complements the bench's bandwidth view (bandwidth-bound vs
 compute-bound, and *why* — frontend/backend/branch). One row per launch.
 
 ```sh
-python3 scripts/pmc_collect.py L1.B1.w1-autovec.w2-simple 1000000 500 1
-# -> .scratch/pmc/<cell>_n1000000_t1.csv
+uv run python scripts/pmc_collect.py ML1.AF1.LP1-autovec.LP2-simple 1000000 500 1
+# -> .scratch/pmc/<algorithm>_n1000000_t1.csv
 ```
 
 ## pmc_sweep.py
 
-PMC across every cell of a layout × N × trials (iter counts scaled by N so
-each trial is ~1-3s), then a rollup CSV (min cycles per `(cell, N)` across
+PMC across every algorithm of a memory layout × N × trials (iter counts scaled by N so
+each trial is ~1-3s), then a rollup CSV (min cycles per `(algorithm, N)` across
 trials + derived percentages). The separate cycle-attribution layer; the
 unified sweep is `collect.py`.
 
 ```sh
-python3 scripts/pmc_sweep.py L1 3                          # layout=L1, 3 trials
-python3 scripts/pmc_sweep.py L1 3 --cells "L1.B1.w1-autovec.w2-simple L1.B3.w1-halide.w2-simple"
+uv run python scripts/pmc_sweep.py ML1 3                          # memory layout=ML1, 3 trials
+uv run python scripts/pmc_sweep.py ML1 3 --algorithms "ML1.AF1.LP1-autovec.LP2-simple ML1.AF3.LP1-halide.LP2-simple"
 ```
 
 ## migrate_data.py
 
-One-time: converts the old per-run-dir CSV data layout into the new
-host-partitioned JSONL layout. Append-only (safe to re-run; `--clean` wipes
+One-time: converts the old per-run-dir CSV data memory layout into the new
+host-partitioned JSONL memory layout. Append-only (safe to re-run; `--clean` wipes
 the host jsonl targets first). `source_hash` is `null` for migrated rows
 (historical; new rows from `collect.py` carry the real hash).
 
 ```sh
-python3 scripts/migrate_data.py            # migrate all old run dirs
-python3 scripts/migrate_data.py --clean    # wipe host jsonl targets first
-python3 scripts/migrate_data.py --dry-run  # show counts, write nothing
+uv run python scripts/migrate_data.py            # migrate all old run dirs
+uv run python scripts/migrate_data.py --clean    # wipe host jsonl targets first
+uv run python scripts/migrate_data.py --dry-run  # show counts, write nothing
 ```
 
 ---
 
-## The full layout-sweep workflow
+## The full memory layout-sweep workflow
 
 ```sh
-# 1. Sweep — all cells × {0.01,0.05,0.1,0.25,0.5} × {4K,65K,262K,1M,16M} × {1,4,10}
+# 1. Sweep — all algorithms × {0.01,0.05,0.1,0.25,0.5} × {4K,65K,262K,1M,16M} × {1,4,10}
 #    (parallel only); appends JSONL into experiments/data/<machine_id>/:
-python3 scripts/collect.py L1
+uv run python scripts/collect.py ML1
 #    (resume an interrupted sweep without duplicating completed units:)
-SKIP_DONE=1 python3 scripts/collect.py L1
+SKIP_DONE=1 uv run python scripts/collect.py ML1
 
 # 2. Build the analysis tree + serve the SPA:
-.venv/bin/python scripts/build_report.py
-python3 -m http.server -d experiments 8000   # open http://localhost:8000/report.html
+uv run python scripts/build_report.py
+uv run python -m http.server -d experiments 8000   # open http://localhost:8000/report.html
 
 # 3. (Mac + Xcode) PMC cycle-attribution for the champions:
-python3 scripts/pmc_sweep.py L1 "L1.<champ1> L1.<champ2> ..."
+uv run python scripts/pmc_sweep.py ML1 "ML1.<champ1> ML1.<champ2> ..."
 
 # 4. Rebuild the report; commit the data + report:
-.venv/bin/python scripts/build_report.py
+uv run python scripts/build_report.py
 git add experiments/data/<machine_id> experiments/analysis experiments/report.html experiments/report.js experiments/style.css
-git commit -m "L1: sweep + PMC + analysis tree"
+git commit -m "ML1: sweep + PMC + analysis tree"
 ```
 
-Or via the Makefile shortcuts: `make collect` (all), `make collect L1`,
-`make collect <strat>`, `make report`, `make serve`.
+Or via the Makefile shortcuts: `make collect` (all), `make collect ML1`,
+`make collect <algo>`, `make report`, `make serve`.

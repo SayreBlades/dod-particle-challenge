@@ -4,7 +4,7 @@
 Runs the bench under xctrace's "CPU Counters" template (CPU Bottlenecks
 guided mode) and exports per-process cycle-saturation data to CSV. This is
 the cycle-side context instrument that complements the bench's bandwidth-side
-view: together they tell you whether a cell is bandwidth-bound (near the
+view: together they tell you whether an algorithm is bandwidth-bound (near the
 streaming ceiling) or compute/overhead-bound (well below it, and *why* —
 frontend stalls, backend stalls, or branch mispredictions).
 
@@ -13,10 +13,10 @@ timing + hardware everywhere; this is the separate opt-in for the
 cycle-attribution view on one machine.
 
 Usage:
-    scripts/pmc_collect.py <cell> <N> <iters> <trial>
-    scripts/pmc_collect.py L1.B1.w1-autovec.w2-simple 1000000 500 1
+    scripts/pmc_collect.py <algo> <N> <iters> <trial>
+    scripts/pmc_collect.py ML1.AF1.LP1-autovec.LP2-simple 1000000 500 1
 
-Output: .scratch/pmc/<cell>_n<N>_t<trial>.csv
+Output: .scratch/pmc/<algo>_n<N>_t<trial>.csv
 """
 from __future__ import annotations
 
@@ -42,22 +42,22 @@ def find_xctrace() -> str | None:
     return shutil.which("xctrace")
 
 
-def split_cell(cell: str) -> tuple[str, str]:
-    if "." not in cell:
-        sys.exit(f"error: '{cell}' is not a cell name (expected L<layout>.<strat>)")
-    layout, strat = cell.split(".", 1)
-    return layout, strat
+def split_algo(algo: str) -> tuple[str, str]:
+    if "." not in algo:
+        sys.exit(f"error: '{algo}' is not an algorithm name (expected ML<mem_layout>.<algo>)")
+    mem_layout, algo_part = algo.split(".", 1)
+    return mem_layout, algo_part
 
 
-def build(cell: str) -> str:
-    """Build the bench binary for `cell` into out/ and return its path."""
-    layout, strat = split_cell(cell)
-    bin_path = os.path.join(ROOT, "out", "bin", f"{cell}.bench")
+def build(algo: str) -> str:
+    """Build the bench binary for `algo` into out/ and return its path."""
+    mem_layout, algo_part = split_algo(algo)
+    bin_path = os.path.join(ROOT, "out", "bin", f"{algo}.bench")
     if not os.path.exists(bin_path):
-        print(f"building {cell}...", file=sys.stderr)
+        print(f"building {algo}...", file=sys.stderr)
         subprocess.run(
-            ["zig", "build", "-p", "out", f"-Dlayout={layout}",
-             f"-Dstrat={strat}", "-Dmode=bench", "-Doptimize=ReleaseFast"],
+            ["zig", "build", "-p", "out", f"-Dmem_layout={mem_layout}",
+             f"-Dalgo={algo_part}", "-Dmode=bench", "-Doptimize=ReleaseFast"],
             cwd=ROOT, capture_output=True, timeout=180,
         )
     if not os.path.exists(bin_path):
@@ -99,16 +99,16 @@ def parse_counters(trace_xml: str) -> tuple[int, int, int, int]:
 
 def main() -> int:
     if len(sys.argv) != 5:
-        sys.exit("usage: pmc_collect.py <cell> <N> <iters> <trial>")
-    cell, n, iters, trial = sys.argv[1:5]
+        sys.exit("usage: pmc_collect.py <algo> <N> <iters> <trial>")
+    algo, n, iters, trial = sys.argv[1:5]
 
     xctrace = find_xctrace()
     if not xctrace:
         sys.exit("error: xctrace not found. Install Xcode or set XCTRACE path.\n"
                  "  fallback: powermetrics --show-process-ipc (sudo, IPC only)")
 
-    bin_path = build(cell)
-    tag = cell.replace(".", "_")
+    bin_path = build(algo)
+    tag = algo.replace(".", "_")
     outdir = os.path.join(ROOT, ".scratch", "pmc")
     os.makedirs(outdir, exist_ok=True)
     trace = os.path.join(outdir, f"{tag}_n{n}_t{trial}.trace")
@@ -116,7 +116,7 @@ def main() -> int:
 
     # xctrace ignores --output when launching a process (known quirk); it writes
     # to Launch_<name>_<timestamp>.trace in CWD. Launch from a temp dir and move.
-    print(f"recording: xctrace CPU Counters over cell={cell} N={n} "
+    print(f"recording: xctrace CPU Counters over algo={algo} N={n} "
           f"iters={iters} trial={trial}", file=sys.stderr)
     with tempfile.TemporaryDirectory(prefix="pmc_") as tmp:
         subprocess.run(
@@ -140,9 +140,9 @@ def main() -> int:
     useful, processing, delivery, discarded = parse_counters(trace_xml)
     cycles = useful + processing + delivery + discarded
     with open(csv_path, "w") as f:
-        f.write("cell,N,iters,trial,cycles,useful,processing_bottleneck,"
+        f.write("algo,N,iters,trial,cycles,useful,processing_bottleneck,"
                 "delivery_bottleneck,discarded_bottleneck\n")
-        f.write(f"{cell},{n},{iters},{trial},{cycles},{useful},"
+        f.write(f"{algo},{n},{iters},{trial},{cycles},{useful},"
                 f"{processing},{delivery},{discarded}\n")
     pct = lambda x: 100.0 * x / cycles if cycles else 0
     print(f"  cycles={cycles} useful={useful} ({pct(useful):.1f}%) "

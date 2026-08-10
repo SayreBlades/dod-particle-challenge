@@ -2,7 +2,7 @@
 // Routes: #/ (overview) · #/layout/<L> · #/algorithm/<algorithm>. Loads ECharts + marked.
 const $ = (id) => document.getElementById(id);
 const status = (m) => ($("status").textContent = m);
-const short = (cell) => cell.split(".").slice(1).join(".");
+const short = (algo) => algo.split(".").slice(1).join(".");
 const fmtq = (d) => (d === 0 ? "0" : String(d));
 const fmtN = (n) => n >= 1e6 ? `${n / 1e6}M` : n >= 1e3 ? `${n / 1e3}K` : `${n}`;
 const charts = [];
@@ -11,17 +11,17 @@ const AX = { axisLine: { lineStyle: { color: "#666" } }, axisLabel: { color: "#a
              splitLine: { lineStyle: { color: "#2a2a2a" } }, nameTextStyle: { color: "#aaa" } };
 
 let MACHINES, machine, threads = 1;
-const ovCache = {}, layCache = {}, cellCache = {};
+const ovCache = {}, layCache = {}, algoCache = {};
 const fetchJSON = (u) => fetch(u).then((r) => r.ok ? r.json() : null);
 const fetchText = (u) => fetch(u).then((r) => r.ok ? r.text() : "");
 
 function getOverview(m)   { return ovCache[m]   ?? (ovCache[m]   = fetchJSON(`analysis/${m}/overview.json`)); }
-function getLayout(m, L)  { return layCache[m+L]?? (layCache[m+L]= fetchJSON(`analysis/${m}/${L}/layout.json`)); }
-function getCellJson(m, c){ return cellCache[c] ?? (cellCache[c]= (async()=>{const L=c.split(".")[0],s=short(c);return fetchJSON(`analysis/${m}/${L}/${s}.json`);})()); }
+function getMemLayout(m, L)  { return layCache[m+L]?? (layCache[m+L]= fetchJSON(`analysis/${m}/${L}/mem_layout.json`)); }
+function getAlgoJson(m, c){ return algoCache[c] ?? (algoCache[c]= (async()=>{const L=c.split(".")[0],s=short(c);return fetchJSON(`analysis/${m}/${L}/${s}.json`);})()); }
 const gridCache = {};
 const getGrid = (m) => gridCache[m] ?? (gridCache[m] = fetchJSON(`analysis/${m}/grid.json`));
 
-function cellColor(cell) { let h = 0; for (let i = 0; i < cell.length; i++) h = (h * 31 + cell.charCodeAt(i)) >>> 0; return `hsl(${h % 360} 65% 62%)`; }
+function cellColor(algo) { let h = 0; for (let i = 0; i < algo.length; i++) h = (h * 31 + algo.charCodeAt(i)) >>> 0; return `hsl(${h % 360} 65% 62%)`; }
 function pickThreads(rows) { const t = rows.filter((r) => r.threads === threads); return t.length ? t : rows.filter((r) => r.threads === 1); }
 
 // ---- meta strip ----
@@ -65,18 +65,18 @@ async function renderOverview() {
   const ns = (w.length ? w : champs).map((c) => c.ns_particle);
   const lo = Math.min(...ns), hi = Math.max(...ns);
   const nvals = ov.n_values, deaths = ov.death_rates;
-  const cell = (n, d, rk) => champs.find((c) => c.N === n && Math.abs(c.death_q - d) < 1e-9 && c.rk === rk);
+  const algo = (n, d, rk) => champs.find((c) => c.N === n && Math.abs(c.death_q - d) < 1e-9 && c.rk === rk);
   let html = `<section><h2>All Winners (top-3) <span class="sub">per num-particles × death · T=${threads}</span></h2>`;
   html += `<p class="hint">Green = faster. Click a name for the deep dive, or a box to rank all algorithms at that intersection.</p>`;
   html += `<table class="podium"><thead><tr><th>num-particles＼death</th>${deaths.map((d) => `<th>${fmtq(d)}</th>`).join("")}</tr></thead><tbody>`;
   for (const n of nvals) {
     html += `<tr><th>${fmtN(n)}</th>`;
     for (const d of deaths) {
-      const top3 = [1, 2, 3].map((rk) => cell(n, d, rk)).filter(Boolean);
+      const top3 = [1, 2, 3].map((rk) => algo(n, d, rk)).filter(Boolean);
       const best = top3.length ? top3[0].ns_particle : null;
       const tint = best != null ? `hsla(${120 * (1 - Math.min(1, (best - lo) / (hi - lo)))},60%,45%,0.20)` : null;
       html += `<td${tint ? ` style="background:${tint}"` : ""} data-n="${n}" data-q="${d}">${
-        top3.map((c) => `<div class="prow"><a href="#/algorithm/${c.cell}">${short(c.cell)}</a><span class="n">${c.ns_particle.toFixed(2)}</span></div>`).join("") || "—"}</td>`;
+        top3.map((c) => `<div class="prow"><a href="#/algorithm/${c.algo}">${short(c.algo)}</a><span class="n">${c.ns_particle.toFixed(2)}</span></div>`).join("") || "—"}</td>`;
     }
     html += `</tr>`;
   }
@@ -86,8 +86,8 @@ async function renderOverview() {
 }
 
 // ---------------- layout ----------------
-async function renderLayout(L) {
-  const lb = await getLayout(machine, L);
+async function renderMemLayout(L) {
+  const lb = await getMemLayout(machine, L);
   if (!lb) { status(`no bundle for ${L}`); return; }
   renderMeta({ ...lb, cpu: (MACHINES.machines.find((m) => m.machine_id === machine) || {}).cpu });
   const champs = lb.champions.filter((c) => c.threads === threads);
@@ -96,38 +96,38 @@ async function renderLayout(L) {
   const ns = (w.length ? w : champs).map((c) => c.ns_particle);
   const lo = Math.min(...ns), hi = Math.max(...ns);
   const nvals = lb.n_values, deaths = lb.death_rates;
-  const cell = (n, d, rk) => champs.find((c) => c.N === n && Math.abs(c.death_q - d) < 1e-9 && c.rk === rk);
+  const algo = (n, d, rk) => champs.find((c) => c.N === n && Math.abs(c.death_q - d) < 1e-9 && c.rk === rk);
   let podium = `<table class="podium"><thead><tr><th>num-particles＼death</th>${deaths.map((d) => `<th>${fmtq(d)}</th>`).join("")}</tr></thead><tbody>`;
   for (const n of nvals) {
     podium += `<tr><th>${fmtN(n)}</th>`;
     for (const d of deaths) {
-      const top3 = [1, 2, 3].map((rk) => cell(n, d, rk)).filter(Boolean);
+      const top3 = [1, 2, 3].map((rk) => algo(n, d, rk)).filter(Boolean);
       const best = top3.length ? top3[0].ns_particle : null;
       const tint = best != null ? `hsla(${120 * (1 - Math.min(1, (best - lo) / (hi - lo)))},60%,45%,0.20)` : null;
-      podium += `<td${tint ? ` style="background:${tint}"` : ""}>${top3.map((c) => `<div class="prow"><a href="#/algorithm/${c.cell}">${short(c.cell)}</a><span class="n">${c.ns_particle.toFixed(2)}</span></div>`).join("") || "—"}</td>`;
+      podium += `<td${tint ? ` style="background:${tint}"` : ""}>${top3.map((c) => `<div class="prow"><a href="#/algorithm/${c.algo}">${short(c.algo)}</a><span class="n">${c.ns_particle.toFixed(2)}</span></div>`).join("") || "—"}</td>`;
     }
     podium += `</tr>`;
   }
   podium += `</tbody></table>`;
-  const feat = lb.featured.map((f) => `<div class="feat"><a href="#/algorithm/${f.cell}"><b>${short(f.cell)}</b> <span class="n">${f.ns} ns/p</span></a><div class="tease">${f.teaser}${f.teaser ? `…` : ""}</div></div>`).join("");
-  const cells = lb.cells.map((c) => `<a class="celllink" href="#/algorithm/${c}">${short(c)}</a>`).join(" ");
+  const feat = lb.featured.map((f) => `<div class="feat"><a href="#/algorithm/${f.algo}"><b>${short(f.algo)}</b> <span class="n">${f.ns} ns/p</span></a><div class="tease">${f.teaser}${f.teaser ? `…` : ""}</div></div>`).join("");
+  const algos = lb.algos.map((c) => `<a class="celllink" href="#/algorithm/${c}">${short(c)}</a>`).join(" ");
   $("page").innerHTML = `
     <section><h2>${L} <span class="sub">top-3 per num-particles × death · T=${threads}</span></h2>${podium}</section>
     <section><h3>Featured</h3>${feat || "<p class=hint>(no champions featured)</p>"}</section>
-    <section><h3>All algorithms</h3><div class="cellrow">${cells}</div></section>
+    <section><h3>All algorithms</h3><div class="cellrow">${algos}</div></section>
     <section><h3>Performance landscape <span class="sub">ns/p vs N · q=${lb.death_rates.includes(0.01) ? 0.01 : lb.death_rates[0]}</span></h3><div id="landscape" class="chart"></div></section>
     <section><h3>Achieved bandwidth vs ceiling</h3><div id="bandwidth" class="chart"></div></section>`;
-  status(`${L} · ${lb.cells.length} algorithms · T=${threads}`);
+  status(`${L} · ${lb.algos.length} algorithms · T=${threads}`);
   drawLandscape(lb);
-  drawBandwidthLayout(lb);
+  drawBandwidthMemLayout(lb);
 }
 
 async function drawLandscape(lb) {
   const q = lb.death_rates.includes(0.01) ? 0.01 : lb.death_rates[0];
-  const js = (await Promise.all(lb.cells.map((c) => getCellJson(machine, c)))).filter(Boolean);
+  const js = (await Promise.all(lb.algos.map((c) => getAlgoJson(machine, c)))).filter(Boolean);
   const series = js.map((j) => ({
-    name: short(j.cell), type: "line", symbol: "circle", symbolSize: 4,
-    lineStyle: { width: 1.5, color: cellColor(j.cell) }, itemStyle: { color: cellColor(j.cell) },
+    name: short(j.algo), type: "line", symbol: "circle", symbolSize: 4,
+    lineStyle: { width: 1.5, color: cellColor(j.algo) }, itemStyle: { color: cellColor(j.algo) },
     data: pickThreads(j.series[String(q)] || []).map((r) => [r.N, r.ns_particle]),
   }));
   chart("landscape", {
@@ -139,12 +139,12 @@ async function drawLandscape(lb) {
   });
 }
 
-async function drawBandwidthLayout(lb) {
+async function drawBandwidthMemLayout(lb) {
   const q = lb.death_rates.includes(0.01) ? 0.01 : lb.death_rates[0];
-  const js = (await Promise.all(lb.cells.map((c) => getCellJson(machine, c)))).filter(Boolean);
+  const js = (await Promise.all(lb.algos.map((c) => getAlgoJson(machine, c)))).filter(Boolean);
   const series = js.map((j) => ({
-    name: short(j.cell), type: "line", symbol: "none",
-    lineStyle: { width: 1.5, color: cellColor(j.cell) }, itemStyle: { color: cellColor(j.cell) },
+    name: short(j.algo), type: "line", symbol: "none",
+    lineStyle: { width: 1.5, color: cellColor(j.algo) }, itemStyle: { color: cellColor(j.algo) },
     data: pickThreads(j.series[String(q)] || []).map((r) => [r.N, r.achieved_bw_gbs]).filter((p) => p[1] != null),
   }));
   const ceil = lb.streaming_bw_gbs;
@@ -159,20 +159,20 @@ async function drawBandwidthLayout(lb) {
 }
 
 // ---------------- algorithm ----------------
-// ---- Algorithm section (deterministic, from cell_decl + name) ----
-const BLUEPRINTS = {
-  B1: [["Integrate", "Decide", "Respawn"], ["Render"], null],
-  B2: [["Integrate"], ["Decide", "Respawn"], ["Render"]],
-  B3: [["Integrate", "Decide→mask"], ["scan mask", "Respawn"], ["Render"]],
-  B4: [["Integrate", "Decide→list"], ["Respawn (dead only)"], ["Render"]],
-  B5: [["Integrate", "Decide", "Respawn", "Render"], null, null],
-  B6: [["Integrate"], ["Decide", "Respawn", "Render"], null],
-  B7: [["Integrate", "Decide→mask"], ["scan mask", "Respawn", "Render"], null],
-  B8: [["Integrate", "Decide→list"], ["Respawn", "Render (dead)"], ["Render (live)"]],
+// ---- Algorithm section (deterministic, from algo_meta + name) ----
+const ALGO_FAMS = {
+  AF1: [["Integrate", "Decide", "Respawn"], ["Render"], null],
+  AF2: [["Integrate"], ["Decide", "Respawn"], ["Render"]],
+  AF3: [["Integrate", "Decide→mask"], ["scan mask", "Respawn"], ["Render"]],
+  AF4: [["Integrate", "Decide→list"], ["Respawn (dead only)"], ["Render"]],
+  AF5: [["Integrate", "Decide", "Respawn", "Render"], null, null],
+  AF6: [["Integrate"], ["Decide", "Respawn", "Render"], null],
+  AF7: [["Integrate", "Decide→mask"], ["scan mask", "Respawn", "Render"], null],
+  AF8: [["Integrate", "Decide→list"], ["Respawn", "Render (dead)"], ["Render (live)"]],
 };
-function walkSchedules(cell) {
-  const strat = cell.split(".").slice(1).join(".");
-  const segs = strat.split(/\.w/);
+function loopSchedules(algo) {
+  const algoPart = algo.split(".").slice(1).join(".");
+  const segs = algoPart.split(/\.LP/);
   const SCHED = { autovec: "autovectorized", scalar: "scalar", blend: "branchless blend",
     halide: "Halide", opt: "optimized splat (r1)", simple: "simple splat (r0)",
     fused: "fused (math+render)", rmerge: "ranked-merge scan+respawn" };
@@ -198,12 +198,12 @@ function extractHypothesis(md) {
   return (parts[parts.length - 1] || "").trim();
 }
 
-function blueprintTable(j, cell) {
-  const walks = BLUEPRINTS[j.cell_decl.blueprint] || [];
-  const strat = walkSchedules(cell);
+function algoFamTable(j, algo) {
+  const loops = ALGO_FAMS[j.algo_meta.algo_fam] || [];
+  const algoPart = loopSchedules(algo);
   let t = `<table class="alg"><tbody>`;
   for (let i = 0; i < 3; i++) {
-    if (walks[i]) t += `<tr><td class="walknum">walk ${i + 1}</td><td>${walks[i].join(", ")}</td><td>${strat[i + 1] || ""}</td></tr>`;
+    if (loops[i]) t += `<tr><td class="walknum">loop ${i + 1}</td><td>${loops[i].join(", ")}</td><td>${algoPart[i + 1] || ""}</td></tr>`;
   }
   return t + `</tbody></table>`;
 }
@@ -251,7 +251,7 @@ function asmListing(j) {
   const legend = `<div class="asmleg">${ASM_LEGEND.map(([c, l]) => `<span class="asmlegitem"><i class="icdot ${c}"></i>${l}</span>`).join("")}</div>`;
   const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\t/g, "  ");
   const attributed = j.asm.source_attributed;
-  const cs = j.asm.cell_source;
+  const cs = j.asm.algo_source;
   let html = `<h4>Algorithm</h4>${legend}`;
   if (!attributed) {
     html += `<pre class="asm">`;
@@ -265,7 +265,7 @@ function asmListing(j) {
   // all the asm, independently scrollable. Click a linked source line to jump
   // the asm to its block; click an asm block to jump the source to its line.
   const colors = ["#2d5a44","#5a2d44","#2d4a5a","#5a442d","#4a2d5a","#2d5a5a","#5a5a2d","#442d5a"];
-  const lineGroup = {};                       // cell-line -> first asm group index
+  const lineGroup = {};                       // algo-line -> first asm group index
   if (cs) cs.group_lines.forEach((cl, gi) => { if (cl && !(cl in lineGroup)) lineGroup[cl] = gi; });
   let srcHtml = "";
   if (cs) {
@@ -316,38 +316,38 @@ function setupGodbolt() {
   });
 }
 
-async function renderCell(cell) {
-  const L = cell.split(".")[0], s = short(cell);
+async function renderAlgo(algo) {
+  const L = algo.split(".")[0], s = short(algo);
   const [j, md, lb] = await Promise.all([
-    getCellJson(machine, cell), fetchText(`analysis/${machine}/${L}/${s}.md`), getLayout(machine, L)]);
-  if (!j) { $("page").innerHTML = `<section><p>No analysis bundle for ${cell}.</p></section>`; status("missing"); return; }
+    getAlgoJson(machine, algo), fetchText(`analysis/${machine}/${L}/${s}.md`), getMemLayout(machine, L)]);
+  if (!j) { $("page").innerHTML = `<section><p>No analysis bundle for ${algo}.</p></section>`; status("missing"); return; }
   renderMeta(j.hardware);
-  const d = j.cell_decl;
-  const decl = `<div class="decl"><span><b>blueprint</b> ${d.blueprint}</span><span><b>ordering</b> ${d.ordering}</span><span><b>intermediates</b> ${d.intermediates}</span><span><b>golden</b> ${d.golden_class}</span><span><b>bytes/p</b> ${j.bytes_per_particle}</span><span><b>source_hash</b> <code>${(j.source_hash || "").slice(0, 12)}</code></span></div>`;
+  const d = j.algo_meta;
+  const decl = `<div class="decl"><span><b>algo_fam</b> ${d.algo_fam}</span><span><b>ordering</b> ${d.ordering}</span><span><b>intermediates</b> ${d.intermediates}</span><span><b>golden</b> ${d.golden_class}</span><span><b>bytes/p</b> ${j.bytes_per_particle}</span><span><b>source_hash</b> <code>${(j.source_hash || "").slice(0, 12)}</code></span></div>`;
   const n = splitNarrative(md || "");
   const mp = (k) => marked.parse(n[k] || "<p class='hint'>(no narrative)</p>");
   const mem = lb && lb.memory_layout
     ? `<section><h2>Particle Layout</h2><pre class="memlayout">${lb.memory_layout}</pre><p class="hint">Struct stride; this algorithm's bytes/p (${j.bytes_per_particle}) includes its blueprint intermediate (${d.intermediates}).</p></section>`
     : "";
-  const wtable = blueprintTable(j, cell);
+  const wtable = algoFamTable(j, algo);
   const hyp = extractHypothesis(n["Intent"]);
   const hypo = hyp ? `<div class="hypothesis"><b>Hypothesis:</b> ${marked.parseInline(hyp)}</div>` : "";
   const vraw = (n["Verdict"] || "").trim();
   const vkind = /^holds\b/i.test(vraw) ? "holds" : /^partially\b/i.test(vraw) ? "partial" : /^refuted\b/i.test(vraw) ? "refuted" : "";
   const verdict = vraw ? `<section class="verdict ${vkind}"><h3>Verdict</h3>${marked.parse(vraw)}</section>` : "";
   const banner = j.verified === false
-    ? `<div class="unverified">⚠ <b>narrative failed verification</b> — the prose cites evidence not in the bundle. Regenerate with <code>scripts/analyze_cell.py ${cell} --force</code>${j.verify_errors?.length ? `<br><span class=hint>${j.verify_errors.join("; ")}</span>` : ""}</div>`
+    ? `<div class="unverified">⚠ <b>narrative failed verification</b> — the prose cites evidence not in the bundle. Regenerate with <code>scripts/analyze_algo.py ${algo} --force</code>${j.verify_errors?.length ? `<br><span class=hint>${j.verify_errors.join("; ")}</span>` : ""}</div>`
     : "";
   $("page").innerHTML = `
     ${banner}
     ${mem}
-    <section class="cellhead"><h2>${short(cell)}</h2><div class="cellfull">${cell}</div>${decl}${wtable}${hypo}${verdict}</section>
+    <section class="cellhead"><h2>${short(algo)}</h2><div class="cellfull">${algo}</div>${decl}${wtable}${hypo}${verdict}</section>
     <section class="narrative"><h3>Latency</h3>${mp("Cache saturation")}<div id="cacheplot" class="chart"></div></section>
     <section class="narrative"><h3>Bandwidth</h3>${mp("Bandwidth")}<div id="bwplot" class="chart"></div></section>
     <section class="narrative"><h3>Assembly</h3>${mp("Assembly")}<div id="asmplot" class="chart small"></div>${asmListing(j)}</section>`;
-  status(`${cell} · ${j.asm.n_instructions} asm insns`);
+  status(`${algo} · ${j.asm.n_instructions} asm insns`);
   drawCachePlot(j);
-  drawBandwidthCell(j);
+  drawBandwidthAlgo(j);
   drawAsm(j);
   setupGodbolt();
 }
@@ -386,10 +386,10 @@ function drawCachePlot(j) {
     xAxis: { type: "log", name: "N", min: bands.axisMin, ...AX, axisLabel: { ...AX.axisLabel, formatter: (v) => v >= 1e6 ? `${v / 1e6}M` : v >= 1e3 ? `${v / 1e3}K` : v } },
     yAxis: { type: "value", name: "ns/particle", ...AX },
     series: [...real, carrier], dataZoom: [{ type: "slider", bottom: 8, height: 16 }],
-  }, "cell-link");
+  }, "algo-link");
 }
 
-function drawBandwidthCell(j) {
+function drawBandwidthAlgo(j) {
   const qs = Object.keys(j.series).sort((a, b) => +a - +b);
   const ceil = j.hardware.streaming_bw_gbs;
   const real = qs.map((q) => ({ name: `q=${q}`, type: "line", symbol: "circle", symbolSize: 4,
@@ -404,7 +404,7 @@ function drawBandwidthCell(j) {
     xAxis: { type: "log", name: "N", min: bands.axisMin, ...AX, axisLabel: { ...AX.axisLabel, formatter: (v) => v >= 1e6 ? `${v / 1e6}M` : v >= 1e3 ? `${v / 1e3}K` : v } },
     yAxis: { type: "value", name: "GB/s", ...AX },
     series: [...real, carrier], dataZoom: [{ type: "slider", bottom: 8, height: 16 }],
-  }, "cell-link");
+  }, "algo-link");
 }
 
 function drawAsm(j) {
@@ -453,7 +453,7 @@ function drawRankCharts(pts, ceil) {
   // puts it, so the two headings are centered over their halves from that split.
   // animation is off — otherwise the dashed ceiling markLine draws in jankily.
   const order = [...pts].sort((a, b) => a.ns_particle - b.ns_particle);
-  const names = order.map((p) => short(p.cell));
+  const names = order.map((p) => short(p.algo));
   const lat = order.map((p) => p.ns_particle);             // positive → grows right of 0
   const bw = order.map((p) => -(p.achieved_bw_gbs ?? 0));  // NEGATED → grows left of 0
   const maxLat = Math.max(...order.map((p) => p.ns_particle));
@@ -496,10 +496,10 @@ function drawRankCharts(pts, ceil) {
   const rowAt = (y) => {
     if (!c || y == null) return null;
     const idx = Math.round(c.convertFromPixel({ yAxisIndex: 0 }, y));
-    return order[idx]?.cell ?? null;
+    return order[idx]?.algo ?? null;
   };
   zr?.on("mousemove", (e) => { zr.setCursorStyle(rowAt(e.offsetY != null ? e.offsetY : e.event?.offsetY) ? "pointer" : "default"); });
-  zr?.on("click", (e) => { const cell = rowAt(e.offsetY != null ? e.offsetY : e.event?.offsetY); if (cell) location.hash = `#/algorithm/${cell}`; });
+  zr?.on("click", (e) => { const algo = rowAt(e.offsetY != null ? e.offsetY : e.event?.offsetY); if (algo) location.hash = `#/algorithm/${algo}`; });
 }
 
 // ---------------- router ----------------
@@ -512,8 +512,8 @@ function route() {
   status("loading…");
   if (r === "rank" && a != null && b != null) renderRank(parseInt(a, 10), parseFloat(b));
   else if (!r || (r === "layout" && !a)) renderOverview();
-  else if (r === "layout") renderLayout(a);
-  else if (r === "algorithm") renderCell(decodeURIComponent(a));
+  else if (r === "layout") renderMemLayout(a);
+  else if (r === "algorithm") renderAlgo(decodeURIComponent(a));
   else renderOverview();
 }
 

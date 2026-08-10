@@ -1,0 +1,1491 @@
+{
+  "algo": "ML1.AF3.LP1-autovec.LP2-simple",
+  "machine_id": "minibits-b7641c0e",
+  "source_hash": "ea61da9797ef08e956532ae2eb7179a7d207c908bfc6d25cfe2565a2a5b93689",
+  "git_sha": "7e59438",
+  "mem_layout": "ML1",
+  "bytes_per_particle": 69,
+  "algo_meta": {
+    "algo_fam": "AF3",
+    "ordering": "identity",
+    "intermediates": "mask",
+    "golden_class": "bit_exact",
+    "halide_expressible": "walk1 yes (math+decide\u2192mask); walk2 no (host scan); walk3 n/a"
+  },
+  "hardware": {
+    "cpu": "Apple M4",
+    "l1dcachesize": 65536,
+    "l2cachesize": 4194304,
+    "l3cachesize": 0,
+    "cachelinesize": 128,
+    "streaming_bw_gbs": 25.22,
+    "logicalcpu": 10
+  },
+  "cache_transitions": [
+    [
+      "L1d",
+      949
+    ],
+    [
+      "L2",
+      60787
+    ]
+  ],
+  "series": {
+    "0.01": [
+      {
+        "N": 4000,
+        "threads": 1,
+        "ns_particle": 11.908,
+        "ns_frame": 47633.8,
+        "achieved_bw_gbs": 5.79
+      },
+      {
+        "N": 16000,
+        "threads": 1,
+        "ns_particle": 8.055,
+        "ns_frame": 128877.9,
+        "achieved_bw_gbs": 8.57
+      },
+      {
+        "N": 65000,
+        "threads": 1,
+        "ns_particle": 7.904,
+        "ns_frame": 513779.6,
+        "achieved_bw_gbs": 8.73
+      },
+      {
+        "N": 262000,
+        "threads": 1,
+        "ns_particle": 7.907,
+        "ns_frame": 2071564.0,
+        "achieved_bw_gbs": 8.73
+      },
+      {
+        "N": 1000000,
+        "threads": 1,
+        "ns_particle": 8.021,
+        "ns_frame": 8020591.3,
+        "achieved_bw_gbs": 8.6
+      },
+      {
+        "N": 4000000,
+        "threads": 1,
+        "ns_particle": 8.01,
+        "ns_frame": 32039156.5,
+        "achieved_bw_gbs": 8.61
+      }
+    ],
+    "0.05": [
+      {
+        "N": 4000,
+        "threads": 1,
+        "ns_particle": 11.549,
+        "ns_frame": 46197.5,
+        "achieved_bw_gbs": 5.97
+      },
+      {
+        "N": 16000,
+        "threads": 1,
+        "ns_particle": 8.437,
+        "ns_frame": 134985.2,
+        "achieved_bw_gbs": 8.18
+      },
+      {
+        "N": 65000,
+        "threads": 1,
+        "ns_particle": 8.202,
+        "ns_frame": 533125.8,
+        "achieved_bw_gbs": 8.41
+      },
+      {
+        "N": 262000,
+        "threads": 1,
+        "ns_particle": 8.228,
+        "ns_frame": 2155758.8,
+        "achieved_bw_gbs": 8.39
+      },
+      {
+        "N": 1000000,
+        "threads": 1,
+        "ns_particle": 8.832,
+        "ns_frame": 8832081.0,
+        "achieved_bw_gbs": 7.81
+      },
+      {
+        "N": 4000000,
+        "threads": 1,
+        "ns_particle": 8.828,
+        "ns_frame": 35311305.6,
+        "achieved_bw_gbs": 7.82
+      }
+    ],
+    "0.25": [
+      {
+        "N": 4000,
+        "threads": 1,
+        "ns_particle": 13.627,
+        "ns_frame": 54510.0,
+        "achieved_bw_gbs": 5.06
+      },
+      {
+        "N": 16000,
+        "threads": 1,
+        "ns_particle": 9.934,
+        "ns_frame": 158937.3,
+        "achieved_bw_gbs": 6.95
+      },
+      {
+        "N": 65000,
+        "threads": 1,
+        "ns_particle": 10.018,
+        "ns_frame": 651168.3,
+        "achieved_bw_gbs": 6.89
+      },
+      {
+        "N": 262000,
+        "threads": 1,
+        "ns_particle": 9.976,
+        "ns_frame": 2613584.6,
+        "achieved_bw_gbs": 6.92
+      },
+      {
+        "N": 1000000,
+        "threads": 1,
+        "ns_particle": 10.021,
+        "ns_frame": 10020687.1,
+        "achieved_bw_gbs": 6.89
+      },
+      {
+        "N": 4000000,
+        "threads": 1,
+        "ns_particle": 10.016,
+        "ns_frame": 40062401.5,
+        "achieved_bw_gbs": 6.89
+      }
+    ]
+  },
+  "pmc": [],
+  "asm": {
+    "source_hash": "ea61da9797ef08e956532ae2eb7179a7d207c908bfc6d25cfe2565a2a5b93689",
+    "symbol": "_framework.sim.Strategy(layouts.ML1.data.Data,layouts.ML1.AF3.LP1-autovec.LP2-simple.H).step",
+    "n_instructions": 539,
+    "histogram": {
+      "add": 124,
+      "mov": 56,
+      "ldrb": 45,
+      "cbz": 35,
+      "bl": 35,
+      "b": 27,
+      "cmp": 23,
+      "strb": 20,
+      "ldr": 18,
+      "csel": 18,
+      "ldp": 15,
+      "stp": 12,
+      "fcmp": 9,
+      "fmov": 8,
+      "fmul": 8,
+      "fadd": 6,
+      "orr": 6,
+      "ccmp": 6,
+      "str": 5,
+      "and": 5,
+      "bfi": 5,
+      "eor": 5,
+      "fcvtzs": 5,
+      "tbnz": 4,
+      "lsl": 4,
+      "clz": 3,
+      "sub": 2,
+      "adrp": 2,
+      "movk": 2,
+      "dup": 2,
+      "cset": 2,
+      "subs": 2,
+      "ldur": 2,
+      "ext": 2,
+      "ror": 2,
+      "ucvtf": 2,
+      "cmn": 2,
+      "mul": 2,
+      "movi": 1,
+      "stur": 1,
+      "ld1": 1,
+      "fsub": 1,
+      "sxtw": 1,
+      "ret": 1,
+      "lsr": 1,
+      "tst": 1
+    },
+    "vector_insns": 9,
+    "excerpt": "0000000100055718\tsub\tsp, sp, #0xd0\n000000010005571c\tstp\td15, d14, [sp, #0x30]\n0000000100055720\tstp\td13, d12, [sp, #0x40]\n0000000100055724\tstp\td11, d10, [sp, #0x50]\n0000000100055728\tstp\td9, d8, [sp, #0x60]\n000000010005572c\tstp\tx28, x27, [sp, #0x70]\n0000000100055730\tstp\tx26, x25, [sp, #0x80]\n0000000100055734\tstp\tx24, x23, [sp, #0x90]\n0000000100055738\tstp\tx22, x21, [sp, #0xa0]\n000000010005573c\tstp\tx20, x19, [sp, #0xb0]\n0000000100055740\tstp\tx29, x30, [sp, #0xc0]\n0000000100055744\tadd\tx29, sp, #0xc0\n0000000100055748\tmov\tx19, x4\n000000010005574c\tmov\tx21, x3\n0000000100055750\tmov\tx22, x2\n0000000100055754\tstr\tx1, [sp, #0x10]\n0000000100055758\tmov\tx20, x0\n000000010005575c\tmov\tx24, x0\n0000000100055760\tldr\tx8, [x24, #0x10]!\n0000000100055764\tldr\tx27, [x24, #0x18]\n0000000100055768\tldr\tx25, [x24, #0x8]\n000000010005576c\tcbz\tx25, 0x1000558f4\n0000000100055770\tadrp\tx9, 101 ; 0x1000ba000\n0000000100055774\tldr\ts8, [x9, #0x8a8]\n0000000100055778\tadd\tx26, x8, #0x10\n000000010005577c\tmov\tw8, #0xd70a\n0000000100055780\tmovk\tw8, #0x3ca3, lsl #16\n0000000100055784\tdup.2s\tv9, w8\n0000000100055788\tfmov\ts10, w8\n000000010005578c\tmov\tw8, #0x8889\n0000000100055790\tmovk\tw8, #0x3c88, lsl #16\n0000000100055794\tdup.4s\tv4, w8\n0000000100055798\tmovi.2d\tv11, #0000000000000000\n000000010005579c\tadrp\tx9, 7 ; 0x10005c000\n00000001000557a0\tldr\td12, [x9, #0xba8]\n00000001000557a4\tfmov\ts13, w8\n00000001000557a8\tfmov\ts14, #2.00000000\n00000001000557ac\tmov\tw28, #0x7e\n00000001000557b0\tb\t0x1000557dc\n00000001000557b4\tsub\tw8, w28, w8\n00000001000557b8\tand\tw9, w23, #0x7fffff\n00000001000557bc\tbfi\tw9, w8, #23, #7\n00000001000557c0\tfmov\ts0, w9\n00000001000557c4\tfcmp\ts8, s0\n00000001000557c8\tcset\tw8, gt\n00000001000557cc\tstrb\tw8, [x27], #0x1\n00000001000557d0\tadd\tx26, x26, #0x44\n00000001000557d4\tsubs\tx25, x25, #0x1\n00000001000557d8\tb.eq\t0x1000558f0\n00000001000557dc\tadd\tx8, x26, #0x4\n00000001000557e0\tldur\ts0, [x26, #-0x4]\n00000001000557e4\tldur\tq1, [x26, #-0x10]\n00000001000557e8\tldr\td2, [x26]\n00000001000557ec\tfmul\ts0, s0, s10\n00000001000557f0\tfadd\ts0, s0, s11\n00000001000557f4\text.16b\tv3, v1, v2, #0xc\n00000001000557f8\tmov.s\tv3[3], v0[0]\n00000001000557fc\tfmul.4s\tv0, v3, v4\n0000000100055800\tfadd.4s\tv0, v1, v0\n0000000100055804\tstur\tq0, [x26, #-0x10]\n0000000100055808\tld1.s\t{ v2 }[1], [x8]\n000000010005580c\tfmul.2s\tv0, v2, v9\n0000000100055810\tfadd.2s\tv0, v0, v12\n0000000100055814\tfmul.2s\tv0, v0, v4\n0000000100055818\tfadd.2s\tv0, v2, v0\n000000010005581c\tstr\td0, [x26]\n0000000100055820\tldr\ts0, [x26, #0xc]\n0000000100055824\tfadd\ts0, s0, s13\n0000000100055828\tstr\ts0, [x26, #0xc]\n000000010005582c\tfcmp\ts0, s14\n0000000100055830\tcset\tw8, ge\n0000000100055834\tb.ge\t0x1000557cc\n0000000100055838\tfcmp\ts8, #0.0\n000000010005583c\tb.eq\t0x1000557cc\n0000000100055840\tldp\tx8, x9, [x20, #0x58]\n0000000100055844\tldp\tx11, x10, [x20, #0x68]\n0000000100055848\tadd\tx12, x10, x8\n000000010005584c\tror\tx12, x12, #0x29\n0000000100055850\tadd\tx23, x12, x8\n0000000100055854\teor\tx11, x11, x8\n0000000100055858\teor\tx10, x9, x10\n000000010005585c\teor\tx12, x11, x9\n0000000100055860\teor\tx8, x10, x8\n0000000100055864\tstp\tx8, x12, [x20, #0x58]\n0000000100055868\teor\tx8, x11, x9, lsl #17\n000000010005586c\tror\tx9, x10, #0x13\n0000000100055870\tstp\tx8, x9, [x20, #0x68]\n0000000100055874\tclz\tx8, x23\n0000000100055878\tstrb\tw8, [sp, #0x1f]\n000000010005587c\tand\tw8, w8, #0xff\n0000000100055880\tand\tw9, w8, #0x7f\n0000000100055884\tcmp\tw9, #0x29\n0000000100055888\tb.lo\t0x1000557b4\n000000010005588c\tadd\tx0, x20, #0x58\n0000000100055890\tadd\tx1, sp, #0x20\n0000000100055894\tmov\tw2, #0x8\n0000000100055898\tstr\tq4, [sp]\n000000010005589c\tbl\t_Random.init__anon_32846.gen.fill\n00000001000558a0\tldr\tq4, [sp]\n00000001000558a4\tldr\tx8, [sp, #0x20]\n00000001000558a8\tclz\tx8, x8\n00000001000558ac\tadd\tw8, w8, #0x29\n00000001000558b0\tand\tw8, w8, #0x7f\n00000001000558b4\tstrb\tw8, [sp, #0x1f]\n00000001000558b8\tcmp\tw8, #0x69\n00000001000558bc\tb.ne\t0x1000557b4\n00000001000558c0\tadd\tx0, x20, #0x58\n00000001000558c4\tadd\tx1, sp, #0x2c\n00000001000558c8\tmov\tw2, #0x4\n00000001000558cc\tbl\t_Random.init__anon_32846.gen.fill\n00000001000558d0\tldr\tq4, [sp]\n00000001000558d4\tldr\tw8, [sp, #0x2c]\n00000001000558d8\torr\tw8, w8, #0x7ff\n00000001000558dc\tclz\tw8, w8\n00000001000558e0\tadd\tw8, w8, #0x69\n00000001000558e4\tand\tw8, w8, #0x7f\n00000001000558e8\tstrb\tw8, [sp, #0x1f]\n00000001000558ec\tb\t0x1000557b4\n00000001000558f0\tldr\tx27, [x20, #0x28]\n00000001000558f4\tldr\tx28, [x20, #0x20]\n00000001000558f8\tcmp\tx28, #0x20\n00000001000558fc\tb.hs\t0x100055bf4\n0000000100055900\tmov\tx26, #0x0\n0000000100055904\tcmp\tx26, x28\n0000000100055908\tb.lo\t0x100055950\n000000010005590c\tldr\tx8, [x20, #0x18]\n0000000100055910\tldr\tx3, [sp, #0x10]\n0000000100055914\tcbz\tx8, 0x100055bb8\n0000000100055918\tldr\tx10, [x20, #0x10]\n000000010005591c\tucvtf\ts0, w21\n0000000100055920\tucvtf\ts1, w19\n0000000100055924\tmov\tw9, w21\n0000000100055928\tadd\tx10, x10, #0x28\n000000010005592c\tmov\tw11, #0xff\n0000000100055930\tmov\tw12, #0x437f0000\n0000000100055934\tfmov\ts2, w12\n0000000100055938\tfmov\ts3, #2.00000000\n000000010005593c\tfmov\ts4, #0.25000000\n0000000100055940\tb\t0x100055998\n0000000100055944\tadd\tx26, x26, #0x1\n0000000100055948\tcmp\tx28, x26\n000000010005594c\tb.eq\t0x10005590c\n0000000100055950\tldrb\tw8, [x27, x26]\n0000000100055954\tcbz\tw8, 0x100055944\n0000000100055958\tadd\tx1, x20, #0x38\n000000010005595c\tmov\tx0, x24\n0000000100055960\tmov\tx2, x26\n0000000100055964\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055968\tb\t0x100055944\n000000010005596c\tadd\tx17, x15, #0x1\n0000000100055970\tcmn\tw15, #0x1\n0000000100055974\tccmp\tx17, x9, #0x0, ge\n0000000100055978\tadd\tx16, x17, x16\n000000010005597c\tmov\tw15, #0x3\n0000000100055980\tbfi\tx15, x16, #2, #61\n0000000100055984\tccmp\tx15, x22, #0x2, lt\n0000000100055988\tb.lo\t0x100055b14\n000000010005598c\tadd\tx10, x10, #0x44\n0000000100055990\tsubs\tx8, x8, #0x1\n0000000100055994\tb.eq\t0x100055bb8\n0000000100055998\tldp\ts5, s6, [x10, #-0x28]\n000000010005599c\tldp\ts7, s16, [x10, #-0x8]\n00000001000559a0\tldr\ts17, [x10]\n00000001000559a4\tfcmp\ts7, s2\n00000001000559a8\tfcvtzs\tw12, s7\n00000001000559ac\tcsel\tw12, w11, w12, ge\n00000001000559b0\tfcmp\ts7, #0.0\n00000001000559b4\tcsel\tw12, wzr, w12, ls\n00000001000559b8\tfcmp\ts16, s2\n00000001000559bc\tfcvtzs\tw13, s16\n00000001000559c0\tcsel\tw13, w11, w13, ge\n00000001000559c4\tfcmp\ts16, #0.0\n00000001000559c8\tcsel\tw13, wzr, w13, ls\n00000001000559cc\tfcmp\ts17, s2\n00000001000559d0\tfcvtzs\tw14, s17\n00000001000559d4\tcsel\tw14, w11, w14, ge\n00000001000559d8\tfcmp\ts17, #0.0\n00000001000559dc\tcsel\tw14, wzr, w14, ls\n00000001000559e0\tfadd\ts5, s5, s3\n00000001000559e4\tfmul\ts5, s5, s4\n00000001000559e8\tfmul\ts5, s5, s0\n00000001000559ec\tfcvtzs\tw15, s5\n00000001000559f0\tfsub\ts5, s3, s6\n00000001000559f4\tfmul\ts5, s5, s4\n00000001000559f8\tfmul\ts5, s5, s1\n00000001000559fc\tfcvtzs\tw16, s5\n0000000100055a00\tsxtw\tx15, w15\n0000000100055a04\tcmp\tw16, w19\n0000000100055a08\tb.ge\t0x100055a98\n0000000100055a0c\ttbnz\tw16, #0x1f, 0x100055a98\n0000000100055a10\tmul\tw17, w16, w21\n0000000100055a14\ttbnz\tw15, #0x1f, 0x100055a78\n0000000100055a18\tcmp\tw21, w15\n0000000100055a1c\tadd\tx1, x17, x15\n0000000100055a20\tmov\tw0, #0x3\n0000000100055a24\tbfi\tx0, x1, #2, #61\n0000000100055a28\tccmp\tx0, x22, #0x2, gt\n0000000100055a2c\tb.hs\t0x100055a78\n0000000100055a30\tlsl\tx1, x1, #2\n0000000100055a34\tadd\tx1, x3, x1\n0000000100055a38\tldrb\tw2, [x1]\n0000000100055a3c\tadd\tw2, w2, w12\n0000000100055a40\tcmp\tw2, #0xff\n0000000100055a44\tcsel\tw2, w2, w11, lo\n0000000100055a48\tstrb\tw2, [x1]\n0000000100055a4c\tldrb\tw2, [x1, #0x1]\n0000000100055a50\tadd\tw2, w2, w13\n0000000100055a54\tcmp\tw2, #0xff\n0000000100055a58\tcsel\tw2, w2, w11, lo\n0000000100055a5c\tstrb\tw2, [x1, #0x1]\n0000000100055a60\tldrb\tw2, [x1, #0x2]\n0000000100055a64\tadd\tw2, w2, w14\n0000000100055a68\tcmp\tw2, #0xff\n0000000100055a6c\tcsel\tw2, w2, w11, lo\n0000000100055a70\tstrb\tw2, [x1, #0x2]\n0000000100055a74\tstrb\tw11, [x3, x0]\n0000000100055a78\tadd\tx0, x15, #0x1\n0000000100055a7c\tcmn\tw15, #0x1\n0000000100055a80\tccmp\tx0, x9, #0x0, ge\n0000000100055a84\tadd\tx0, x0, x17\n0000000100055a88\tmov\tw17, #0x3\n0000000100055a8c\tbfi\tx17, x0, #2, #61\n0000000100055a90\tccmp\tx17, x22, #0x2, lt\n0000000100055a94\tb.lo\t0x100055b60\n0000000100055a98\tadd\tw16, w16, #0x1\n0000000100055a9c\tcmp\tw16, w19\n0000000100055aa0\tb.ge\t0x10005598c\n0000000100055aa4\ttbnz\tw16, #0x1f, 0x10005598c\n0000000100055aa8\tmul\tw16, w16, w21\n0000000100055aac\ttbnz\tw15, #0x1f, 0x10005596c\n0000000100055ab0\tcmp\tw21, w15\n0000000100055ab4\tadd\tx0, x16, x15\n0000000100055ab8\tmov\tw17, #0x3\n0000000100055abc\tbfi\tx17, x0, #2, #61\n0000000100055ac0\tccmp\tx17, x22, #0x2, gt\n0000000100055ac4\tb.hs\t0x10005596c\n0000000100055ac8\tlsl\tx0, x0, #2\n0000000100055acc\tadd\tx0, x3, x0\n0000000100055ad0\tldrb\tw1, [x0]\n0000000100055ad4\tadd\tw1, w1, w12\n0000000100055ad8\tcmp\tw1, #0xff\n0000000100055adc\tcsel\tw1, w1, w11, lo\n0000000100055ae0\tstrb\tw1, [x0]\n0000000100055ae4\tldrb\tw1, [x0, #0x1]\n0000000100055ae8\tadd\tw1, w1, w13\n0000000100055aec\tcmp\tw1, #0xff\n0000000100055af0\tcsel\tw1, w1, w11, lo\n0000000100055af4\tstrb\tw1, [x0, #0x1]\n0000000100055af8\tldrb\tw1, [x0, #0x2]\n0000000100055afc\tadd\tw1, w1, w14\n0000000100055b00\tcmp\tw1, #0xff\n0000000100055b04\tcsel\tw1, w1, w11, lo\n0000000100055b08\tstrb\tw1, [x0, #0x2]\n0000000100055b0c\tstrb\tw11, [x3, x17]\n0000000100055b10\tb\t0x10005596c\n0000000100055b14\tlsl\tx16, x16, #2\n0000000100055b18\tadd\tx16, x3, x16\n0000000100055b1c\tldrb\tw17, [x16]\n0000000100055b20\tadd\tw12, w17, w12\n0000000100055b24\tcmp\tw12, #0xff\n0000000100055b28\tcsel\tw12, w12, w11, lo\n0000000100055b2c\tstrb\tw12, [x16]\n0000000100055b30\tldrb\tw12, [x16, #0x1]\n0000000100055b34\tadd\tw12, w12, w13\n0000000100055b38\tcmp\tw12, #0xff\n0000000100055b3c\tcsel\tw12, w12, w11, lo\n0000000100055b40\tstrb\tw12, [x16, #0x1]\n0000000100055b44\tldrb\tw12, [x16, #0x2]\n0000000100055b48\tadd\tw12, w12, w14\n0000000100055b4c\tcmp\tw12, #0xff\n0000000100055b50\tcsel\tw12, w12, w11, lo\n0000000100055b54\tstrb\tw12, [x16, #0x2]\n0000000100055b58\tstrb\tw11, [x3, x15]\n0000000100055b5c\tb\t0x10005598c\n0000000100055b60\tlsl\tx0, x0, #2\n0000000100055b64\tadd\tx0, x3, x0\n0000000100055b68\tldrb\tw1, [x0]\n0000000100055b6c\tadd\tw1, w1, w12\n0000000100055b70\tcmp\tw1, #0xff\n0000000100055b74\tcsel\tw1, w1, w11, lo\n0000000100055b78\tstrb\tw1, [x0]\n0000000100055b7c\tldrb\tw1, [x0, #0x1]\n0000000100055b80\tadd\tw1, w1, w13\n0000000100055b84\tcmp\tw1, #0xff\n0000000100055b88\tcsel\tw1, w1, w11, lo\n0000000100055b8c\tstrb\tw1, [x0, #0x1]\n0000000100055b90\tldrb\tw1, [x0, #0x2]\n0000000100055b94\tadd\tw1, w1, w14\n0000000100055b98\tcmp\tw1, #0xff\n0000000100055b9c\tcsel\tw1, w1, w11, lo\n0000000100055ba0\tstrb\tw1, [x0, #0x2]\n0000000100055ba4\tstrb\tw11, [x3, x17]\n0000000100055ba8\tadd\tw16, w16, #0x1\n0000000100055bac\tcmp\tw16, w19\n0000000100055bb0\tb.lt\t0x100055aa4\n0000000100055bb4\tb\t0x10005598c\n0000000100055bb8\tldr\tx8, [x20, #0x78]\n0000000100055bbc\tadd\tx8, x8, #0x1\n0000000100055bc0\tstr\tx8, [x20, #0x78]\n0000000100055bc4\tldp\tx29, x30, [sp, #0xc0]\n0000000100055bc8\tldp\tx20, x19, [sp, #0xb0]\n0000000100055bcc\tldp\tx22, x21, [sp, #0xa0]\n0000000100055bd0\tldp\tx24, x23, [sp, #0x90]\n0000000100055bd4\tldp\tx26, x25, [sp, #0x80]\n0000000100055bd8\tldp\tx28, x27, [sp, #0x70]\n0000000100055bdc\tldp\td9, d8, [sp, #0x60]\n0000000100055be0\tldp\td11, d10, [sp, #0x50]\n0000000100055be4\tldp\td13, d12, [sp, #0x40]\n0000000100055be8\tldp\td15, d14, [sp, #0x30]\n0000000100055bec\tadd\tsp, sp, #0xd0\n0000000100055bf0\tret\n0000000100055bf4\tmov\tx25, #0x0\n0000000100055bf8\tb\t0x100055c10\n0000000100055bfc\tadd\tx26, x25, #0x20\n0000000100055c00\tadd\tx8, x25, #0x40\n0000000100055c04\tmov\tx25, x26\n0000000100055c08\tcmp\tx8, x28\n0000000100055c0c\tb.hi\t0x100055904\n0000000100055c10\tadd\tx8, x27, x25\n0000000100055c14\tldp\tq1, q0, [x8]\n0000000100055c18\torr.16b\tv0, v1, v0\n0000000100055c1c\text.16b\tv1, v0, v0, #0x8\n0000000100055c20\torr.8b\tv0, v0, v1\n0000000100055c24\tfmov\tx8, d0\n0000000100055c28\torr\tx8, x8, x8, lsr #32\n0000000100055c2c\tlsr\tx9, x8, #16\n0000000100055c30\torr\tw8, w8, w9\n0000000100055c34\torr\tw8, w8, w8, lsr #8\n0000000100055c38\ttst\tw8, #0xff\n0000000100055c3c\tb.eq\t0x100055bfc\n0000000100055c40\tldrb\tw8, [x27, x25]\n0000000100055c44\tcbz\tw8, 0x100055c58\n0000000100055c48\tadd\tx1, x20, #0x38\n0000000100055c4c\tmov\tx0, x24\n0000000100055c50\tmov\tx2, x25\n0000000100055c54\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055c58\tadd\tx23, x27, x25\n0000000100055c5c\tldrb\tw8, [x23, #0x1]\n0000000100055c60\tcbz\tw8, 0x100055c74\n0000000100055c64\tadd\tx1, x20, #0x38\n0000000100055c68\tadd\tx2, x25, #0x1\n0000000100055c6c\tmov\tx0, x24\n0000000100055c70\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055c74\tldrb\tw8, [x23, #0x2]\n0000000100055c78\tcbz\tw8, 0x100055c8c\n0000000100055c7c\tadd\tx1, x20, #0x38\n0000000100055c80\tadd\tx2, x25, #0x2\n0000000100055c84\tmov\tx0, x24\n0000000100055c88\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055c8c\tadd\tx23, x27, x25\n0000000100055c90\tldrb\tw8, [x23, #0x3]\n0000000100055c94\tcbz\tw8, 0x100055ca8\n0000000100055c98\tadd\tx1, x20, #0x38\n0000000100055c9c\tadd\tx2, x25, #0x3\n0000000100055ca0\tmov\tx0, x24\n0000000100055ca4\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055ca8\tldrb\tw8, [x23, #0x4]\n0000000100055cac\tcbz\tw8, 0x100055cc0\n0000000100055cb0\tadd\tx1, x20, #0x38\n0000000100055cb4\tadd\tx2, x25, #0x4\n0000000100055cb8\tmov\tx0, x24\n0000000100055cbc\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055cc0\tadd\tx23, x27, x25\n0000000100055cc4\tldrb\tw8, [x23, #0x5]\n0000000100055cc8\tcbz\tw8, 0x100055cdc\n0000000100055ccc\tadd\tx1, x20, #0x38\n0000000100055cd0\tadd\tx2, x25, #0x5\n0000000100055cd4\tmov\tx0, x24\n0000000100055cd8\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055cdc\tldrb\tw8, [x23, #0x6]\n0000000100055ce0\tcbz\tw8, 0x100055cf4\n0000000100055ce4\tadd\tx1, x20, #0x38\n0000000100055ce8\tadd\tx2, x25, #0x6\n0000000100055cec\tmov\tx0, x24\n0000000100055cf0\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055cf4\tadd\tx23, x27, x25\n0000000100055cf8\tldrb\tw8, [x23, #0x7]\n0000000100055cfc\tcbz\tw8, 0x100055d10\n0000000100055d00\tadd\tx1, x20, #0x38\n0000000100055d04\tadd\tx2, x25, #0x7\n0000000100055d08\tmov\tx0, x24\n0000000100055d0c\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055d10\tldrb\tw8, [x23, #0x8]\n0000000100055d14\tcbz\tw8, 0x100055d28\n0000000100055d18\tadd\tx1, x20, #0x38\n0000000100055d1c\tadd\tx2, x25, #0x8\n0000000100055d20\tmov\tx0, x24\n0000000100055d24\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055d28\tadd\tx23, x27, x25\n0000000100055d2c\tldrb\tw8, [x23, #0x9]\n0000000100055d30\tcbz\tw8, 0x100055d44\n0000000100055d34\tadd\tx1, x20, #0x38\n0000000100055d38\tadd\tx2, x25, #0x9\n0000000100055d3c\tmov\tx0, x24\n0000000100055d40\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055d44\tldrb\tw8, [x23, #0xa]\n0000000100055d48\tcbz\tw8, 0x100055d5c\n0000000100055d4c\tadd\tx1, x20, #0x38\n0000000100055d50\tadd\tx2, x25, #0xa\n0000000100055d54\tmov\tx0, x24\n0000000100055d58\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055d5c\tadd\tx23, x27, x25\n0000000100055d60\tldrb\tw8, [x23, #0xb]\n0000000100055d64\tcbz\tw8, 0x100055d78\n0000000100055d68\tadd\tx1, x20, #0x38\n0000000100055d6c\tadd\tx2, x25, #0xb\n0000000100055d70\tmov\tx0, x24\n0000000100055d74\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055d78\tldrb\tw8, [x23, #0xc]\n0000000100055d7c\tcbz\tw8, 0x100055d90\n0000000100055d80\tadd\tx1, x20, #0x38\n0000000100055d84\tadd\tx2, x25, #0xc\n0000000100055d88\tmov\tx0, x24\n0000000100055d8c\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055d90\tadd\tx23, x27, x25\n0000000100055d94\tldrb\tw8, [x23, #0xd]\n0000000100055d98\tcbz\tw8, 0x100055dac\n0000000100055d9c\tadd\tx1, x20, #0x38\n0000000100055da0\tadd\tx2, x25, #0xd\n0000000100055da4\tmov\tx0, x24\n0000000100055da8\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055dac\tldrb\tw8, [x23, #0xe]\n0000000100055db0\tcbz\tw8, 0x100055dc4\n0000000100055db4\tadd\tx1, x20, #0x38\n0000000100055db8\tadd\tx2, x25, #0xe\n0000000100055dbc\tmov\tx0, x24\n0000000100055dc0\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055dc4\tadd\tx23, x27, x25\n0000000100055dc8\tldrb\tw8, [x23, #0xf]\n0000000100055dcc\tcbz\tw8, 0x100055de0\n0000000100055dd0\tadd\tx1, x20, #0x38\n0000000100055dd4\tadd\tx2, x25, #0xf\n0000000100055dd8\tmov\tx0, x24\n0000000100055ddc\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055de0\tldrb\tw8, [x23, #0x10]\n0000000100055de4\tcbz\tw8, 0x100055df8\n0000000100055de8\tadd\tx1, x20, #0x38\n0000000100055dec\tadd\tx2, x25, #0x10\n0000000100055df0\tmov\tx0, x24\n0000000100055df4\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055df8\tadd\tx23, x27, x25\n0000000100055dfc\tldrb\tw8, [x23, #0x11]\n0000000100055e00\tcbz\tw8, 0x100055e14\n0000000100055e04\tadd\tx1, x20, #0x38\n0000000100055e08\tadd\tx2, x25, #0x11\n0000000100055e0c\tmov\tx0, x24\n0000000100055e10\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055e14\tldrb\tw8, [x23, #0x12]\n0000000100055e18\tcbz\tw8, 0x100055e2c\n0000000100055e1c\tadd\tx1, x20, #0x38\n0000000100055e20\tadd\tx2, x25, #0x12\n0000000100055e24\tmov\tx0, x24\n0000000100055e28\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055e2c\tadd\tx23, x27, x25\n0000000100055e30\tldrb\tw8, [x23, #0x13]\n0000000100055e34\tcbz\tw8, 0x100055e48\n0000000100055e38\tadd\tx1, x20, #0x38\n0000000100055e3c\tadd\tx2, x25, #0x13\n0000000100055e40\tmov\tx0, x24\n0000000100055e44\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055e48\tldrb\tw8, [x23, #0x14]\n0000000100055e4c\tcbz\tw8, 0x100055e60\n0000000100055e50\tadd\tx1, x20, #0x38\n0000000100055e54\tadd\tx2, x25, #0x14\n0000000100055e58\tmov\tx0, x24\n0000000100055e5c\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055e60\tadd\tx23, x27, x25\n0000000100055e64\tldrb\tw8, [x23, #0x15]\n0000000100055e68\tcbz\tw8, 0x100055e7c\n0000000100055e6c\tadd\tx1, x20, #0x38\n0000000100055e70\tadd\tx2, x25, #0x15\n0000000100055e74\tmov\tx0, x24\n0000000100055e78\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055e7c\tldrb\tw8, [x23, #0x16]\n0000000100055e80\tcbz\tw8, 0x100055e94\n0000000100055e84\tadd\tx1, x20, #0x38\n0000000100055e88\tadd\tx2, x25, #0x16\n0000000100055e8c\tmov\tx0, x24\n0000000100055e90\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055e94\tadd\tx23, x27, x25\n0000000100055e98\tldrb\tw8, [x23, #0x17]\n0000000100055e9c\tcbz\tw8, 0x100055eb0\n0000000100055ea0\tadd\tx1, x20, #0x38\n0000000100055ea4\tadd\tx2, x25, #0x17\n0000000100055ea8\tmov\tx0, x24\n0000000100055eac\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055eb0\tldrb\tw8, [x23, #0x18]\n0000000100055eb4\tcbz\tw8, 0x100055ec8\n0000000100055eb8\tadd\tx1, x20, #0x38\n0000000100055ebc\tadd\tx2, x25, #0x18\n0000000100055ec0\tmov\tx0, x24\n0000000100055ec4\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055ec8\tadd\tx23, x27, x25\n0000000100055ecc\tldrb\tw8, [x23, #0x19]\n0000000100055ed0\tcbz\tw8, 0x100055ee4\n0000000100055ed4\tadd\tx1, x20, #0x38\n0000000100055ed8\tadd\tx2, x25, #0x19\n0000000100055edc\tmov\tx0, x24\n0000000100055ee0\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055ee4\tldrb\tw8, [x23, #0x1a]\n0000000100055ee8\tcbz\tw8, 0x100055efc\n0000000100055eec\tadd\tx1, x20, #0x38\n0000000100055ef0\tadd\tx2, x25, #0x1a\n0000000100055ef4\tmov\tx0, x24\n0000000100055ef8\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055efc\tadd\tx23, x27, x25\n0000000100055f00\tldrb\tw8, [x23, #0x1b]\n0000000100055f04\tcbz\tw8, 0x100055f18\n0000000100055f08\tadd\tx1, x20, #0x38\n0000000100055f0c\tadd\tx2, x25, #0x1b\n0000000100055f10\tmov\tx0, x24\n0000000100055f14\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055f18\tldrb\tw8, [x23, #0x1c]\n0000000100055f1c\tcbz\tw8, 0x100055f30\n0000000100055f20\tadd\tx1, x20, #0x38\n0000000100055f24\tadd\tx2, x25, #0x1c\n0000000100055f28\tmov\tx0, x24\n0000000100055f2c\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055f30\tadd\tx23, x27, x25\n0000000100055f34\tldrb\tw8, [x23, #0x1d]\n0000000100055f38\tcbz\tw8, 0x100055f4c\n0000000100055f3c\tadd\tx1, x20, #0x38\n0000000100055f40\tadd\tx2, x25, #0x1d\n0000000100055f44\tmov\tx0, x24\n0000000100055f48\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055f4c\tldrb\tw8, [x23, #0x1e]\n0000000100055f50\tcbz\tw8, 0x100055f64\n0000000100055f54\tadd\tx1, x20, #0x38\n0000000100055f58\tadd\tx2, x25, #0x1e\n0000000100055f5c\tmov\tx0, x24\n0000000100055f60\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055f64\tadd\tx8, x27, x25\n0000000100055f68\tldrb\tw8, [x8, #0x1f]\n0000000100055f6c\tcbz\tw8, 0x100055bfc\n0000000100055f70\tadd\tx1, x20, #0x38\n0000000100055f74\tadd\tx2, x25, #0x1f\n0000000100055f78\tmov\tx0, x24\n0000000100055f7c\tbl\t_layouts.ML1.data.Data.spawn\n0000000100055f80\tb\t0x100055bfc",
+    "source_attributed": [
+      {
+        "source": "        pub fn step(self: *Self, dt: f32, fb: []u8, w: u32, h: u32) void {",
+        "asm": [
+          "sub\tsp, sp, #0xd0",
+          "stp\td15, d14, [sp, #0x30]",
+          "stp\td13, d12, [sp, #0x40]",
+          "stp\td11, d10, [sp, #0x50]",
+          "stp\td9, d8, [sp, #0x60]",
+          "stp\tx28, x27, [sp, #0x70]",
+          "stp\tx26, x25, [sp, #0x80]",
+          "stp\tx24, x23, [sp, #0x90]",
+          "stp\tx22, x21, [sp, #0xa0]",
+          "stp\tx20, x19, [sp, #0xb0]",
+          "stp\tx29, x30, [sp, #0xc0]",
+          "add\tx29, sp, #0xc0",
+          "mov\tx19, x4",
+          "mov\tx21, x3",
+          "mov\tx22, x2",
+          "str\tx1, [sp, #0x10]",
+          "mov\tx20, x0",
+          "mov\tx24, x0",
+          "ldr\tx8, [x24, #0x10]!",
+          "ldr\tx27, [x24, #0x18]",
+          "ldr\tx25, [x24, #0x8]"
+        ]
+      },
+      {
+        "source": "        for (data.particles, 0..) |*p, i| {",
+        "asm": [
+          "cbz\tx25, 0x1000558f4",
+          "adrp\tx9, 101 ; 0x1000ba000",
+          "ldr\ts8, [x9, #0x8a8]",
+          "add\tx26, x8, #0x10",
+          "mov\tw8, #0xd70a",
+          "movk\tw8, #0x3ca3, lsl #16",
+          "dup.2s\tv9, w8",
+          "fmov\ts10, w8",
+          "mov\tw8, #0x8889",
+          "movk\tw8, #0x3c88, lsl #16",
+          "dup.4s\tv4, w8",
+          "movi.2d\tv11, #0000000000000000",
+          "adrp\tx9, 7 ; 0x10005c000",
+          "ldr\td12, [x9, #0xba8]",
+          "fmov\ts13, w8",
+          "fmov\ts14, #2.00000000",
+          "mov\tw28, #0x7e",
+          "b\t0x1000557dc",
+          "sub\tw8, w28, w8",
+          "and\tw9, w23, #0x7fffff"
+        ]
+      },
+      {
+        "source": "return @bitCast(exponent | mantissa);",
+        "asm": [
+          "bfi\tw9, w8, #23, #7",
+          "fmov\ts0, w9"
+        ]
+      },
+      {
+        "source": "    return kill_rng.random().float(f32) < q;",
+        "asm": [
+          "fcmp\ts8, s0",
+          "cset\tw8, gt"
+        ]
+      },
+      {
+        "source": "            dead[i] = @intFromBool(config.isDead(p.age, &sim.kill_rng));",
+        "asm": [
+          "strb\tw8, [x27], #0x1"
+        ]
+      },
+      {
+        "source": "        for (data.particles, 0..) |*p, i| {",
+        "asm": [
+          "add\tx26, x26, #0x44",
+          "subs\tx25, x25, #0x1",
+          "b.eq\t0x1000558f0"
+        ]
+      },
+      {
+        "source": "            p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "add\tx8, x26, #0x4",
+          "ldur\ts0, [x26, #-0x4]",
+          "ldur\tq1, [x26, #-0x10]",
+          "ldr\td2, [x26]"
+        ]
+      },
+      {
+        "source": "                .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "asm": [
+          "fmul\ts0, s0, s10",
+          "fadd\ts0, s0, s11"
+        ]
+      },
+      {
+        "source": "        return .{ .x = a.x * s, .y = a.y * s, .z = a.z * s };",
+        "asm": [
+          "ext.16b\tv3, v1, v2, #0xc",
+          "mov.s\tv3[3], v0[0]",
+          "fmul.4s\tv0, v3, v4",
+          "fadd.4s\tv0, v1, v0",
+          "stur\tq0, [x26, #-0x10]",
+          "ld1.s\t{ v2 }[1], [x8]"
+        ]
+      },
+      {
+        "source": "                .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "asm": [
+          "fmul.2s\tv0, v2, v9",
+          "fadd.2s\tv0, v0, v12",
+          "fmul.2s\tv0, v0, v4",
+          "fadd.2s\tv0, v2, v0",
+          "str\td0, [x26]"
+        ]
+      },
+      {
+        "source": "            p.age += dt;",
+        "asm": [
+          "ldr\ts0, [x26, #0xc]",
+          "fadd\ts0, s0, s13",
+          "str\ts0, [x26, #0xc]"
+        ]
+      },
+      {
+        "source": "    if (age >= kill_age) return true;",
+        "asm": [
+          "fcmp\ts0, s14",
+          "cset\tw8, ge",
+          "b.ge\t0x1000557cc",
+          "fcmp\ts8, #0.0",
+          "b.eq\t0x1000557cc"
+        ]
+      },
+      {
+        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
+        "asm": [
+          "ldp\tx8, x9, [x20, #0x58]",
+          "ldp\tx11, x10, [x20, #0x68]",
+          "add\tx12, x10, x8",
+          "ror\tx12, x12, #0x29",
+          "add\tx23, x12, x8",
+          "eor\tx11, x11, x8",
+          "eor\tx10, x9, x10"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "eor\tx12, x11, x9"
+        ]
+      },
+      {
+        "source": "self.s[0] ^= self.s[3];",
+        "asm": [
+          "eor\tx8, x10, x8"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "stp\tx8, x12, [x20, #0x58]"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "eor\tx8, x11, x9, lsl #17"
+        ]
+      },
+      {
+        "source": "return x << ar | x >> 1 +% ~ar;",
+        "asm": [
+          "ror\tx9, x10, #0x13"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "stp\tx8, x9, [x20, #0x68]"
+        ]
+      },
+      {
+        "source": "var rand_lz = @clz(rand);",
+        "asm": [
+          "clz\tx8, x23",
+          "strb\tw8, [sp, #0x1f]"
+        ]
+      },
+      {
+        "source": "if (rand_lz >= 41) {",
+        "asm": [
+          "and\tw8, w8, #0xff",
+          "and\tw9, w8, #0x7f",
+          "cmp\tw9, #0x29",
+          "b.lo\t0x1000557b4"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "add\tx0, x20, #0x58",
+          "add\tx1, sp, #0x20",
+          "mov\tw2, #0x8",
+          "str\tq4, [sp]",
+          "bl\t_Random.init__anon_32846.gen.fill",
+          "ldr\tq4, [sp]",
+          "ldr\tx8, [sp, #0x20]",
+          "clz\tx8, x8"
+        ]
+      },
+      {
+        "source": "rand_lz = 41 + @clz(r.int(u64));",
+        "asm": [
+          "add\tw8, w8, #0x29",
+          "and\tw8, w8, #0x7f",
+          "strb\tw8, [sp, #0x1f]"
+        ]
+      },
+      {
+        "source": "if (rand_lz == 41 + 64) {",
+        "asm": [
+          "cmp\tw8, #0x69",
+          "b.ne\t0x1000557b4"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "add\tx0, x20, #0x58",
+          "add\tx1, sp, #0x2c",
+          "mov\tw2, #0x4",
+          "bl\t_Random.init__anon_32846.gen.fill",
+          "ldr\tq4, [sp]"
+        ]
+      },
+      {
+        "source": "const value: T = @bitCast(buffer.*);",
+        "asm": [
+          "ldr\tw8, [sp, #0x2c]"
+        ]
+      },
+      {
+        "source": "rand_lz += @clz(r.int(u32) | 0x7FF);",
+        "asm": [
+          "orr\tw8, w8, #0x7ff",
+          "clz\tw8, w8",
+          "add\tw8, w8, #0x69",
+          "and\tw8, w8, #0x7f",
+          "strb\tw8, [sp, #0x1f]",
+          "b\t0x1000557b4",
+          "ldr\tx27, [x20, #0x28]",
+          "ldr\tx28, [x20, #0x20]",
+          "cmp\tx28, #0x20"
+        ]
+      },
+      {
+        "source": "        while (i + B <= n) : (i += B) {",
+        "asm": [
+          "b.hs\t0x100055bf4",
+          "mov\tx26, #0x0"
+        ]
+      },
+      {
+        "source": "        while (i < n) : (i += 1) {",
+        "asm": [
+          "cmp\tx26, x28",
+          "b.lo\t0x100055950"
+        ]
+      },
+      {
+        "source": "        for (data.particles) |p| {",
+        "asm": [
+          "ldr\tx8, [x20, #0x18]",
+          "ldr\tx3, [sp, #0x10]",
+          "cbz\tx8, 0x100055bb8",
+          "ldr\tx10, [x20, #0x10]",
+          "ucvtf\ts0, w21",
+          "ucvtf\ts1, w19",
+          "mov\tw9, w21",
+          "add\tx10, x10, #0x28",
+          "mov\tw11, #0xff",
+          "mov\tw12, #0x437f0000",
+          "fmov\ts2, w12",
+          "fmov\ts3, #2.00000000",
+          "fmov\ts4, #0.25000000",
+          "b\t0x100055998",
+          "add\tx26, x26, #0x1",
+          "cmp\tx28, x26"
+        ]
+      },
+      {
+        "source": "        while (i < n) : (i += 1) {",
+        "asm": [
+          "b.eq\t0x10005590c"
+        ]
+      },
+      {
+        "source": "            if (dead[i] != 0) sim.data.spawn(&sim.rng, i);",
+        "asm": [
+          "ldrb\tw8, [x27, x26]",
+          "cbz\tw8, 0x100055944",
+          "add\tx1, x20, #0x38",
+          "mov\tx0, x24",
+          "mov\tx2, x26",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "b\t0x100055944"
+        ]
+      },
+      {
+        "source": "            const fx = px + dx;",
+        "asm": [
+          "add\tx17, x15, #0x1"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "cmn\tw15, #0x1",
+          "ccmp\tx17, x9, #0x0, ge"
+        ]
+      },
+      {
+        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
+        "asm": [
+          "add\tx16, x17, x16"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "mov\tw15, #0x3",
+          "bfi\tx15, x16, #2, #61",
+          "ccmp\tx15, x22, #0x2, lt",
+          "b.lo\t0x100055b14",
+          "add\tx10, x10, #0x44",
+          "subs\tx8, x8, #0x1",
+          "b.eq\t0x100055bb8",
+          "ldp\ts5, s6, [x10, #-0x28]"
+        ]
+      },
+      {
+        "source": "        for (data.particles) |p| {",
+        "asm": [
+          "ldp\ts7, s16, [x10, #-0x8]",
+          "ldr\ts17, [x10]"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "fcmp\ts7, s2"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(v);",
+        "asm": [
+          "fcvtzs\tw12, s7"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "csel\tw12, w11, w12, ge"
+        ]
+      },
+      {
+        "source": "    if (v <= 0) return 0;",
+        "asm": [
+          "fcmp\ts7, #0.0",
+          "csel\tw12, wzr, w12, ls"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "fcmp\ts16, s2"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(v);",
+        "asm": [
+          "fcvtzs\tw13, s16"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "csel\tw13, w11, w13, ge"
+        ]
+      },
+      {
+        "source": "    if (v <= 0) return 0;",
+        "asm": [
+          "fcmp\ts16, #0.0",
+          "csel\tw13, wzr, w13, ls"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "fcmp\ts17, s2"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(v);",
+        "asm": [
+          "fcvtzs\tw14, s17"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "csel\tw14, w11, w14, ge",
+          "fcmp\ts17, #0.0",
+          "csel\tw14, wzr, w14, ls",
+          "fadd\ts5, s5, s3",
+          "fmul\ts5, s5, s4",
+          "fmul\ts5, s5, s0"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(norm * half);",
+        "asm": [
+          "fcvtzs\tw15, s5"
+        ]
+      },
+      {
+        "source": "    const norm = (config.view_half - y) / (2.0 * config.view_half); // [0,1)",
+        "asm": [
+          "fsub\ts5, s3, s6",
+          "fmul\ts5, s5, s4"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(norm * half);",
+        "asm": [
+          "fmul\ts5, s5, s1",
+          "fcvtzs\tw16, s5"
+        ]
+      },
+      {
+        "source": "    while (dy < 2) : (dy += 1) {",
+        "asm": [
+          "sxtw\tx15, w15",
+          "cmp\tw16, w19"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "b.ge\t0x100055a98",
+          "tbnz\tw16, #0x1f, 0x100055a98",
+          "mul\tw17, w16, w21"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "tbnz\tw15, #0x1f, 0x100055a78",
+          "cmp\tw21, w15"
+        ]
+      },
+      {
+        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
+        "asm": [
+          "add\tx1, x17, x15"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "mov\tw0, #0x3",
+          "bfi\tx0, x1, #2, #61",
+          "ccmp\tx0, x22, #0x2, gt",
+          "b.hs\t0x100055a78",
+          "lsl\tx1, x1, #2"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "add\tx1, x3, x1",
+          "ldrb\tw2, [x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw2, w2, w12"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw2, #0xff",
+          "csel\tw2, w2, w11, lo",
+          "strb\tw2, [x1]",
+          "ldrb\tw2, [x1, #0x1]",
+          "add\tw2, w2, w13",
+          "cmp\tw2, #0xff",
+          "csel\tw2, w2, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "strb\tw2, [x1, #0x1]"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "ldrb\tw2, [x1, #0x2]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw2, w2, w14"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw2, #0xff",
+          "csel\tw2, w2, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "strb\tw2, [x1, #0x2]"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "strb\tw11, [x3, x0]"
+        ]
+      },
+      {
+        "source": "            const fx = px + dx;",
+        "asm": [
+          "add\tx0, x15, #0x1"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "cmn\tw15, #0x1",
+          "ccmp\tx0, x9, #0x0, ge"
+        ]
+      },
+      {
+        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
+        "asm": [
+          "add\tx0, x0, x17",
+          "mov\tw17, #0x3",
+          "bfi\tx17, x0, #2, #61",
+          "ccmp\tx17, x22, #0x2, lt",
+          "b.lo\t0x100055b60",
+          "add\tw16, w16, #0x1",
+          "cmp\tw16, w19",
+          "b.ge\t0x10005598c",
+          "tbnz\tw16, #0x1f, 0x10005598c",
+          "mul\tw16, w16, w21"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "tbnz\tw15, #0x1f, 0x10005596c",
+          "cmp\tw21, w15"
+        ]
+      },
+      {
+        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
+        "asm": [
+          "add\tx0, x16, x15"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "mov\tw17, #0x3",
+          "bfi\tx17, x0, #2, #61",
+          "ccmp\tx17, x22, #0x2, gt",
+          "b.hs\t0x10005596c",
+          "lsl\tx0, x0, #2"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "add\tx0, x3, x0",
+          "ldrb\tw1, [x0]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw1, w1, w12",
+          "cmp\tw1, #0xff",
+          "csel\tw1, w1, w11, lo",
+          "strb\tw1, [x0]",
+          "ldrb\tw1, [x0, #0x1]",
+          "add\tw1, w1, w13"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw1, #0xff",
+          "csel\tw1, w1, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "strb\tw1, [x0, #0x1]"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "ldrb\tw1, [x0, #0x2]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw1, w1, w14"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw1, #0xff",
+          "csel\tw1, w1, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "strb\tw1, [x0, #0x2]"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "strb\tw11, [x3, x17]",
+          "b\t0x10005596c",
+          "lsl\tx16, x16, #2"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "add\tx16, x3, x16",
+          "ldrb\tw17, [x16]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw12, w17, w12"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw12, #0xff",
+          "csel\tw12, w12, w11, lo",
+          "strb\tw12, [x16]",
+          "ldrb\tw12, [x16, #0x1]",
+          "add\tw12, w12, w13",
+          "cmp\tw12, #0xff",
+          "csel\tw12, w12, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "strb\tw12, [x16, #0x1]"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "ldrb\tw12, [x16, #0x2]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw12, w12, w14"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw12, #0xff",
+          "csel\tw12, w12, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "strb\tw12, [x16, #0x2]"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "strb\tw11, [x3, x15]",
+          "b\t0x10005598c",
+          "lsl\tx0, x0, #2"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "add\tx0, x3, x0",
+          "ldrb\tw1, [x0]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw1, w1, w12"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw1, #0xff",
+          "csel\tw1, w1, w11, lo",
+          "strb\tw1, [x0]",
+          "ldrb\tw1, [x0, #0x1]",
+          "add\tw1, w1, w13",
+          "cmp\tw1, #0xff",
+          "csel\tw1, w1, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "strb\tw1, [x0, #0x1]"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "ldrb\tw1, [x0, #0x2]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw1, w1, w14"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw1, #0xff",
+          "csel\tw1, w1, w11, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "strb\tw1, [x0, #0x2]"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "strb\tw11, [x3, x17]",
+          "add\tw16, w16, #0x1",
+          "cmp\tw16, w19",
+          "b.lt\t0x100055aa4",
+          "b\t0x10005598c"
+        ]
+      },
+      {
+        "source": "            self.frame +%= 1; // AF1-blend hash RNG frame counter (free otherwise)",
+        "asm": [
+          "ldr\tx8, [x20, #0x78]",
+          "add\tx8, x8, #0x1",
+          "str\tx8, [x20, #0x78]",
+          "ldp\tx29, x30, [sp, #0xc0]",
+          "ldp\tx20, x19, [sp, #0xb0]",
+          "ldp\tx22, x21, [sp, #0xa0]",
+          "ldp\tx24, x23, [sp, #0x90]",
+          "ldp\tx26, x25, [sp, #0x80]",
+          "ldp\tx28, x27, [sp, #0x70]",
+          "ldp\td9, d8, [sp, #0x60]",
+          "ldp\td11, d10, [sp, #0x50]",
+          "ldp\td13, d12, [sp, #0x40]",
+          "ldp\td15, d14, [sp, #0x30]",
+          "add\tsp, sp, #0xd0",
+          "ret",
+          "mov\tx25, #0x0",
+          "b\t0x100055c10"
+        ]
+      },
+      {
+        "source": "        while (i + B <= n) : (i += B) {",
+        "asm": [
+          "add\tx26, x25, #0x20",
+          "add\tx8, x25, #0x40",
+          "mov\tx25, x26",
+          "cmp\tx8, x28",
+          "b.hi\t0x100055904"
+        ]
+      },
+      {
+        "source": "            const block: @Vector(B, u8) = dead[i..][0..B].*;",
+        "asm": [
+          "add\tx8, x27, x25",
+          "ldp\tq1, q0, [x8]",
+          "orr.16b\tv0, v1, v0",
+          "ext.16b\tv1, v0, v0, #0x8",
+          "orr.8b\tv0, v0, v1",
+          "fmov\tx8, d0",
+          "orr\tx8, x8, x8, lsr #32"
+        ]
+      },
+      {
+        "source": "            if (@reduce(.Or, block) == 0) continue;",
+        "asm": [
+          "lsr\tx9, x8, #16",
+          "orr\tw8, w8, w9",
+          "orr\tw8, w8, w8, lsr #8",
+          "tst\tw8, #0xff",
+          "b.eq\t0x100055bfc"
+        ]
+      },
+      {
+        "source": "            const block: @Vector(B, u8) = dead[i..][0..B].*;",
+        "asm": [
+          "ldrb\tw8, [x27, x25]"
+        ]
+      },
+      {
+        "source": "                if (dead[j] != 0) sim.data.spawn(&sim.rng, j);",
+        "asm": [
+          "cbz\tw8, 0x100055c58",
+          "add\tx1, x20, #0x38",
+          "mov\tx0, x24",
+          "mov\tx2, x25",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0x1]",
+          "cbz\tw8, 0x100055c74",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x1",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0x2]",
+          "cbz\tw8, 0x100055c8c",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x2",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0x3]",
+          "cbz\tw8, 0x100055ca8",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x3",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0x4]",
+          "cbz\tw8, 0x100055cc0",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x4",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0x5]",
+          "cbz\tw8, 0x100055cdc",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x5",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0x6]",
+          "cbz\tw8, 0x100055cf4",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x6",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0x7]",
+          "cbz\tw8, 0x100055d10",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x7",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0x8]",
+          "cbz\tw8, 0x100055d28",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x8",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0x9]",
+          "cbz\tw8, 0x100055d44",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x9",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0xa]",
+          "cbz\tw8, 0x100055d5c",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0xa",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0xb]",
+          "cbz\tw8, 0x100055d78",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0xb",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0xc]",
+          "cbz\tw8, 0x100055d90",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0xc",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0xd]",
+          "cbz\tw8, 0x100055dac",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0xd",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0xe]",
+          "cbz\tw8, 0x100055dc4",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0xe",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0xf]",
+          "cbz\tw8, 0x100055de0",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0xf",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0x10]",
+          "cbz\tw8, 0x100055df8",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x10",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0x11]",
+          "cbz\tw8, 0x100055e14",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x11",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0x12]",
+          "cbz\tw8, 0x100055e2c",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x12",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0x13]",
+          "cbz\tw8, 0x100055e48",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x13",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0x14]",
+          "cbz\tw8, 0x100055e60",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x14",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0x15]",
+          "cbz\tw8, 0x100055e7c",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x15",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0x16]",
+          "cbz\tw8, 0x100055e94",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x16",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0x17]",
+          "cbz\tw8, 0x100055eb0",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x17",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0x18]",
+          "cbz\tw8, 0x100055ec8",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x18",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0x19]",
+          "cbz\tw8, 0x100055ee4",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x19",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0x1a]",
+          "cbz\tw8, 0x100055efc",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x1a",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0x1b]",
+          "cbz\tw8, 0x100055f18",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x1b",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0x1c]",
+          "cbz\tw8, 0x100055f30",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x1c",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx23, x27, x25",
+          "ldrb\tw8, [x23, #0x1d]",
+          "cbz\tw8, 0x100055f4c",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x1d",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "ldrb\tw8, [x23, #0x1e]",
+          "cbz\tw8, 0x100055f64",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x1e",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "add\tx8, x27, x25",
+          "ldrb\tw8, [x8, #0x1f]",
+          "cbz\tw8, 0x100055bfc",
+          "add\tx1, x20, #0x38",
+          "add\tx2, x25, #0x1f",
+          "mov\tx0, x24",
+          "bl\t_layouts.ML1.data.Data.spawn",
+          "b\t0x100055bfc"
+        ]
+      }
+    ],
+    "algo_source": {
+      "file": "src/layouts/ML1/AF3.LP1-autovec.LP2-simple.zig",
+      "lines": [
+        "// Algorithm ML1.AF3.LP1-autovec.LP2-simple \u2014 AF3 (math+decide\u2192mask | mask-scan+respawn | render),",
+        "// loop 1 autovec, loop 2 autovec ordered, loop 3 r0 splat. SERIAL.",
+        "//",
+        "// Golden: bit-exact. The dead-mask variant: loop 1 does math + decide \u2192 a 1 B/p",
+        "// dead mask (no spawn RNG); loop 2 scans the mask in index order, respawning",
+        "// from the shared spawn RNG (rank order = serial RNG order). The mask makes",
+        "// loop 2 parallelizable (via ranked-merge \u2014 see AF3.LP1-autovec-par.LP2-rmerge);",
+        "// this serial cell is the baseline. Diff vs AF1: the mask intermediate + the",
+        "// two-loop split (isolates the intermediate axis at T=1).",
+        "//",
+        "// Self-contained (\u00a78 rule 2). The mask is the declared intermediate (1 B/p).",
+        "",
+        "const std = @import(\"std\");",
+        "const fw = @import(\"../../framework/sim.zig\");",
+        "const config = @import(\"../../framework/config.zig\");",
+        "const layout = @import(\"data.zig\");",
+        "const r0 = @import(\"../common/render_simple.zig\");",
+        "",
+        "const Data = layout.Data;",
+        "",
+        "pub const H = struct {",
+        "    pub const algo_meta: fw.AlgorithmMeta = .{",
+        "        .mem_layout = \"ML1\",",
+        "        .algo_fam = .AF3,",
+        "        .ordering = .identity,",
+        "        .intermediates = .mask,",
+        "        .loops = &.{",
+        "            .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .none },",
+        "            .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .ordered },",
+        "            .{ .impl = .zig, .schedule = .r0, .parallel = .none, .variant = .none },",
+        "        },",
+        "        .golden = .bit_exact,",
+        "        .halide_expressible = \"loop1 yes (math+decide\u2192mask); loop2 no (host scan); loop3 n/a\",",
+        "    };",
+        "",
+        "    pub const Extra = struct {",
+        "        dead: []u8, // 1 B/p mask (the declared intermediate)",
+        "    };",
+        "",
+        "    pub fn initExtra(sim: anytype, desc: fw.Desc) !void {",
+        "        sim.extra = .{ .dead = try sim.alloc.alloc(u8, desc.n) };",
+        "    }",
+        "",
+        "    pub fn deinitExtra(sim: anytype) void {",
+        "        sim.alloc.free(sim.extra.dead);",
+        "    }",
+        "",
+        "    pub fn scratchBytes(sim: *const Sim) usize {",
+        "        _ = sim;",
+        "        return 1; // the dead mask",
+        "    }",
+        "",
+        "    pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {",
+        "        const data = &sim.data;",
+        "        const dead = sim.extra.dead;",
+        "        // loop 1: math + decide \u2192 dead mask (no spawn RNG).",
+        "        for (data.particles, 0..) |*p, i| {",
+        "            p.pos = p.pos.add(p.vel.scale(dt));",
+        "            const v = p.vel;",
+        "            p.vel = .{",
+        "                .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "                .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "                .z = v.z + (config.gravity.z + config.drag * v.z) * dt,",
+        "            };",
+        "            p.age += dt;",
+        "            dead[i] = @intFromBool(config.isDead(p.age, &sim.kill_rng));",
+        "        }",
+        "        // loop 2: mask-scan + respawn in index order (bit-exact). Block skip.",
+        "        phase2Respawn(sim);",
+        "        // loop 3: r0 splat pass.",
+        "        for (data.particles) |p| {",
+        "            r0.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);",
+        "        }",
+        "    }",
+        "",
+        "    fn phase2Respawn(sim: anytype) void {",
+        "        const dead = sim.extra.dead;",
+        "        const n = sim.data.n;",
+        "        const B = 32;",
+        "        var i: usize = 0;",
+        "        while (i + B <= n) : (i += B) {",
+        "            const block: @Vector(B, u8) = dead[i..][0..B].*;",
+        "            if (@reduce(.Or, block) == 0) continue;",
+        "            var j: usize = i;",
+        "            while (j < i + B) : (j += 1) {",
+        "                if (dead[j] != 0) sim.data.spawn(&sim.rng, j);",
+        "            }",
+        "        }",
+        "        while (i < n) : (i += 1) {",
+        "            if (dead[i] != 0) sim.data.spawn(&sim.rng, i);",
+        "        }",
+        "    }",
+        "};",
+        "",
+        "pub const Sim = fw.Strategy(Data, H);"
+      ],
+      "group_lines": [
+        null,
+        57,
+        null,
+        null,
+        66,
+        57,
+        58,
+        61,
+        null,
+        62,
+        65,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        81,
+        89,
+        71,
+        89,
+        90,
+        null,
+        null,
+        null,
+        null,
+        71,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        81,
+        82,
+        83,
+        82,
+        86
+      ]
+    }
+  }
+}

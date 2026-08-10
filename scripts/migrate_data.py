@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""One-time migration: convert the old per-run-dir CSV data layout into the
-new host-partitioned JSONL layout (refactor §6.7).
+"""One-time migration: convert the old per-run-dir CSV data mem_layout into the
+new host-partitioned JSONL mem_layout (refactor §6.7).
 
 [HISTORICAL — already run for L1; do not re-run. The manifest it parsed
-(`experiments/cells/L1.md`) was subsequently retired per
+(`experiments/algos/L1.md`) was subsequently retired per
 reporting-and-analysis.md §9.5; this script is kept as the as-built record.]
 
 Old:  experiments/data/L1/<run-id>/{runs.csv, checks.csv, pmc_rollup.csv,
@@ -13,9 +13,9 @@ New:  experiments/data/<machine_id>/{runs.jsonl, checks.jsonl, pmc.jsonl,
 
 Each migrated row is enriched to the §6.2 schema: provenance from meta.json
 (ts_utc, git_sha, git_branch, zig_version, machine_id, host) + the static
-cell_decl axes (blueprint, ordering, intermediates, golden_class,
+algo_meta axes (algo_fam, ordering, intermediates, golden_class,
 halide_expressible) parsed from the generated manifest
-(experiments/cells/L1.md). source_hash is null for migrated rows
+(experiments/algos/L1.md). source_hash is null for migrated rows
 (historical; recomputing against the old git sha is fiddly — new rows from
 collect.py carry the real hash).
 
@@ -35,13 +35,13 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "experiments", "data")
-MANIFEST = os.path.join(ROOT, "experiments", "cells", "L1.md")
+MANIFEST = os.path.join(ROOT, "experiments", "algos", "L1.md")
 
 
 def parse_manifest(path):
-    """Parse experiments/cells/L1.md into {cell_name: {static axes}}.
-    Each section is `## <cell>` followed by a ``` block of `key: value` lines."""
-    cells = {}
+    """Parse experiments/algos/L1.md into {cell_name: {static axes}}.
+    Each section is `## <algo>` followed by a ``` block of `key: value` lines."""
+    algos = {}
     text = open(path, encoding="utf-8").read()
     # Sections: ## <name> then a fenced ``` block.
     for m in re.finditer(r"^## (\S+)\s*\n```\n(.*?)\n```", text, re.MULTILINE | re.DOTALL):
@@ -52,17 +52,17 @@ def parse_manifest(path):
             if ":" in line:
                 k, _, v = line.partition(":")
                 d[k.strip()] = v.strip()
-        # blueprint line: "B5  (math+decide+respawn+render)" -> "B5"
-        bp = d.get("blueprint", "").split(" ")[0]
-        cells[name] = {
-            "layout": d.get("layout", ""),
-            "blueprint": bp,
+        # algo_fam line: "B5  (math+decide+respawn+render)" -> "B5"
+        bp = d.get("algo_fam", "").split(" ")[0]
+        algos[name] = {
+            "mem_layout": d.get("mem_layout", ""),
+            "algo_fam": bp,
             "ordering": d.get("ordering", ""),
             "intermediates": d.get("intermediates", ""),
             "golden_class": d.get("golden", ""),
             "halide_expressible": d.get("halide_expressible", ""),
         }
-    return cells
+    return algos
 
 
 def host_from_machine_id(mid):
@@ -71,8 +71,8 @@ def host_from_machine_id(mid):
 
 
 def migrate(dry_run=False, clean=False):
-    cells = parse_manifest(MANIFEST)
-    print(f"manifest: {len(cells)} cells parsed from {MANIFEST}", file=sys.stderr)
+    algos = parse_manifest(MANIFEST)
+    print(f"manifest: {len(algos)} algos parsed from {MANIFEST}", file=sys.stderr)
 
     old_layout_dir = os.path.join(DATA, "L1")
     if not os.path.isdir(old_layout_dir):
@@ -97,7 +97,7 @@ def migrate(dry_run=False, clean=False):
         git_sha = meta.get("git_sha", "")
         git_branch = meta.get("git_branch", "")
         zig_version = meta.get("zig_version", "")
-        layout = meta.get("layout", "L1")
+        mem_layout = meta.get("mem_layout", "L1")
 
         if mid not in targets:
             host_dir = os.path.join(DATA, mid)
@@ -132,11 +132,11 @@ def migrate(dry_run=False, clean=False):
         if os.path.isfile(runs_csv):
             with open(runs_csv) as f:
                 for row in csv.DictReader(f):
-                    cell = row["cell"]
-                    cd = cells.get(cell, {})
+                    algo = row["algo"]
+                    cd = algos.get(algo, {})
                     out = {
                         "run_id": row["run_id"], "ts_utc": ts, "host": host,
-                        "machine_id": mid, "layout": layout, "cell": cell,
+                        "machine_id": mid, "mem_layout": mem_layout, "algo": algo,
                         "source_hash": None, "git_sha": git_sha,
                         "git_branch": git_branch, "zig_version": zig_version,
                         "death_q": _float(row["death_q"]),
@@ -146,7 +146,7 @@ def migrate(dry_run=False, clean=False):
                         "trial": int(row["trial"]),
                         "ns_frame": _float(row["ns_frame"]),
                         "ns_particle": _float(row["ns_particle"]),
-                        "blueprint": cd.get("blueprint", ""),
+                        "algo_fam": cd.get("algo_fam", ""),
                         "ordering": cd.get("ordering", ""),
                         "intermediates": cd.get("intermediates", ""),
                         "golden_class": cd.get("golden_class", ""),
@@ -164,7 +164,7 @@ def migrate(dry_run=False, clean=False):
                 for row in csv.DictReader(f):
                     out = {
                         "run_id": row["run_id"], "ts_utc": ts, "machine_id": mid,
-                        "layout": layout, "cell": row["cell"],
+                        "mem_layout": mem_layout, "algo": row["algo"],
                         "death_q": _float(row["death_q"]), "source_hash": None,
                         "git_sha": git_sha,
                         "checked": "PASS" if "PASS" in row["checked"] else "FAIL",
@@ -181,7 +181,7 @@ def migrate(dry_run=False, clean=False):
                 for row in csv.DictReader(f):
                     out = {
                         "run_id": run_id, "ts_utc": ts, "machine_id": mid,
-                        "layout": layout, "cell": row["cell"],
+                        "mem_layout": mem_layout, "algo": row["algo"],
                         "N": int(row["N"]), "death_q": _float(row["death_q"]),
                         "trial": int(row.get("trial", 0)), "source_hash": None,
                         "git_sha": git_sha, "cycles": int(row["cycles"]),

@@ -1,41 +1,41 @@
 // Entry point. Comptime registry: opts.name -> SimImpl, opts.mode -> driver.
-// build.zig resolves -Dlayout/-Dstrat (verticals) to a canonical name; every
+// build.zig resolves -Dmem_layout/-Dalgo (verticals) to a canonical name; every
 // name below must match a registry entry in build.zig.
 const std = @import("std");
 const opts = @import("options");
 const fw = @import("framework/sim.zig");
 
 const sim_map = std.StaticStringMap(type).initComptime(.{
-    // --- the layout verticals (src/layouts/; -Dlayout=LX -Dstrat=name) ---
-    // B1 cells are self-contained (§8 rule 2): each inlines physics + splat
-    // in `step`. The Halide cells call B1.w1-halide_api.run() for walk 1.
-    .{ "L1.B1.w1-autovec.w2-simple", @import("layouts/L1/B1.w1-autovec.w2-simple.zig").Sim },
-    .{ "L1.B1.w1-autovec.w2-opt", @import("layouts/L1/B1.w1-autovec.w2-opt.zig").Sim },
-    .{ "L1.B1.w1-scalar.w2-simple", @import("layouts/L1/B1.w1-scalar.w2-simple.zig").Sim },
-    .{ "L1.B1.w1-unroll.w2-simple", @import("layouts/L1/B1.w1-unroll.w2-simple.zig").Sim },
-    .{ "L1.B1.w1-autovec-par.w2-simple", @import("layouts/L1/B1.w1-autovec-par.w2-simple.zig").Sim },
-    .{ "L1.B1.w1-blend.w2-simple", @import("layouts/L1/B1.w1-blend.w2-simple.zig").Sim },
-    .{ "L1.B1.w1-blend-par.w2-simple", @import("layouts/L1/B1.w1-blend-par.w2-simple.zig").Sim },
-    .{ "L1.B1.w1-halide.w2-simple", @import("layouts/L1/B1.w1-halide.w2-simple.zig").Sim },
-    .{ "L1.B1.w1-halide.w2-opt", @import("layouts/L1/B1.w1-halide.w2-opt.zig").Sim },
-    .{ "L1.B1.w1-halide-par.w2-simple", @import("layouts/L1/B1.w1-halide-par.w2-simple.zig").Sim },
-    .{ "L1.B2.w1-autovec.w2-simple", @import("layouts/L1/B2.w1-autovec.w2-simple.zig").Sim },
-    .{ "L1.B2.w1-autovec-par.w2-simple", @import("layouts/L1/B2.w1-autovec-par.w2-simple.zig").Sim },
-    .{ "L1.B2.w1-halide.w2-simple", @import("layouts/L1/B2.w1-halide.w2-simple.zig").Sim },
-    .{ "L1.B2.w1-halide-par.w2-simple", @import("layouts/L1/B2.w1-halide-par.w2-simple.zig").Sim },
-    .{ "L1.B3.w1-halide.w2-simple", @import("layouts/L1/B3.w1-halide.w2-simple.zig").Sim },
-    .{ "L1.B3.w1-autovec.w2-simple", @import("layouts/L1/B3.w1-autovec.w2-simple.zig").Sim },
-    .{ "L1.B3.w1-autovec-par.w2-rmerge", @import("layouts/L1/B3.w1-autovec-par.w2-rmerge.zig").Sim },
-    .{ "L1.B4.w1-autovec.w2-simple", @import("layouts/L1/B4.w1-autovec.w2-simple.zig").Sim },
-    .{ "L1.B4.w1-autovec-par.w2-rmerge", @import("layouts/L1/B4.w1-autovec-par.w2-rmerge.zig").Sim },
-    .{ "L1.B5.w1-fused", @import("layouts/L1/B5.w1-fused.zig").Sim },
-    .{ "L1.B6.w1-autovec.w2-fused", @import("layouts/L1/B6.w1-autovec.w2-fused.zig").Sim },
-    .{ "L1.B7.w1-autovec.w2-fused", @import("layouts/L1/B7.w1-autovec.w2-fused.zig").Sim },
-    .{ "L1.B8.w1-autovec.w2-fused", @import("layouts/L1/B8.w1-autovec.w2-fused.zig").Sim },
+    // --- the mem_layout verticals (src/layouts/; -Dmem_layout=MLX -Dalgo=name) ---
+    // AF1 algorithms are self-contained (§8 rule 2): each inlines physics + splat
+    // in `step`. The Halide algorithms call AF1.LP1-halide_api.run() for loop 1.
+    .{ "ML1.AF1.LP1-autovec.LP2-simple", @import("layouts/ML1/AF1.LP1-autovec.LP2-simple.zig").Sim },
+    .{ "ML1.AF1.LP1-autovec.LP2-opt", @import("layouts/ML1/AF1.LP1-autovec.LP2-opt.zig").Sim },
+    .{ "ML1.AF1.LP1-scalar.LP2-simple", @import("layouts/ML1/AF1.LP1-scalar.LP2-simple.zig").Sim },
+    .{ "ML1.AF1.LP1-unroll.LP2-simple", @import("layouts/ML1/AF1.LP1-unroll.LP2-simple.zig").Sim },
+    .{ "ML1.AF1.LP1-autovec-par.LP2-simple", @import("layouts/ML1/AF1.LP1-autovec-par.LP2-simple.zig").Sim },
+    .{ "ML1.AF1.LP1-blend.LP2-simple", @import("layouts/ML1/AF1.LP1-blend.LP2-simple.zig").Sim },
+    .{ "ML1.AF1.LP1-blend-par.LP2-simple", @import("layouts/ML1/AF1.LP1-blend-par.LP2-simple.zig").Sim },
+    .{ "ML1.AF1.LP1-halide.LP2-simple", @import("layouts/ML1/AF1.LP1-halide.LP2-simple.zig").Sim },
+    .{ "ML1.AF1.LP1-halide.LP2-opt", @import("layouts/ML1/AF1.LP1-halide.LP2-opt.zig").Sim },
+    .{ "ML1.AF1.LP1-halide-par.LP2-simple", @import("layouts/ML1/AF1.LP1-halide-par.LP2-simple.zig").Sim },
+    .{ "ML1.AF2.LP1-autovec.LP2-simple", @import("layouts/ML1/AF2.LP1-autovec.LP2-simple.zig").Sim },
+    .{ "ML1.AF2.LP1-autovec-par.LP2-simple", @import("layouts/ML1/AF2.LP1-autovec-par.LP2-simple.zig").Sim },
+    .{ "ML1.AF2.LP1-halide.LP2-simple", @import("layouts/ML1/AF2.LP1-halide.LP2-simple.zig").Sim },
+    .{ "ML1.AF2.LP1-halide-par.LP2-simple", @import("layouts/ML1/AF2.LP1-halide-par.LP2-simple.zig").Sim },
+    .{ "ML1.AF3.LP1-halide.LP2-simple", @import("layouts/ML1/AF3.LP1-halide.LP2-simple.zig").Sim },
+    .{ "ML1.AF3.LP1-autovec.LP2-simple", @import("layouts/ML1/AF3.LP1-autovec.LP2-simple.zig").Sim },
+    .{ "ML1.AF3.LP1-autovec-par.LP2-rmerge", @import("layouts/ML1/AF3.LP1-autovec-par.LP2-rmerge.zig").Sim },
+    .{ "ML1.AF4.LP1-autovec.LP2-simple", @import("layouts/ML1/AF4.LP1-autovec.LP2-simple.zig").Sim },
+    .{ "ML1.AF4.LP1-autovec-par.LP2-rmerge", @import("layouts/ML1/AF4.LP1-autovec-par.LP2-rmerge.zig").Sim },
+    .{ "ML1.AF5.LP1-fused", @import("layouts/ML1/AF5.LP1-fused.zig").Sim },
+    .{ "ML1.AF6.LP1-autovec.LP2-fused", @import("layouts/ML1/AF6.LP1-autovec.LP2-fused.zig").Sim },
+    .{ "ML1.AF7.LP1-autovec.LP2-fused", @import("layouts/ML1/AF7.LP1-autovec.LP2-fused.zig").Sim },
+    .{ "ML1.AF8.LP1-autovec.LP2-fused", @import("layouts/ML1/AF8.LP1-autovec.LP2-fused.zig").Sim },
 });
 
 const SimImpl = sim_map.get(opts.name) orelse
-    @compileError("unknown sim '" ++ opts.name ++ "' (see strat_labels in build.zig / sim_map in main.zig)");
+    @compileError("unknown sim '" ++ opts.name ++ "' (see algo_labels in build.zig / sim_map in main.zig)");
 
 pub fn main(init: std.process.Init) !void {
     // play pulls in raylib (windowing); gate it so bench/audit/manifest builds
@@ -54,8 +54,8 @@ pub fn main(init: std.process.Init) !void {
     };
 }
 
-/// Manifest mode: print every registered sim's CellDecl to stdout — a
-/// diagnostic of what's registered in `sim_map`. The `cell_decl` in each
+/// Manifest mode: print every registered sim's AlgorithmMeta to stdout — a
+/// diagnostic of what's registered in `sim_map`. The `algo_meta` in each
 /// strategy file is the source of truth; there is no checked-in manifest
 /// file (reporting-and-analysis.md §9.5 retired experiments/cells/).
 fn emitManifest(init: std.process.Init) !void {

@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """Thin build/bench/play/profile dispatcher used by the Makefile.
 
-Resolves a target — a full cell name (L1.B1.w1-autovec.w2-simple), a layout
-(L1), or `all`/empty — into the list of cells to act on, then runs the
-requested action for each. (Bare strats are rejected: strat names recur
-across layouts, so they're ambiguous.)
+Resolves a target — a full algorithm name (ML1.AF1.LP1-autovec.LP2-simple), a
+memory layout (ML1), or `all`/empty — into the list of algorithms to act on,
+then runs the requested action for each. (Bare algos are rejected: algo names
+recur across memory layouts, so they're ambiguous.)
 
     scripts/run.py build  [target]   zig build into out/ (one prefix, overwritten)
     scripts/run.py bench  [target]   build + run bench (table to stderr; no data append)
-    scripts/run.py play   [target]   build + open the raylib window (one cell)
-    scripts/run.py profile [target]  PMC cycle-attribution for one cell (macOS+Xcode)
+    scripts/run.py play   [target]   build + open the raylib window (one algorithm)
+    scripts/run.py profile [target]  PMC cycle-attribution for one algorithm (macOS+Xcode)
 
-`build`/`bench` accept `all`/a layout/a cell; `play`/`profile` need a single
-cell (default: the L1 reference, L1.B1.w1-autovec.w2-simple).
+`build`/`bench` accept `all`/a memory layout/an algorithm; `play`/`profile`
+need a single algorithm (default: the ML1 reference, ML1.AF1.LP1-autovec.LP2-simple).
 
 Used by the Makefile's positional-target convention, e.g.:
     make build              # -> run.py build all
-    make build L1           # -> run.py build L1
-    make bench L1.B1.w1-autovec.w2-simple
-    make play L1.B1.w1-autovec.w2-simple
+    make build ML1          # -> run.py build ML1
+    make bench ML1.AF1.LP1-autovec.LP2-simple
+    make play ML1.AF1.LP1-autovec.LP2-simple
 """
 from __future__ import annotations
 
@@ -28,94 +28,94 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT_CELL = "L1.B1.w1-autovec.w2-simple"
+DEFAULT_ALGO = "ML1.AF1.LP1-autovec.LP2-simple"
 
 
-def layout_ids() -> list[str]:
-    """Layout ids = the L<digits> directories under src/layouts/. The folder
-    name IS the layout id, so there's no id->folder mapping to maintain."""
+def mem_layout_ids() -> list[str]:
+    """Memory-layout ids = the ML<digits> directories under src/layouts/. The
+    folder name IS the mem_layout id, so there's no id->folder mapping to maintain."""
     import re
     base = os.path.join(ROOT, "src", "layouts")
     return sorted(d for d in os.listdir(base)
-                  if re.fullmatch(r"L\d+", d) and os.path.isdir(os.path.join(base, d)))
+                  if re.fullmatch(r"ML\d+", d) and os.path.isdir(os.path.join(base, d)))
 
 
-def read_cells(layout: str) -> list[str]:
-    path = os.path.join(ROOT, "experiments", "sweeps", f"{layout}.cells")
+def read_algos(mem_layout: str) -> list[str]:
+    path = os.path.join(ROOT, "experiments", "sweeps", f"{mem_layout}.algos")
     return [l.strip() for l in open(path)
             if l.strip() and not l.strip().startswith("#")]
 
 
 def resolve(target: str) -> list[str]:
-    """target -> list of full cell names."""
-    known = layout_ids()
+    """target -> list of full algorithm names."""
+    known = mem_layout_ids()
     if not target or target == "all":
-        cells = []
-        for layout in known:
-            cells.extend(read_cells(layout))
-        return cells
+        algos = []
+        for mem_layout in known:
+            algos.extend(read_algos(mem_layout))
+        return algos
     if target in known:
-        return read_cells(target)
+        return read_algos(target)
     if "." in target:
-        layout = target.split(".", 1)[0]
-        if layout not in known:
-            sys.exit(f"error: unknown layout '{layout}' in cell '{target}'")
+        mem_layout = target.split(".", 1)[0]
+        if mem_layout not in known:
+            sys.exit(f"error: unknown mem_layout '{mem_layout}' in algorithm '{target}'")
         return [target]
-    sys.exit(f"error: '{target}' is not a layout or a full cell name "
-            f"(expected L<layout>.<strat>, e.g. {DEFAULT_CELL})")
+    sys.exit(f"error: '{target}' is not a memory layout or a full algorithm name "
+            f"(expected ML<mem_layout>.<algo>, e.g. {DEFAULT_ALGO})")
 
 
-def zig_build(cell: str, mode: str, prefix: str = "out") -> bool:
-    layout, strat = cell.split(".", 1)
+def zig_build(algo: str, mode: str, prefix: str = "out") -> bool:
+    mem_layout, algo_part = algo.split(".", 1)
     r = subprocess.run(
-        ["zig", "build", "-p", prefix, f"-Dlayout={layout}",
-         f"-Dstrat={strat}", f"-Dmode={mode}", "-Doptimize=ReleaseFast"],
+        ["zig", "build", "-p", prefix, f"-Dmem_layout={mem_layout}",
+         f"-Dalgo={algo_part}", f"-Dmode={mode}", "-Doptimize=ReleaseFast"],
         cwd=ROOT)
     return r.returncode == 0
 
 
-def bin_path(cell: str, mode: str) -> str:
-    """Flat-name binary: out/bin/<layout>.<strat>.<mode>"""
-    return os.path.join(ROOT, "out", "bin", f"{cell}.{mode}")
+def bin_path(algo: str, mode: str) -> str:
+    """Flat-name binary: out/bin/<algo>.<mode>"""
+    return os.path.join(ROOT, "out", "bin", f"{algo}.{mode}")
 
 
-def cmd_build(cells: list[str]) -> int:
-    for c in cells:
-        print(f"  build {c}...", file=sys.stderr)
-        if not zig_build(c, "bench"):
-            print(f"    BUILD FAILED — {c}", file=sys.stderr)
+def cmd_build(algos: list[str]) -> int:
+    for a in algos:
+        print(f"  build {a}...", file=sys.stderr)
+        if not zig_build(a, "bench"):
+            print(f"    BUILD FAILED — {a}", file=sys.stderr)
     return 0
 
 
-def cmd_bench(cells: list[str]) -> int:
-    for c in cells:
-        print(f"=== bench {c} ===", file=sys.stderr)
-        if not zig_build(c, "bench"):
-            print(f"    BUILD FAILED — {c}", file=sys.stderr)
+def cmd_bench(algos: list[str]) -> int:
+    for a in algos:
+        print(f"=== bench {a} ===", file=sys.stderr)
+        if not zig_build(a, "bench"):
+            print(f"    BUILD FAILED — {a}", file=sys.stderr)
             continue
-        bin_path = bin_path(c, "bench")
-        subprocess.run([bin_path], cwd=ROOT)
+        bp = bin_path(a, "bench")
+        subprocess.run([bp], cwd=ROOT)
     return 0
 
 
-def cmd_play(cells: list[str]) -> int:
-    if len(cells) != 1:
-        sys.exit("error: play needs exactly one cell (got: " + " ".join(cells) + ")")
-    c = cells[0]
-    print(f"=== play {c} ===", file=sys.stderr)
-    if not zig_build(c, "play"):
-        sys.exit(f"BUILD FAILED — {c}")
-    return subprocess.run([bin_path(c, "play")], cwd=ROOT).returncode
+def cmd_play(algos: list[str]) -> int:
+    if len(algos) != 1:
+        sys.exit("error: play needs exactly one algorithm (got: " + " ".join(algos) + ")")
+    a = algos[0]
+    print(f"=== play {a} ===", file=sys.stderr)
+    if not zig_build(a, "play"):
+        sys.exit(f"BUILD FAILED — {a}")
+    return subprocess.run([bin_path(a, "play")], cwd=ROOT).returncode
 
 
-def cmd_profile(cells: list[str]) -> int:
-    if len(cells) != 1:
-        sys.exit("error: profile needs exactly one cell (got: " + " ".join(cells) + ")")
-    c = cells[0]
+def cmd_profile(algos: list[str]) -> int:
+    if len(algos) != 1:
+        sys.exit("error: profile needs exactly one algorithm (got: " + " ".join(algos) + ")")
+    a = algos[0]
     # PMC needs a single (N, iters, trial); pick a large-N sample for stable counters.
     return subprocess.run([sys.executable,
                            os.path.join(ROOT, "scripts", "pmc_collect.py"),
-                           c, "1000000", "100", "1"]).returncode
+                           a, "1000000", "100", "1"]).returncode
 
 
 def main() -> int:
@@ -123,24 +123,24 @@ def main() -> int:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("action", choices=["build", "bench", "play", "profile"])
     ap.add_argument("target", nargs="?", default="all",
-                    help="layout (L1), full cell name (L1.B1.w1-autovec.w2-simple), or all (default: all)")
+                    help="memory layout (ML1), full algorithm name (ML1.AF1.LP1-autovec.LP2-simple), or all (default: all)")
     args = ap.parse_args()
 
     if args.action in ("play", "profile"):
-        cells = resolve(args.target)
-        if len(cells) != 1 and args.target not in ("", "all") and "." not in args.target:
-            # layout/all -> pick default; a full cell resolved to one already
-            cells = [DEFAULT_CELL]
-        elif args.target in ("", "all") or len(cells) != 1:
-            cells = [DEFAULT_CELL]
+        algos = resolve(args.target)
+        if len(algos) != 1 and args.target not in ("", "all") and "." not in args.target:
+            # memory layout/all -> pick default; a full algorithm resolved to one already
+            algos = [DEFAULT_ALGO]
+        elif args.target in ("", "all") or len(algos) != 1:
+            algos = [DEFAULT_ALGO]
     else:
-        cells = resolve(args.target)
+        algos = resolve(args.target)
 
-    if not cells:
-        sys.exit("error: no cells to act on.")
+    if not algos:
+        sys.exit("error: no algorithms to act on.")
 
     return {"build": cmd_build, "bench": cmd_bench,
-            "play": cmd_play, "profile": cmd_profile}[args.action](cells)
+            "play": cmd_play, "profile": cmd_profile}[args.action](algos)
 
 
 if __name__ == "__main__":

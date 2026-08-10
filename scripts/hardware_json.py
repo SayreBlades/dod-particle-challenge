@@ -101,17 +101,17 @@ def _streaming_bw_gbs(facts):
     Falls back to a Python estimate (clearly warned) if the Zig toolchain or
     build fails, so analysis-only hosts still produce a number."""
     import subprocess
-    bin_path = os.path.join(ROOT, "out", ".hwprobe", "bin", "L1.B1.w1-autovec.w2-simple.bench")
+    bin_path = os.path.join(ROOT, "out", ".hwprobe", "bin", "ML1.AF1.LP1-autovec.LP2-simple.bench")
     # Build the bandwidth binary into a DEDICATED dir (out/.hwprobe), not the
-    # top-level out/bin — the --bandwidth flag is cell-agnostic (never touches
+    # top-level out/bin — the --bandwidth flag is algorithm-agnostic (never touches
     # the sim), so this probe binary must not masquerade as "the" build output
-    # or collide with collect.py's per-cell dirs. Cached + reused; make clean
-    # (`rm -rf out`) still sweeps it. Reference strat so no Halide env is needed.
+    # or collide with collect.py's per-algorithm dirs. Cached + reused; make clean
+    # (`rm -rf out`) still sweeps it. Reference algo so no Halide env is needed.
     if not os.path.exists(bin_path):
         try:
             subprocess.run(
-                ["zig", "build", "-p", "out/.hwprobe", "-Dlayout=L1",
-                 "-Dstrat=B1.w1-autovec.w2-simple", "-Dmode=bench",
+                ["zig", "build", "-p", "out/.hwprobe", "-Dmem_layout=ML1",
+                 "-Dalgo=AF1.LP1-autovec.LP2-simple", "-Dmode=bench",
                  "-Doptimize=ReleaseFast"],
                 cwd=ROOT, capture_output=True, timeout=120, check=True,
             )
