@@ -355,7 +355,7 @@ def main() -> int:
     elif os.path.exists(RATES_FILE):
         rates = [l.strip() for l in open(RATES_FILE) if l.strip() and not l.strip().startswith("#")]
     else:
-        rates = ["0.01", "0.05", "0.1", "0.25", "0.5"]
+        rates = ["0.01", "0.05", "0.10", "0.25", "0.50"]
 
     # algorithms: target is `all` | a memory layout | an algo | a space-list of algos.
     target = args.target

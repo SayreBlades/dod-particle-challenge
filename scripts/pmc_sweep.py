@@ -29,8 +29,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # N -> iters pairs. Smaller N gets more iters (each step is cheap); larger N
 # gets fewer (each step is already slow).
 N_ITERS = [
-    (4000, 2000), (16000, 1000), (65000, 500), (262000, 200),
-    (1000000, 100), (4000000, 50), (16000000, 20), (64000000, 10),
+    (4000, 2000), (65000, 500), (262000, 200),
+    (1000000, 100), (16000000, 20),
 ]
 
 

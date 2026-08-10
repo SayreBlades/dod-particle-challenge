@@ -5,6 +5,7 @@ const status = (m) => ($("status").textContent = m);
 const short = (algo) => algo.split(".").slice(1).join(".");
 const fmtq = (d) => (d === 0 ? "0" : String(d));
 const fmtN = (n) => n >= 1e6 ? `${n / 1e6}M` : n >= 1e3 ? `${n / 1e3}K` : `${n}`;
+const axisTooltip = { trigger: "axis", formatter(params) { const p = Array.isArray(params) ? params : [params]; const hdr = `<div style="text-align:center;margin-bottom:4px">${fmtN(Math.round(p[0].axisValue))} Particles</div>`; return hdr + p.filter(x => x.seriesName !== '__cache' && x.seriesName !== '__marks').map(x => { const name = x.seriesName.startsWith('q=') ? '' : x.seriesName + ': '; return `${x.marker} ${name}${x.value[1] != null ? x.value[1].toFixed(2) : '-'}`; }).join('<br/>'); } };
 const charts = [];
 window.addEventListener("resize", () => charts.forEach((c) => c.resize()));
 const AX = { axisLine: { lineStyle: { color: "#666" } }, axisLabel: { color: "#aaa" },
@@ -131,7 +132,7 @@ async function drawLandscape(lb) {
     data: pickThreads(j.series[String(q)] || []).map((r) => [r.N, r.ns_particle]),
   }));
   chart("landscape", {
-    tooltip: { trigger: "axis" }, legend: { type: "scroll", bottom: 0, textStyle: { color: "#ccc", fontSize: 9 } },
+    tooltip: axisTooltip, legend: { type: "scroll", bottom: 0, textStyle: { color: "#ccc", fontSize: 9 } },
     grid: { left: 55, right: 20, top: 20, bottom: 70, containLabel: true },
     xAxis: { type: "log", name: "N", ...AX, axisLabel: { ...AX.axisLabel, formatter: (v) => v >= 1e6 ? `${v / 1e6}M` : v >= 1e3 ? `${v / 1e3}K` : v } },
     yAxis: { type: "value", name: "ns/particle", ...AX },
@@ -149,7 +150,7 @@ async function drawBandwidthMemLayout(lb) {
   }));
   const ceil = lb.streaming_bw_gbs;
   chart("bandwidth", {
-    tooltip: { trigger: "axis" }, legend: { type: "scroll", bottom: 0, textStyle: { color: "#ccc", fontSize: 9 } },
+    tooltip: axisTooltip, legend: { type: "scroll", bottom: 0, textStyle: { color: "#ccc", fontSize: 9 } },
     grid: { left: 55, right: 20, top: 20, bottom: 70, containLabel: true },
     xAxis: { type: "log", name: "N", ...AX, axisLabel: { ...AX.axisLabel, formatter: (v) => v >= 1e6 ? `${v / 1e6}M` : v >= 1e3 ? `${v / 1e3}K` : v } },
     yAxis: { type: "value", name: "GB/s", ...AX },
@@ -381,7 +382,7 @@ function drawCachePlot(j) {
   const bands = cacheBands(j);
   const carrier = { name: "__cache", type: "line", data: [], symbol: "none", lineStyle: { opacity: 0 }, silent: true, markArea: bands };
   chart("cacheplot", {
-    tooltip: { trigger: "axis" }, legend: { top: 0, textStyle: { color: "#ccc", fontSize: 10 }, data: real.map((s) => s.name) },
+    tooltip: axisTooltip, legend: { top: 0, textStyle: { color: "#ccc", fontSize: 10 }, data: real.map((s) => s.name) },
     grid: { left: 55, right: 20, top: 30, bottom: 55, containLabel: true },
     xAxis: { type: "log", name: "N", min: bands.axisMin, ...AX, axisLabel: { ...AX.axisLabel, formatter: (v) => v >= 1e6 ? `${v / 1e6}M` : v >= 1e3 ? `${v / 1e3}K` : v } },
     yAxis: { type: "value", name: "ns/particle", ...AX },
@@ -399,7 +400,7 @@ function drawBandwidthAlgo(j) {
     markArea: bands,
     markLine: { silent: true, symbol: "none", data: [{ yAxis: ceil, lineStyle: { type: "dashed", color: "#e74c3c", width: 2 }, label: { formatter: `ceiling ${ceil}`, color: "#e74c3c", position: "insideEndTop" } }] } };
   chart("bwplot", {
-    tooltip: { trigger: "axis" }, legend: { top: 0, textStyle: { color: "#ccc", fontSize: 10 }, data: real.map((s) => s.name) },
+    tooltip: axisTooltip, legend: { top: 0, textStyle: { color: "#ccc", fontSize: 10 }, data: real.map((s) => s.name) },
     grid: { left: 55, right: 20, top: 30, bottom: 55, containLabel: true },
     xAxis: { type: "log", name: "N", min: bands.axisMin, ...AX, axisLabel: { ...AX.axisLabel, formatter: (v) => v >= 1e6 ? `${v / 1e6}M` : v >= 1e3 ? `${v / 1e3}K` : v } },
     yAxis: { type: "value", name: "GB/s", ...AX },
