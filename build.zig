@@ -136,10 +136,11 @@ pub fn build(b: *std.Build) void {
             const python = b.graph.environ_map.get("HALIDE_PYTHON") orelse ".venv/bin/python";
             // Derive the Halide schedule from the algo name: an algo containing
             // "-par" gets {"parallel":true}; the plain algo gets the default.
-            // NOTE: this BAKES parallelism into the kernel at build time — the
-            // runtime --threads flag does NOT govern it (Halide's runtime pool
-            // defaults to all cores). Making it a runtime variant is tracked in
-            // https://github.com/SayreBlades/dod-particle-challenge/issues/4
+            // NOTE: the `parallel(i)` SCHEDULE is still baked into the kernel
+            // at build time, but the -par cell's `initExtra` now caps the
+            // Halide runtime pool via `halide_set_num_threads(sim.threads)`
+            // (issue #4) — so `--threads T` governs actual CPU use. The serial
+            // `halide` kernel has no parallel loop and needs no cap.
             // (-Dhalide_variant still works for ad-hoc sweep variants; it adds
             // a suffix to the stem and is expected to be pre-generated.)
             const sched_json: []const u8 = if (std.mem.indexOf(u8, algo, "-par") != null)

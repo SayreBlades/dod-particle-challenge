@@ -37,11 +37,30 @@ extern fn halide_b2_math(
     age_out: *halide_buffer_t,
 ) c_int;
 
+// --- runtime thread cap (issue #4) ---
+// The `-par` kernel's `f.parallel(i)` schedule (from the generator) is
+// executed by the Halide runtime's OWN thread pool, which defaults to hardware
+// concurrency — i.e. all cores, ignoring the sim's `--threads`. This runtime
+// symbol (bundled into every compile_to_static_library .a) caps that pool so
+// `-par` cells honor `--threads`. It MUST stay behind the halide gate (only
+// halide cells link the runtime): never call it from shared bench.zig — zig-cell
+// binaries have no such symbol → link error. The `-par` cells call it from their
+// `initExtra`; the serial `halide` kernel has no parallel loop and needs no cap.
+extern fn halide_set_num_threads(n: c_int) c_int;
+
 const FLOAT32: halide_type_t = .{ .code = 2, .bits = 32, .lanes = 1 };
 
 fn out1d(host: [*]u8, n: usize, stride: i32, d: *[1]halide_dimension_t) halide_buffer_t {
     d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };
     return .{ .host = host, .type = FLOAT32, .dimensions = 1, .dim = d };
+}
+
+/// Cap the Halide runtime thread pool at `n` so the `-par` kernel honors the
+/// sim's `--threads`. Called once per Sim init by the `-par` cell's
+/// `initExtra`. Idempotent + cheap (sets a process-global in the runtime), so
+/// it is safe to call per-N in the bench sweep (one Sim per N).
+pub fn setThreads(n: usize) void {
+    _ = halide_set_num_threads(@intCast(n));
 }
 
 /// Run the Halide AF2 math loop over the whole particle array in place.
