@@ -28,6 +28,17 @@ pub const H = struct {
         .halide_expressible = "loop1 yes (branchless blend, per-particle hash RNG); loop2 n/a (render)",
     };
 
+    /// Cap the Halide runtime pool so the `-par` kernel honors `--threads`
+    /// (issue #4): the kernel's `f.parallel(i)` schedule is still baked at build
+    /// time, but the runtime pool that executes it is now capped to
+    /// `sim.threads`. The Strategy harness sets `sim.threads` from `desc.threads`
+    /// before this runs. Idempotent + cheap, so the per-N re-init in the bench
+    /// sweep just re-sets the same value.
+    pub fn initExtra(sim: anytype, desc: fw.Desc) !void {
+        _ = desc;
+        halide.setThreads(sim.threads);
+    }
+
     pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {
         const data = &sim.data;
         // loop 1: Halide branchless blend (math + decide + respawn in one pipeline).
