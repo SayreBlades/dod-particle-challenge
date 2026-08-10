@@ -26,20 +26,20 @@ when you need the full knobs.
 ## Bench binary flags
 
 One binary per `(algorithm, mode)`, flat-named `out/bin/<memory layout>.<algo>.<mode>`
-(e.g. `ML1.AF3.LP1-halide.LP2-simple.bench`). Behavior is configured at the command
+(e.g. `ML01.AF03.LP1-halide.LP2-simple.bench`). Behavior is configured at the command
 line — **`q` is runtime**, so one binary sweeps the whole death axis (zig *and*
 halide). `collect.py` uses these under the hood; run a binary directly for an
 ad-hoc measurement. `--help` prints the algorithm's declaration + every flag.
 
 ```sh
-./out/bin/ML1.AF3.LP1-halide.LP2-simple.bench --help            # algo_meta + options
-./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench -q 0.1 -N 4000    # single N at q=0.1
-./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench --json --ns 4000,65000,1000000 --trials 5  # sweep (collect.py greps `^json,`)
-./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench -N 1000000 --iters 500  # single N (PMC mode — clean step() region for xctrace)
-./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench --threads 8       # parallel algorithms only (serial algorithms ignore this)
-./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench --check           # invariant suite (PASS/FAIL)
-./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench --record          # 10s MP4 via ffmpeg (default: out/record/)
-./out/bin/ML1.AF1.LP1-unroll.LP2-simple.bench --bandwidth       # streaming-BW microbench (reads `streaming_bw_gbs=` for hardware.json)
+./out/bin/ML01.AF03.LP1-halide.LP2-simple.bench --help            # algo_meta + options
+./out/bin/ML01.AF01.LP1-unroll.LP2-simple.bench -q 0.1 -N 4000    # single N at q=0.1
+./out/bin/ML01.AF01.LP1-unroll.LP2-simple.bench --json --ns 4000,65000,1000000 --trials 5  # sweep (collect.py greps `^json,`)
+./out/bin/ML01.AF01.LP1-unroll.LP2-simple.bench -N 1000000 --iters 500  # single N (PMC mode — clean step() region for xctrace)
+./out/bin/ML01.AF01.LP1-unroll.LP2-simple.bench --threads 8       # parallel algorithms only (serial algorithms ignore this)
+./out/bin/ML01.AF01.LP1-unroll.LP2-simple.bench --check           # invariant suite (PASS/FAIL)
+./out/bin/ML01.AF01.LP1-unroll.LP2-simple.bench --record          # 10s MP4 via ffmpeg (default: out/record/)
+./out/bin/ML01.AF01.LP1-unroll.LP2-simple.bench --bandwidth       # streaming-BW microbench (reads `streaming_bw_gbs=` for hardware.json)
 ```
 
 - `-q`/`--death <q>` is a **runtime flag**: the competing-risks accident rate
@@ -58,8 +58,8 @@ ad-hoc measurement. `--help` prints the algorithm's declaration + every flag.
 ## run.py
 
 Build / play / profile for a **target** — a full algorithm name
-(`ML1.AF1.LP1-autovec.LP2-simple`), a memory layout (`ML1`), or `all`. (Bare algos are
-rejected: the AF1–AF8 algo names recur across memory layouts, so they're ambiguous
+(`ML01.AF01.LP1-autovec.LP2-simple`), a memory layout (`ML01`), or `all`. (Bare algos are
+rejected: the AF01–AF08 algo names recur across memory layouts, so they're ambiguous
 once a second memory layout lands.) `build`, `play`, and `profile` are what `make build`,
 `make play`, and `make profile` call. There's also a `bench` subcommand for a
 **raw one-algorithm measurement** (build + run the table, nothing appended) — it's
@@ -67,23 +67,23 @@ intentionally *not* a make target, because at the make level the measurement
 workflow is [`collect.py`](#collectpy) (or `make collect`).
 
 ```sh
-uv run python scripts/run.py build                       # build every algorithm (ML1 assumed) into out/
-uv run python scripts/run.py build ML1                    # build every algorithm of memory layout ML1
-uv run python scripts/run.py build ML1.AF1.LP1-halide.LP2-simple
-uv run python scripts/run.py play ML1.AF1.LP1-autovec.LP2-simple # open the interactive raylib window
-uv run python scripts/run.py profile ML1.AF1.LP1-autovec.LP2-simple   # PMC (one algorithm, one N)
+uv run python scripts/run.py build                       # build every algorithm (ML01 assumed) into out/
+uv run python scripts/run.py build ML01                    # build every algorithm of memory layout ML01
+uv run python scripts/run.py build ML01.AF01.LP1-halide.LP2-simple
+uv run python scripts/run.py play ML01.AF01.LP1-autovec.LP2-simple # open the interactive raylib window
+uv run python scripts/run.py profile ML01.AF01.LP1-autovec.LP2-simple   # PMC (one algorithm, one N)
 
 # Raw one-algorithm benchmark — build + run the bench table to stderr; no JSONL,
 # no death/threads sweep, no provenance. For a quick local number only:
-uv run python scripts/run.py bench ML1.AF1.LP1-autovec.LP2-simple
+uv run python scripts/run.py bench ML01.AF01.LP1-autovec.LP2-simple
 ```
 
 `build` and `bench` accept a memory layout or `all` (each algorithm builds to its own flat
 `out/bin/<algorithm>.bench` — they coexist, no overwriting); `play` and `profile`
-need a single algorithm (default: the ML1 reference `ML1.AF1.LP1-autovec.LP2-simple`). To customize the raw bench (N, trials,
+need a single algorithm (default: the ML01 reference `ML01.AF01.LP1-autovec.LP2-simple`). To customize the raw bench (N, trials,
 threads, JSON output) pass flags to the binary directly — see
 [Bench binary flags](#bench-binary-flags). The Makefile wraps the make-backed
-subcommands so you can pass the target positionally — `make build ML1` — see
+subcommands so you can pass the target positionally — `make build ML01` — see
 the [Makefile](../Makefile).
 
 > **`bench` vs `collect.py`** — `run.py bench` builds one algorithm at the default
@@ -122,11 +122,11 @@ per host (the report joins on `machine_id`).
 
 ```sh
 uv run python scripts/collect.py                       # every algorithm of every memory layout (all)
-uv run python scripts/collect.py ML1                    # every algorithm of memory layout ML1
-uv run python scripts/collect.py ML1.AF1.LP1-autovec.LP2-simple   # one algorithm (full name)
-NS=4000,65000 TRIALS=5 uv run python scripts/collect.py ML1           # quick subset
-DEATH_RATES="0 0.5" uv run python scripts/collect.py ML1               # override rate set
-THREADS="1 4" uv run python scripts/collect.py ML1.AF3.LP1-autovec-par.LP2-rmerge
+uv run python scripts/collect.py ML01                    # every algorithm of memory layout ML01
+uv run python scripts/collect.py ML01.AF01.LP1-autovec.LP2-simple   # one algorithm (full name)
+NS=4000,65000 TRIALS=5 uv run python scripts/collect.py ML01           # quick subset
+DEATH_RATES="0 0.5" uv run python scripts/collect.py ML01               # override rate set
+THREADS="1 4" uv run python scripts/collect.py ML01.AF03.LP1-autovec-par.LP2-rmerge
 ```
 
 ### Phases, resume, and the progress bar
@@ -136,12 +136,12 @@ Two phases: **(1) build** one binary per algorithm into the flat `out/bin/` (ser
 **(2) bench+check** every `(algorithm, q)` serially for clean timing.
 
 ```sh
-SKIP_DONE=1 uv run python scripts/collect.py ML1           # resume an interrupted sweep (skip done units)
+SKIP_DONE=1 uv run python scripts/collect.py ML01           # resume an interrupted sweep (skip done units)
 VERBOSE=0 uv run python scripts/collect.py                # quiet: live bar only
 ```
 
 A live progress bar prints to stderr, one line per completed unit:
-`[##########--------------------] 2/6 (33%) ML1.AF1.LP1-autovec.LP2-simple q=0.05`.
+`[##########--------------------] 2/6 (33%) ML01.AF01.LP1-autovec.LP2-simple q=0.05`.
 
 Benches always run serially (concurrent runs contend for cores and skew
 `ns_frame`); builds are serial too, into the shared `out/` prefix — with one
@@ -161,9 +161,9 @@ row as `source_hash` so a row pins the exact code that ran (catches
 uncommitted edits).
 
 ```sh
-uv run python scripts/algo_hash.py ML1.AF1.LP1-autovec.LP2-simple        # prints the hash
-uv run python scripts/algo_hash.py ML1.AF1.LP1-halide.LP2-simple         # includes the gen .py
-uv run python scripts/algo_hash.py ML1.AF1.LP1-autovec.LP2-simple --files  # also list the closure
+uv run python scripts/algo_hash.py ML01.AF01.LP1-autovec.LP2-simple        # prints the hash
+uv run python scripts/algo_hash.py ML01.AF01.LP1-halide.LP2-simple         # includes the gen .py
+uv run python scripts/algo_hash.py ML01.AF01.LP1-autovec.LP2-simple --files  # also list the closure
 ```
 
 ## hardware_json.py
@@ -240,11 +240,11 @@ derives stride/footprint/% values not 1:1 in the json). `build_report.py` runs
 this as its gate.
 
 ```sh
-uv run python scripts/analyze_algo.py ML1.AF1.LP1-autovec.LP2-opt        # full: json + md
-uv run python scripts/analyze_algo.py ML1                           # whole memory layout (resume-skips existing .md; --force regenerates)
-uv run python scripts/analyze_algo.py ML1 --verify                   # integrity gate (0 FAIL = green)
-uv run python scripts/analyze_algo.py ML1.AF1.LP1-autovec.LP2-opt --json-only    # evidence only, no LLM call
-uv run python scripts/analyze_algo.py ML1.AF1.LP1-autovec.LP2-opt --prompt-only  # print the LLM prompt
+uv run python scripts/analyze_algo.py ML01.AF01.LP1-autovec.LP2-opt        # full: json + md
+uv run python scripts/analyze_algo.py ML01                           # whole memory layout (resume-skips existing .md; --force regenerates)
+uv run python scripts/analyze_algo.py ML01 --verify                   # integrity gate (0 FAIL = green)
+uv run python scripts/analyze_algo.py ML01.AF01.LP1-autovec.LP2-opt --json-only    # evidence only, no LLM call
+uv run python scripts/analyze_algo.py ML01.AF01.LP1-autovec.LP2-opt --prompt-only  # print the LLM prompt
 ```
 
 LLM key: `ZAI_API_KEY` env or `.scratch/zai_api_key`; optional `ZAI_BASE_URL`
@@ -260,7 +260,7 @@ context that complements the bench's bandwidth view (bandwidth-bound vs
 compute-bound, and *why* — frontend/backend/branch). One row per launch.
 
 ```sh
-uv run python scripts/pmc_collect.py ML1.AF1.LP1-autovec.LP2-simple 1000000 500 1
+uv run python scripts/pmc_collect.py ML01.AF01.LP1-autovec.LP2-simple 1000000 500 1
 # -> .scratch/pmc/<algorithm>_n1000000_t1.csv
 ```
 
@@ -272,8 +272,8 @@ trials + derived percentages). The separate cycle-attribution layer; the
 unified sweep is `collect.py`.
 
 ```sh
-uv run python scripts/pmc_sweep.py ML1 3                          # memory layout=ML1, 3 trials
-uv run python scripts/pmc_sweep.py ML1 3 --algorithms "ML1.AF1.LP1-autovec.LP2-simple ML1.AF3.LP1-halide.LP2-simple"
+uv run python scripts/pmc_sweep.py ML01 3                          # memory layout=ML01, 3 trials
+uv run python scripts/pmc_sweep.py ML01 3 --algorithms "ML01.AF01.LP1-autovec.LP2-simple ML01.AF03.LP1-halide.LP2-simple"
 ```
 
 ## migrate_data.py
@@ -296,22 +296,22 @@ uv run python scripts/migrate_data.py --dry-run  # show counts, write nothing
 ```sh
 # 1. Sweep — all algorithms × {0.01,0.05,0.1,0.25,0.5} × {4K,65K,262K,1M,16M} × {1,4,10}
 #    (parallel only); appends JSONL into experiments/data/<machine_id>/:
-uv run python scripts/collect.py ML1
+uv run python scripts/collect.py ML01
 #    (resume an interrupted sweep without duplicating completed units:)
-SKIP_DONE=1 uv run python scripts/collect.py ML1
+SKIP_DONE=1 uv run python scripts/collect.py ML01
 
 # 2. Build the analysis tree + serve the SPA:
 uv run python scripts/build_report.py
 uv run python -m http.server -d experiments 8000   # open http://localhost:8000/report.html
 
 # 3. (Mac + Xcode) PMC cycle-attribution for the champions:
-uv run python scripts/pmc_sweep.py ML1 "ML1.<champ1> ML1.<champ2> ..."
+uv run python scripts/pmc_sweep.py ML01 "ML01.<champ1> ML01.<champ2> ..."
 
 # 4. Rebuild the report; commit the data + report:
 uv run python scripts/build_report.py
 git add experiments/data/<machine_id> experiments/analysis experiments/report.html experiments/report.js experiments/style.css
-git commit -m "ML1: sweep + PMC + analysis tree"
+git commit -m "ML01: sweep + PMC + analysis tree"
 ```
 
-Or via the Makefile shortcuts: `make collect` (all), `make collect ML1`,
+Or via the Makefile shortcuts: `make collect` (all), `make collect ML01`,
 `make collect <algo>`, `make report`, `make serve`.

@@ -1,16 +1,16 @@
 # Makefile — common actions for the DoD Particle Challenge.
 #
 # Each target accepts an optional positional target: a full algorithm name
-# (ML1.AF1.LP1-autovec.LP2-simple), a memory layout (ML1), or `all` (default). It's read
+# (ML01.AF01.LP1-autovec.LP2-simple), a memory layout (ML01), or `all` (default). It's read
 # from any extra goal on the
 # command line, e.g.:
 #
 #   make init                               # one-time setup: git submodules + python env (uv sync)
 #   make build                              # build every algorithm of every memory layout
-#   make build ML1                           # build every algorithm of ML1
-#   make build ML1.AF1.LP1-autovec.LP2-simple   # build one algorithm (full name; memory layouts share algo names)
-#   make play ML1.AF1.LP1-autovec.LP2-simple    # open the interactive raylib window
-#   make profile ML1.AF1.LP1-autovec.LP2-simple # PMC cycle-attribution (macOS+Xcode)
+#   make build ML01                           # build every algorithm of ML01
+#   make build ML01.AF01.LP1-autovec.LP2-simple   # build one algorithm (full name; memory layouts share algo names)
+#   make play ML01.AF01.LP1-autovec.LP2-simple    # open the interactive raylib window
+#   make profile ML01.AF01.LP1-autovec.LP2-simple # PMC cycle-attribution (macOS+Xcode)
 #   make report                             # build the analysis tree + verify gate
 #   make serve                              # serve experiments/ on :8000 (open report.html)
 #   make clean                              # remove out/ and worker build dirs
@@ -29,7 +29,7 @@ PY := uv run python
 KNOWN := init build profile play report serve clean help collect
 TARGET := $(filter-out $(KNOWN),$(MAKECMDGOALS))
 
-# `make build ML1` would also try to build ML1 as a file target; neutralize that
+# `make build ML01` would also try to build ML01 as a file target; neutralize that
 # with a silent no-op recipe so make doesn't print "Nothing to be done".
 $(TARGET): ; @:
 
@@ -44,7 +44,7 @@ init:
 	@echo "  OK: vendor/raylib populated"
 	@echo "==> python env (uv sync)"
 	uv sync
-	@echo "==> done. Next: 'make build ML1' or 'make help'."
+	@echo "==> done. Next: 'make build ML01' or 'make help'."
 
 build:
 	$(PY) scripts/run.py build $(TARGET)
@@ -65,8 +65,8 @@ serve:
 clean:
 	rm -rf out out.w*
 
-# Data-collection sweep (see scripts/README.md). Target is a memory layout (ML1), a
-# algorithm (ML1.AF1.LP1-autovec.LP2-simple), or empty = all memory layouts.
+# Data-collection sweep (see scripts/README.md). Target is a memory layout (ML01), a
+# algorithm (ML01.AF01.LP1-autovec.LP2-simple), or empty = all memory layouts.
 collect:
 	$(PY) scripts/collect.py $(TARGET)
 
@@ -83,7 +83,7 @@ help:
 	@echo ""
 	@echo "  make collect [target]       data-collection sweep (target: algorithm|memory layout|all)"
 	@echo ""
-	@echo "Target may be an algorithm (ML1.AF1.LP1-autovec.LP2-simple), a memory layout (ML1),"
-	@echo "a memory layout (ML1), or all (default). See scripts/README.md for details."
+	@echo "Target may be an algorithm (ML01.AF01.LP1-autovec.LP2-simple), a memory layout (ML01),"
+	@echo "a memory layout (ML01), or all (default). See scripts/README.md for details."
 
 .DEFAULT_GOAL := help

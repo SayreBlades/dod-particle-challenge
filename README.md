@@ -13,11 +13,13 @@ Acton's CppCon 2014 talk, ["Data-Oriented Design and C++"][acton].
 
 This challenge explores the performance optimization space across several
 **memory layouts** — each a different answer to how the particle data is
-arranged in memory. To optimize the rendering loop for a particular hardware
-target, it will require exploring various implementations of the same four
-logical stages of processing a given particle — **Integrate, Decide, Respawn,
-Render**. The physics (the math, the seed, the death model) never changes
-between them; only the data layout and access pattern do.
+arranged in memory.
+
+To optimize the rendering loop for a particular hardware target, it will require
+exploring various implementations of the same four logical stages of processing
+a given particle — **Integrate, Decide, Respawn, Render**. The physics (the
+math, the seed, the death model) never changes between them; only the data
+layout and access pattern do.
 
 [acton]: https://www.youtube.com/watch?v=rX0ItVEVjHc
 
@@ -31,49 +33,94 @@ A memory layout is a particular approach to the particle representation.
 > Memory layouts and Algorithm families below are the design reference — the frozen spec of what varies. Just here to build and run? Skip to [Prerequisites](#prerequisites).
 
 
-| #  | data model                                     | hot B/p |   status    |
-|----|------------------------------------------------|--------:|:-----------:|
-| [ML1](src/layouts/ML1/README.md) | AoS, full 11-field, plain alloc                |     ~68 | ✅ complete |
-| [ML2](src/layouts/ML2/README.md) | AoS, lean 4-field, plain alloc                 |      29 |   queued    |
-| [ML3](src/layouts/ML3/README.md) | hot/cold AoS split                             | ~36 hot |   queued    |
-| [ML4](src/layouts/ML4/README.md) | `[]Vec3` pos/vel + age + kind                  |      29 |   queued    |
-| [ML5](src/layouts/ML5/README.md) | `[]Vec4` pos/vel (aligned) + age + kind        |      37 |   queued    |
-| [ML6](src/layouts/ML6/README.md) | per-component `[]f32` (lean), plain alloc      |      29 |   queued    |
-| [ML7](src/layouts/ML7/README.md) | per-component `[]f32`, 128 B-aligned, W-padded |      29 |   queued    |
-| [ML8](src/layouts/ML8/README.md) | blocked AoSoA                                  |  ~29–32 |   queued    |
+|                                  | data model                                     | hot B/p |   status    |
+|----------------------------------|------------------------------------------------|--------:|:-----------:|
+| [ML01](src/layouts/ML01/README.md) | AoS, full 11-field, plain alloc                |     ~68 | ✅ complete |
+| [ML02](src/layouts/ML02/README.md) | AoS, lean 4-field, plain alloc                 |      29 |   queued    |
+| [ML03](src/layouts/ML03/README.md) | hot/cold AoS split                             | ~36 hot |   queued    |
+| [ML04](src/layouts/ML04/README.md) | `[]Vec3` pos/vel + age + kind                  |      29 |   queued    |
+| [ML05](src/layouts/ML05/README.md) | `[]Vec4` pos/vel (aligned) + age + kind        |      37 |   queued    |
+| [ML06](src/layouts/ML06/README.md) | per-component `[]f32` (lean), plain alloc      |      29 |   queued    |
+| [ML07](src/layouts/ML07/README.md) | per-component `[]f32`, 128 B-aligned, W-padded |      29 |   queued    |
+| [ML08](src/layouts/ML08/README.md) | blocked AoSoA                                  |  ~29–32 |   queued    |
      
-### Algorithm families
+### Algorithms & algorithm families
 
-An **algorithm family** is how the four logical stages — **Integrate, Decide, Respawn,
-Render** — fuse into one or more **loops** (sequential passes over the
-particles), plus the **intermediate** (none / mask / list) that carries the
-death decision between loops. It's pure data flow. There are exactly eight
-different algorithm families to explore:
+**An algorithm is any solution to the problem.** Given the frozen constraints,
+it must carry each particle through the four logical stages — **Integrate →
+Decide → Respawn → Render**, in that order — and produce exactly the output the
+[golden reference](experiments/golden) governs. The physics never moves; what's
+free is *how* the work gets done — how many passes over the data, scalar vs.
+vectorized, Zig vs. Halide, branchy vs. branchless. Every legal choice is a
+different algorithm.
 
-| AF | loop 1                      | loop 2                      | loop 3                      | note                                                          |
-|----|-----------------------------|-----------------------------|-----------------------------|---------------------------------------------------------------|
-| AF1 | Integrate, Decide, Respawn  | Render                      | —                           | naive baseline (branchy); blend → statistical golden class    |
-| AF2 | Integrate                   | Decide, Respawn             | Render                      | the natural seam — Halide Integrate, Zig Decide, Respawn      |
-| AF3 | Integrate, Decide→mask      | mask-scan, Respawn          | Render                      | mask makes loop 2 parallelizable via ranked-merge             |
-| AF4 | Integrate, Decide→list      | Respawn (dead only)         | Render                      | wins at rare death (loop 2 ≈ dead count), loses at common     |
-| AF5 | Integrate, Decide, Respawn, Render | —                    | —                           | fully fused; framebuffer byte-identical (splat is order-free) |
-| AF6 | Integrate                   | Decide, Respawn, Render     | —                           | Integrate seam, fused Respawn, Render                         |
-| AF7 | Integrate, Decide→mask      | mask-scan, Respawn, Render  | —                           | mask + fused Respawn, Render                                  |
-| AF8 | Integrate, Decide→list      | Respawn, Render (dead only) | Render (live, mask-tested)  | dead/live render split — carries both the list and the mask   |
+Nothing says the four stages have to run as four separate passes. A **loop**
+here is one full sweep over the particles, you can solve this problem using:
+
+- **1 loop** — walk each particle once and do everything inline: integrate it,
+  test whether it's dead, respawn it if so, splat it to the framebuffer, then
+  move on. Nothing is ever re-read. (AF05 — the fully-fused floor.)
+- **4 loops** — the opposite extreme: one pass per logical phase. Integrate
+  everything, then decide every fate, then respawn, then render. Maximum
+  passes, minimum fusion. (AF11 — the fully-defused ceiling.)
+- **2–3 loops** — everything in between: fuse two or three stages into a loop,
+  split the rest off.
+
+When considering every possible algorithm that solves this problem, each
+approach will sort into **eleven families of algorightms** — one per distinct
+loop-fusion strategy across the four stages (Integrate, Decide, Respawn,
+Render):
+
+
+|      | loop 1                             | loop 2                       | loop 3                     | loop 4 | note                                                                                                                                                               |
+|------|------------------------------------|------------------------------|----------------------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| AF01  | Integrate, Decide, Respawn         | Render                       | —                          | —      | naive baseline (branchy); blend → statistical golden class                                                                                                         |
+| AF02  | Integrate                          | Decide, Respawn              | Render                     | —      | the natural seam — Halide Integrate, Zig Decide, Respawn                                                                                                           |
+| AF03  | Integrate, Decide→mask             | mask-scan, Respawn           | Render                     | —      | mask makes loop 2 parallelizable via ranked-merge                                                                                                                  |
+| AF04  | Integrate, Decide→list             | Respawn (dead only)          | Render                     | —      | wins at rare death (loop 2 ≈ dead count), loses at common                                                                                                          |
+| AF05  | Integrate, Decide, Respawn, Render | —                            | —                          | —      | fully fused; framebuffer byte-identical (splat is order-free)                                                                                                      |
+| AF06  | Integrate                          | Decide, Respawn, Render      | —                          | —      | Integrate seam, fused Respawn, Render                                                                                                                              |
+| AF07  | Integrate, Decide→mask             | mask-scan, Respawn, Render   | —                          | —      | mask + fused Respawn, Render                                                                                                                                       |
+| AF08  | Integrate, Decide→list             | Respawn, Render (dead only)  | Render (live, mask-tested) | —      | dead/live render split — carries both the list and the mask                                                                                                        |
+| AF09  | Integrate, Decide→partition        | Respawn (dense dead slice)   | Render                     | —      | partition analog of AF04 — dead grouped to a dense front-slice so Respawn walks a contiguous range (no gather, no mask-test); reorders storage → statistical golden |
+| AF10 | Integrate, Decide→partition        | Respawn, Render (dead slice) | Render (live slice)        | —      | partition analog of AF08 — fully dense (dead + live slices); statistical golden                                                                                     |
+| AF11 | Integrate                          | Decide→mask                  | mask-scan, Respawn         | Render | the fully-defused ceiling — Decide as its own loop, re-reading `age` Integrate just wrote (dominated); kept for completeness                                       |
+
+<details>
+<summary><b>The intermediate axis and per-loop implementations</b></summary>
+
+The `→mask`, `→list`, and `→partition` annotations mark the **intermediate** —
+how Decide's death verdict is carried to the loop where Respawn lives:
+
+- **nothing** — Decide and Respawn share a loop; the verdict lives in a
+  register and dies with the iteration.
+- **a mask** — Decide writes a 1 byte/p bitmap; the Respawn loop scans it.
+- **a list** — Decide compacts the dead into an `idx[]`; the Respawn loop walks
+  only the dead.
+- **a partition** — Decide permutes the dead into a contiguous front-slice; the
+  Respawn loop walks a dense range with no per-particle test (this reorders
+  storage, so it trades the bit-exact golden for a statistical one).
 
 An algorithm family fixes *what* stages a loop fuses, not *how* each stage is
 computed. The same loop can have many interchangeable implementations that
-agree bit-for-bit (or statistically) but differ in schedule. AF1's loop 1
-(`Integrate, Decide, Respawn`) alone has four in ML1:
+agree bit-for-bit (or statistically) but differ in schedule. Orthogonal to the
+family, **tiling** runs the loops at block granularity so a block of particles
+stays cache-resident across loop boundaries — an axis in its own right,
+alongside storage **ordering** (identity / kind-sorted / double-buffered),
+and explored like unrolling as a per-loop implementation
+choice rather than a new family. AF01's loop 1
+(`Integrate, Decide, Respawn`) alone has four in ML01:
 
-- [scalar Zig](src/layouts/ML1/AF1.LP1-scalar.LP2-simple.zig) —
+- [scalar Zig](src/layouts/ML01/AF01.LP1-scalar.LP2-simple.zig) —
   de-vectorized (asm-boxed intermediates), branchy respawn
-- [vector Zig](src/layouts/ML1/AF1.LP1-autovec.LP2-simple.zig) —
+- [vector Zig](src/layouts/ML01/AF01.LP1-autovec.LP2-simple.zig) —
   auto-vectorized (NEON), branchy respawn
-- [blend Zig](src/layouts/ML1/AF1.LP1-blend.LP2-simple.zig) —
+- [blend Zig](src/layouts/ML01/AF01.LP1-blend.LP2-simple.zig) —
   branchless blend respawn (the statistical-golden class)
-- [Halide](src/layouts/ML1/AF1.LP1-halide.LP2-simple.zig) —
+- [Halide](src/layouts/ML01/AF01.LP1-halide.LP2-simple.zig) —
   AOT-compiled, per-particle hash RNG
+
+</details>
 
 ## Prerequisites
 
@@ -112,10 +159,10 @@ The common actions are `make` targets ([Makefile](Makefile));
 
 ```sh
 make build                                  # build every algorithm into out/   (target: algo | mem_layout | all)
-make build   ML1                            #   …every algorithm of memory layout ML1
-make build   ML1.AF1.LP1-autovec.LP2-simple #   …one algorithm (use the full ML1.<algo> name)
-make play    ML1.AF1.LP1-autovec.LP2-simple # open the interactive raylib window
-make profile ML1.AF1.LP1-autovec.LP2-simple # PMC cycle-attribution (macOS + Xcode)
+make build   ML01                            #   …every algorithm of memory layout ML01
+make build   ML01.AF01.LP1-autovec.LP2-simple #   …one algorithm (use the full ML01.<algo> name)
+make play    ML01.AF01.LP1-autovec.LP2-simple # open the interactive raylib window
+make profile ML01.AF01.LP1-autovec.LP2-simple # PMC cycle-attribution (macOS + Xcode)
 make report && make serve                   # build + serve the report on http://localhost:8000
 ```
 
@@ -123,12 +170,12 @@ Under the hood each target shells out to
 `zig build -p out -Dmem_layout=<ML> -Dalgo=<algo> -Dmode=<play|bench|audit> -Doptimize=ReleaseFast`,
 producing `out/bin/dod-particles`. The algorithm registry lives in
 [`build.zig`](build.zig) (`algo_labels`) and [`src/main.zig`](src/main.zig)
-(`sim_map`); the buildable ML1 algorithms are listed in
-[`experiments/sweeps/ML1.algos`](experiments/sweeps/ML1.algos) (or
+(`sim_map`); the buildable ML01 algorithms are listed in
+[`experiments/sweeps/ML01.algos`](experiments/sweeps/ML01.algos) (or
 `zig build manifests` → prints the registered roster to stdout).
 
 Halide algorithms need the `halide` package (`uv sync`); the build runs the generator in
-`src/layouts/ML1/<base>_gen.py` to emit `out/halide/<base>.{h,a}`,
+`src/layouts/ML01/<base>_gen.py` to emit `out/halide/<base>.{h,a}`,
 then links it. For the full `dod-particles` bench-binary flag reference
 (`--json`, `--ns`, `--n`, `--threads`, `--check`, `--record`, `--bandwidth`,
 `-Ddeath`), see [scripts/README.md § Bench binary flags](scripts/README.md#bench-binary-flags).
@@ -153,7 +200,7 @@ One loop powers the whole lab: **sweep → report → (optional) PMC**.
   cycle-saturation — the *why* behind a bandwidth- or compute-bound result.
 
 ```sh
-make collect ML1                   # sweep  (`make collect` = all; `make collect <algo>` = one algorithm)
+make collect ML01                   # sweep  (`make collect` = all; `make collect <algo>` = one algorithm)
 make report && make serve          # build + view the dashboard
 ```
 
@@ -162,7 +209,7 @@ make report && make serve          # build + view the dashboard
 ```
 src/
   framework/        instruments: config, sim, bench, audit, correctness, hardware, render, ...
-  layouts/ML1/      the ML1 vertical: data.zig + loops/ + algorithms
+  layouts/ML01/      the ML01 vertical: data.zig + loops/ + algorithms
   bindings/         raylib.zig (hand-written extern)
   main.zig          comptime registry: algo-name -> Sim
 experiments/

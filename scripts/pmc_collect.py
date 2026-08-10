@@ -14,7 +14,7 @@ cycle-attribution view on one machine.
 
 Usage:
     scripts/pmc_collect.py <algo> <N> <iters> <trial>
-    scripts/pmc_collect.py ML1.AF1.LP1-autovec.LP2-simple 1000000 500 1
+    scripts/pmc_collect.py ML01.AF01.LP1-autovec.LP2-simple 1000000 500 1
 
 Output: .scratch/pmc/<algo>_n<N>_t<trial>.csv
 """

@@ -7,31 +7,31 @@ const fw = @import("framework/sim.zig");
 
 const sim_map = std.StaticStringMap(type).initComptime(.{
     // --- the mem_layout verticals (src/layouts/; -Dmem_layout=MLX -Dalgo=name) ---
-    // AF1 algorithms are self-contained (§8 rule 2): each inlines physics + splat
-    // in `step`. The Halide algorithms call AF1.LP1-halide_api.run() for loop 1.
-    .{ "ML1.AF1.LP1-autovec.LP2-simple", @import("layouts/ML1/AF1.LP1-autovec.LP2-simple.zig").Sim },
-    .{ "ML1.AF1.LP1-autovec.LP2-opt", @import("layouts/ML1/AF1.LP1-autovec.LP2-opt.zig").Sim },
-    .{ "ML1.AF1.LP1-scalar.LP2-simple", @import("layouts/ML1/AF1.LP1-scalar.LP2-simple.zig").Sim },
-    .{ "ML1.AF1.LP1-unroll.LP2-simple", @import("layouts/ML1/AF1.LP1-unroll.LP2-simple.zig").Sim },
-    .{ "ML1.AF1.LP1-autovec-par.LP2-simple", @import("layouts/ML1/AF1.LP1-autovec-par.LP2-simple.zig").Sim },
-    .{ "ML1.AF1.LP1-blend.LP2-simple", @import("layouts/ML1/AF1.LP1-blend.LP2-simple.zig").Sim },
-    .{ "ML1.AF1.LP1-blend-par.LP2-simple", @import("layouts/ML1/AF1.LP1-blend-par.LP2-simple.zig").Sim },
-    .{ "ML1.AF1.LP1-halide.LP2-simple", @import("layouts/ML1/AF1.LP1-halide.LP2-simple.zig").Sim },
-    .{ "ML1.AF1.LP1-halide.LP2-opt", @import("layouts/ML1/AF1.LP1-halide.LP2-opt.zig").Sim },
-    .{ "ML1.AF1.LP1-halide-par.LP2-simple", @import("layouts/ML1/AF1.LP1-halide-par.LP2-simple.zig").Sim },
-    .{ "ML1.AF2.LP1-autovec.LP2-simple", @import("layouts/ML1/AF2.LP1-autovec.LP2-simple.zig").Sim },
-    .{ "ML1.AF2.LP1-autovec-par.LP2-simple", @import("layouts/ML1/AF2.LP1-autovec-par.LP2-simple.zig").Sim },
-    .{ "ML1.AF2.LP1-halide.LP2-simple", @import("layouts/ML1/AF2.LP1-halide.LP2-simple.zig").Sim },
-    .{ "ML1.AF2.LP1-halide-par.LP2-simple", @import("layouts/ML1/AF2.LP1-halide-par.LP2-simple.zig").Sim },
-    .{ "ML1.AF3.LP1-halide.LP2-simple", @import("layouts/ML1/AF3.LP1-halide.LP2-simple.zig").Sim },
-    .{ "ML1.AF3.LP1-autovec.LP2-simple", @import("layouts/ML1/AF3.LP1-autovec.LP2-simple.zig").Sim },
-    .{ "ML1.AF3.LP1-autovec-par.LP2-rmerge", @import("layouts/ML1/AF3.LP1-autovec-par.LP2-rmerge.zig").Sim },
-    .{ "ML1.AF4.LP1-autovec.LP2-simple", @import("layouts/ML1/AF4.LP1-autovec.LP2-simple.zig").Sim },
-    .{ "ML1.AF4.LP1-autovec-par.LP2-rmerge", @import("layouts/ML1/AF4.LP1-autovec-par.LP2-rmerge.zig").Sim },
-    .{ "ML1.AF5.LP1-fused", @import("layouts/ML1/AF5.LP1-fused.zig").Sim },
-    .{ "ML1.AF6.LP1-autovec.LP2-fused", @import("layouts/ML1/AF6.LP1-autovec.LP2-fused.zig").Sim },
-    .{ "ML1.AF7.LP1-autovec.LP2-fused", @import("layouts/ML1/AF7.LP1-autovec.LP2-fused.zig").Sim },
-    .{ "ML1.AF8.LP1-autovec.LP2-fused", @import("layouts/ML1/AF8.LP1-autovec.LP2-fused.zig").Sim },
+    // AF01 algorithms are self-contained (§8 rule 2): each inlines physics + splat
+    // in `step`. The Halide algorithms call AF01.LP1-halide_api.run() for loop 1.
+    .{ "ML01.AF01.LP1-autovec.LP2-simple", @import("layouts/ML01/AF01.LP1-autovec.LP2-simple.zig").Sim },
+    .{ "ML01.AF01.LP1-autovec.LP2-opt", @import("layouts/ML01/AF01.LP1-autovec.LP2-opt.zig").Sim },
+    .{ "ML01.AF01.LP1-scalar.LP2-simple", @import("layouts/ML01/AF01.LP1-scalar.LP2-simple.zig").Sim },
+    .{ "ML01.AF01.LP1-unroll.LP2-simple", @import("layouts/ML01/AF01.LP1-unroll.LP2-simple.zig").Sim },
+    .{ "ML01.AF01.LP1-autovec-par.LP2-simple", @import("layouts/ML01/AF01.LP1-autovec-par.LP2-simple.zig").Sim },
+    .{ "ML01.AF01.LP1-blend.LP2-simple", @import("layouts/ML01/AF01.LP1-blend.LP2-simple.zig").Sim },
+    .{ "ML01.AF01.LP1-blend-par.LP2-simple", @import("layouts/ML01/AF01.LP1-blend-par.LP2-simple.zig").Sim },
+    .{ "ML01.AF01.LP1-halide.LP2-simple", @import("layouts/ML01/AF01.LP1-halide.LP2-simple.zig").Sim },
+    .{ "ML01.AF01.LP1-halide.LP2-opt", @import("layouts/ML01/AF01.LP1-halide.LP2-opt.zig").Sim },
+    .{ "ML01.AF01.LP1-halide-par.LP2-simple", @import("layouts/ML01/AF01.LP1-halide-par.LP2-simple.zig").Sim },
+    .{ "ML01.AF02.LP1-autovec.LP2-simple", @import("layouts/ML01/AF02.LP1-autovec.LP2-simple.zig").Sim },
+    .{ "ML01.AF02.LP1-autovec-par.LP2-simple", @import("layouts/ML01/AF02.LP1-autovec-par.LP2-simple.zig").Sim },
+    .{ "ML01.AF02.LP1-halide.LP2-simple", @import("layouts/ML01/AF02.LP1-halide.LP2-simple.zig").Sim },
+    .{ "ML01.AF02.LP1-halide-par.LP2-simple", @import("layouts/ML01/AF02.LP1-halide-par.LP2-simple.zig").Sim },
+    .{ "ML01.AF03.LP1-halide.LP2-simple", @import("layouts/ML01/AF03.LP1-halide.LP2-simple.zig").Sim },
+    .{ "ML01.AF03.LP1-autovec.LP2-simple", @import("layouts/ML01/AF03.LP1-autovec.LP2-simple.zig").Sim },
+    .{ "ML01.AF03.LP1-autovec-par.LP2-rmerge", @import("layouts/ML01/AF03.LP1-autovec-par.LP2-rmerge.zig").Sim },
+    .{ "ML01.AF04.LP1-autovec.LP2-simple", @import("layouts/ML01/AF04.LP1-autovec.LP2-simple.zig").Sim },
+    .{ "ML01.AF04.LP1-autovec-par.LP2-rmerge", @import("layouts/ML01/AF04.LP1-autovec-par.LP2-rmerge.zig").Sim },
+    .{ "ML01.AF05.LP1-fused", @import("layouts/ML01/AF05.LP1-fused.zig").Sim },
+    .{ "ML01.AF06.LP1-autovec.LP2-fused", @import("layouts/ML01/AF06.LP1-autovec.LP2-fused.zig").Sim },
+    .{ "ML01.AF07.LP1-autovec.LP2-fused", @import("layouts/ML01/AF07.LP1-autovec.LP2-fused.zig").Sim },
+    .{ "ML01.AF08.LP1-autovec.LP2-fused", @import("layouts/ML01/AF08.LP1-autovec.LP2-fused.zig").Sim },
 });
 
 const SimImpl = sim_map.get(opts.name) orelse

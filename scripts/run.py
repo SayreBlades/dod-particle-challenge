@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Thin build/bench/play/profile dispatcher used by the Makefile.
 
-Resolves a target — a full algorithm name (ML1.AF1.LP1-autovec.LP2-simple), a
-memory layout (ML1), or `all`/empty — into the list of algorithms to act on,
+Resolves a target — a full algorithm name (ML01.AF01.LP1-autovec.LP2-simple), a
+memory layout (ML01), or `all`/empty — into the list of algorithms to act on,
 then runs the requested action for each. (Bare algos are rejected: algo names
 recur across memory layouts, so they're ambiguous.)
 
@@ -12,13 +12,13 @@ recur across memory layouts, so they're ambiguous.)
     scripts/run.py profile [target]  PMC cycle-attribution for one algorithm (macOS+Xcode)
 
 `build`/`bench` accept `all`/a memory layout/an algorithm; `play`/`profile`
-need a single algorithm (default: the ML1 reference, ML1.AF1.LP1-autovec.LP2-simple).
+need a single algorithm (default: the ML01 reference, ML01.AF01.LP1-autovec.LP2-simple).
 
 Used by the Makefile's positional-target convention, e.g.:
     make build              # -> run.py build all
-    make build ML1          # -> run.py build ML1
-    make bench ML1.AF1.LP1-autovec.LP2-simple
-    make play ML1.AF1.LP1-autovec.LP2-simple
+    make build ML01          # -> run.py build ML01
+    make bench ML01.AF01.LP1-autovec.LP2-simple
+    make play ML01.AF01.LP1-autovec.LP2-simple
 """
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT_ALGO = "ML1.AF1.LP1-autovec.LP2-simple"
+DEFAULT_ALGO = "ML01.AF01.LP1-autovec.LP2-simple"
 
 
 def mem_layout_ids() -> list[str]:
@@ -123,7 +123,7 @@ def main() -> int:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("action", choices=["build", "bench", "play", "profile"])
     ap.add_argument("target", nargs="?", default="all",
-                    help="memory layout (ML1), full algorithm name (ML1.AF1.LP1-autovec.LP2-simple), or all (default: all)")
+                    help="memory layout (ML01), full algorithm name (ML01.AF01.LP1-autovec.LP2-simple), or all (default: all)")
     args = ap.parse_args()
 
     if args.action in ("play", "profile"):

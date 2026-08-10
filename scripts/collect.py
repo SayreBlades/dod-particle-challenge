@@ -36,13 +36,13 @@ Env knobs (all optional; override the regime grid):
 
 Usage:
     scripts/collect.py                            # every algorithm of every memory layout (all)
-    scripts/collect.py ML1                        # every algorithm of memory layout ML1
-    scripts/collect.py ML1.AF1.LP1-autovec.LP2-simple   # one algorithm (full name)
-    scripts/collect.py "AF1.LP1-x AF1.LP1-y"     # a space-list of algorithms
-    NS=4000,65000 TRIALS=5 scripts/collect.py ML1
-    DEATH_RATES="0 0.5" scripts/collect.py ML1
-    THREADS="1 2 4 8" scripts/collect.py ML1   # T is the OUTER loop: all algos@T=1, then -par algos @T=2,4,8
-    PARALLEL=4 SKIP_DONE=1 scripts/collect.py ML1
+    scripts/collect.py ML01                        # every algorithm of memory layout ML01
+    scripts/collect.py ML01.AF01.LP1-autovec.LP2-simple   # one algorithm (full name)
+    scripts/collect.py "AF01.LP1-x AF01.LP1-y"     # a space-list of algorithms
+    NS=4000,65000 TRIALS=5 scripts/collect.py ML01
+    DEATH_RATES="0 0.5" scripts/collect.py ML01
+    THREADS="1 2 4 8" scripts/collect.py ML01   # T is the OUTER loop: all algos@T=1, then -par algos @T=2,4,8
+    PARALLEL=4 SKIP_DONE=1 scripts/collect.py ML01
 """
 from __future__ import annotations
 
@@ -91,12 +91,12 @@ def read_algos(mem_layout: str) -> list[str]:
 
 def resolve_algo(name: str) -> str:
     """Validate a full algorithm name (ML<mem_layout>.<algo>). Bare algos are
-    rejected — the same algo names recur across memory layouts (AF1–AF8 share
+    rejected — the same algo names recur across memory layouts (AF01–AF08 share
     families), so a bare algo is ambiguous once a second layout lands."""
     if name.split(".", 1)[0] in mem_layout_ids():
         return name
     sys.exit(f"error: '{name}' is not a full algorithm name "
-            f"(expected ML<mem_layout>.<algo>, e.g. ML1.AF1.LP1-autovec.LP2-simple)")
+            f"(expected ML<mem_layout>.<algo>, e.g. ML01.AF01.LP1-autovec.LP2-simple)")
 
 
 def is_parallel(algo: str) -> bool:
@@ -327,7 +327,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("target", nargs="?", default="all",
-                    help="memory layout (ML1), full algorithm name (ML1.AF1.LP1-autovec.LP2-simple), "
+                    help="memory layout (ML01), full algorithm name (ML01.AF01.LP1-autovec.LP2-simple), "
                          "space-list of algorithms, or all (default: all)")
     ap.add_argument("--ns", default=env("NS"), help="comma-list of N (default: bench SWEEP)")
     ap.add_argument("--trials", type=int, default=int(env("TRIALS", "3")))

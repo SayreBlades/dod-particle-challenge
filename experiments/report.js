@@ -161,14 +161,14 @@ async function drawBandwidthMemLayout(lb) {
 // ---------------- algorithm ----------------
 // ---- Algorithm section (deterministic, from algo_meta + name) ----
 const ALGO_FAMS = {
-  AF1: [["Integrate", "Decide", "Respawn"], ["Render"], null],
-  AF2: [["Integrate"], ["Decide", "Respawn"], ["Render"]],
-  AF3: [["Integrate", "Decide→mask"], ["scan mask", "Respawn"], ["Render"]],
-  AF4: [["Integrate", "Decide→list"], ["Respawn (dead only)"], ["Render"]],
-  AF5: [["Integrate", "Decide", "Respawn", "Render"], null, null],
-  AF6: [["Integrate"], ["Decide", "Respawn", "Render"], null],
-  AF7: [["Integrate", "Decide→mask"], ["scan mask", "Respawn", "Render"], null],
-  AF8: [["Integrate", "Decide→list"], ["Respawn", "Render (dead)"], ["Render (live)"]],
+  AF01: [["Integrate", "Decide", "Respawn"], ["Render"], null],
+  AF02: [["Integrate"], ["Decide", "Respawn"], ["Render"]],
+  AF03: [["Integrate", "Decide→mask"], ["scan mask", "Respawn"], ["Render"]],
+  AF04: [["Integrate", "Decide→list"], ["Respawn (dead only)"], ["Render"]],
+  AF05: [["Integrate", "Decide", "Respawn", "Render"], null, null],
+  AF06: [["Integrate"], ["Decide", "Respawn", "Render"], null],
+  AF07: [["Integrate", "Decide→mask"], ["scan mask", "Respawn", "Render"], null],
+  AF08: [["Integrate", "Decide→list"], ["Respawn", "Render (dead)"], ["Render (live)"]],
 };
 function loopSchedules(algo) {
   const algoPart = algo.split(".").slice(1).join(".");
@@ -536,7 +536,7 @@ document.addEventListener("click", (e) => {
     MACHINES.machines.forEach((m) => { const o = document.createElement("option"); o.value = m.machine_id; o.textContent = `${m.cpu} · ${m.machine_id}`; ms.add(o); });
     machine = MACHINES.machines[0].machine_id;
     const ts = $("threads");
-    [1, 4, 10].forEach((t) => { const o = document.createElement("option"); o.value = t; o.textContent = `T=${t}`; ts.add(o); });
+    [1, 2, 4, 8].forEach((t) => { const o = document.createElement("option"); o.value = t; o.textContent = `T=${t}`; ts.add(o); });
     ts.value = threads;
     ms.onchange = () => { machine = ms.value; ovCache._cur = null; route(); };
     ts.onchange = () => { threads = +ts.value; route(); };

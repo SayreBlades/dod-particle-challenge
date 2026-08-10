@@ -4,9 +4,9 @@ committed JSONL data (the terminology refactor of optimization-framework.md).
 
 Rewrites, in place, every experiments/data/<machine_id>/{runs,checks,pmc}.jsonl:
   - JSON keys:   cell -> algo,  layout -> mem_layout,  blueprint -> algo_fam
-  - JSON values: cell name  L1.B1.w1-x.w2-y   -> ML1.AF1.LP1-x.LP2-y
-                 layout id  L1                -> ML1
-                 family id  B1                -> AF1
+  - JSON values: cell name  L1.B1.w1-x.w2-y   -> ML01.AF01.LP1-x.LP2-y
+                 layout id  L1                -> ML01
+                 family id  B1                -> AF01
 hardware.json is untouched (no cell/layout fields).
 
 Idempotent: running twice is a no-op (rename_cell is a fixed point on already-
@@ -29,9 +29,9 @@ DATA = os.path.join(ROOT, "experiments", "data")
 
 
 def rename_cell(name: str) -> str:
-    """L1.B1.w1-x.w2-y -> ML1.AF1.LP1-x.LP2-y (fixed point on already-renamed)."""
-    name = re.sub(r'^L(\d+)(\.|$)', r'ML\1\2', name)        # L1(.|$) -> ML1
-    name = re.sub(r'(^|\.)B(\d+)(\.|$)', r'\1AF\2\3', name)  # B1 / .B1 -> AF1
+    """L1.B1.w1-x.w2-y -> ML01.AF01.LP1-x.LP2-y (fixed point on already-renamed)."""
+    name = re.sub(r'^L(\d+)(\.|$)', r'ML\1\2', name)        # L1(.|$) -> ML01
+    name = re.sub(r'(^|\.)B(\d+)(\.|$)', r'\1AF\2\3', name)  # B1 / .B1 -> AF01
     name = re.sub(r'\.w(\d+)', r'.LP\1', name)               # .w1 -> .LP1
     return name
 

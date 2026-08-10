@@ -12,7 +12,7 @@ sweep takes hours).
 
 Usage:
     scripts/pmc_sweep.py [mem_layout] [trials] [--algos "<list>"] [--run-dir <dir>"]
-    mem_layout defaults to ML1 (reads experiments/sweeps/<mem_layout>.algos)
+    mem_layout defaults to ML01 (reads experiments/sweeps/<mem_layout>.algos)
     trials defaults to 3
 """
 from __future__ import annotations
@@ -97,7 +97,7 @@ def build_rollup(outdir: str, rollout_dir: str) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("mem_layout", nargs="?", default="ML1")
+    ap.add_argument("mem_layout", nargs="?", default="ML01")
     ap.add_argument("trials", nargs="?", type=int, default=3)
     ap.add_argument("--algos", default="", help="space-separated algorithm list (default: <mem_layout>.algos)")
     ap.add_argument("--run-dir", default=None, help="where to write the rollup (default: .scratch/pmc/)")

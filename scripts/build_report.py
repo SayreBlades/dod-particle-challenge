@@ -25,7 +25,7 @@ Usage:
     uv run python scripts/build_report.py --no-algos   # aggregation only (skip per-algo gen)
     uv run python scripts/build_report.py --force      # force-regenerate all narratives
     uv run python scripts/build_report.py --verify-only
-    uv run python scripts/build_report.py ML1           # restrict to one mem_layout
+    uv run python scripts/build_report.py ML01           # restrict to one mem_layout
 
 Needs duckdb — run via `uv run` (or `make report`). Re-run after every collect.
 """
@@ -50,7 +50,7 @@ EXCLUDE_DEATH_Q = (0.0, 0.75)
 # Per-mem_layout struct diagram shown atop the algo page (the data-model identity).
 # TODO: read from the mem_layout README spec; hardcoded per-mem_layout for now (L1 only).
 MEM_LAYOUT_MEMORY = {
-    "ML1": (
+    "ML01": (
         "particles: []Particle        ONE AoS array, plain alloc, natural alignment\n"
         "┌────────┬────────┬──────┬─────┬───────┬──────┬──────────┬──────┬───────┬──────┬──────┐\n"
         "│pos 12B │vel 12B │life 4│age 4│color16│size 4│rotation 4│mass 4│flags 1│kind 1│seed 4│  = 68 B\n"

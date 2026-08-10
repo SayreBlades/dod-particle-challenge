@@ -17,7 +17,7 @@ pub const ParticleKind = enum(u8) { smoke, spark, debris };
 /// Golden class (mem-layout-matrix.md §8.2): how the algorithm relates to the
 /// golden files. Default (no declaration) = bit_exact trajectory equality.
 /// `.statistical` = the algorithm intentionally uses a different RNG model
-/// (per-particle hash respawn, halide-doc §2.3 AF1): trajectories diverge
+/// (per-particle hash respawn, halide-doc §2.3 AF01): trajectories diverge
 /// from stage1.bin by design; correctness is distributional. The bench
 /// skips the golden compare loudly, never silently.
 pub const GoldenClass = enum { bit_exact, statistical, framebuffer_only };
@@ -60,34 +60,34 @@ pub const RenderColorSemantics = enum { current_kind, stale_cold };
 /// ∈ {none, mask, list}; choose a contiguous fusion of
 /// {Integrate+Decide, Respawn, Render} into loops.
 pub const AlgorithmFamily = enum {
-    AF1, // math+decide+respawn | render                          (none)
-    AF2, // math | decide+respawn | render                        (none)
-    AF3, // math+decide→mask | mask-scan+respawn | render         (mask)
-    AF4, // math+decide→list | respawn-dead-only | render         (list)
-    AF5, // math+decide+respawn+render                            (none)
-    AF6, // math | decide+respawn+render                          (none)
-    AF7, // math+decide→mask | mask-scan+respawn+render           (mask)
-    AF8, // math+decide→list | respawn+render(dead) | render(live)(list+mask)
+    AF01, // math+decide+respawn | render                          (none)
+    AF02, // math | decide+respawn | render                        (none)
+    AF03, // math+decide→mask | mask-scan+respawn | render         (mask)
+    AF04, // math+decide→list | respawn-dead-only | render         (list)
+    AF05, // math+decide+respawn+render                            (none)
+    AF06, // math | decide+respawn+render                          (none)
+    AF07, // math+decide→mask | mask-scan+respawn+render           (mask)
+    AF08, // math+decide→list | respawn+render(dead) | render(live)(list+mask)
 
     /// Human-readable loop structure for this family (for printing).
     pub fn structure(self: AlgorithmFamily) []const u8 {
         return switch (self) {
-            .AF1 => "math+decide+respawn | render",
-            .AF2 => "math | decide+respawn | render",
-            .AF3 => "math+decide→mask | mask-scan+respawn | render",
-            .AF4 => "math+decide→list | respawn-dead-only | render",
-            .AF5 => "math+decide+respawn+render",
-            .AF6 => "math | decide+respawn+render",
-            .AF7 => "math+decide→mask | mask-scan+respawn+render",
-            .AF8 => "math+decide→list | respawn+render(dead) | render(live)",
+            .AF01 => "math+decide+respawn | render",
+            .AF02 => "math | decide+respawn | render",
+            .AF03 => "math+decide→mask | mask-scan+respawn | render",
+            .AF04 => "math+decide→list | respawn-dead-only | render",
+            .AF05 => "math+decide+respawn+render",
+            .AF06 => "math | decide+respawn+render",
+            .AF07 => "math+decide→mask | mask-scan+respawn+render",
+            .AF08 => "math+decide→list | respawn+render(dead) | render(live)",
         };
     }
 
     /// How many loops this family has (length of the loops array).
     pub fn nLoops(self: AlgorithmFamily) usize {
         return switch (self) {
-            .AF1 => 2, .AF2 => 3, .AF3 => 3, .AF4 => 3,
-            .AF5 => 1, .AF6 => 2, .AF7 => 2, .AF8 => 3,
+            .AF01 => 2, .AF02 => 3, .AF03 => 3, .AF04 => 3,
+            .AF05 => 1, .AF06 => 2, .AF07 => 2, .AF08 => 3,
         };
     }
 };
@@ -111,7 +111,7 @@ pub const LoopSchedule = enum {
     tile,
     r0, // naive splat
     r1, // optimized splat (LUT, packed, tight loop)
-    fused, // splat inlined into the physics loop (AF5–AF8, §17.7)
+    fused, // splat inlined into the physics loop (AF05–AF08, §17.7)
 };
 
 /// Per-loop: the parallel scheme (closed vocabulary, §4).
@@ -126,9 +126,9 @@ pub const LoopParallel = enum {
 /// Per-loop: the semantic variant (drives golden class, §6).
 pub const LoopVariant = enum {
     none, // loop has no respawn/RNG semantics (e.g. render loop)
-    branchy, // branchy respawn, ordered spawn RNG (AF1-branchy)
-    blend, // branchless blend respawn, per-particle hash RNG (AF1-blend)
-    ordered, // ordered spawn RNG, respawn via mask/list scan (AF3/AF4)
+    branchy, // branchy respawn, ordered spawn RNG (AF01-branchy)
+    blend, // branchless blend respawn, per-particle hash RNG (AF01-blend)
+    ordered, // ordered spawn RNG, respawn via mask/list scan (AF03/AF04)
 };
 
 /// One loop's declared attributes.
@@ -198,7 +198,7 @@ pub const FieldDump = struct {
 //           ![]FieldDump;  // raw bytes per field, for the density audit
 //   };
 //
-// `dumpFields` is mem_layout-aware: ML1 strides an AoS array; ML4 emits
+// `dumpFields` is mem_layout-aware: ML01 strides an AoS array; ML04 emits
 // per-component SoA streams. The audit output therefore reflects the mem_layout
 // transformation itself.
 //
@@ -229,7 +229,7 @@ pub const FieldDump = struct {
 /// respawns — same sequence as the arc's single-RNG sims, so the golden
 /// holds), a DEDICATED kill RNG (drawn only under q>0 so spawn draws stay
 /// comparable across rates, optimization-framework.md §7), and the frame
-/// counter (used by the AF1-blend per-particle hash RNG), and the thread count
+/// counter (used by the AF01-blend per-particle hash RNG), and the thread count
 /// (serial strategies ignore).
 pub fn Strategy(comptime Data: type, comptime H: type) type {
     return struct {
@@ -253,7 +253,7 @@ pub fn Strategy(comptime Data: type, comptime H: type) type {
         extra: Extra = undefined, // strategy-owned (scratch, pool, ...)
         rng: std.Random.DefaultPrng,
         kill_rng: std.Random.DefaultPrng, // dedicated kill stream (drawn only when q>0, §7)
-        frame: usize, // step counter (AF1-blend per-particle hash RNG uses this)
+        frame: usize, // step counter (AF01-blend per-particle hash RNG uses this)
         threads: usize,
         n: usize, // mirrors data.n — framework drivers read sim.n directly
 
@@ -274,17 +274,17 @@ pub fn Strategy(comptime Data: type, comptime H: type) type {
             return self;
         }
 
-        /// step takes an optional framebuffer so fused families (AF5/AF6/AF7)
+        /// step takes an optional framebuffer so fused families (AF05/AF06/AF07)
         /// can splat inside the step loop (§17.7). fb == null = step-only
         /// One call: math + decide + respawn + splat, always (§17.7 as revised).
         /// The splat always runs — the driver always provides a real fb. The
         /// clear is NOT here (the driver owns it: play memsets each frame, bench
-        /// memsets once before the timed loop). Unfused families (AF1–AF4) put
-        /// the splat in a separate pass after physics; fused families (AF5+)
+        /// memsets once before the timed loop). Unfused families (AF01–AF04) put
+        /// the splat in a separate pass after physics; fused families (AF05+)
         /// splat inline in the physics loop.
         pub fn step(self: *Self, dt: f32, fb: []u8, w: u32, h: u32) void {
             H.step(self, dt, fb, w, h);
-            self.frame +%= 1; // AF1-blend hash RNG frame counter (free otherwise)
+            self.frame +%= 1; // AF01-blend hash RNG frame counter (free otherwise)
         }
 
         pub fn deinit(self: *Self) void {
