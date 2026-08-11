@@ -59,47 +59,49 @@ here is one full sweep over the particles, you can solve this problem using:
 
 - **1 loop** — walk each particle once and do everything inline: integrate it,
   test whether it's dead, respawn it if so, splat it to the framebuffer, then
-  move on. Nothing is ever re-read. (AF05 — the fully-fused floor.)
+  move on. Nothing is ever re-read. (AF01 — the fully-fused floor.)
 - **4 loops** — the opposite extreme: one pass per logical phase. Integrate
   everything, then decide every fate, then respawn, then render. Maximum
-  passes, minimum fusion. (AF11 — the fully-defused ceiling.)
+  passes, minimum fusion. (AF08 — the fully-defused ceiling.)
 - **2–3 loops** — everything in between: fuse two or three stages into a loop,
   split the rest off.
 
 When considering every possible algorithm that solves this problem, each
-approach will sort into **eleven families of algorightms** — one per distinct
+approach will sort into **eight algorithm families** — one per distinct
 loop-fusion strategy across the four stages (Integrate, Decide, Respawn,
-Render):
+Render). Within a family, the choice of **intermediate** (mask, list,
+partition) and whether Render is partially fused with Respawn for dead
+particles are implementation-level decisions, not family-level ones:
 
 
-|      | loop 1                             | loop 2                       | loop 3                     | loop 4 | note                                                                                                                                                               |
-|------|------------------------------------|------------------------------|----------------------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| AF01  | Integrate, Decide, Respawn         | Render                       | —                          | —      | naive baseline (branchy); blend → statistical golden class                                                                                                         |
-| AF02  | Integrate                          | Decide, Respawn              | Render                     | —      | the natural seam — Halide Integrate, Zig Decide, Respawn                                                                                                           |
-| AF03  | Integrate, Decide→mask             | mask-scan, Respawn           | Render                     | —      | mask makes loop 2 parallelizable via ranked-merge                                                                                                                  |
-| AF04  | Integrate, Decide→list             | Respawn (dead only)          | Render                     | —      | wins at rare death (loop 2 ≈ dead count), loses at common                                                                                                          |
-| AF05  | Integrate, Decide, Respawn, Render | —                            | —                          | —      | fully fused; framebuffer byte-identical (splat is order-free)                                                                                                      |
-| AF06  | Integrate                          | Decide, Respawn, Render      | —                          | —      | Integrate seam, fused Respawn, Render                                                                                                                              |
-| AF07  | Integrate, Decide→mask             | mask-scan, Respawn, Render   | —                          | —      | mask + fused Respawn, Render                                                                                                                                       |
-| AF08  | Integrate, Decide→list             | Respawn, Render (dead only)  | Render (live, mask-tested) | —      | dead/live render split — carries both the list and the mask                                                                                                        |
-| AF09  | Integrate, Decide→partition        | Respawn (dense dead slice)   | Render                     | —      | partition analog of AF04 — dead grouped to a dense front-slice so Respawn walks a contiguous range (no gather, no mask-test); reorders storage → statistical golden |
-| AF10 | Integrate, Decide→partition        | Respawn, Render (dead slice) | Render (live slice)        | —      | partition analog of AF08 — fully dense (dead + live slices); statistical golden                                                                                     |
-| AF11 | Integrate                          | Decide→mask                  | mask-scan, Respawn         | Render | the fully-defused ceiling — Decide as its own loop, re-reading `age` Integrate just wrote (dominated); kept for completeness                                       |
+|      | loop 1                             | loop 2                     | loop 3             | loop 4 | note                                                                                                                    |
+|------|------------------------------------|-----------------------------|--------------------|---------|-------------------------------------------------------------------------------------------------------------------------|
+| AF01 | Integrate, Decide, Respawn, Render | —                           | —                  | —       | fully fused; framebuffer byte-identical (splat is order-free)                                                           |
+| AF02 | Integrate, Decide, Respawn         | Render                      | —                  | —       | naive baseline (branchy); blend → statistical golden class                                                              |
+| AF03 | Integrate, Decide                  | Respawn, Render             | —                  | —       | fused Respawn+Render; intermediate is an impl choice                                                                    |
+| AF04 | Integrate                          | Decide, Respawn, Render     | —                  | —       | Integrate seam, fused Decide+Respawn+Render                                                                             |
+| AF05 | Integrate                          | Decide, Respawn             | Render             | —       | the natural seam — Halide Integrate, Zig Decide+Respawn                                                                 |
+| AF06 | Integrate, Decide                  | Respawn                     | Render             | —       | intermediate (mask/list/partition) and dead-render fusion are impl choices; partition reorders storage → stat. golden    |
+| AF07 | Integrate                          | Decide                      | Respawn, Render    | —       | Integrate and Decide each isolated; Respawn+Render fused — intermediate carries verdict from Decide to loop 3           |
+| AF08 | Integrate                          | Decide                      | Respawn            | Render  | the fully-defused ceiling — Decide as its own loop, re-reading `age` Integrate just wrote (dominated); for completeness |
 
 <details>
 <summary><b>The intermediate axis and per-loop implementations</b></summary>
 
-The `→mask`, `→list`, and `→partition` annotations mark the **intermediate** —
-how Decide's death verdict is carried to the loop where Respawn lives:
+When Decide and Respawn share a loop (AF01, AF02, AF04, AF05), the death verdict
+lives in a register and dies with the iteration — no intermediate needed. When
+they land in separate loops (AF03, AF06, AF07, AF08), an **intermediate**
+carries the verdict across the loop boundary:
 
-- **nothing** — Decide and Respawn share a loop; the verdict lives in a
-  register and dies with the iteration.
-- **a mask** — Decide writes a 1 byte/p bitmap; the Respawn loop scans it.
-- **a list** — Decide compacts the dead into an `idx[]`; the Respawn loop walks
+- **mask** — Decide writes a 1 byte/p bitmap; the Respawn loop scans it.
+- **list** — Decide compacts the dead into an `idx[]`; the Respawn loop walks
   only the dead.
-- **a partition** — Decide permutes the dead into a contiguous front-slice; the
+- **partition** — Decide permutes the dead into a contiguous front-slice; the
   Respawn loop walks a dense range with no per-particle test (this reorders
   storage, so it trades the bit-exact golden for a statistical one).
+
+The intermediate is an implementation choice within any family that splits
+Decide from Respawn — not a family-defining axis.
 
 An algorithm family fixes *what* stages a loop fuses, not *how* each stage is
 computed. The same loop can have many interchangeable implementations that
@@ -108,16 +110,16 @@ family, **tiling** runs the loops at block granularity so a block of particles
 stays cache-resident across loop boundaries — an axis in its own right,
 alongside storage **ordering** (identity / kind-sorted / double-buffered),
 and explored like unrolling as a per-loop implementation
-choice rather than a new family. AF01's loop 1
+choice rather than a new family. AF02's loop 1
 (`Integrate, Decide, Respawn`) alone has four in ML01:
 
-- [scalar Zig](src/layouts/ML01/AF01.LP1-scalar.LP2-simple.zig) —
+- [scalar Zig](src/layouts/ML01/AF02.LP1-scalar.LP2-simple.zig) —
   de-vectorized (asm-boxed intermediates), branchy respawn
-- [vector Zig](src/layouts/ML01/AF01.LP1-autovec.LP2-simple.zig) —
+- [vector Zig](src/layouts/ML01/AF02.LP1-autovec.LP2-simple.zig) —
   auto-vectorized (NEON), branchy respawn
-- [blend Zig](src/layouts/ML01/AF01.LP1-blend.LP2-simple.zig) —
+- [blend Zig](src/layouts/ML01/AF02.LP1-blend.LP2-simple.zig) —
   branchless blend respawn (the statistical-golden class)
-- [Halide](src/layouts/ML01/AF01.LP1-halide.LP2-simple.zig) —
+- [Halide](src/layouts/ML01/AF02.LP1-halide.LP2-simple.zig) —
   AOT-compiled, per-particle hash RNG
 
 </details>
