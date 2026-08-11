@@ -131,7 +131,7 @@ choice rather than a new family. AF01's loop 1
 | [uv]     | python env management (Halide generator + analysis) | any        |
 | [Make]   | the `make` targets (`make init`, `make build`, …)   | GNU make   |
 | [ffmpeg] | `--record` video export (raw RGBA pipe)             | any        |
-| Xcode    | optional: PMC cycle-attribution (`pmc_collect.py`)  | macOS only |
+| Xcode    | optional: cycle-attribution profiler backend (`profile.py` → xctrace)  | macOS only |
 
 [Zig]: https://ziglang.org
 [raylib]: https://github.com/raysan5/raylib
@@ -182,25 +182,28 @@ then links it. For the full `dod-particles` bench-binary flag reference
 
 ## Collect & analyze
 
-One loop powers the whole lab: **sweep → report → (optional) PMC**.
+One loop powers the whole lab: **collect → report → (optional) profile**.
 
-- **Sweep** — [`scripts/collect.py`](scripts/collect.py) runs every algorithm across
-  the **regime grid** (N × death-rate q × threads), appending one
-  self-describing JSONL row per trial into the host-partitioned data dir
-  (`experiments/data/<machine_id>/`). Knobs include `PARALLEL=N` (concurrent
-  tasks), `SKIP_DONE=1` (resume), `VERBOSE=0`.
-- **Report** — [`scripts/build_report.py`](scripts/build_report.py) builds the
-  derived analysis tree under [`experiments/analysis/`](experiments/analysis/)
-  (per-algorithm evidence + LLM narratives via `analyze_algo.py`, machine/memory-layout
-  aggregations, a `--verify` integrity gate) and the thin SPA at
-  [`experiments/report.html`](experiments/report.html) (ECharts: performance
-  landscapes, champion grid, achieved-vs-ceiling bandwidth, PMC breakdown).
-- **PMC** (optional, macOS + Xcode) — [`scripts/pmc_collect.py`](scripts/pmc_collect.py) /
-  [`scripts/pmc_sweep.py`](scripts/pmc_sweep.py) add per-process
-  cycle-saturation — the *why* behind a bandwidth- or compute-bound result.
+- **Collect** — [`scripts/collect.py`](scripts/collect.py) orchestrates the atomic
+  measurement scripts across the **regime grid** (N × death-rate q × threads):
+  `hardware` (machine facts), `algo` (the asm bundle), `bench` (timing + invariant
+  check), `profile` (cycle attribution, where a profiler backend exists). Each
+  writes per-algorithm files under `experiments/data/<machine_id>/`. Knobs:
+  `SKIP_DONE=1` (resume), `NS=`, `THREADS=`, `TRIALS=`.
+- **Report** — [`scripts/build_report.py`](scripts/build_report.py) is pure derivation:
+  it reads `data/` (no toolchain — zig/otool/xctrace not needed) and builds the
+  analysis tree under [`experiments/analysis/`](experiments/analysis/) (per-algorithm
+  evidence + LLM narratives via `analyze_algo.py`, machine/memory-layout aggregations,
+  a `--verify` integrity gate) and the thin SPA at
+  [`experiments/report.html`](experiments/report.html).
+- **Profile** (optional) — `collect --with-profile` (or `--only profile`) adds
+  cycle attribution across the grid via the host's profiler backend (xctrace on
+  macOS) — the *why* behind a bandwidth- or compute-bound result, and the radar's
+  data source.
 
 ```sh
 make collect ML01                   # sweep  (`make collect` = all; `make collect <algo>` = one algorithm)
+make collect-profile ML01            # cycle-attribution grid sweep (the radar's data)
 make report && make serve          # build + view the dashboard
 ```
 
@@ -214,13 +217,13 @@ src/
   main.zig          comptime registry: algo-name -> Sim
 experiments/
   sweeps/           <mem_layout>.algos lists + death_rates.txt + regime-grid docs
-  data/             host-partitioned JSONL: <machine_id>/{runs,checks,pmc}.jsonl + hardware.json (RAW — collect.py only)
+  data/             source-of-truth measurements: <machine_id>/{<algo>.runs,<algo>.profile}.jsonl + <algo>.json + hardware.json (RAW — atomic scripts via collect.py)
   analysis/         derived analysis tree: <m>/<ML>/<algo>.{md,json} + machine/mem-layout bundles (rebuilt by build_report.py)
   golden/           stage1.bin + frame.sha256 (the byte-exact reference; tracked)
   report.html       the thin SPA (+ report.js + style.css) — machine+thread-scoped, fetches analysis/
-scripts/            all Python — run.py, collect.py, build_report.py, analyze_algo.py, algo_hash.py,
-                    hardware_json.py, hardware_profile.py, pmc_collect.py, pmc_sweep.py
-Makefile            make build|play|profile|report|serve (target: algo|mem_layout|all)
+scripts/            all Python — collect.py (orchestrator) + atomics: algo, bench, profile (+ profile_xctrace),
+                    hardware_json; plus build_report, analyze_algo, algo_hash, run.py, sweep_config
+Makefile            make build|play|profile|report|serve|collect (target: algo|mem_layout|all)
 vendor/raylib/      git submodule (the renderer)
 ```
 

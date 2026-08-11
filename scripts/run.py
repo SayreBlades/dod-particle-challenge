@@ -88,13 +88,16 @@ def cmd_build(algos: list[str]) -> int:
 
 
 def cmd_bench(algos: list[str]) -> int:
+    # Quick single-point smoke (no --json, so nothing is appended to data/):
+    # the binary is a single-point primitive now, so `make bench` shows one point.
     for a in algos:
-        print(f"=== bench {a} ===", file=sys.stderr)
+        print(f"=== bench {a} (N=65000 q=0.1 T=1) ===", file=sys.stderr)
         if not zig_build(a, "bench"):
             print(f"    BUILD FAILED — {a}", file=sys.stderr)
             continue
         bp = bin_path(a, "bench")
-        subprocess.run([bp], cwd=ROOT)
+        subprocess.run([bp, "--n", "65000", "--q", "0.1", "--threads", "1",
+                        "--iters", "100", "--trial", "1"], cwd=ROOT)
     return 0
 
 
@@ -112,10 +115,11 @@ def cmd_profile(algos: list[str]) -> int:
     if len(algos) != 1:
         sys.exit("error: profile needs exactly one algorithm (got: " + " ".join(algos) + ")")
     a = algos[0]
-    # PMC needs a single (N, iters, trial); pick a large-N sample for stable counters.
-    return subprocess.run([sys.executable,
-                           os.path.join(ROOT, "scripts", "pmc_collect.py"),
-                           a, "1000000", "100", "1"]).returncode
+    # One cycle-attribution point via the platform profiler backend (xctrace on
+    # macOS). Full grid: `scripts/collect.py <target> --only profile`.
+    return subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "profile.py"),
+                           a, "--n", "1000000", "--q", "0.1", "--threads", "1",
+                           "--trial", "1"]).returncode
 
 
 def main() -> int:

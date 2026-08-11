@@ -106,25 +106,27 @@ pre.asm .ic.other { color: #888; }
    linked (colored gutter, clickable); the rest is dimmed context. Click a
    linked line → asm jumps to its block; click an asm block → source jumps to
    its line. Hover highlights the pair. */
-.gb-head { display: flex; font-size: 10.5px; color: #777; padding: 6px 0;
+.gb-head { display: flex; align-items: center; font-size: 10.5px; color: #777; padding: 6px 12px;
   border: 1px solid #2a2a2a; border-bottom: none; background: #15171a; border-radius: 4px 4px 0 0;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-.gb-h { padding: 0 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-.gb-h-src { flex: 3; } .gb-h-asm { flex: 1; }
-.godbolt { display: flex; height: 660px; border: 1px solid #2a2a2a; border-top: none;
-  border-radius: 0 0 4px 4px; background: #0f1115; margin-top: 6px;
+.gb-h { padding: 0; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px; }
+a.gb-h { color: #9aa; text-decoration: none; }
+a.gb-h:hover { color: #5dade2; }
+.gb-h-src { flex: 5; } .gb-h-asm { flex: 6; justify-content: flex-end; }
+.godbolt { display: flex; flex: 1; min-height: 0; border: 1px solid #2a2a2a; border-top: none;
+  border-radius: 0 0 4px 4px; background: #0f1115;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-.gb-pane { height: 660px; overflow: auto; position: relative; }              /* position:relative so offsetTop is relative to the pane (click-to-jump) */
-.gb-pane-src { flex: 3; border-right: 1px solid #2a2a2a; }
-.gb-pane-asm { flex: 1; }
+.gb-pane { height: 100%; overflow: auto; position: relative; }              /* position:relative so offsetTop is relative to the pane (click-to-jump) */
+.gb-pane-src { flex: 5; border-right: 1px solid #2a2a2a; }
+.gb-pane-asm { flex: 6; }
 .gb-ln { display: inline-block; min-width: 3ch; text-align: right; color: #3a3f47; margin-right: 10px; user-select: none; }
 .gb-src { white-space: pre; font-size: 11.5px; line-height: var(--rh); color: #566069;
   padding: 0 12px 0 0; border-left: 3px solid transparent; }
 .gb-src.linked { color: #9ad0a0; cursor: pointer; }
 .gb-src.linked:hover, .gb-src.hl, .gb-src.gb-hl { background: #1c2a36; }
 .gb-src.hl, .gb-src.gb-hl { border-left-color: #5dade2 !important; }
-.gb-asm-group { border-left: 3px solid #2d5a44; }
-.gb-asm-group.hl, .gb-asm-group.gb-hl { background: #1c2a36; }
+.asm-grp { border-left: 3px solid #2d5a44; }
+.asm-grp.hl, .asm-grp.gb-hl { background: #1c2a36; }
 .gb-asm { white-space: pre; font-size: 11.5px; line-height: var(--rh); color: #888; padding: 0 10px; }
 .gb-asm.load { color: #7fb3ff; } .gb-asm.store { color: #e74c3c; } .gb-asm.fp { color: #2ecc71; }
 .gb-asm.vload { color: #5dade2; } .gb-asm.vstore { color: #e8a87c; } .gb-asm.branch { color: #bb86fc; }
@@ -162,4 +164,51 @@ table.alg td.walknum { color: #8ab4f8; font-weight: 600; white-space: nowrap; }
 h4 { margin: 14px 0 6px; font-size: 13px; color: #cfcfcf; }
 
 footer { color: #666; font-size: 12px; padding: 20px 0; border-top: 1px solid #2a2a2a; }
+
+/* ---- assembly viewer: toolbar + view modes ---- */
+.asm-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 10px 0 2px; }
+.asm-tabs { display: inline-flex; background: #15171a; border: 1px solid #2a2a2a; border-radius: 6px; padding: 2px; }
+.asm-tab { background: transparent; color: #9aa; border: none; padding: 4px 11px; font-size: 11.5px;
+  border-radius: 4px; cursor: pointer; font-family: inherit; transition: background .1s, color .1s; }
+.asm-tab:hover { color: #d8d8d8; }
+.asm-tab.on { background: #2c3540; color: #e8f0f8; }
+.asm-info { font-size: 11px; color: #777; font-variant-numeric: tabular-nums; }
+.asm-gh { margin-left: auto; font-size: 11px; color: #9aa; font-family: ui-monospace, monospace;
+  display: inline-flex; align-items: center; gap: 5px; text-decoration: none; white-space: nowrap; }
+.asm-gh:hover { color: #5dade2; text-decoration: none; }
+.asm-gh.none { color: #555; }
+
+.asm-body { height: 640px; display: flex; flex-direction: column; margin-top: 4px; }
+.asm-body > .godbolt,
+.asm-body > .interleave,
+.asm-body > .asm-full,
+.asm-body > pre.asm { flex: 1; min-height: 0; margin-top: 0; }
+
+/* aligned mnemonic/operand columns — used by every mode. Mnemonic is colored
+   by instruction class; operands stay a neutral gray (godbolt-style). */
+.asm-row { display: flex; align-items: baseline; white-space: pre; font-size: 11.5px;
+  line-height: var(--rh); color: #8a8a8a; padding: 0 10px 0 4px; }
+.asm-row .asm-mnem { display: inline-block; min-width: 7ch; }
+.asm-row .asm-ops { color: #8a8a8a; }
+.asm-row.load .asm-mnem { color: #7fb3ff; } .asm-row.store .asm-mnem { color: #e74c3c; }
+.asm-row.fp .asm-mnem { color: #2ecc71; } .asm-row.vload .asm-mnem { color: #5dade2; }
+.asm-row.vstore .asm-mnem { color: #e8a87c; } .asm-row.branch .asm-mnem { color: #bb86fc; }
+.asm-row.cmp .asm-mnem { color: #f1c40f; } .asm-row.vec .asm-mnem { color: #48c9b0; }
+.asm-row.other .asm-mnem { color: #888; }
+.asm-full { background: #0f1115; border-radius: 4px; padding: 6px 0; overflow: auto; }
+
+/* interleaved + source-only views */
+.interleave { background: #0f1115; border-radius: 4px; padding: 6px 0; overflow: auto; }
+.il-src { white-space: pre; font-size: 11.5px; line-height: var(--rh); color: #566069;
+  padding: 0 12px; border-left: 3px solid transparent; }
+.il-src.linked { color: #cfcfcf; }
+.il-src.linked:hover { background: #1c2a36; }
+.il-asmwrap { padding-left: 16px; }
+.il-asmwrap .asm-grp { margin-left: 2px; }
+.il-asmwrap .asm-row { font-size: 11px; padding-left: 6px; }
+.interleave.src-only .il-src { color: #c8c8c8; }
+
+/* line-number links (source/interleave views) */
+a.gb-ln { color: #3a3f47; text-decoration: none; }
+a.gb-ln:hover { color: #5dade2; }
 

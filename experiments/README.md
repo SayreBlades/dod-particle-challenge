@@ -5,17 +5,18 @@ Three layers, changing on different clocks (see
 
 | dir / file | what | changes when | written by |
 |---|---|---|---|
-| [`data/`](data/) | **RAW** — host-partitioned JSONL + `hardware.json` | every sweep | `collect.py` (the only writer) |
+| [`data/`](data/) | **RAW** — per-algo `<algo>.{json,runs.jsonl,profile.jsonl}` + `hardware.json` | every sweep | atomic scripts (`algo`/`bench`/`profile`/`hardware`), orchestrated by `collect.py` |
 | [`analysis/`](analysis/) | **DERIVED** — per-algorithm bundles + machine/memory layout aggregations + a browsable markdown tree | every report-build | `build_report.py` (+ `analyze_algo.py`) |
 | [`report.html`](report.html) + [`report.js`](report.js) + [`style.css`](style.css) | the **SPA** — thin: stores no data, fetches `analysis/` | hand-edited (rare) | (source) |
 | [`sweeps/`](sweeps/) | the regime grid + `<memory layout>.algos` rosters + sweep-knob docs | when the sweep policy changes | (source) |
 | [`golden/`](golden/) | `stage1.bin` + `frame.sha256` (the byte-exact reference) | when the reference algorithm changes | `correctness.zig` |
 
-`collect.py` is pure measurement (writes only `data/`); **all** analysis —
-champion grids, cache/bandwidth reads, the LLM narratives, the assembly
-evidence — is computed at report-build time into `analysis/`. The asm is
-reproduced by rebuilding each algorithm from its pinned source (cached by
-`source_hash`), not captured during the sweep.
+`collect.py` orchestrates the atomic measurement scripts (`hardware`, `algo`,
+`bench`, `profile`), all writing only `data/`. The asm bundle (`<algo>.json`) and
+cycle attribution (`<algo>.profile.jsonl`) are captured at collection time, so
+`analysis/` is pure derivation — `build_report.py` needs no toolchain (no zig /
+otool / xctrace) at report time; it reads `data/` and computes champion grids,
+cache/bandwidth reads, and the LLM narratives.
 
 ## Serve the report
 
@@ -32,15 +33,17 @@ resolve. Or `make serve`.)
 stores **no data** — every route fetches from `analysis/`:
 
 - Two persistent selectors at the top: **machine** (from
-  `analysis/machines.json`) and **thread group** {1, 4, 10}. Champions are
-  partitioned by thread group (a parallel algorithm's T=10 and a serial algorithm's T=1
+  `analysis/machines.json`) and **thread group** {1, 2, 4, 8}. Champions are
+  partitioned by thread group (a parallel algorithm's T=8 and a serial algorithm's T=1
   never share a podium).
 - **`#/`** — global top-3 per (regime × death_q) on the selected
   (machine, threads).
 - **`#/memory layout/<L>`** — one memory layout's champion grid + performance landscape +
   achieved-vs-ceiling bandwidth + featured algorithms.
 - **`#/algorithm/<algorithm>`** — the per-algorithm deep dive: header + Particle Memory layout +
-  the cache-saturation + bandwidth plots (linked brush) + the colorized
+  the cache-saturation + bandwidth plots (linked brush) + the **bottleneck radar**
+  (5 goodness axes — Compute / Bandwidth / Latency / Sync / Control — per `(N, q)`;
+  needs `<algo>.profile.jsonl`, else shows a hint) + the colorized
   `step` disassembly + the Tier-2 narrative (rendered from the algorithm's `.md`).
   An algorithm whose narrative failed `--verify` shows a red banner.
 

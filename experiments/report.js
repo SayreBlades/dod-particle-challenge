@@ -244,75 +244,164 @@ function asmClassMnem(line) {            // attributed line: "mnem\toperands"
   return classByMnem((first.split(".")[0] || "").toLowerCase(), first);
 }
 
-const ASM_LEGEND = [["label", "symbol/label"], ["src", "source line (godbolt)"], ["vload", "NEON load (ld1–4)"], ["vstore", "NEON store (st1–4)"],
+const ASM_LEGEND = [["label", "symbol/label"], ["vload", "NEON load (ld1–4)"], ["vstore", "NEON store (st1–4)"],
   ["load", "scalar load (ldr/ldp)"], ["store", "store (str/stp)"], ["fp", "FP math (fmul/fadd…)"],
   ["branch", "branch (b/cbz/ret)"], ["cmp", "compare (cmp/ccmp)"], ["vec", "vector op (dup/ext/movi)"], ["other", "other"]];
 
-function asmListing(j) {
-  const legend = `<div class="asmleg">${ASM_LEGEND.map(([c, l]) => `<span class="asmlegitem"><i class="icdot ${c}"></i>${l}</span>`).join("")}</div>`;
-  const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\t/g, "  ");
-  const attributed = j.asm.source_attributed;
-  const cs = j.asm.algo_source;
-  let html = `<h4>Algorithm</h4>${legend}`;
-  if (!attributed) {
-    html += `<pre class="asm">`;
-    (j.asm.excerpt || "").split("\n").forEach((ln0, i) => {
-      html += `<span class="ic ${asmClass(ln0)}"><span class="ln">${String(i + 1).padStart(3, " ")}</span>${esc(ln0)}</span>`;
-    });
-    return html + "</pre>";
-  }
-  // Decoupled godbolt: LEFT = the algorithm's real source file (formatted exactly;
-  // lines that produced code are linked, the rest is dimmed context). RIGHT =
-  // all the asm, independently scrollable. Click a linked source line to jump
-  // the asm to its block; click an asm block to jump the source to its line.
-  const colors = ["#2d5a44","#5a2d44","#2d4a5a","#5a442d","#4a2d5a","#2d5a5a","#5a5a2d","#442d5a"];
-  const lineGroup = {};                       // algo-line -> first asm group index
-  if (cs) cs.group_lines.forEach((cl, gi) => { if (cl && !(cl in lineGroup)) lineGroup[cl] = gi; });
-  let srcHtml = "";
-  if (cs) {
-    cs.lines.forEach((line, i) => {
-      const ln = i + 1, gi = lineGroup[ln], linked = gi !== undefined;
-      const c = linked ? colors[gi % colors.length] : null;
-      srcHtml += `<div class="gb-src${linked ? " linked" : ""}"${linked ? ` data-g="${gi}"` : ""}` +
-                 ` data-line="${ln}"${c ? ` style="border-left-color:${c}"` : ""}>` +
-                 `<span class="gb-ln">${ln}</span>${esc(line) || " "}</div>`;
-    });
-  }
-  let asmHtml = "", ln = 1;
-  attributed.forEach((g, gi) => {
-    const c = colors[gi % colors.length];
-    asmHtml += `<div class="gb-asm-group" data-g="${gi}" style="border-left-color:${c}">`;
-    for (const line of g.asm)
-      asmHtml += `<div class="gb-asm ${asmClassMnem(line)}"><span class="gb-ln">${ln++}</span>${esc(line)}</div>`;
-    asmHtml += `</div>`;
+// ---- assembly viewer (godbolt-like, with view modes + GitHub source link) ----
+// j.asm.algo_source      = {file, lines[], group_lines[gi] -> srcLineNo|null}
+// j.asm.source_attributed = [{source, asm[]}] in address order
+// Four modes share aligned mnemonic/operand columns:
+//   link (side-by-side, hover/click) · interleave (src + nested asm) · source · asm
+const ASM_COLORS = ["#2d5a44","#5a2d44","#2d4a5a","#5a442d","#4a2d5a","#2d5a5a","#5a5a2d","#442d5a"];
+const REPO_URL = "https://github.com/SayreBlades/dod-particle-challenge";
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\t/g, "  ");
+const srcFileUrl = (file, sha, line) => `${REPO_URL}/blob/${sha || "main"}/${file}${line ? `#L${line}` : ""}`;
+const splitAsm = (line) => { const t = line.indexOf("\t"); return t < 0 ? [line, ""] : [line.slice(0, t), line.slice(t + 1)]; };
+let asmMode = "link";                          // persists across algorithm navigation
+
+const GH_SVG = `<svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-1px"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>`;
+
+function asmRowHtml(line, ln) {
+  const [mnem, ops] = splitAsm(line);
+  return `<div class="asm-row ${asmClassMnem(line)}">${ln != null ? `<span class="gb-ln">${ln}</span>` : ""}<span class="asm-mnem">${esc(mnem)}</span><span class="asm-ops">${esc(ops)}</span></div>`;
+}
+function asmGroupHtml(g, gi, ln, color) {    // ln: running counter or null; color: explicit border or undefined→cycle
+  const c = color != null ? color : ASM_COLORS[gi % ASM_COLORS.length];
+  let rows = "";
+  for (const line of g.asm) rows += asmRowHtml(line, ln != null ? ln++ : null);
+  return { html: `<div class="asm-grp" data-g="${gi}" style="border-left-color:${c}">${rows}</div>`, ln };
+}
+function flatAsmHtml(j) {                     // fallback when no source attribution
+  let html = "";
+  (j.asm.excerpt || "").split("\n").forEach((ln0, i) => {
+    html += `<span class="ic ${asmClass(ln0)}"><span class="ln">${String(i + 1).padStart(3, " ")}</span>${esc(ln0)}</span>`;
   });
-  const fileLabel = cs ? esc(cs.file.split("/").slice(-2).join("/")) : "Zig source";
-  html += `<div class="gb-head"><span class="gb-h gb-h-src">${fileLabel}</span><span class="gb-h gb-h-asm">arm64 — ReleaseFast (otool)</span></div>`;
-  html += `<div class="godbolt" data-grouplines='${cs ? JSON.stringify(cs.group_lines) : "[]"}'>`;
-  html += `<div class="gb-pane gb-pane-src">${srcHtml}</div>`;
-  html += `<div class="gb-pane gb-pane-asm">${asmHtml}</div></div>`;
   return html;
 }
 
-function setupGodbolt() {
+function asmToolbar(j, mode) {
+  const cs = j.asm.algo_source;
+  const tabs = [["link", "Linked", "Side-by-side with hover/click linking (godbolt)"],
+                ["interleave", "Interleaved", "Source with its assembly nested beneath each line"],
+                ["source", "Source", "The original source file"],
+                ["asm", "Assembly", "Full disassembly, grouped by source line"]]
+    .map(([m, label, title]) => `<button type="button" class="asm-tab${mode === m ? " on" : ""}" data-mode="${m}" title="${title}">${label}</button>`).join("");
+  const fileLink = cs
+    ? `<a class="asm-gh" href="${srcFileUrl(cs.file, j.git_sha)}" target="_blank" title="Open ${esc(cs.file)} on GitHub">${GH_SVG}${esc(cs.file)} ↗</a>`
+    : `<span class="asm-gh none">${esc(j.asm.symbol)}</span>`;
+  return `<div class="asm-toolbar"><div class="asm-tabs">${tabs}</div><span class="asm-info">${j.asm.n_instructions} instructions · ${j.asm.vector_insns} vector</span>${fileLink}</div>`;
+}
+
+function asmViewer(j) {
+  const legend = `<div class="asmleg">${ASM_LEGEND.map(([c, l]) => `<span class="asmlegitem"><i class="icdot ${c}"></i>${l}</span>`).join("")}</div>`;
+  return `${asmToolbar(j, asmMode)}${legend}<div id="asmbody" class="asm-body"></div>`;
+}
+
+// ---- mode renderers ----
+function sideBySideHtml(j) {
+  const attributed = j.asm.source_attributed, cs = j.asm.algo_source;
+  if (!attributed || !cs) return `<pre class="asm">${flatAsmHtml(j)}</pre>`;
+  const lineGroup = {};
+  cs.group_lines.forEach((cl, gi) => { if (cl && !(cl in lineGroup)) lineGroup[cl] = gi; });
+  let srcHtml = "";
+  cs.lines.forEach((line, i) => {
+    const ln = i + 1, gi = lineGroup[ln], linked = gi !== undefined;
+    const c = linked ? ASM_COLORS[gi % ASM_COLORS.length] : null;
+    srcHtml += `<div class="gb-src${linked ? " linked" : ""}"${linked ? ` data-g="${gi}"` : ""} data-line="${ln}"${c ? ` style="border-left-color:${c}"` : ""}><span class="gb-ln">${ln}</span>${esc(line) || " "}</div>`;
+  });
+  let asmHtml = "", ln = 1;
+  attributed.forEach((g, gi) => { const r = asmGroupHtml(g, gi, ln); ln = r.ln; asmHtml += r.html; });
+  const fileLabel = esc(cs.file.split("/").slice(-2).join("/"));
+  return `<div class="gb-head"><a class="gb-h gb-h-src" href="${srcFileUrl(cs.file, j.git_sha)}" target="_blank" title="Open on GitHub">${GH_SVG} ${fileLabel} ↗</a><span class="gb-h gb-h-asm">arm64 — ReleaseFast</span></div>` +
+    `<div class="godbolt" data-grouplines='${JSON.stringify(cs.group_lines)}'>` +
+    `<div class="gb-pane gb-pane-src">${srcHtml}</div>` +
+    `<div class="gb-pane gb-pane-asm">${asmHtml}</div></div>`;
+}
+
+function interleaveHtml(j) {
+  // Execution-order (godbolt-style): walk source_attributed in address order;
+  // render each group's asm, inserting the attributed source line as a bright
+  // divider wherever the disassembler mapped one. Unattributed groups flow on
+  // with a faint gutter. (Attribution is sparse, so a file-order interleave would
+  // bury most asm in a preamble — this keeps the full asm visible in context.)
+  const cs = j.asm.algo_source, sa = j.asm.source_attributed;
+  if (!cs || !sa) return `<pre class="asm">${flatAsmHtml(j)}</pre>`;
+  const FAINT = "#23262b", lineColor = {};                 // file line → color idx (first-seen order)
+  let lc = 0, html = "", ln = 1;
+  sa.forEach((g, gi) => {
+    const cl = cs.group_lines[gi];                         // file line number or null
+    let color = FAINT;
+    if (cl != null) {
+      if (!(cl in lineColor)) lineColor[cl] = lc++ % ASM_COLORS.length;
+      color = ASM_COLORS[lineColor[cl]];
+      html += `<div class="il-src linked" style="border-left-color:${color}"><a class="gb-ln" href="${srcFileUrl(cs.file, j.git_sha, cl)}" target="_blank" title="Line ${cl} on GitHub">${cl}</a>${esc(cs.lines[cl - 1] || "")}</div>`;
+    }
+    const r = asmGroupHtml(g, gi, ln, color); ln = r.ln;
+    html += `<div class="il-asmwrap">${r.html}</div>`;
+  });
+  return `<div class="interleave">${html}</div>`;
+}
+
+function sourceOnlyHtml(j) {
+  const cs = j.asm.algo_source;
+  if (!cs) return `<pre class="asm">${flatAsmHtml(j)}</pre>`;
+  let html = "";
+  cs.lines.forEach((line, i) => {
+    const ln = i + 1;
+    html += `<div class="il-src"><a class="gb-ln" href="${srcFileUrl(cs.file, j.git_sha, ln)}" target="_blank" title="Line ${ln} on GitHub">${ln}</a>${esc(line) || " "}</div>`;
+  });
+  return `<div class="interleave src-only">${html}</div>`;
+}
+
+function asmOnlyHtml(j) {
+  const sa = j.asm.source_attributed;
+  if (!sa) return `<pre class="asm">${flatAsmHtml(j)}</pre>`;
+  let html = "", ln = 1;
+  sa.forEach((g, gi) => { const r = asmGroupHtml(g, gi, ln); ln = r.ln; html += r.html; });
+  return `<div class="asm-full">${html}</div>`;
+}
+
+function wireAsmViewer(j) {
+  const body = $("asmbody");
+  if (!body) return;
+  const draw = () => {
+    body.className = `asm-body mode-${asmMode}`;
+    body.innerHTML = asmMode === "source" ? sourceOnlyHtml(j)
+                   : asmMode === "asm" ? asmOnlyHtml(j)
+                   : asmMode === "interleave" ? interleaveHtml(j)
+                   : sideBySideHtml(j);
+    if (asmMode === "link") setupLinked();
+  };
+  draw();
+  document.querySelectorAll(".asm-tab").forEach((b) => {
+    b.onclick = () => {
+      asmMode = b.dataset.mode;
+      document.querySelectorAll(".asm-tab").forEach((x) => x.classList.toggle("on", x === b));
+      draw();
+    };
+  });
+}
+
+function setupLinked() {
   const src = document.querySelector(".gb-pane-src");
   const asm = document.querySelector(".gb-pane-asm");
   const gb = document.querySelector(".godbolt");
   if (!src || !asm || !gb) return;
   const groupLines = JSON.parse(gb.dataset.grouplines || "[]");
-  const flash = g => {
-    document.querySelectorAll(".gb-hl").forEach(n => n.classList.remove("gb-hl"));
-    document.querySelectorAll(`[data-g="${g}"]`).forEach(n => n.classList.add("gb-hl"));
+  const flash = (g) => {
+    document.querySelectorAll(".gb-hl").forEach((n) => n.classList.remove("gb-hl"));
+    document.querySelectorAll(`[data-g="${g}"]`).forEach((n) => n.classList.add("gb-hl"));
   };
-  src.addEventListener("click", e => {                       // source line -> its asm block
+  src.addEventListener("click", (e) => {                       // source line -> its asm block
     const r = e.target.closest("[data-g]"); if (!r) return;
-    const g = asm.querySelector(`.gb-asm-group[data-g="${r.dataset.g}"]`);
-    if (g) { asm.scrollTo({ top: g.offsetTop, behavior: "smooth" }); flash(r.dataset.g); }
+    const g = asm.querySelector(`.asm-grp[data-g="${r.dataset.g}"]`);
+    if (g) { asm.scrollTop = g.offsetTop; flash(r.dataset.g); }   // instant — smooth scroll is flaky across browsers/CDP
   });
-  asm.addEventListener("click", e => {                       // asm block -> its source line (if linked)
-    const r = e.target.closest(".gb-asm-group"); if (!r) return;
+  asm.addEventListener("click", (e) => {                       // asm block -> its source line (if linked)
+    const r = e.target.closest(".asm-grp"); if (!r) return;
     const gi = r.dataset.g, cl = groupLines[gi];
-    if (cl) { const s = src.querySelector(`[data-line="${cl}"]`); if (s) s.scrollIntoView({ block: "center", behavior: "smooth" }); }
+    if (cl) { const s = src.querySelector(`[data-line="${cl}"]`); if (s) s.scrollIntoView({ block: "center" }); }
     flash(gi);
   });
 }
@@ -345,12 +434,14 @@ async function renderAlgo(algo) {
     <section class="cellhead"><h2>${short(algo)}</h2><div class="cellfull">${algo}</div>${decl}${wtable}${hypo}${verdict}</section>
     <section class="narrative"><h3>Latency</h3>${mp("Cache saturation")}<div id="cacheplot" class="chart"></div></section>
     <section class="narrative"><h3>Bandwidth</h3>${mp("Bandwidth")}<div id="bwplot" class="chart"></div></section>
-    <section class="narrative"><h3>Assembly</h3>${mp("Assembly")}<div id="asmplot" class="chart small"></div>${asmListing(j)}</section>`;
+${(j.profile || []).length ? `<section class="narrative"><h3>Bottleneck radar <span class="sub">goodness per axis (bigger = better)</span></h3><div style="margin:6px 0;display:flex;gap:12px;align-items:center;font-size:12px;color:#9aa"><label>N <select id=\"radarN\"></select></label><label>q <select id=\"radarQ\"></select></label> <span id="radarcap" class="sub"></span></div><div id="radar" class="chart" style="height:380px"></div></section>` : `<section class="narrative"><h3>Bottleneck radar</h3><p class="hint">No cycle-attribution data for ${short(algo)} — run <code>scripts/collect.py ${algo} --only profile</code> to populate it.</p></section>`}
+    <section class="narrative"><h3>Assembly</h3>${mp("Assembly")}<div id="asmplot" class="chart small"></div>${asmViewer(j)}</section>`;
   status(`${algo} · ${j.asm.n_instructions} asm insns`);
   drawCachePlot(j);
   drawBandwidthAlgo(j);
+  if ((j.profile || []).length) drawRadar(j);
   drawAsm(j);
-  setupGodbolt();
+  wireAsmViewer(j);
 }
 
 function cacheBands(j) {
@@ -416,6 +507,74 @@ function drawAsm(j) {
     yAxis: { type: "value", ...AX },
     series: [{ type: "bar", data: entries.map((e) => e[1]), itemStyle: { color: "#5dade2" } }],
   });
+}
+
+// ---------------- bottleneck radar (algo page) ----------------
+// 5 goodness axes (0–100, bigger = better). Compute/Latency/Control come from
+// cycle attribution (profile, always T=1); Bandwidth/Sync come from timing at
+// the global thread count. Per (N, q) — the character shifts with both: high q
+// raises branch_flush (Control drops); high N raises backend_stall (Latency drops).
+function profAt(j, N, q) {
+  return (j.profile || []).find((p) => p.N === N && Math.abs(p.death_q - q) < 1e-9 && p.threads === 1);
+}
+function seriesAt(j, q, N, T) {
+  return (j.series[String(q)] || []).find((r) => r.N === N && r.threads === T);
+}
+function radarScores(j, N, q, T) {
+  const ceil = j.hardware.streaming_bw_gbs;
+  const p = profAt(j, N, q), rT = seriesAt(j, q, N, T), r1 = seriesAt(j, q, N, 1);
+  const compute = p ? +p.compute_pct : null;
+  const latency = p ? 100 - +p.backend_stall_pct : null;
+  const control = p ? 100 - +p.branch_flush_pct : null;
+  const bandwidth = rT && ceil ? Math.min(100, (rT.achieved_bw_gbs / ceil) * 100) : null;
+  let sync = 100;
+  if (T !== 1 && r1 && rT) sync = (r1.ns_particle / (rT.ns_particle * T)) * 100;
+  return { compute, bandwidth, latency, sync, control, profiler: p ? p.profiler : null };
+}
+function drawRadar(j) {
+  const allN = [...new Set(Object.values(j.series).flat().map((r) => r.N))].sort((a, b) => a - b);
+  const allQ = Object.keys(j.series).map(Number).sort((a, b) => a - b);
+  const elN = $("radarN"), elQ = $("radarQ");
+  if (!elN || !elQ) return;
+  allN.forEach((n) => elN.add(new Option(fmtN(n), n)));
+  allQ.forEach((q) => elQ.add(new Option(fmtq(q), q)));
+  let N = allN[allN.length - 1];
+  let q = allQ.includes(0.25) ? 0.25 : allQ[Math.min(2, allQ.length - 1)];
+  elN.value = N; elQ.value = q;
+  let rc = null;
+  const AXES = ["Compute", "Bandwidth", "Latency", "Sync", "Control"];
+  const draw = () => {
+    const s = radarScores(j, N, q, threads);
+    const cap = $("radarcap");
+    if (cap) cap.innerHTML = s.compute == null
+      ? `<span style="color:#e74c3c">no cycle attribution at N=${fmtN(N)}, q=${fmtq(q)}</span>`
+      : `cycle attribution @ T=1 via <b>${s.profiler || "?"}</b> · bandwidth/sync @ T=<b>${threads}</b>`;
+    const opt = s.compute == null
+      ? { title: { text: "—", left: "center", top: "center", textStyle: { color: "#444" } } }
+      : {
+          tooltip: { formatter: (p) => AXES.map((a, i) => `${a}: ${p.value[i]}`).join("<br>") },
+          radar: {
+            indicator: AXES.map((a) => ({ name: a, max: 100 })),
+            radius: "62%",
+            axisName: { color: "#bbb", fontSize: 11 },
+            splitLine: { lineStyle: { color: "#2a2a2a" } },
+            splitArea: { areaStyle: { color: ["rgba(255,255,255,0.015)", "rgba(255,255,255,0.035)"] } },
+            axisLine: { lineStyle: { color: "#333" } },
+          },
+          series: [{
+            type: "radar",
+            data: [{ value: [s.compute, s.bandwidth, s.latency, s.sync, s.control].map((v) => Math.round(v || 0)),
+                     name: short(j.algo) }],
+            areaStyle: { color: "rgba(93,173,226,0.22)" },
+            lineStyle: { color: "#5dade2", width: 2 },
+            itemStyle: { color: "#5dade2" },
+          }],
+        };
+    if (!rc) rc = chart("radar", opt); else rc.setOption(opt, true);
+  };
+  elN.onchange = () => { N = +elN.value; draw(); };
+  elQ.onchange = () => { q = +elQ.value; draw(); };
+  draw();
 }
 
 // ---------------- rank: every algorithm at one (N, death_q, threads) ----------------

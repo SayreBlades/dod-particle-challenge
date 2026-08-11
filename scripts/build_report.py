@@ -47,6 +47,12 @@ RETRY_MAX_TOKENS = "24000"   # bump on verify-fail retry (reasoning model headro
 # SPA never surfaces them. Keep in sync with analyze_algo.py.
 EXCLUDE_DEATH_Q = (0.0, 0.75)
 
+# Particle counts (N) EXCLUDED from the report. Legacy sweep points retired
+# from the bench SWEEP (src/framework/bench.zig); raw data retains them.
+# 16000 was an L1-era point, dropped in the one-pass sparse grid (97f2541) but
+# the collected rows were never purged. Same sync rule as EXCLUDE_DEATH_Q.
+EXCLUDE_N = (16000,)
+
 # Per-mem_layout struct diagram shown atop the algo page (the data-model identity).
 # TODO: read from the mem_layout README spec; hardcoded per-mem_layout for now (L1 only).
 MEM_LAYOUT_MEMORY = {
@@ -62,29 +68,45 @@ MEM_LAYOUT_MEMORY = {
 # ---- duckdb load ----
 
 def load(con):
-    paths = sorted(glob.glob(os.path.join(DATA, "*", "runs.jsonl")))
+    # Per-algo files: data/<id>/<algo>.runs.jsonl (kind-discriminated timing +
+    # check rows). The report table keeps only kind='timing'; check rows aren't timings.
+    paths = sorted(glob.glob(os.path.join(DATA, "*", "*.runs.jsonl")))
     if not paths:
-        sys.exit(f"no runs.jsonl under {DATA}; run collect.py first")
+        sys.exit(f"no <algo>.runs.jsonl under {DATA}; run collect.py first")
     con.execute("CREATE TABLE runs AS " +
                 " UNION ALL ".join(f"SELECT * FROM read_json_auto('{p}')" for p in paths))
     if EXCLUDE_DEATH_Q:
         qmarks = ",".join(map(str, EXCLUDE_DEATH_Q))
         con.execute(f"DELETE FROM runs WHERE death_q IN ({qmarks})")
         print(f"  excluded death_q in ({qmarks}) from the report", file=sys.stderr)
+    if EXCLUDE_N:
+        nmarks = ",".join(map(str, EXCLUDE_N))
+        con.execute(f"DELETE FROM runs WHERE N IN ({nmarks})")
+        print(f"  excluded N in ({nmarks}) from the report", file=sys.stderr)
     hws = sorted(glob.glob(os.path.join(DATA, "*", "hardware.json")))
     con.execute("CREATE TABLE hardware AS " +
                 " UNION ALL ".join(f"SELECT * FROM read_json_auto('{p}')" for p in hws))
-    for kind in ("checks", "pmc"):
-        ps = sorted(glob.glob(os.path.join(DATA, "*", f"{kind}.jsonl")))
-        if ps:
-            con.execute(f"CREATE TABLE {kind} AS " +
-                        " UNION ALL ".join(f"SELECT * FROM read_json_auto('{p}')" for p in ps))
-        else:
-            con.execute(f"CREATE TABLE {kind}(algo VARCHAR, death_q DOUBLE)")
+    # Keep only rows pinned to each algorithm's CURRENT source_hash — drops
+    # pre-versioning null rows and stale-source rows so the report never mixes
+    # measurement epochs (the min ns_particle stays within one source version).
+    import algo_hash
+    cur = []
+    for (algo,) in con.execute("SELECT DISTINCT algo FROM runs").fetchall():
+        try:
+            sh, _ = algo_hash.algo_hash(algo)
+        except (Exception, SystemExit):
+            continue  # source gone — drop this algo's rows
+        cur.append((algo, sh))
+    con.execute("CREATE TABLE current_source(algo VARCHAR, shash VARCHAR)")
+    if cur:
+        con.executemany("INSERT INTO current_source VALUES (?, ?)", cur)
     con.execute("""CREATE TABLE report AS
         SELECT r.*, h.streaming_bw_gbs,
                (r.bytes_per_particle * r.N / NULLIF(r.ns_frame, 0)) AS achieved_bw_gbs
-        FROM runs r LEFT JOIN hardware h USING (machine_id)""")
+        FROM runs r
+        JOIN current_source cs ON r.algo = cs.algo AND r.source_hash = cs.shash
+        LEFT JOIN hardware h USING (machine_id)
+        WHERE r.kind = 'timing'""")
 
 
 def rows(con, sql, params=()):
@@ -138,7 +160,7 @@ def teaser(md_path):
 
 def mem_layouts_in_data(con):
     return [r[0] for r in con.execute(
-        "SELECT DISTINCT mem_layout FROM runs ORDER BY mem_layout").fetchall()]
+        "SELECT DISTINCT mem_layout FROM runs WHERE mem_layout IS NOT NULL ORDER BY mem_layout").fetchall()]
 
 
 def run_analyze(args, env=None):
@@ -203,6 +225,8 @@ def inject_verified(machine, mem_layout, verify_results):
     """Stamp `verified` + `verify_errors` into each algo .json so the SPA can
     banner unverified narratives. (Additive; analyze_algo.py owns the rest of
     the schema and rewrites the .json each run — this runs after.)"""
+    if not mem_layout:
+        return
     base = os.path.join(OUT, machine, mem_layout)
     for algo, v in verify_results.items():
         if algo.split(".")[0] != mem_layout:

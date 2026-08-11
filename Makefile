@@ -10,14 +10,17 @@
 #   make build ML01                           # build every algorithm of ML01
 #   make build ML01.AF01.LP1-autovec.LP2-simple   # build one algorithm (full name; memory layouts share algo names)
 #   make play ML01.AF01.LP1-autovec.LP2-simple    # open the interactive raylib window
-#   make profile ML01.AF01.LP1-autovec.LP2-simple # PMC cycle-attribution (macOS+Xcode)
+#   make profile ML01.AF01.LP1-autovec.LP2-simple # cycle-attribution, one point (profiler backend: xctrace on macOS)
 #   make report                             # build the analysis tree + verify gate
 #   make serve                              # serve experiments/ on :8000 (open report.html)
 #   make clean                              # remove out/ and worker build dirs
 #
-# Heavy data-collection sweeps (with parallelism, resume, JSONL append) use
-# scripts/collect.py directly (or `make collect`) — see scripts/README.md.
-# A raw one-algorithm benchmark (build + run the table, no data append) is
+# Heavy data-collection sweeps (timing + check + asm bundle, with parallelism,
+# resume, per-algo JSONL) use scripts/collect.py directly (or `make collect`).
+# Cycle attribution across the grid (the radar's data) is `make collect-profile`;
+# for `--with-profile` (timing + profile in one run) invoke collect.py directly.
+# See scripts/README.md.
+# A raw one-algorithm benchmark (build + run one point, no data append) is
 # `uv run python scripts/run.py bench <algorithm>`, also documented in scripts/README.md.
 
 # uv run guarantees the project venv (duckdb, zai-sdk, halide — all installed by `uv sync`)
@@ -26,14 +29,14 @@
 PY := uv run python
 
 # The extra positional goal (if any), with the known targets filtered out.
-KNOWN := init build profile play report serve clean help collect
+KNOWN := init build profile play report serve clean help collect collect-profile
 TARGET := $(filter-out $(KNOWN),$(MAKECMDGOALS))
 
 # `make build ML01` would also try to build ML01 as a file target; neutralize that
 # with a silent no-op recipe so make doesn't print "Nothing to be done".
 $(TARGET): ; @:
 
-.PHONY: init build profile play report serve clean help collect
+.PHONY: init build profile play report serve clean help collect collect-profile
 
 # One-time setup: clone/update git submodules (raylib) + create the python venv
 # (duckdb + halide + zai-sdk via uv sync). Idempotent — safe to re-run anytime.
@@ -70,18 +73,26 @@ clean:
 collect:
 	$(PY) scripts/collect.py $(TARGET)
 
+# Cycle-attribution grid sweep (the radar's data; profiler backend, e.g. xctrace
+# on macOS). A separate target because `--only profile` would collide with the
+# `make profile` target name if threaded through `make collect ... --`.
+collect-profile:
+	$(PY) scripts/collect.py $(TARGET) --only profile
+
 help:
 	@echo "DoD Particle Challenge — common actions"
 	@echo ""
 	@echo "  make init               one-time setup: git submodules + python env (uv sync)"
 	@echo "  make build [target]     build algorithms into out/ (target: algorithm|memory layout|all)"
 	@echo "  make play  [algorithm]       open the interactive raylib window (N=<count> to size particles)"
-	@echo "  make profile [algorithm]     PMC cycle-attribution (macOS + Xcode)"
+	@echo "  make profile [algorithm]     cycle-attribution, one point (profiler backend)"
 	@echo "  make report             build experiments/analysis/ + run the verify gate"
 	@echo "  make serve              serve experiments/ (open report.html)"
 	@echo "  make clean              rm -rf out out.w*"
 	@echo ""
-	@echo "  make collect [target]       data-collection sweep (target: algorithm|memory layout|all)"
+	@echo "  make collect [target]           data-collection sweep (timing + check + asm; target: algorithm|memory layout|all)"
+	@echo "  make collect-profile [target]   cycle-attribution grid sweep (the radar's data; profiler backend)"
+	@echo "  (for --with-profile, run: uv run python scripts/collect.py <target> --with-profile)"
 	@echo ""
 	@echo "Target may be an algorithm (ML01.AF01.LP1-autovec.LP2-simple), a memory layout (ML01),"
 	@echo "a memory layout (ML01), or all (default). See scripts/README.md for details."

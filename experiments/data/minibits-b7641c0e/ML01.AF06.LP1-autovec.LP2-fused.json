@@ -1,0 +1,991 @@
+{
+  "source_hash": "c46cdf3068c8cdcb8cebec14218868a6ef5fcfba132134953399ec7a8224cea2",
+  "asm": {
+    "source_hash": "c46cdf3068c8cdcb8cebec14218868a6ef5fcfba132134953399ec7a8224cea2",
+    "symbol": "_framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF06.LP1-autovec.LP2-fused.H).step",
+    "n_instructions": 297,
+    "histogram": {
+      "add": 42,
+      "mov": 26,
+      "cmp": 20,
+      "b": 19,
+      "strb": 19,
+      "csel": 18,
+      "ldp": 14,
+      "ldr": 13,
+      "stp": 12,
+      "ldrb": 12,
+      "fcmp": 9,
+      "fmul": 8,
+      "fmov": 6,
+      "fadd": 6,
+      "ccmp": 6,
+      "bfi": 5,
+      "eor": 5,
+      "and": 5,
+      "fcvtzs": 5,
+      "tbnz": 4,
+      "lsl": 4,
+      "ldur": 3,
+      "str": 3,
+      "clz": 3,
+      "bl": 3,
+      "sub": 2,
+      "cbz": 2,
+      "movk": 2,
+      "dup": 2,
+      "adrp": 2,
+      "ucvtf": 2,
+      "cmn": 2,
+      "ror": 2,
+      "mul": 2,
+      "movi": 1,
+      "ext": 1,
+      "stur": 1,
+      "ld1": 1,
+      "subs": 1,
+      "fsub": 1,
+      "sxtw": 1,
+      "orr": 1,
+      "ret": 1
+    },
+    "vector_insns": 9,
+    "excerpt": "00000001000553e8\tsub\tsp, sp, #0xc0\n00000001000553ec\tstp\td13, d12, [sp, #0x30]\n00000001000553f0\tstp\td11, d10, [sp, #0x40]\n00000001000553f4\tstp\td9, d8, [sp, #0x50]\n00000001000553f8\tstp\tx28, x27, [sp, #0x60]\n00000001000553fc\tstp\tx26, x25, [sp, #0x70]\n0000000100055400\tstp\tx24, x23, [sp, #0x80]\n0000000100055404\tstp\tx22, x21, [sp, #0x90]\n0000000100055408\tstp\tx20, x19, [sp, #0xa0]\n000000010005540c\tstp\tx29, x30, [sp, #0xb0]\n0000000100055410\tadd\tx29, sp, #0xb0\n0000000100055414\tmov\tx20, x0\n0000000100055418\tmov\tx27, x0\n000000010005541c\tldp\tx9, x8, [x27, #0x10]!\n0000000100055420\tcbz\tx8, 0x100055854\n0000000100055424\tmov\tx19, x4\n0000000100055428\tmov\tx21, x3\n000000010005542c\tmov\tx22, x2\n0000000100055430\tmov\tx23, x1\n0000000100055434\tadd\tx9, x9, #0x10\n0000000100055438\tmov\tw10, #0xd70a\n000000010005543c\tmovk\tw10, #0x3ca3, lsl #16\n0000000100055440\tdup.2s\tv0, w10\n0000000100055444\tfmov\ts1, w10\n0000000100055448\tmovi.2d\tv2, #0000000000000000\n000000010005544c\tmov\tw10, #0x8889\n0000000100055450\tmovk\tw10, #0x3c88, lsl #16\n0000000100055454\tdup.4s\tv3, w10\n0000000100055458\tadrp\tx11, 7 ; 0x10005c000\n000000010005545c\tldr\td4, [x11, #0x3e8]\n0000000100055460\tfmov\ts5, w10\n0000000100055464\tadd\tx10, x9, #0x4\n0000000100055468\tldur\ts6, [x9, #-0x4]\n000000010005546c\tldur\tq7, [x9, #-0x10]\n0000000100055470\tldr\td16, [x9]\n0000000100055474\tfmul\ts6, s6, s1\n0000000100055478\tfadd\ts6, s6, s2\n000000010005547c\text.16b\tv17, v7, v16, #0xc\n0000000100055480\tmov.s\tv17[3], v6[0]\n0000000100055484\tfmul.4s\tv6, v17, v3\n0000000100055488\tfadd.4s\tv6, v7, v6\n000000010005548c\tstur\tq6, [x9, #-0x10]\n0000000100055490\tld1.s\t{ v16 }[1], [x10]\n0000000100055494\tfmul.2s\tv6, v16, v0\n0000000100055498\tfadd.2s\tv6, v6, v4\n000000010005549c\tfmul.2s\tv6, v6, v3\n00000001000554a0\tfadd.2s\tv6, v16, v6\n00000001000554a4\tstr\td6, [x9]\n00000001000554a8\tldr\ts6, [x9, #0xc]\n00000001000554ac\tfadd\ts6, s6, s5\n00000001000554b0\tstr\ts6, [x9, #0xc]\n00000001000554b4\tadd\tx9, x9, #0x44\n00000001000554b8\tsubs\tx8, x8, #0x1\n00000001000554bc\tb.ne\t0x100055464\n00000001000554c0\tldr\tx26, [x20, #0x18]\n00000001000554c4\tcbz\tx26, 0x100055854\n00000001000554c8\tmov\tx25, #0x0\n00000001000554cc\tucvtf\ts8, w21\n00000001000554d0\tldr\tx8, [x20, #0x10]\n00000001000554d4\tucvtf\ts9, w19\n00000001000554d8\tmov\tw9, w21\n00000001000554dc\tstp\tx26, x9, [sp, #0x8]\n00000001000554e0\tadd\tx28, x8, #0x28\n00000001000554e4\tfmov\ts10, #2.00000000\n00000001000554e8\tmov\tw24, #0xff\n00000001000554ec\tmov\tw8, #0x437f0000\n00000001000554f0\tfmov\ts11, w8\n00000001000554f4\tfmov\ts12, #0.25000000\n00000001000554f8\tb\t0x100055530\n00000001000554fc\tadd\tx13, x11, #0x1\n0000000100055500\tcmn\tw11, #0x1\n0000000100055504\tldr\tx11, [sp, #0x10]\n0000000100055508\tccmp\tx13, x11, #0x0, ge\n000000010005550c\tadd\tx12, x13, x12\n0000000100055510\tmov\tw11, #0x3\n0000000100055514\tbfi\tx11, x12, #2, #61\n0000000100055518\tccmp\tx11, x22, #0x2, lt\n000000010005551c\tb.lo\t0x100055758\n0000000100055520\tadd\tx28, x28, #0x44\n0000000100055524\tadd\tx25, x25, #0x1\n0000000100055528\tcmp\tx26, x25\n000000010005552c\tb.eq\t0x100055854\n0000000100055530\tldur\ts0, [x28, #-0xc]\n0000000100055534\tfcmp\ts0, s10\n0000000100055538\tb.ge\t0x1000555c8\n000000010005553c\tadrp\tx8, 101 ; 0x1000ba000\n0000000100055540\tldr\ts13, [x8, #0x8a8]\n0000000100055544\tfcmp\ts13, #0.0\n0000000100055548\tb.eq\t0x1000555d8\n000000010005554c\tmov\tx26, x27\n0000000100055550\tmov\tx27, x23\n0000000100055554\tldp\tx8, x9, [x20, #0x48]\n0000000100055558\tldp\tx11, x10, [x20, #0x58]\n000000010005555c\tadd\tx12, x10, x8\n0000000100055560\tror\tx12, x12, #0x29\n0000000100055564\tadd\tx23, x12, x8\n0000000100055568\teor\tx11, x11, x8\n000000010005556c\teor\tx10, x9, x10\n0000000100055570\teor\tx12, x11, x9\n0000000100055574\teor\tx8, x10, x8\n0000000100055578\tstp\tx8, x12, [x20, #0x48]\n000000010005557c\teor\tx8, x11, x9, lsl #17\n0000000100055580\tror\tx9, x10, #0x13\n0000000100055584\tstp\tx8, x9, [x20, #0x58]\n0000000100055588\tclz\tx8, x23\n000000010005558c\tstrb\tw8, [sp, #0x1f]\n0000000100055590\tand\tw8, w8, #0xff\n0000000100055594\tand\tw9, w8, #0x7f\n0000000100055598\tcmp\tw9, #0x29\n000000010005559c\tb.hs\t0x1000557fc\n00000001000555a0\tmov\tw9, #0x7e\n00000001000555a4\tsub\tw8, w9, w8\n00000001000555a8\tand\tw9, w23, #0x7fffff\n00000001000555ac\tbfi\tw9, w8, #23, #7\n00000001000555b0\tfmov\ts0, w9\n00000001000555b4\tfcmp\ts13, s0\n00000001000555b8\tmov\tx23, x27\n00000001000555bc\tmov\tx27, x26\n00000001000555c0\tldr\tx26, [sp, #0x8]\n00000001000555c4\tb.le\t0x1000555d8\n00000001000555c8\tadd\tx1, x20, #0x28\n00000001000555cc\tmov\tx0, x27\n00000001000555d0\tmov\tx2, x25\n00000001000555d4\tbl\t_layouts.ML01.data.Data.spawn\n00000001000555d8\tldp\ts0, s1, [x28, #-0x28]\n00000001000555dc\tldp\ts2, s3, [x28, #-0x8]\n00000001000555e0\tldr\ts4, [x28]\n00000001000555e4\tfcmp\ts2, s11\n00000001000555e8\tfcvtzs\tw8, s2\n00000001000555ec\tcsel\tw8, w24, w8, ge\n00000001000555f0\tfcmp\ts2, #0.0\n00000001000555f4\tcsel\tw8, wzr, w8, ls\n00000001000555f8\tfcmp\ts3, s11\n00000001000555fc\tfcvtzs\tw9, s3\n0000000100055600\tcsel\tw9, w24, w9, ge\n0000000100055604\tfcmp\ts3, #0.0\n0000000100055608\tcsel\tw9, wzr, w9, ls\n000000010005560c\tfcmp\ts4, s11\n0000000100055610\tfcvtzs\tw10, s4\n0000000100055614\tcsel\tw10, w24, w10, ge\n0000000100055618\tfcmp\ts4, #0.0\n000000010005561c\tcsel\tw10, wzr, w10, ls\n0000000100055620\tfadd\ts0, s0, s10\n0000000100055624\tfmul\ts0, s0, s12\n0000000100055628\tfmul\ts0, s0, s8\n000000010005562c\tfcvtzs\tw11, s0\n0000000100055630\tfsub\ts0, s10, s1\n0000000100055634\tfmul\ts0, s0, s12\n0000000100055638\tfmul\ts0, s0, s9\n000000010005563c\tfcvtzs\tw12, s0\n0000000100055640\tsxtw\tx11, w11\n0000000100055644\tcmp\tw12, w19\n0000000100055648\tb.ge\t0x1000556dc\n000000010005564c\ttbnz\tw12, #0x1f, 0x1000556dc\n0000000100055650\tmul\tw13, w12, w21\n0000000100055654\ttbnz\tw11, #0x1f, 0x1000556b8\n0000000100055658\tcmp\tw21, w11\n000000010005565c\tadd\tx15, x13, x11\n0000000100055660\tmov\tw14, #0x3\n0000000100055664\tbfi\tx14, x15, #2, #61\n0000000100055668\tccmp\tx14, x22, #0x2, gt\n000000010005566c\tb.hs\t0x1000556b8\n0000000100055670\tlsl\tx15, x15, #2\n0000000100055674\tadd\tx15, x23, x15\n0000000100055678\tldrb\tw16, [x15]\n000000010005567c\tadd\tw16, w16, w8\n0000000100055680\tcmp\tw16, #0xff\n0000000100055684\tcsel\tw16, w16, w24, lo\n0000000100055688\tstrb\tw16, [x15]\n000000010005568c\tldrb\tw16, [x15, #0x1]\n0000000100055690\tadd\tw16, w16, w9\n0000000100055694\tcmp\tw16, #0xff\n0000000100055698\tcsel\tw16, w16, w24, lo\n000000010005569c\tstrb\tw16, [x15, #0x1]\n00000001000556a0\tldrb\tw16, [x15, #0x2]\n00000001000556a4\tadd\tw16, w16, w10\n00000001000556a8\tcmp\tw16, #0xff\n00000001000556ac\tcsel\tw16, w16, w24, lo\n00000001000556b0\tstrb\tw16, [x15, #0x2]\n00000001000556b4\tstrb\tw24, [x23, x14]\n00000001000556b8\tadd\tx14, x11, #0x1\n00000001000556bc\tcmn\tw11, #0x1\n00000001000556c0\tldr\tx15, [sp, #0x10]\n00000001000556c4\tccmp\tx14, x15, #0x0, ge\n00000001000556c8\tadd\tx14, x14, x13\n00000001000556cc\tmov\tw13, #0x3\n00000001000556d0\tbfi\tx13, x14, #2, #61\n00000001000556d4\tccmp\tx13, x22, #0x2, lt\n00000001000556d8\tb.lo\t0x1000557a4\n00000001000556dc\tadd\tw12, w12, #0x1\n00000001000556e0\tcmp\tw12, w19\n00000001000556e4\tb.ge\t0x100055520\n00000001000556e8\ttbnz\tw12, #0x1f, 0x100055520\n00000001000556ec\tmul\tw12, w12, w21\n00000001000556f0\ttbnz\tw11, #0x1f, 0x1000554fc\n00000001000556f4\tcmp\tw21, w11\n00000001000556f8\tadd\tx14, x12, x11\n00000001000556fc\tmov\tw13, #0x3\n0000000100055700\tbfi\tx13, x14, #2, #61\n0000000100055704\tccmp\tx13, x22, #0x2, gt\n0000000100055708\tb.hs\t0x1000554fc\n000000010005570c\tlsl\tx14, x14, #2\n0000000100055710\tadd\tx14, x23, x14\n0000000100055714\tldrb\tw15, [x14]\n0000000100055718\tadd\tw15, w15, w8\n000000010005571c\tcmp\tw15, #0xff\n0000000100055720\tcsel\tw15, w15, w24, lo\n0000000100055724\tstrb\tw15, [x14]\n0000000100055728\tldrb\tw15, [x14, #0x1]\n000000010005572c\tadd\tw15, w15, w9\n0000000100055730\tcmp\tw15, #0xff\n0000000100055734\tcsel\tw15, w15, w24, lo\n0000000100055738\tstrb\tw15, [x14, #0x1]\n000000010005573c\tldrb\tw15, [x14, #0x2]\n0000000100055740\tadd\tw15, w15, w10\n0000000100055744\tcmp\tw15, #0xff\n0000000100055748\tcsel\tw15, w15, w24, lo\n000000010005574c\tstrb\tw15, [x14, #0x2]\n0000000100055750\tstrb\tw24, [x23, x13]\n0000000100055754\tb\t0x1000554fc\n0000000100055758\tlsl\tx12, x12, #2\n000000010005575c\tadd\tx12, x23, x12\n0000000100055760\tldrb\tw13, [x12]\n0000000100055764\tadd\tw8, w13, w8\n0000000100055768\tcmp\tw8, #0xff\n000000010005576c\tcsel\tw8, w8, w24, lo\n0000000100055770\tstrb\tw8, [x12]\n0000000100055774\tldrb\tw8, [x12, #0x1]\n0000000100055778\tadd\tw8, w8, w9\n000000010005577c\tcmp\tw8, #0xff\n0000000100055780\tcsel\tw8, w8, w24, lo\n0000000100055784\tstrb\tw8, [x12, #0x1]\n0000000100055788\tldrb\tw8, [x12, #0x2]\n000000010005578c\tadd\tw8, w8, w10\n0000000100055790\tcmp\tw8, #0xff\n0000000100055794\tcsel\tw8, w8, w24, lo\n0000000100055798\tstrb\tw8, [x12, #0x2]\n000000010005579c\tstrb\tw24, [x23, x11]\n00000001000557a0\tb\t0x100055520\n00000001000557a4\tlsl\tx14, x14, #2\n00000001000557a8\tadd\tx14, x23, x14\n00000001000557ac\tldrb\tw15, [x14]\n00000001000557b0\tadd\tw15, w15, w8\n00000001000557b4\tcmp\tw15, #0xff\n00000001000557b8\tcsel\tw15, w15, w24, lo\n00000001000557bc\tstrb\tw15, [x14]\n00000001000557c0\tldrb\tw15, [x14, #0x1]\n00000001000557c4\tadd\tw15, w15, w9\n00000001000557c8\tcmp\tw15, #0xff\n00000001000557cc\tcsel\tw15, w15, w24, lo\n00000001000557d0\tstrb\tw15, [x14, #0x1]\n00000001000557d4\tldrb\tw15, [x14, #0x2]\n00000001000557d8\tadd\tw15, w15, w10\n00000001000557dc\tcmp\tw15, #0xff\n00000001000557e0\tcsel\tw15, w15, w24, lo\n00000001000557e4\tstrb\tw15, [x14, #0x2]\n00000001000557e8\tstrb\tw24, [x23, x13]\n00000001000557ec\tadd\tw12, w12, #0x1\n00000001000557f0\tcmp\tw12, w19\n00000001000557f4\tb.lt\t0x1000556e8\n00000001000557f8\tb\t0x100055520\n00000001000557fc\tadd\tx0, x20, #0x48\n0000000100055800\tadd\tx1, sp, #0x20\n0000000100055804\tmov\tw2, #0x8\n0000000100055808\tbl\t_Random.init__anon_32872.gen.fill\n000000010005580c\tldr\tx8, [sp, #0x20]\n0000000100055810\tclz\tx8, x8\n0000000100055814\tadd\tw8, w8, #0x29\n0000000100055818\tand\tw8, w8, #0x7f\n000000010005581c\tstrb\tw8, [sp, #0x1f]\n0000000100055820\tcmp\tw8, #0x69\n0000000100055824\tb.ne\t0x1000555a0\n0000000100055828\tadd\tx0, x20, #0x48\n000000010005582c\tadd\tx1, sp, #0x2c\n0000000100055830\tmov\tw2, #0x4\n0000000100055834\tbl\t_Random.init__anon_32872.gen.fill\n0000000100055838\tldr\tw8, [sp, #0x2c]\n000000010005583c\torr\tw8, w8, #0x7ff\n0000000100055840\tclz\tw8, w8\n0000000100055844\tadd\tw8, w8, #0x69\n0000000100055848\tand\tw8, w8, #0x7f\n000000010005584c\tstrb\tw8, [sp, #0x1f]\n0000000100055850\tb\t0x1000555a0\n0000000100055854\tldr\tx8, [x20, #0x68]\n0000000100055858\tadd\tx8, x8, #0x1\n000000010005585c\tstr\tx8, [x20, #0x68]\n0000000100055860\tldp\tx29, x30, [sp, #0xb0]\n0000000100055864\tldp\tx20, x19, [sp, #0xa0]\n0000000100055868\tldp\tx22, x21, [sp, #0x90]\n000000010005586c\tldp\tx24, x23, [sp, #0x80]\n0000000100055870\tldp\tx26, x25, [sp, #0x70]\n0000000100055874\tldp\tx28, x27, [sp, #0x60]\n0000000100055878\tldp\td9, d8, [sp, #0x50]\n000000010005587c\tldp\td11, d10, [sp, #0x40]\n0000000100055880\tldp\td13, d12, [sp, #0x30]\n0000000100055884\tadd\tsp, sp, #0xc0\n0000000100055888\tret",
+    "source_attributed": [
+      {
+        "source": "        pub fn step(self: *Self, dt: f32, fb: []u8, w: u32, h: u32) void {",
+        "asm": [
+          "sub\tsp, sp, #0xc0",
+          "stp\td13, d12, [sp, #0x30]",
+          "stp\td11, d10, [sp, #0x40]",
+          "stp\td9, d8, [sp, #0x50]",
+          "stp\tx28, x27, [sp, #0x60]",
+          "stp\tx26, x25, [sp, #0x70]",
+          "stp\tx24, x23, [sp, #0x80]",
+          "stp\tx22, x21, [sp, #0x90]",
+          "stp\tx20, x19, [sp, #0xa0]",
+          "stp\tx29, x30, [sp, #0xb0]",
+          "add\tx29, sp, #0xb0",
+          "mov\tx20, x0",
+          "mov\tx27, x0"
+        ]
+      },
+      {
+        "source": "        for (data.particles) |*p| {",
+        "asm": [
+          "ldp\tx9, x8, [x27, #0x10]!",
+          "cbz\tx8, 0x100055854",
+          "mov\tx19, x4",
+          "mov\tx21, x3",
+          "mov\tx22, x2",
+          "mov\tx23, x1",
+          "add\tx9, x9, #0x10",
+          "mov\tw10, #0xd70a",
+          "movk\tw10, #0x3ca3, lsl #16",
+          "dup.2s\tv0, w10",
+          "fmov\ts1, w10",
+          "movi.2d\tv2, #0000000000000000",
+          "mov\tw10, #0x8889",
+          "movk\tw10, #0x3c88, lsl #16",
+          "dup.4s\tv3, w10",
+          "adrp\tx11, 7 ; 0x10005c000",
+          "ldr\td4, [x11, #0x3e8]",
+          "fmov\ts5, w10"
+        ]
+      },
+      {
+        "source": "            p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "add\tx10, x9, #0x4",
+          "ldur\ts6, [x9, #-0x4]",
+          "ldur\tq7, [x9, #-0x10]",
+          "ldr\td16, [x9]"
+        ]
+      },
+      {
+        "source": "                .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "asm": [
+          "fmul\ts6, s6, s1",
+          "fadd\ts6, s6, s2",
+          "ext.16b\tv17, v7, v16, #0xc",
+          "mov.s\tv17[3], v6[0]",
+          "fmul.4s\tv6, v17, v3",
+          "fadd.4s\tv6, v7, v6"
+        ]
+      },
+      {
+        "source": "            p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "stur\tq6, [x9, #-0x10]"
+        ]
+      },
+      {
+        "source": "                .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "asm": [
+          "ld1.s\t{ v16 }[1], [x10]",
+          "fmul.2s\tv6, v16, v0",
+          "fadd.2s\tv6, v6, v4",
+          "fmul.2s\tv6, v6, v3",
+          "fadd.2s\tv6, v16, v6",
+          "str\td6, [x9]"
+        ]
+      },
+      {
+        "source": "            p.age += dt;",
+        "asm": [
+          "ldr\ts6, [x9, #0xc]",
+          "fadd\ts6, s6, s5",
+          "str\ts6, [x9, #0xc]"
+        ]
+      },
+      {
+        "source": "        for (data.particles) |*p| {",
+        "asm": [
+          "add\tx9, x9, #0x44",
+          "subs\tx8, x8, #0x1",
+          "b.ne\t0x100055464",
+          "ldr\tx26, [x20, #0x18]",
+          "cbz\tx26, 0x100055854",
+          "mov\tx25, #0x0",
+          "ucvtf\ts8, w21",
+          "ldr\tx8, [x20, #0x10]",
+          "ucvtf\ts9, w19",
+          "mov\tw9, w21",
+          "stp\tx26, x9, [sp, #0x8]"
+        ]
+      },
+      {
+        "source": "        for (data.particles, 0..) |*p, i| {",
+        "asm": [
+          "add\tx28, x8, #0x28",
+          "fmov\ts10, #2.00000000",
+          "mov\tw24, #0xff",
+          "mov\tw8, #0x437f0000",
+          "fmov\ts11, w8",
+          "fmov\ts12, #0.25000000",
+          "b\t0x100055530"
+        ]
+      },
+      {
+        "source": "            const fx = px + dx;",
+        "asm": [
+          "add\tx13, x11, #0x1"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "cmn\tw11, #0x1",
+          "ldr\tx11, [sp, #0x10]",
+          "ccmp\tx13, x11, #0x0, ge",
+          "add\tx12, x13, x12",
+          "mov\tw11, #0x3",
+          "bfi\tx11, x12, #2, #61",
+          "ccmp\tx11, x22, #0x2, lt"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "b.lo\t0x100055758",
+          "add\tx28, x28, #0x44"
+        ]
+      },
+      {
+        "source": "}",
+        "asm": [
+          "add\tx25, x25, #0x1"
+        ]
+      },
+      {
+        "source": "        for (data.particles, 0..) |*p, i| {",
+        "asm": [
+          "cmp\tx26, x25",
+          "b.eq\t0x100055854"
+        ]
+      },
+      {
+        "source": "            if (config.isDead(p.age, &sim.kill_rng)) {",
+        "asm": [
+          "ldur\ts0, [x28, #-0xc]"
+        ]
+      },
+      {
+        "source": "    if (age >= kill_age) return true;",
+        "asm": [
+          "fcmp\ts0, s10",
+          "b.ge\t0x1000555c8"
+        ]
+      },
+      {
+        "source": "    if (q == 0) return false; // runtime short-circuit; no kill-RNG draw at q=0",
+        "asm": [
+          "adrp\tx8, 101 ; 0x1000ba000",
+          "ldr\ts13, [x8, #0x8a8]",
+          "fcmp\ts13, #0.0",
+          "b.eq\t0x1000555d8",
+          "mov\tx26, x27",
+          "mov\tx27, x23"
+        ]
+      },
+      {
+        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
+        "asm": [
+          "ldp\tx8, x9, [x20, #0x48]",
+          "ldp\tx11, x10, [x20, #0x58]",
+          "add\tx12, x10, x8",
+          "ror\tx12, x12, #0x29",
+          "add\tx23, x12, x8",
+          "eor\tx11, x11, x8"
+        ]
+      },
+      {
+        "source": "self.s[3] ^= self.s[1];",
+        "asm": [
+          "eor\tx10, x9, x10"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "eor\tx12, x11, x9"
+        ]
+      },
+      {
+        "source": "self.s[0] ^= self.s[3];",
+        "asm": [
+          "eor\tx8, x10, x8"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "stp\tx8, x12, [x20, #0x48]"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "eor\tx8, x11, x9, lsl #17"
+        ]
+      },
+      {
+        "source": "return x << ar | x >> 1 +% ~ar;",
+        "asm": [
+          "ror\tx9, x10, #0x13"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "stp\tx8, x9, [x20, #0x58]"
+        ]
+      },
+      {
+        "source": "var rand_lz = @clz(rand);",
+        "asm": [
+          "clz\tx8, x23",
+          "strb\tw8, [sp, #0x1f]"
+        ]
+      },
+      {
+        "source": "if (rand_lz >= 41) {",
+        "asm": [
+          "and\tw8, w8, #0xff",
+          "and\tw9, w8, #0x7f",
+          "cmp\tw9, #0x29",
+          "b.hs\t0x1000557fc"
+        ]
+      },
+      {
+        "source": "const exponent = @as(u32, 126 - rand_lz) << 23;",
+        "asm": [
+          "mov\tw9, #0x7e",
+          "sub\tw8, w9, w8",
+          "and\tw9, w23, #0x7fffff",
+          "bfi\tw9, w8, #23, #7",
+          "fmov\ts0, w9",
+          "fcmp\ts13, s0",
+          "mov\tx23, x27",
+          "mov\tx27, x26",
+          "ldr\tx26, [sp, #0x8]"
+        ]
+      },
+      {
+        "source": "            if (config.isDead(p.age, &sim.kill_rng)) {",
+        "asm": [
+          "b.le\t0x1000555d8"
+        ]
+      },
+      {
+        "source": "                data.spawn(&sim.rng, i);",
+        "asm": [
+          "add\tx1, x20, #0x28",
+          "mov\tx0, x27",
+          "mov\tx2, x25",
+          "bl\t_layouts.ML01.data.Data.spawn"
+        ]
+      },
+      {
+        "source": "            rast.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);",
+        "asm": [
+          "ldp\ts0, s1, [x28, #-0x28]",
+          "ldp\ts2, s3, [x28, #-0x8]",
+          "ldr\ts4, [x28]"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "fcmp\ts2, s11"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(v);",
+        "asm": [
+          "fcvtzs\tw8, s2"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "csel\tw8, w24, w8, ge"
+        ]
+      },
+      {
+        "source": "    if (v <= 0) return 0;",
+        "asm": [
+          "fcmp\ts2, #0.0",
+          "csel\tw8, wzr, w8, ls",
+          "fcmp\ts3, s11",
+          "fcvtzs\tw9, s3",
+          "csel\tw9, w24, w9, ge",
+          "fcmp\ts3, #0.0",
+          "csel\tw9, wzr, w9, ls"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "fcmp\ts4, s11"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(v);",
+        "asm": [
+          "fcvtzs\tw10, s4"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "csel\tw10, w24, w10, ge"
+        ]
+      },
+      {
+        "source": "    if (v <= 0) return 0;",
+        "asm": [
+          "fcmp\ts4, #0.0",
+          "csel\tw10, wzr, w10, ls"
+        ]
+      },
+      {
+        "source": "    const norm = (x + config.view_half) / (2.0 * config.view_half); // [0,1)",
+        "asm": [
+          "fadd\ts0, s0, s10",
+          "fmul\ts0, s0, s12"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(norm * half);",
+        "asm": [
+          "fmul\ts0, s0, s8",
+          "fcvtzs\tw11, s0"
+        ]
+      },
+      {
+        "source": "    const norm = (config.view_half - y) / (2.0 * config.view_half); // [0,1)",
+        "asm": [
+          "fsub\ts0, s10, s1",
+          "fmul\ts0, s0, s12"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(norm * half);",
+        "asm": [
+          "fmul\ts0, s0, s9",
+          "fcvtzs\tw12, s0"
+        ]
+      },
+      {
+        "source": "    while (dy < 2) : (dy += 1) {",
+        "asm": [
+          "sxtw\tx11, w11",
+          "cmp\tw12, w19",
+          "b.ge\t0x1000556dc",
+          "tbnz\tw12, #0x1f, 0x1000556dc",
+          "mul\tw13, w12, w21",
+          "tbnz\tw11, #0x1f, 0x1000556b8",
+          "cmp\tw21, w11"
+        ]
+      },
+      {
+        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
+        "asm": [
+          "add\tx15, x13, x11"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "mov\tw14, #0x3",
+          "bfi\tx14, x15, #2, #61",
+          "ccmp\tx14, x22, #0x2, gt",
+          "b.hs\t0x1000556b8",
+          "lsl\tx15, x15, #2"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "add\tx15, x23, x15",
+          "ldrb\tw16, [x15]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw16, w16, w8"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw16, #0xff",
+          "csel\tw16, w16, w24, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "strb\tw16, [x15]"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "ldrb\tw16, [x15, #0x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw16, w16, w9"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw16, #0xff",
+          "csel\tw16, w16, w24, lo",
+          "strb\tw16, [x15, #0x1]",
+          "ldrb\tw16, [x15, #0x2]",
+          "add\tw16, w16, w10",
+          "cmp\tw16, #0xff",
+          "csel\tw16, w16, w24, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "strb\tw16, [x15, #0x2]"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "strb\tw24, [x23, x14]"
+        ]
+      },
+      {
+        "source": "            const fx = px + dx;",
+        "asm": [
+          "add\tx14, x11, #0x1"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "cmn\tw11, #0x1",
+          "ldr\tx15, [sp, #0x10]",
+          "ccmp\tx14, x15, #0x0, ge"
+        ]
+      },
+      {
+        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
+        "asm": [
+          "add\tx14, x14, x13"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "mov\tw13, #0x3",
+          "bfi\tx13, x14, #2, #61",
+          "ccmp\tx13, x22, #0x2, lt",
+          "b.lo\t0x1000557a4",
+          "add\tw12, w12, #0x1",
+          "cmp\tw12, w19",
+          "b.ge\t0x100055520",
+          "tbnz\tw12, #0x1f, 0x100055520",
+          "mul\tw12, w12, w21",
+          "tbnz\tw11, #0x1f, 0x1000554fc",
+          "cmp\tw21, w11",
+          "add\tx14, x12, x11",
+          "mov\tw13, #0x3",
+          "bfi\tx13, x14, #2, #61",
+          "ccmp\tx13, x22, #0x2, gt",
+          "b.hs\t0x1000554fc",
+          "lsl\tx14, x14, #2"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "add\tx14, x23, x14",
+          "ldrb\tw15, [x14]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw15, w15, w8"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw15, #0xff",
+          "csel\tw15, w15, w24, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "strb\tw15, [x14]"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "ldrb\tw15, [x14, #0x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw15, w15, w9"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw15, #0xff",
+          "csel\tw15, w15, w24, lo",
+          "strb\tw15, [x14, #0x1]",
+          "ldrb\tw15, [x14, #0x2]",
+          "add\tw15, w15, w10",
+          "cmp\tw15, #0xff",
+          "csel\tw15, w15, w24, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "strb\tw15, [x14, #0x2]"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "strb\tw24, [x23, x13]",
+          "b\t0x1000554fc",
+          "lsl\tx12, x12, #2"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "add\tx12, x23, x12",
+          "ldrb\tw13, [x12]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw8, w13, w8"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw8, #0xff",
+          "csel\tw8, w8, w24, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "strb\tw8, [x12]"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "ldrb\tw8, [x12, #0x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw8, w8, w9"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw8, #0xff",
+          "csel\tw8, w8, w24, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "strb\tw8, [x12, #0x1]",
+          "ldrb\tw8, [x12, #0x2]",
+          "add\tw8, w8, w10",
+          "cmp\tw8, #0xff",
+          "csel\tw8, w8, w24, lo",
+          "strb\tw8, [x12, #0x2]"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "strb\tw24, [x23, x11]",
+          "b\t0x100055520",
+          "lsl\tx14, x14, #2"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "add\tx14, x23, x14",
+          "ldrb\tw15, [x14]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw15, w15, w8"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw15, #0xff",
+          "csel\tw15, w15, w24, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "strb\tw15, [x14]"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "ldrb\tw15, [x14, #0x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw15, w15, w9"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw15, #0xff",
+          "csel\tw15, w15, w24, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "strb\tw15, [x14, #0x1]"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "ldrb\tw15, [x14, #0x2]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tw15, w15, w10"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tw15, #0xff",
+          "csel\tw15, w15, w24, lo"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "strb\tw15, [x14, #0x2]"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "strb\tw24, [x23, x13]",
+          "add\tw12, w12, #0x1",
+          "cmp\tw12, w19",
+          "b.lt\t0x1000556e8",
+          "b\t0x100055520",
+          "add\tx0, x20, #0x48",
+          "add\tx1, sp, #0x20",
+          "mov\tw2, #0x8",
+          "bl\t_Random.init__anon_32872.gen.fill"
+        ]
+      },
+      {
+        "source": "const value: T = @bitCast(buffer.*);",
+        "asm": [
+          "ldr\tx8, [sp, #0x20]"
+        ]
+      },
+      {
+        "source": "rand_lz = 41 + @clz(r.int(u64));",
+        "asm": [
+          "clz\tx8, x8",
+          "add\tw8, w8, #0x29",
+          "and\tw8, w8, #0x7f",
+          "strb\tw8, [sp, #0x1f]"
+        ]
+      },
+      {
+        "source": "if (rand_lz == 41 + 64) {",
+        "asm": [
+          "cmp\tw8, #0x69",
+          "b.ne\t0x1000555a0"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "add\tx0, x20, #0x48",
+          "add\tx1, sp, #0x2c",
+          "mov\tw2, #0x4",
+          "bl\t_Random.init__anon_32872.gen.fill",
+          "ldr\tw8, [sp, #0x2c]",
+          "orr\tw8, w8, #0x7ff",
+          "clz\tw8, w8",
+          "add\tw8, w8, #0x69",
+          "and\tw8, w8, #0x7f"
+        ]
+      },
+      {
+        "source": "rand_lz += @clz(r.int(u32) | 0x7FF);",
+        "asm": [
+          "strb\tw8, [sp, #0x1f]",
+          "b\t0x1000555a0"
+        ]
+      },
+      {
+        "source": "            self.frame +%= 1; // AF01-blend hash RNG frame counter (free otherwise)",
+        "asm": [
+          "ldr\tx8, [x20, #0x68]",
+          "add\tx8, x8, #0x1",
+          "str\tx8, [x20, #0x68]",
+          "ldp\tx29, x30, [sp, #0xb0]",
+          "ldp\tx20, x19, [sp, #0xa0]",
+          "ldp\tx22, x21, [sp, #0x90]",
+          "ldp\tx24, x23, [sp, #0x80]",
+          "ldp\tx26, x25, [sp, #0x70]",
+          "ldp\tx28, x27, [sp, #0x60]",
+          "ldp\td9, d8, [sp, #0x50]",
+          "ldp\td11, d10, [sp, #0x40]",
+          "ldp\td13, d12, [sp, #0x30]",
+          "add\tsp, sp, #0xc0",
+          "ret"
+        ]
+      }
+    ],
+    "algo_source": {
+      "file": "src/layouts/ML01/AF06.LP1-autovec.LP2-fused.zig",
+      "lines": [
+        "// Algorithm ML01.AF06.LP1-autovec.LP2-fused \u2014 AF06 (math | decide+respawn+render fused),",
+        "// loop 1 math, loop 2 fused decide+respawn+splat.",
+        "//",
+        "// Golden: framebuffer_only. Loop 1 is pure math (separable); loop 2 fuses",
+        "// decide+respawn+render so the splat reads post-respawn pos from a register.",
+        "// Diff vs AF05: the math/decide seam (isolates whether fusing just the",
+        "// decide+respawn+render, without fusing math, still wins).",
+        "",
+        "const std = @import(\"std\");",
+        "const fw = @import(\"../../framework/sim.zig\");",
+        "const config = @import(\"../../framework/config.zig\");",
+        "const layout = @import(\"data.zig\");",
+        "const rast = @import(\"../common/render_simple.zig\");",
+        "",
+        "const Data = layout.Data;",
+        "",
+        "pub const H = struct {",
+        "    pub const algo_meta: fw.AlgorithmMeta = .{",
+        "        .mem_layout = \"ML01\",",
+        "        .algo_fam = .AF06,",
+        "        .ordering = .identity,",
+        "        .intermediates = .none,",
+        "        .loops = &.{",
+        "            .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .none },",
+        "            .{ .impl = .zig, .schedule = .fused, .parallel = .none, .variant = .branchy },",
+        "        },",
+        "        .golden = .framebuffer_only,",
+        "        .halide_expressible = \"loop1 yes; loop2 no (fused scatter)\",",
+        "    };",
+        "",
+        "    pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {",
+        "        const data = &sim.data;",
+        "        // loop 1: math only.",
+        "        for (data.particles) |*p| {",
+        "            p.pos = p.pos.add(p.vel.scale(dt));",
+        "            const v = p.vel;",
+        "            p.vel = .{",
+        "                .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "                .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "                .z = v.z + (config.gravity.z + config.drag * v.z) * dt,",
+        "            };",
+        "            p.age += dt;",
+        "        }",
+        "        // loop 2: fused decide + respawn + splat (reads post-respawn pos).",
+        "        for (data.particles, 0..) |*p, i| {",
+        "            if (config.isDead(p.age, &sim.kill_rng)) {",
+        "                data.spawn(&sim.rng, i);",
+        "            }",
+        "            rast.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);",
+        "        }",
+        "    }",
+        "};",
+        "",
+        "pub const Sim = fw.Strategy(Data, H);"
+      ],
+      "group_lines": [
+        null,
+        34,
+        35,
+        38,
+        35,
+        39,
+        42,
+        34,
+        45,
+        null,
+        null,
+        null,
+        43,
+        45,
+        46,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        46,
+        47,
+        49,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  }
+}

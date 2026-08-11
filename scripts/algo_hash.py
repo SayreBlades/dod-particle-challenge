@@ -15,7 +15,7 @@ Usage:
     scripts/algo_hash.py ML01.AF01.LP1-halide.LP2-simple            # includes the gen .py
     scripts/algo_hash.py ML01.AF01.LP1-autovec.LP2-simple --files   # also lists the closure
 
-Stamped on every runs.jsonl row as `source_hash` (refactor §5/§6.2) so a row
+Stamped on every `<algo>.runs.jsonl` row as `source_hash` (refactor §5/§6.2) so a row
 pins not just the git commit but the exact code that ran (catches uncommitted
 edits to the algorithm or its imports).
 """
