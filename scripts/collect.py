@@ -20,7 +20,7 @@ resumes an interrupted sweep without duplicating rows at the current source_hash
 Usage:
     scripts/collect.py                              # every algo of every memory layout
     scripts/collect.py ML01                          # one memory layout
-    scripts/collect.py ML01.AF01.LP1-autovec.LP2-simple   # one algorithm
+    scripts/collect.py ML01.AF05.LP1-autovec.LP2-simple   # one algorithm
     scripts/collect.py ML01 --with-profile           # + cycle attribution
     scripts/collect.py ML01 --only profile           # just the profile loop
     NS=4000,65000 TRIALS=5 scripts/collect.py ML01
@@ -73,7 +73,7 @@ def resolve(target):
             out.append(tok)
         else:
             sys.exit(f"error: '{tok}' is not a memory layout or full algorithm name "
-                     f"(expected ML<mem_layout>.<algo>, e.g. ML01.AF01.LP1-autovec.LP2-simple)")
+                     f"(expected ML<mem_layout>.<algo>, e.g. ML01.AF05.LP1-autovec.LP2-simple)")
     return out
 
 

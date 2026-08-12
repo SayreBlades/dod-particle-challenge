@@ -11,9 +11,9 @@ generator whose output the algorithm links. It does NOT cover build flags
 (reproducible from the generator .py, which IS hashed).
 
 Usage:
-    scripts/algo_hash.py ML01.AF01.LP1-autovec.LP2-simple           # prints the hash
-    scripts/algo_hash.py ML01.AF01.LP1-halide.LP2-simple            # includes the gen .py
-    scripts/algo_hash.py ML01.AF01.LP1-autovec.LP2-simple --files   # also lists the closure
+    scripts/algo_hash.py ML01.AF05.LP1-autovec.LP2-simple           # prints the hash
+    scripts/algo_hash.py ML01.AF05.LP1-halide.LP2-simple            # includes the gen .py
+    scripts/algo_hash.py ML01.AF05.LP1-autovec.LP2-simple --files   # also lists the closure
 
 Stamped on every `<algo>.runs.jsonl` row as `source_hash` (refactor §5/§6.2) so a row
 pins not just the git commit but the exact code that ran (catches uncommitted
@@ -34,7 +34,7 @@ IMPORT_RE = re.compile(r'@import\("([^"]+)"\)')
 
 
 def algo_file_path(algo_name: str) -> str:
-    """ML01.AF01.LP1-autovec.LP2-simple -> src/layouts/ML01/AF01.LP1-autovec.LP2-simple.zig
+    """ML01.AF05.LP1-autovec.LP2-simple -> src/layouts/ML01/AF05.LP1-autovec.LP2-simple.zig
     (the folder name IS the mem_layout id)."""
     mem_layout, algo = algo_name.split(".", 1)
     return os.path.join(SRC, "layouts", mem_layout, algo + ".zig")
@@ -42,17 +42,17 @@ def algo_file_path(algo_name: str) -> str:
 
 def halide_generator_path(algo_name: str) -> str | None:
     """For halide algorithms, the generator .py that produces the linked .a.
-    Mirrors build.zig halideGenBase: AF01/AF02/AF03.LP1-halide algorithms each have
+    Mirrors build.zig halideGenBase: AF02/AF05/AF06.LP1-halide algorithms each have
     their own generator at the mem_layout root."""
     mem_layout, algo = algo_name.split(".", 1)
     if "LP1-halide" not in algo:
         return None
-    if algo.startswith("AF02."):
-        base = "AF02.LP1-halide"
-    elif algo.startswith("AF03."):
-        base = "AF03.LP1-halide"
+    if algo.startswith("AF05."):
+        base = "AF05.LP1-halide"
+    elif algo.startswith("AF06."):
+        base = "AF06.LP1-halide"
     else:
-        base = "AF01.LP1-halide"
+        base = "AF02.LP1-halide"
     return os.path.join(SRC, "layouts", mem_layout, base + "_gen.py")
 
 

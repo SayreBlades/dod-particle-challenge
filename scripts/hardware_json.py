@@ -101,7 +101,7 @@ def _streaming_bw_gbs(facts):
     Falls back to a Python estimate (clearly warned) if the Zig toolchain or
     build fails, so analysis-only hosts still produce a number."""
     import subprocess
-    bin_path = os.path.join(ROOT, "out", ".hwprobe", "bin", "ML01.AF01.LP1-autovec.LP2-simple.bench")
+    bin_path = os.path.join(ROOT, "out", ".hwprobe", "bin", "ML01.AF02.LP1-autovec.LP2-simple.bench")
     # Build the bandwidth binary into a DEDICATED dir (out/.hwprobe), not the
     # top-level out/bin — the --bandwidth flag is algorithm-agnostic (never touches
     # the sim), so this probe binary must not masquerade as "the" build output
@@ -111,7 +111,7 @@ def _streaming_bw_gbs(facts):
         try:
             subprocess.run(
                 ["zig", "build", "-p", "out/.hwprobe", "-Dmem_layout=ML01",
-                 "-Dalgo=AF01.LP1-autovec.LP2-simple", "-Dmode=bench",
+                 "-Dalgo=AF02.LP1-autovec.LP2-simple", "-Dmode=bench",
                  "-Doptimize=ReleaseFast"],
                 cwd=ROOT, capture_output=True, timeout=120, check=True,
             )

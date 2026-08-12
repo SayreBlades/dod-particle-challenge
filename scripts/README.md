@@ -37,17 +37,17 @@ cutover script (legacy `runs.jsonl`/`checks.jsonl` → per-algo files).
 ## Bench binary flags
 
 One binary per algorithm, flat-named `out/bin/<algo>.bench` (e.g.
-`ML01.AF03.LP1-halide.LP2-simple.bench`). It is a **single-point primitive**: it
+`ML01.AF06.LP1-halide.LP2-mask.bench`). It is a **single-point primitive**: it
 measures ONE `(N, q, threads, trial)` and emits one JSONL row. There is **no
 default sweep** — `collect.py` / `bench.py` own the grid. Missing required args
 error (no silent default run).
 
 ```sh
-./out/bin/ML01.AF01.LP1-autovec.LP2-simple.bench --help                       # algo_meta + options
-./out/bin/ML01.AF01.LP1-autovec.LP2-simple.bench --n 65000 --q 0.1 --threads 1 --iters 100 --trial 1 --json  # one timing row
-./out/bin/ML01.AF01.LP1-autovec.LP2-simple.bench --check --q 0.1 --threads 1  # invariant suite (PASS/FAIL)
-./out/bin/ML01.AF01.LP1-autovec.LP2-simple.bench --bandwidth                  # streaming-BW microbench
-./out/bin/ML01.AF01.LP1-autovec-par.LP2-simple.bench --n 65000 --q 0.1 --threads 4 --iters 100 --trial 1 --json
+./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --help                       # algo_meta + options
+./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --n 65000 --q 0.1 --threads 1 --iters 100 --trial 1 --json  # one timing row
+./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --check --q 0.1 --threads 1  # invariant suite (PASS/FAIL)
+./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --bandwidth                  # streaming-BW microbench
+./out/bin/ML01.AF02.LP1-autovec-par.LP2-simple.bench --n 65000 --q 0.1 --threads 4 --iters 100 --trial 1 --json
 ```
 
 - **Timing (default)** requires `--n`, `--q`, `--threads`, `--iters`, `--trial`;
@@ -95,7 +95,7 @@ failure.
 ```sh
 uv run python scripts/collect.py                                  # every algo of every memory layout
 uv run python scripts/collect.py ML01                               # one memory layout
-uv run python scripts/collect.py ML01.AF01.LP1-autovec.LP2-simple    # one algorithm
+uv run python scripts/collect.py ML01.AF02.LP1-autovec.LP2-simple    # one algorithm
 uv run python scripts/collect.py ML01 --with-profile                 # + cycle attribution
 uv run python scripts/collect.py ML01 --only profile                 # just the profile loop
 NS=4000,65000 TRIALS=5 uv run python scripts/collect.py ML01          # quick subset
@@ -117,8 +117,8 @@ home of the disassembly functions; `analyze_algo.py` reads the bundle instead of
 rebuilding.
 
 ```sh
-uv run python scripts/algo.py ML01.AF01.LP1-autovec.LP2-simple           # write <algo>.json
-uv run python scripts/algo.py ML01.AF01.LP1-autovec.LP2-simple --force
+uv run python scripts/algo.py ML01.AF02.LP1-autovec.LP2-simple           # write <algo>.json
+uv run python scripts/algo.py ML01.AF02.LP1-autovec.LP2-simple --force
 ```
 
 ## bench.py
@@ -130,8 +130,8 @@ point via the single-point binary, then one `--check` — appending rows into
 (from `sweep_config`). `collect.py` loops algos × q × threads and calls this.
 
 ```sh
-uv run python scripts/bench.py ML01.AF01.LP1-autovec.LP2-simple --q 0.1 --threads 1
-uv run python scripts/bench.py ML01.AF01.LP1-autovec-par.LP2-simple --q 0.25 --threads 4 --trials 3 --skip-done
+uv run python scripts/bench.py ML01.AF02.LP1-autovec.LP2-simple --q 0.1 --threads 1
+uv run python scripts/bench.py ML01.AF02.LP1-autovec-par.LP2-simple --q 0.25 --threads 4 --trials 3 --skip-done
 ```
 
 ## profile.py
@@ -145,7 +145,7 @@ backend exists. The `profile_xctrace.py` backend (macOS + Xcode) is implemented;
 a future `profile_perf.py` (Linux) plugs in without schema/analysis changes.
 
 ```sh
-uv run python scripts/profile.py ML01.AF01.LP1-autovec.LP2-simple --n 1000000 --q 0.1 --threads 1 --trial 1
+uv run python scripts/profile.py ML01.AF02.LP1-autovec.LP2-simple --n 1000000 --q 0.1 --threads 1 --trial 1
 ```
 
 ## hardware_json.py
@@ -194,8 +194,8 @@ saturation / Bandwidth / Assembly / Verdict). `--verify` checks cited
 instructions + section presence (the gate `build_report.py` runs).
 
 ```sh
-uv run python scripts/analyze_algo.py ML01.AF01.LP1-autovec.LP2-opt        # full: json + md
-uv run python scripts/analyze_algo.py ML01.AF01.LP1-autovec.LP2-opt --json-only    # evidence only, no LLM
+uv run python scripts/analyze_algo.py ML01.AF02.LP1-autovec.LP2-opt        # full: json + md
+uv run python scripts/analyze_algo.py ML01.AF02.LP1-autovec.LP2-opt --json-only    # evidence only, no LLM
 uv run python scripts/analyze_algo.py ML01 --verify                   # integrity gate (0 FAIL = green)
 ```
 
@@ -210,8 +210,8 @@ file plus, for halide algorithms, the generator `.py`. Stamped on every row as
 `source_hash` so a row pins the exact code that ran.
 
 ```sh
-uv run python scripts/algo_hash.py ML01.AF01.LP1-autovec.LP2-simple        # prints the hash
-uv run python scripts/algo_hash.py ML01.AF01.LP1-autovec.LP2-simple --files  # also list the closure
+uv run python scripts/algo_hash.py ML01.AF02.LP1-autovec.LP2-simple        # prints the hash
+uv run python scripts/algo_hash.py ML01.AF02.LP1-autovec.LP2-simple --files  # also list the closure
 ```
 
 ## sweep_config.py
@@ -230,9 +230,9 @@ at the make level measurement is [`collect.py`](#collectpy).
 
 ```sh
 uv run python scripts/run.py build ML01
-uv run python scripts/run.py play ML01.AF01.LP1-autovec.LP2-simple
-uv run python scripts/run.py profile ML01.AF01.LP1-autovec.LP2-simple   # one cycle point
-uv run python scripts/run.py bench ML01.AF01.LP1-autovec.LP2-simple     # one timing point, no append
+uv run python scripts/run.py play ML01.AF02.LP1-autovec.LP2-simple
+uv run python scripts/run.py profile ML01.AF02.LP1-autovec.LP2-simple   # one cycle point
+uv run python scripts/run.py bench ML01.AF02.LP1-autovec.LP2-simple     # one timing point, no append
 ```
 
 ---

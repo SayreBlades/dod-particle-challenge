@@ -115,11 +115,11 @@ choice rather than a new family. AF02's loop 1
 
 - [scalar Zig](src/layouts/ML01/AF02.LP1-scalar.LP2-simple.zig) —
   de-vectorized (asm-boxed intermediates), branchy respawn
-- [vector Zig](src/layouts/ML01/AF02.LP1-autovec.LP2-simple.zig) —
+- [vector Zig](src/layouts/ML01/AF05.LP1-autovec.LP2-simple.zig) —
   auto-vectorized (NEON), branchy respawn
 - [blend Zig](src/layouts/ML01/AF02.LP1-blend.LP2-simple.zig) —
   branchless blend respawn (the statistical-golden class)
-- [Halide](src/layouts/ML01/AF02.LP1-halide.LP2-simple.zig) —
+- [Halide](src/layouts/ML01/AF05.LP1-halide.LP2-simple.zig) —
   AOT-compiled, per-particle hash RNG
 
 </details>
@@ -162,9 +162,9 @@ The common actions are `make` targets ([Makefile](Makefile));
 ```sh
 make build                                     # build every algorithm into out/
 make build   ML01                              #   …every algorithm of memory layout ML01
-make build   ML01.AF02.LP1-autovec.LP2-simple  #   …one algorithm (use the full ML01.<algo> name)
-make play    ML01.AF02.LP1-autovec.LP2-simple  # open the interactive raylib window
-make profile ML01.AF02.LP1-autovec.LP2-simple  # PMC cycle-attribution (macOS + Xcode)
+make build   ML01.AF05.LP1-autovec.LP2-simple  #   …one algorithm (use the full ML01.<algo> name)
+make play    ML01.AF05.LP1-autovec.LP2-simple  # open the interactive raylib window
+make profile ML01.AF05.LP1-autovec.LP2-simple  # PMC cycle-attribution (macOS + Xcode)
 make report && make serve                      # build + serve the report on http://localhost:8000
 ```
 
