@@ -25,6 +25,7 @@
 // (deterministic per chunk, independent of scheduling).
 
 const std = @import("std");
+const builtin = @import("builtin");
 
 extern "c" fn __ulock_wait(op: u32, addr: *const anyopaque, value: u64, timeout_us: u32) c_int;
 extern "c" fn __ulock_wake(op: u32, addr: *const anyopaque, wake_value: u64) c_int;
@@ -141,10 +142,32 @@ pub const Pool = struct {
 fn waitWhile(v: *const std.atomic.Value(u32), cur: u32) void {
     // Sleep only if the value is still `cur` (race-free re-check inside the
     // syscall). Returns on any change, spurious wake, or error — the caller
-    // re-reads.
-    _ = __ulock_wait(UL_COMPARE_AND_WAIT, @ptrCast(&v.raw), cur, 0);
+    // re-reads. Only the branch for THIS OS is analyzed (comptime switch), so
+    // the ulock externs are never referenced on Linux and the futex call is
+    // never referenced on macOS.
+    switch (builtin.os.tag) {
+        .macos => {
+            _ = __ulock_wait(UL_COMPARE_AND_WAIT, @ptrCast(&v.raw), cur, 0);
+        },
+        .linux => {
+            const op: std.os.linux.FUTEX_OP = .{ .cmd = .WAIT, .private = true };
+            _ = std.os.linux.futex_3arg(@ptrCast(&v.raw), op, cur);
+        },
+        // No parking primitive: callers already spin (SPIN) before reaching here,
+        // so a no-op keeps the pool correct (busy) on other OSes.
+        else => {},
+    }
 }
 
 fn wakeAll(v: *const std.atomic.Value(u32)) void {
-    _ = __ulock_wake(UL_COMPARE_AND_WAIT | ULF_WAKE_ALL, @ptrCast(&v.raw), 0);
+    switch (builtin.os.tag) {
+        .macos => {
+            _ = __ulock_wake(UL_COMPARE_AND_WAIT | ULF_WAKE_ALL, @ptrCast(&v.raw), 0);
+        },
+        .linux => {
+            const op: std.os.linux.FUTEX_OP = .{ .cmd = .WAKE, .private = true };
+            _ = std.os.linux.futex_3arg(@ptrCast(&v.raw), op, std.math.maxInt(u32));
+        },
+        else => {},
+    }
 }

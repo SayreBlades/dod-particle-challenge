@@ -8,6 +8,7 @@
 // (NEON fmul.s and fmul.4s lanes are both IEEE single — same ops, same order.)
 
 const std = @import("std");
+const builtin = @import("builtin");
 const fw = @import("../../framework/sim.zig");
 const config = @import("../../framework/config.zig");
 const layout = @import("data.zig");
@@ -33,10 +34,21 @@ pub const H = struct {
     /// the optimizer cannot prove it equals the input — SLP can't pack
     /// producer or consumer chains across the box.
     inline fn box(x: f32) f32 {
-        return asm volatile (""
-            : [ret] "=w" (-> f32)
-            : [in] "w" (x)
-        );
+        // De-vectorization barrier: force the value through a SIMD register so
+        // LLVM can't prove it equals the input (defeats SLP auto-vectorization).
+        // The register-class constraint is arch-specific (NEON "w" on ARM64, SSE
+        // "x" on x86_64); the comptime switch keeps only the live arm analyzed.
+        return switch (builtin.cpu.arch) {
+            .aarch64 => asm volatile (""
+                : [ret] "=w" (-> f32)
+                : [in] "w" (x)
+            ),
+            .x86_64 => asm volatile (""
+                : [ret] "=x" (-> f32)
+                : [in] "x" (x)
+            ),
+            else => x, // no SIMD barrier available: vectorization may still occur
+        };
     }
 
     pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {
