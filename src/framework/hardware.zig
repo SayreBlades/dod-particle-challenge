@@ -1,6 +1,6 @@
 // hardware.zig — runtime cache/memory profile via sysctl.
 // Printed at the start of every bench run so the numbers anchor the DOD story.
-// (Same facts as scripts/hardware_profile.py, consumed programmatically here.)
+// (Consumed programmatically here; scripts/hardware_json.py is the JSON counterpart.)
 
 const std = @import("std");
 const Io = std.Io;

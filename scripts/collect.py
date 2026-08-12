@@ -28,7 +28,6 @@ Usage:
 """
 from __future__ import annotations
 import argparse, datetime, json, os, re, subprocess, sys, threading, time
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
@@ -155,7 +154,6 @@ def main():
     ap.add_argument("--only", choices=["profile"], default=None,
                     help="run only the profile loop (the radar's data source)")
     ap.add_argument("--refresh-hw", action="store_true", default=env("REFRESH_HW", "0") == "1")
-    ap.add_argument("--parallel", type=int, default=int(env("PARALLEL", str(os.cpu_count() or 4))))
     ap.add_argument("--verbose", action="store_true", default=env("VERBOSE", "0") == "1",
                     help="per-step chatter instead of the progress bar (default: bar)")
     a = ap.parse_args()
@@ -188,34 +186,9 @@ def main():
           f"backends={profilers or 'none'}", file=sys.stderr)
     print(f"  skip_done={int(a.skip_done)}", file=sys.stderr)
 
-    # --- PHASE 1: build one binary per algorithm (PARALLEL) ---
-    build_workers = max(1, min(len(algos), a.parallel))
-    print(f"  phase 1: build {len(algos)} binaries ({build_workers} parallel) -> out/bin/",
-          file=sys.stderr)
-    build_failures = []
-
-    def _build(al):
-        ok = True
-        try:
-            bench.build_binary(al, machine_id, host)
-        except SystemExit:
-            ok = False
-        return al, ok
-
-    try:
-        with ThreadPoolExecutor(max_workers=build_workers) as ex:
-            futs = [ex.submit(_build, al) for al in algos]
-            for fut in as_completed(futs):
-                al, ok = fut.result()
-                if not ok:
-                    with STATE_LOCK:
-                        FAILED.add(al)
-                    build_failures.append(al)
-    except KeyboardInterrupt:
-        sys.stderr.write("\ninterrupted (phase 1)\n")
-        return 130
-    for al in build_failures:
-        print(f"    BUILD FAILED — {al}", file=sys.stderr)
+    # (No build phase — `make build` (the prereq) builds all binaries in one
+    # parallel multi-build via -Dselect; the atoms build-if-missing for
+    # standalone use.)
 
     # --- PHASE 2: per-algo collect (SERIAL — clean timing / clean counters) ---
     # Interleaved: fully process one algorithm (bundle + bench + profile) before

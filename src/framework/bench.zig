@@ -7,7 +7,6 @@
 // Also serves three non-timing modes (each early-outs):
 //   --check      the invariant suite (PASS/FAIL) at one (q, threads)
 //   --bandwidth  the single-core streaming-BW microbench (the report ceiling)
-//   --record <d> headless fixed-step render → ffmpeg
 //
 // Timing model (one point):
 //   - warmup: WARMUP_DEFAULT (or --warmup) steps to prime caches/predictors/DVFS.
@@ -28,7 +27,7 @@ const GOLDEN_STEPS: usize = 600;
 const GOLDEN_N: usize = 1024;
 const EPS: f32 = 1e-4;
 const GOLDEN_PATH = "experiments/golden/stage1.bin";
-// The framebuffer dimensions used by the bench timing + record mode.
+// The framebuffer dimensions used by the bench timing mode.
 const RENDER_W: u32 = 1024;
 const RENDER_H: u32 = 1024;
 const RENDER_SETTLE_STEPS: usize = 120; // 2s = kill_age -> steady-state spread
@@ -47,10 +46,15 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
     var warmup: usize = WARMUP_DEFAULT;
     var run_id: []const u8 = "";
     var ts_utc: []const u8 = "";
+    // Provenance supplied at runtime by collect/bench.py (alongside run_id/ts_utc).
+    // Kept out of build options so `make build` is pure-zig (no python provenance
+    // in the build path); the binary echoes whatever the caller passes here.
+    var machine_id: []const u8 = "";
+    var host: []const u8 = "";
+    var source_hash: []const u8 = "";
     var json_mode = false;
     var check_mode = false;
     var bandwidth_mode = false;
-    var record_dir: ?[]const u8 = null;
     var show_help = false;
     {
         var it_opt: ?std.process.Args.Iterator = std.process.Args.Iterator.initAllocator(init.minimal.args, alloc) catch null;
@@ -74,6 +78,12 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
                     if (it.next()) |val| run_id = val;
                 } else if (std.mem.eql(u8, arg, "--ts-utc")) {
                     if (it.next()) |val| ts_utc = val;
+                } else if (std.mem.eql(u8, arg, "--machine-id")) {
+                    if (it.next()) |val| machine_id = val;
+                } else if (std.mem.eql(u8, arg, "--host")) {
+                    if (it.next()) |val| host = val;
+                } else if (std.mem.eql(u8, arg, "--source-hash")) {
+                    if (it.next()) |val| source_hash = val;
                 } else if (std.mem.eql(u8, arg, "--json")) {
                     // One JSONL row for the one timed point, prefixed `json,`.
                     // collect.py / bench.py grep `^json,` and strip the prefix.
@@ -86,9 +96,6 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
                     // timed. Prints `streaming_bw_gbs=<GB/s>` to stdout and exits.
                     // hardware_json.py reads this — the real ceiling, not an estimate.
                     bandwidth_mode = true;
-                } else if (std.mem.eql(u8, arg, "--record")) {
-                    // `--record <dir>` exports a headless video; default out/record.
-                    record_dir = it.next() orelse "out/record";
                 } else if (std.mem.eql(u8, arg, "--help") or std.mem.eql(u8, arg, "-h")) {
                     show_help = true;
                 }
@@ -153,7 +160,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         return;
     }
 
-    // --- timing or record path: both need q + threads ---
+    // --- timing path: needs q + threads ---
     const qv = q_opt orelse {
         printUsage(SimImpl);
         std.debug.print("\nerror: --q is required\n", .{});
@@ -246,13 +253,6 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         }
     }
 
-    // --- record mode (--record <dir>): headless fixed-step render -> ffmpeg.
-    // Runs AFTER the golden check above: the math is proven before the video.
-    if (record_dir) |dir| {
-        try recordVideo(SimImpl, alloc, io, dir, threads);
-        return;
-    }
-
     // --- benchmark: ONE point. Remaining required args (no defaults). ---
     const n = n_opt orelse {
         printUsage(SimImpl);
@@ -313,7 +313,7 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
             .ns_frame = ns_frame,
             .ns_particle = ns_particle,
             .trial_ns = trial_ns,
-        }, run_id, ts_utc);
+        }, run_id, ts_utc, machine_id, host, source_hash);
     }
 }
 
@@ -335,7 +335,7 @@ fn printUsage(comptime SimImpl: type) void {
         \\Measures ONE point — there is no default sweep; the caller owns the grid.
         \\
         \\Required for timing: --n, --q, --threads, --iters, --trial.
-        \\Required for --check / --record: --q, --threads. (--bandwidth: none.)
+        \\Required for --check: --q, --threads. (--bandwidth: none.)
         \\
         \\Options:
         \\  -q, --death <q>     per-frame accident rate (0 = natural/golden)
@@ -347,125 +347,9 @@ fn printUsage(comptime SimImpl: type) void {
         \\      --json          emit one JSONL timing row (prefix `json,`)
         \\      --check         invariant suite only (PASS/FAIL), then exit
         \\      --bandwidth     streaming-BW microbench, then exit
-        \\      --record <dir>  headless render -> ffmpeg
         \\  -h, --help          this message
         \\
     , .{});
-}
-
-// --- record mode (stage 11, --record <dir>) ----------------------------------------
-
-const RECORD_N: usize = 65_000; // play mode's DEFAULT_N — visual parity
-const RECORD_STEPS: usize = 600; // fixed steps, fixed dt -> deterministic replay
-const RECORD_FPS: u32 = 30; // capture every 2nd step: 300 frames = 10 s
-
-/// Headless video export (P12: determinism enables replay). Runs the sim for
-/// RECORD_STEPS fixed steps, renders every 2nd step into an RGBA framebuffer,
-/// and pipes the raw frames straight into ffmpeg's stdin to encode
-/// <dir>/video.mp4 (30 fps x 300 frames = 10 s at 1024^2 -- the acceptance
-/// spec). No image library: raw RGBA over a pipe is ffmpeg's native input.
-/// Deterministic: same seed + same dt => byte-identical frames => byte-identical
-/// video across runs.
-fn recordVideo(comptime SimImpl: type, alloc: std.mem.Allocator, io: Io, out_dir: []const u8, threads: usize) !void {
-    const video_path = try std.fmt.allocPrint(alloc, "{s}/video.mp4", .{out_dir});
-    defer alloc.free(video_path);
-
-    var dir = std.Io.Dir.cwd();
-    try dir.createDirPath(io, out_dir);
-
-    std.debug.print("=== Record: {s} ===\n", .{@import("options").label});
-    std.debug.print("  sim: N={d}, seed=0x{X}, {d} steps @ dt={d:.6}\n", .{ RECORD_N, config.spawn_seed, RECORD_STEPS, config.dt });
-    std.debug.print("  capture: every 2nd step -> {d} frames @ {d} fps = {d:.1} s at {d}x{d} (raw RGBA -> ffmpeg)\n\n", .{
-        RECORD_STEPS / 2, RECORD_FPS, @as(f64, RECORD_STEPS / 2) / @as(f64, RECORD_FPS), RENDER_W, RENDER_H,
-    });
-
-    var sim = try SimImpl.init(alloc, .{ .n = RECORD_N, .seed = config.spawn_seed, .threads = threads });
-    defer sim.deinit();
-
-    const fb = try alloc.alloc(u8, @as(usize, RENDER_W) * RENDER_H * 4);
-    defer alloc.free(fb);
-
-    // ffmpeg reads raw RGBA frames from stdin. yuv420p for player compatibility
-    // (1024x1024 is even -- valid for 4:2:0). crf 18 = visually lossless.
-    // +faststart for web playback. stderr -> /dev/null (progress spam);
-    // failures surface via the exit code + output-file check.
-    const size_arg = try std.fmt.allocPrint(alloc, "{d}x{d}", .{ RENDER_W, RENDER_H });
-    defer alloc.free(size_arg);
-    var child = std.process.spawn(io, .{
-        .argv = &.{
-            "ffmpeg", "-y",
-            "-f", "rawvideo",
-            "-pixel_format", "rgba",
-            "-video_size", size_arg,
-            "-framerate", "30",
-            "-i", "-",
-            "-c:v", "libx264",
-            "-pix_fmt", "yuv420p",
-            "-crf", "18",
-            "-movflags", "+faststart",
-            video_path,
-        },
-        .stdin = .pipe,
-        .stdout = .ignore,
-        .stderr = .ignore,
-    }) catch |e| {
-        std.debug.print("  ERROR: failed to spawn ffmpeg ({t}). Is ffmpeg on PATH?\n", .{e});
-        return e;
-    };
-    defer child.kill(io);
-    const stdin_file = child.stdin orelse return error.NoStdinPipe;
-
-    // Settle to steady state before capturing: init places every particle at
-    // the origin (maximally overlapped, unrepresentative). Running
-    // RENDER_SETTLE_STEPS (2s = kill_age) reaches the developed fountain spread
-    // before the first recorded frame. Determinism is preserved (settle steps
-    // are deterministic too) — same seed+dt still yields byte-identical video.
-    var su: usize = 0;
-    while (su < RENDER_SETTLE_STEPS) : (su += 1) sim.step(config.dt, fb, RENDER_W, RENDER_H);
-
-    const record_t0 = Io.Timestamp.now(io, .awake);
-    var frame: usize = 0;
-    var step_i: usize = 0;
-    while (step_i < RECORD_STEPS) : (step_i += 1) {
-        // Clear before each step so each captured frame shows exactly this
-        // step's splat on a clean fb (step always splats now, §17.7).
-        @memset(fb, 0);
-        sim.step(config.dt, fb, RENDER_W, RENDER_H);
-        if (step_i % 2 != 0) continue;
-        // Stream the captured frame to ffmpeg.
-        stdin_file.writeStreamingAll(io, fb) catch |e| {
-            std.debug.print("  ERROR: ffmpeg stdin write failed ({t}) -- encoder likely exited early\n", .{e});
-            return e;
-        };
-        frame += 1;
-        if (frame % 60 == 0) std.debug.print("  streamed {d}/{d} frames...\n", .{ frame, RECORD_STEPS / 2 });
-    }
-    // Close stdin (EOF) so ffmpeg flushes and exits, then wait for it.
-    stdin_file.close(io);
-    child.stdin = null;
-    const record_t1 = Io.Timestamp.now(io, .awake);
-    std.debug.print("  streamed {d} frames in {d:.1} ms; waiting for ffmpeg...\n", .{
-        frame, @as(f64, @floatFromInt(record_t0.durationTo(record_t1).nanoseconds)) / 1e6,
-    });
-
-    const term = child.wait(io) catch |e| {
-        std.debug.print("  ERROR: ffmpeg wait failed ({t})\n", .{e});
-        return e;
-    };
-    if (switch (term) { .exited => |c| c != 0, else => true }) {
-        std.debug.print("  ERROR: ffmpeg exited nonzero ({t}). Run it manually to see stderr:\n", .{term});
-        std.debug.print("    ffmpeg -y -f rawvideo -pixel_format rgba -video_size {s} -framerate 30 -i - -c:v libx264 -pix_fmt yuv420p -crf 18 {s}\n", .{ size_arg, video_path });
-        return error.FfmpegFailed;
-    }
-
-    const stat = try dir.statFile(io, video_path, .{});
-    std.debug.print("  wrote {s} ({d:.2} MB, {d} frames @ {d} fps = {d:.1} s)\n", .{
-        video_path,
-        @as(f64, @floatFromInt(stat.size)) / (1024.0 * 1024.0),
-        frame,
-        RECORD_FPS,
-        @as(f64, @floatFromInt(frame)) / @as(f64, RECORD_FPS),
-    });
 }
 
 // --- streaming-bandwidth microbench (--bandwidth) -------------------------------
@@ -551,7 +435,7 @@ const Measure = struct {
     trial_ns: f64,
 };
 
-fn emitJsonRow(comptime SimImpl: type, m: Measure, run_id: []const u8, ts_utc: []const u8) void {
+fn emitJsonRow(comptime SimImpl: type, m: Measure, run_id: []const u8, ts_utc: []const u8, machine_id: []const u8, host: []const u8, source_hash: []const u8) void {
     const o = @import("options");
     // algo_meta axes (static per algorithm; denormalized onto every row).
     var algo_fam: []const u8 = "";
@@ -572,11 +456,11 @@ fn emitJsonRow(comptime SimImpl: type, m: Measure, run_id: []const u8, ts_utc: [
     std.debug.print("\"run_id\":\"{s}\",", .{run_id});
     std.debug.print("\"ts_utc\":\"{s}\",", .{ts_utc});
     std.debug.print("\"kind\":\"timing\",", .{});
-    std.debug.print("\"host\":\"{s}\",", .{o.host});
-    std.debug.print("\"machine_id\":\"{s}\",", .{o.machine_id});
+    std.debug.print("\"host\":\"{s}\",", .{host});
+    std.debug.print("\"machine_id\":\"{s}\",", .{machine_id});
     std.debug.print("\"mem_layout\":\"{s}\",", .{if (SimImpl.algo_meta) |cd| cd.mem_layout else ""});
     std.debug.print("\"algo\":\"{s}\",", .{o.name});
-    std.debug.print("\"source_hash\":\"{s}\",", .{o.source_hash});
+    std.debug.print("\"source_hash\":\"{s}\",", .{source_hash});
     std.debug.print("\"git_sha\":\"{s}\",", .{o.git_sha});
     std.debug.print("\"git_branch\":\"{s}\",", .{o.git_branch});
     std.debug.print("\"zig_version\":\"{s}\",", .{@import("builtin").zig_version_string});

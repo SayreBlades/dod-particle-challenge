@@ -4,13 +4,16 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    // --- build options: -Dmem_layout=ML01 -Dalgo=name (the mem_layout verticals) ---
-    // The arc (src/stages/) is retired as a build target — relocated to
-    // .scratch/orig/ as reference history (optimization-framework §11/§16.1).
-    // -Dstage is gone; its algorithms are scavenged where useful
-    // (ML01.AF02.LP1-autovec.LP2-simple == arc stage 1's step).
-    const mem_layout_opt = b.option([]const u8, "mem_layout", "memory-layout id, e.g. ML01 (needs -Dalgo)");
-    const algo_opt = b.option([]const u8, "algo", "algorithm name, e.g. AF02.LP1-autovec.LP2-simple");
+    // --- build options ---
+    // -Dselect (multi-build): "all" | ML<layout> | <full algo name>. When set,
+    //   build every matching algorithm in ONE configure (zig's DAG runner
+    //   compiles them in parallel). When absent, fall back to -Dmem_layout /
+    //   -Dalgo (single-algo, backward compat for the python callers + ad-hoc).
+    //   (Named -Dselect, not -Dtarget: zig reserves -Dtarget for the build
+    //   target triple — see b.standardTargetOptions above.)
+    const select_opt = b.option([]const u8, "select", "all | ML<layout> | <full algo name> (multi-build). Overrides -Dmem_layout/-Dalgo.");
+    const mem_layout_opt = b.option([]const u8, "mem_layout", "memory-layout id, e.g. ML01 (needs -Dalgo; single-algo unless -Dtarget is set)");
+    const algo_opt = b.option([]const u8, "algo", "algorithm name, e.g. AF02.LP1-autovec.LP2-simple (single-algo unless -Dtarget is set)");
     const halide_variant_opt = b.option([]const u8, "halide_variant", "Halide sweep candidate id (links a pre-generated out/halide/<algo>_<id>.a)");
     const halide_prefix_opt = b.option([]const u8, "halide_prefix", "Halide generator output base dir (default out/halide; per-worker when collect.py parallelizes)") orelse "out/halide";
     const mode_str = b.option([]const u8, "mode", "play | bench | audit") orelse "play";
@@ -24,10 +27,12 @@ pub fn build(b: *std.Build) void {
     if (!std.math.isFinite(death_q) or death_q < 0.0 or death_q >= 1.0)
         std.debug.panic("invalid -Ddeath={d} (expect 0 <= q < 1)", .{death_q});
 
-    // --- provenance build options (refactor §6.6) ---
-    // git_sha/git_branch computed at configure time via `git`; source_hash
-    // /machine_id/host passed by collect.py (computed from algo_hash.py /
-    // hardware_json.py). Defaults to empty/"unknown" for ad-hoc builds.
+    // --- provenance build options ---
+    // git_sha/git_branch computed at configure time via `git` and baked (cheap,
+    // stable per commit). source_hash/machine_id/host are NOT build options —
+    // the bench binary takes them as runtime flags (--source-hash/--machine-id/
+    // --host) from collect/bench.py, so `make build` stays pure-zig (no python
+    // provenance computation in the build path).
     const git_sha = blk: {
         const out = b.run(&.{ "git", "rev-parse", "--short", "HEAD" });
         break :blk std.mem.trim(u8, out, &std.ascii.whitespace);
@@ -36,9 +41,6 @@ pub fn build(b: *std.Build) void {
         const out = b.run(&.{ "git", "rev-parse", "--abbrev-ref", "HEAD" });
         break :blk std.mem.trim(u8, out, &std.ascii.whitespace);
     };
-    const source_hash = b.option([]const u8, "source_hash", "algorithm import-closure hash (from scripts/algo_hash.py)") orelse "";
-    const machine_id = b.option([]const u8, "machine_id", "host machine id (from hardware_json.py)") orelse "";
-    const host = b.option([]const u8, "host", "hostname") orelse "";
     // (run_id / ts_utc are RUNTIME flags now — --run-id / --ts-utc, stamped on
     // each JSONL row. They were build options, which invalidated zig's cache
     // every collect (the timestamp changed) and forced a full recompile.)
@@ -56,143 +58,31 @@ pub fn build(b: *std.Build) void {
     // linking no GUI library makes them portable (no Cocoa/OpenGL) and smaller.
     const link_raylib = (mode == .play);
 
-    // Resolve the selection to a canonical sim name + display label.
-    // Names are "ML<mem_layout>.<algo>"; main.zig's comptime registry must have
-    // an arm for each.
-    var name: []const u8 = undefined;
-    var label: []const u8 = undefined;
-    var mem_layout_sel: ?[]const u8 = null;
-    var algo_sel: ?[]const u8 = null;
-    {
-        const mem_layout = mem_layout_opt orelse "ML01";
-        const algo = algo_opt orelse "AF02.LP1-autovec.LP2-simple";
-        mem_layout_sel = mem_layout;
-        algo_sel = algo;
-        name = b.fmt("{s}.{s}", .{ mem_layout, algo });
-        label = algoLabel(mem_layout, algo) orelse {
-            // Collect the valid algorithm names for the error message.
-            var valid = std.ArrayList(u8).initCapacity(b.allocator, 128) catch unreachable;
-            for (algo_labels) |s| {
-                if (std.mem.eql(u8, s.mem_layout, mem_layout)) {
-                    valid.appendSlice(b.allocator, s.algo) catch unreachable;
-                    valid.appendSlice(b.allocator, ", ") catch unreachable;
-                }
-            }
-            if (valid.items.len == 0)
-                std.debug.panic("unknown mem_layout '{s}' (no algorithms registered; see algo_labels in build.zig)", .{mem_layout});
-            std.debug.panic("invalid -Dalgo='{s}' for mem_layout {s} — valid: {s}", .{ algo, mem_layout, valid.items[0 .. valid.items.len - 2] });
-        };
+    // --- selection: which (mem_layout, algo) pairs to build ---
+    const sel = resolveSelection(b.allocator, select_opt, mem_layout_opt, algo_opt);
+
+    // scope banner (D12): one line up front so `make build` states its scope.
+    // zig's native std.Progress renders the live step bar during the run.
+    const scope = if (select_opt) |t| t else "default";
+    std.debug.print("build: {d} algorithm(s) [{s}] -> out/bin (.{s})\n", .{ sel.len, scope, mode_str });
+
+    // --- build one exe per selection (parallel via zig's DAG runner) ---
+    var first_exe: ?*std.Build.Step.Compile = null;
+    for (sel) |s| {
+        const exe = addAlgoExe(b, target, optimize, s.mem_layout, s.algo, mode_str, mode_enum, link_raylib, death_q, git_sha, git_branch, keep_debug, halide_variant_opt, halide_prefix_opt);
+        if (first_exe == null) first_exe = exe;
     }
 
-    const opts = b.addOptions();
-    opts.addOption([]const u8, "name", name);
-    opts.addOption([]const u8, "label", label);
-    // The golden files are generated by the reference sim only:
-    // ML01.AF02.LP1-autovec.LP2-simple
-    // (= arc stage 1's step, scavenged). The arc itself is no longer a build
-    // target (relocated to .scratch/orig/).
-    opts.addOption(bool, "is_reference", std.mem.eql(u8, name, "ML01.AF02.LP1-autovec.LP2-simple"));
-    opts.addOption(f64, "death", death_q);
-    opts.addOption(Mode, "mode", mode_enum);
-    opts.addOption(bool, "link_raylib", link_raylib);
-    // Provenance (refactor §6.6): stamped on every JSONL bench row so a row
-    // pins the exact code + machine that produced it.
-    opts.addOption([]const u8, "git_sha", git_sha);
-    opts.addOption([]const u8, "git_branch", git_branch);
-    opts.addOption([]const u8, "source_hash", source_hash);
-    opts.addOption([]const u8, "machine_id", machine_id);
-    opts.addOption([]const u8, "host", host);
-    // (run_id / ts_utc moved to runtime --run-id / --ts-utc — see above.)
-
-    // --- raylib C library (compiled directly; raylib-zig build is broken on 0.17-dev) ---
-    // Only built for play (bench/audit/manifest are headless — no GUI link).
-    const raylib_lib: ?*std.Build.Step.Compile = if (link_raylib) addRaylib(b, target, optimize) else null;
-
-    // --- main exe ---
-    // Flat name: <mem_layout>.<algo>.<mode>  →  out/bin/ML01.AF06.LP1-halide.LP2-mask.bench
-    // One binary per (algorithm, mode); behavior (q, N, …) is runtime config.
-    const exe_name = b.fmt("{s}.{s}", .{ name, mode_str });
-    const exe = b.addExecutable(.{
-        .name = exe_name,
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main.zig"),
-            .target = target,
-            .optimize = optimize,
-            .strip = if (keep_debug) false else null,
-            .link_libc = true,
-        }),
-    });
-    // --- Halide path: ONLY for algorithms whose loop 1 is halide (the LP1-halide
-    // loop). Fully gated: Zig algorithms never touch python/Halide. The
-    // generator (Python bindings) emits out/halide/<base>[_<variant>].{h,a}
-    // with the runtime bundled; the exe links the static .a. No libHalide at
-    // runtime.
-    if (algo_sel) |algo| {
-        if (halideGenBase(algo)) |base| {
-            const mem_layout = mem_layout_sel.?;
-            // If this python is missing, the generator step fails loudly at
-            // build time; set HALIDE_PYTHON or create the env:
-            //   uv sync
-            const python = b.graph.environ_map.get("HALIDE_PYTHON") orelse ".venv/bin/python";
-            // Derive the Halide schedule from the algo name: an algo containing
-            // "-par" gets {"parallel":true}; the plain algo gets the default.
-            // NOTE: the `parallel(i)` SCHEDULE is still baked into the kernel
-            // at build time, but the -par cell's `initExtra` now caps the
-            // Halide runtime pool via `halide_set_num_threads(sim.threads)`
-            // (issue #4) — so `--threads T` governs actual CPU use. The serial
-            // `halide` kernel has no parallel loop and needs no cap.
-            // (-Dhalide_variant still works for ad-hoc sweep variants; it adds
-            // a suffix to the stem and is expected to be pre-generated.)
-            const sched_json: []const u8 = if (std.mem.indexOf(u8, algo, "-par") != null)
-                "{\"parallel\":true}"
-            else
-                "{}";
-            // The stem: the base name, plus an optional explicit variant suffix.
-            // For a "-par" algo we bake "_par" into the stem so the parallel .a
-            // doesn't collide with the scalar .a (same generator, different schedule).
-            const stem_par = if (std.mem.indexOf(u8, algo, "-par") != null) "_par" else "";
-            const stem = if (halide_variant_opt) |v| b.fmt("{s}_{s}", .{ base, v }) else b.fmt("{s}{s}", .{ base, stem_par });
-            const out_prefix = b.fmt("{s}/{s}", .{ halide_prefix_opt, stem });
-            // Always run the generator for the derived schedule (no more
-            // "pre-generated variant" expectation). A sweep can override the
-            // schedule via -Dhalide_variant=<suffix> (pre-generated) if needed.
-            const gen_dir = b.fmt("src/layouts/{s}/{s}_gen.py", .{ mem_layout, base });
-            const gen = b.addSystemCommand(&.{
-                python,
-                gen_dir,
-                out_prefix,
-                sched_json,
-                // q is now a runtime Halide Param (the Zig wrapper passes config.q
-                // to the kernel), so the generator no longer takes it on argv.
-            });
-            exe.step.dependOn(&gen.step);
-            exe.root_module.addObjectFile(b.path(b.fmt("{s}.a", .{out_prefix})));
-        }
-    }
-
-    exe.root_module.addOptions("options", opts);
-    // raylib binding + link ONLY when link_raylib (play). bench/audit/manifest
-    // builds skip this entirely — no raylib module, no GUI frameworks linked.
-    if (raylib_lib) |rl| {
-        exe.root_module.addImport("raylib", raylib_module: {
-            const rl_mod = b.createModule(.{
-                .root_source_file = b.path("src/bindings/raylib.zig"),
-                .target = target,
-                .optimize = optimize,
-                .link_libc = true,
-            });
-            rl_mod.linkLibrary(rl);
-            break :raylib_module rl_mod;
-        });
-    }
-
-    b.installArtifact(exe);
-
-    const run = b.addRunArtifact(exe);
-    const run_step = b.step("run", "Run the app");
+    // `run` step: convenience for single-algo builds (runs the first/only exe).
+    // For multi-build, run the installed binaries directly (./out/bin/<algo>.<mode>).
+    const run = b.addRunArtifact(first_exe.?);
+    const run_step = b.step("run", "Run the app (single-algo; for multi-build use ./out/bin/<algo>.<mode>)");
     run_step.dependOn(&run.step);
 
     // --- unit tests (render_opt's rasterizer byte-equivalence proof) ---
+    // The test needs a valid options struct (death pattern); use the reference
+    // algo's opts regardless of the selection.
+    const test_opts = makeOpts(b, "ML01", "AF02.LP1-autovec.LP2-simple", mode_enum, link_raylib, death_q, git_sha, git_branch);
     const unit_tests = b.addTest(.{
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/test_root.zig"),
@@ -200,7 +90,7 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
         }),
     });
-    unit_tests.root_module.addOptions("options", opts); // config.zig imports options (death pattern)
+    unit_tests.root_module.addOptions("options", test_opts); // config.zig imports options (death pattern)
     const run_tests = b.addRunArtifact(unit_tests);
     const test_step = b.step("test", "Run unit tests (render_opt rasterizer equivalence)");
     test_step.dependOn(&run_tests.step);
@@ -208,9 +98,8 @@ pub fn build(b: *std.Build) void {
     // --- manifest diagnostic (reporting-and-analysis.md §9.5) ---
     // The declaration blocks in algorithm files are the single source of truth;
     // `zig build manifests` prints the registered roster to stdout as a
-    // diagnostic (what's in sim_map). There is no checked-in manifest file
-    // (experiments/cells/ was retired); run this to inspect the registry
-    // after editing any algo_meta.
+    // diagnostic (what's in sim_map). There is no checked-in manifest file;
+    // run this to inspect the registry after editing any algo_meta.
     const manifest_exe = b.addExecutable(.{
         .name = "dod-manifest",
         .root_module = b.createModule(.{
@@ -241,6 +130,7 @@ pub fn build(b: *std.Build) void {
 pub const Mode = enum { play, bench, audit, manifest };
 
 const AlgoEntry = struct { mem_layout: []const u8, algo: []const u8, label: []const u8 };
+const Selection = struct { mem_layout: []const u8, algo: []const u8 };
 
 /// The algorithm registry (mem-layout-verticals.md §9): every buildable
 /// (mem_layout, algo) and its HUD label. main.zig's comptime map must have an
@@ -276,6 +166,219 @@ const algo_labels = [_]AlgoEntry{
     .{ .mem_layout = "ML01", .algo = "AF06.LP1-autovec-par.LP2-list-rmerge", .label = "ML01.AF06.LP1-autovec-par.LP2-list-rmerge (AF06: parallel math+decide→list | ranked-merge respawn | r0 render)" },
     .{ .mem_layout = "ML01", .algo = "AF06.LP1-autovec.LP2-list-fused", .label = "ML01.AF06.LP1-autovec.LP2-list-fused (AF06: math+decide→list | fused respawn+render(dead) | render(live); FRAMEBUFFER-ONLY)" },
 };
+
+/// Resolve the build selection into a list of (mem_layout, algo) pairs.
+/// - selection = "all"        → every entry in algo_labels.
+/// - selection = ML<layout>   → every entry of that layout.
+/// - selection = <full algo>  → the one (validated against algo_labels).
+/// - selection unset          → single-algo from -Dmem_layout/-Dalgo (defaults
+///                              ML01 / AF02.LP1-autovec.LP2-simple), backward compat.
+/// Uses the in-build.zig algo_labels registry (the buildable superset) rather
+/// than reading experiments/sweeps/<ml>.algos — avoids configure-time file I/O
+/// and stays self-contained. Allocated via b.allocator (lives for the build).
+fn resolveSelection(
+    allocator: std.mem.Allocator,
+    selection: ?[]const u8,
+    mem_layout_opt: ?[]const u8,
+    algo_opt: ?[]const u8,
+) []const Selection {
+    if (selection) |t| {
+        if (std.mem.eql(u8, t, "all")) {
+            const out = allocator.alloc(Selection, algo_labels.len) catch unreachable;
+            for (algo_labels, 0..) |e, i| out[i] = .{ .mem_layout = e.mem_layout, .algo = e.algo };
+            return out;
+        }
+        // ML<layout>? (any entry matches this mem_layout)
+        var is_layout = false;
+        for (algo_labels) |e| {
+            if (std.mem.eql(u8, e.mem_layout, t)) {
+                is_layout = true;
+                break;
+            }
+        }
+        if (is_layout) {
+            var count: usize = 0;
+            for (algo_labels) |e| {
+                if (std.mem.eql(u8, e.mem_layout, t)) count += 1;
+            }
+            const out = allocator.alloc(Selection, count) catch unreachable;
+            var i: usize = 0;
+            for (algo_labels) |e| {
+                if (std.mem.eql(u8, e.mem_layout, t)) {
+                    out[i] = .{ .mem_layout = e.mem_layout, .algo = e.algo };
+                    i += 1;
+                }
+            }
+            return out;
+        }
+        // Else: a full algo name "ML<layout>.<algo>". Split on the first dot.
+        const dot = std.mem.indexOfScalar(u8, t, '.') orelse
+            std.debug.panic("-Dselect='{s}' is not 'all', a layout (MLxx), or a full algo name (MLxx.<algo>)", .{t});
+        const ml = t[0..dot];
+        const algo = t[dot + 1 ..];
+        if (algoLabel(ml, algo) == null)
+            std.debug.panic("-Dselect='{s}': not a registered algorithm (see algo_labels in build.zig)", .{t});
+        const out = allocator.alloc(Selection, 1) catch unreachable;
+        out[0] = .{ .mem_layout = ml, .algo = algo };
+        return out;
+    }
+    // No -Dselect: single-algo path (backward compat for -Dmem_layout/-Dalgo).
+    const ml = mem_layout_opt orelse "ML01";
+    const algo = algo_opt orelse "AF02.LP1-autovec.LP2-simple";
+    if (algoLabel(ml, algo) == null) {
+        // Collect the valid algorithm names for the error message.
+        var valid = std.ArrayList(u8).initCapacity(allocator, 128) catch unreachable;
+        for (algo_labels) |s| {
+            if (std.mem.eql(u8, s.mem_layout, ml)) {
+                valid.appendSlice(allocator, s.algo) catch unreachable;
+                valid.appendSlice(allocator, ", ") catch unreachable;
+            }
+        }
+        if (valid.items.len == 0)
+            std.debug.panic("unknown mem_layout '{s}' (no algorithms registered; see algo_labels in build.zig)", .{ml});
+        std.debug.panic("invalid -Dalgo='{s}' for mem_layout {s} — valid: {s}", .{ algo, ml, valid.items[0 .. valid.items.len - 2] });
+    }
+    const out = allocator.alloc(Selection, 1) catch unreachable;
+    out[0] = .{ .mem_layout = ml, .algo = algo };
+    return out;
+}
+
+/// Build the per-algo options struct (name/label/is_reference + the shared
+/// build config: death, mode, link_raylib, provenance). Shared by addAlgoExe
+/// and the test step.
+fn makeOpts(
+    b: *std.Build,
+    mem_layout: []const u8,
+    algo: []const u8,
+    mode: Mode,
+    link_raylib: bool,
+    death_q: f64,
+    git_sha: []const u8,
+    git_branch: []const u8,
+) *std.Build.Step.Options {
+    const name = b.fmt("{s}.{s}", .{ mem_layout, algo });
+    const label = algoLabel(mem_layout, algo) orelse
+        std.debug.panic("makeOpts: unknown algorithm {s}.{s}", .{ mem_layout, algo });
+    const opts = b.addOptions();
+    opts.addOption([]const u8, "name", name);
+    opts.addOption([]const u8, "label", label);
+    // The golden files are generated by the reference sim only:
+    // ML01.AF02.LP1-autovec.LP2-simple (= arc stage 1's step, scavenged).
+    opts.addOption(bool, "is_reference", std.mem.eql(u8, name, "ML01.AF02.LP1-autovec.LP2-simple"));
+    opts.addOption(f64, "death", death_q);
+    opts.addOption(Mode, "mode", mode);
+    opts.addOption(bool, "link_raylib", link_raylib);
+    // Provenance (refactor §6.6): stamped on every JSONL bench row so a row
+    // pins the exact code + machine that produced it.
+    opts.addOption([]const u8, "git_sha", git_sha);
+    opts.addOption([]const u8, "git_branch", git_branch);
+    return opts;
+}
+
+/// Create + install ONE algorithm's executable (opts + exe + halide gen + raylib
+/// link). Called once per selection entry. Returns the exe for the run step.
+fn addAlgoExe(
+    b: *std.Build,
+    target: std.Build.ResolvedTarget,
+    optimize: std.builtin.OptimizeMode,
+    mem_layout: []const u8,
+    algo: []const u8,
+    mode_str: []const u8,
+    mode: Mode,
+    link_raylib: bool,
+    death_q: f64,
+    git_sha: []const u8,
+    git_branch: []const u8,
+    keep_debug: bool,
+    halide_variant_opt: ?[]const u8,
+    halide_prefix: []const u8,
+) *std.Build.Step.Compile {
+    const opts = makeOpts(b, mem_layout, algo, mode, link_raylib, death_q, git_sha, git_branch);
+
+    // --- raylib C library (compiled directly; raylib-zig build is broken on 0.17-dev) ---
+    // Only built for play (bench/audit/manifest are headless — no GUI link).
+    const raylib_lib: ?*std.Build.Step.Compile = if (link_raylib) addRaylib(b, target, optimize) else null;
+
+    // --- main exe ---
+    // Flat name: <mem_layout>.<algo>.<mode>  →  out/bin/ML01.AF03.LP1-halide.LP2-simple.bench
+    // One binary per (algorithm, mode); behavior (q, N, …) is runtime config.
+    const name = b.fmt("{s}.{s}", .{ mem_layout, algo });
+    const exe_name = b.fmt("{s}.{s}", .{ name, mode_str });
+    const exe = b.addExecutable(.{
+        .name = exe_name,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+            .strip = if (keep_debug) false else null,
+            .link_libc = true,
+        }),
+    });
+
+    // --- Halide path: ONLY for algorithms whose loop 1 is halide (the LP1-halide
+    // loop). Fully gated: Zig algorithms never touch python/Halide. The
+    // generator (Python bindings) emits out/halide/<base>[_<variant>].{h,a}
+    // with the runtime bundled; the exe links the static .a. No libHalide at
+    // runtime.
+    if (halideGenBase(algo)) |base| {
+        // If this python is missing, the generator step fails loudly at
+        // build time; set HALIDE_PYTHON or create the env:
+        //   uv sync
+        const python = b.graph.environ_map.get("HALIDE_PYTHON") orelse ".venv/bin/python";
+        // Derive the Halide schedule from the algo name: an algo containing
+        // "-par" gets {"parallel":true}; the plain algo gets the default.
+        // NOTE: the `parallel(i)` SCHEDULE is still baked into the kernel
+        // at build time, but the -par cell's `initExtra` now caps the
+        // Halide runtime pool via `halide_set_num_threads(sim.threads)`
+        // (issue #4) — so `--threads T` governs actual CPU use. The serial
+        // `halide` kernel has no parallel loop and needs no cap.
+        // (-Dhalide_variant still works for ad-hoc sweep variants; it adds
+        // a suffix to the stem and is expected to be pre-generated.)
+        const sched_json: []const u8 = if (std.mem.indexOf(u8, algo, "-par") != null)
+            "{\"parallel\":true}"
+        else
+            "{}";
+        // The stem: the base name, plus an optional explicit variant suffix.
+        // For a "-par" algo we bake "_par" into the stem so the parallel .a
+        // doesn't collide with the scalar .a (same generator, different schedule).
+        const stem_par = if (std.mem.indexOf(u8, algo, "-par") != null) "_par" else "";
+        const stem = if (halide_variant_opt) |v| b.fmt("{s}_{s}", .{ base, v }) else b.fmt("{s}{s}", .{ base, stem_par });
+        const out_prefix = b.fmt("{s}/{s}", .{ halide_prefix, stem });
+        // Always run the generator for the derived schedule (no more
+        // "pre-generated variant" expectation). A sweep can override the
+        // schedule via -Dhalide_variant=<suffix> (pre-generated) if needed.
+        const gen_dir = b.fmt("src/layouts/{s}/{s}_gen.py", .{ mem_layout, base });
+        const gen = b.addSystemCommand(&.{
+            python,
+            gen_dir,
+            out_prefix,
+            sched_json,
+            // q is now a runtime Halide Param (the Zig wrapper passes config.q
+            // to the kernel), so the generator no longer takes it on argv.
+        });
+        exe.step.dependOn(&gen.step);
+        exe.root_module.addObjectFile(b.path(b.fmt("{s}.a", .{out_prefix})));
+    }
+
+    exe.root_module.addOptions("options", opts);
+    // raylib binding + link ONLY when link_raylib (play). bench/audit/manifest
+    // builds skip this entirely — no raylib module, no GUI frameworks linked.
+    if (raylib_lib) |rl| {
+        exe.root_module.addImport("raylib", raylib_module: {
+            const rl_mod = b.createModule(.{
+                .root_source_file = b.path("src/bindings/raylib.zig"),
+                .target = target,
+                .optimize = optimize,
+                .link_libc = true,
+            });
+            rl_mod.linkLibrary(rl);
+            break :raylib_module rl_mod;
+        });
+    }
+
+    b.installArtifact(exe);
+    return exe;
+}
 
 /// Returns the generator base name for a Halide algorithm, or null if the
 /// algorithm is not Halide. Used both to gate the generator step and to find the .a.

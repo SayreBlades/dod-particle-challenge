@@ -126,20 +126,19 @@ choice rather than a new family. AF02's loop 1
 
 ## Prerequisites
 
-| tool     | why                                                 | version    |
-|----------|-----------------------------------------------------|------------|
-| [Zig]    | the build + the sim                                 | 0.16.0     |
-| [raylib] | the play-mode renderer (git submodule, built)       | (pinned)   |
-| [uv]     | python env management (Halide generator + analysis) | any        |
-| [Make]   | the `make` targets (`make init`, `make build`, …)   | GNU make   |
-| [ffmpeg] | `--record` video export (raw RGBA pipe)             | any        |
-| Xcode    | optional: cycle-attribution profiler backend (`profile.py` → xctrace)  | macOS only |
+| host tool | why                                                  | required? |
+|-----------|------------------------------------------------------|:---------:|
+| [Zig]     | the build + the sim                                  |   yes     |
+| [uv]      | python env (Halide generator + collection + report)  |   yes     |
+| [Make]    | the `make` verbs                                     |   yes     |
+| Xcode (macOS) / perf (Linux) | cycle-attribution profiling (`make profile`) | optional |
+
+Bundled by `make init` (nothing to install by hand): **raylib** (git submodule,
+built from source), **halide + duckdb + zai-sdk** (via `uv sync`).
 
 [Zig]: https://ziglang.org
-[raylib]: https://github.com/raysan5/raylib
 [uv]: https://docs.astral.sh/uv/
 [Make]: https://www.gnu.org/software/make/
-[ffmpeg]: https://ffmpeg.org
 
 ## Setup
 
@@ -156,21 +155,26 @@ the halide algorithms need the `halide` package `uv sync` installs.
 
 ## Build & run
 
-The common actions are `make` targets ([Makefile](Makefile));
-[`scripts/run.py`](scripts/run.py) is the dispatcher underneath:
+The common actions are `make` targets ([Makefile](Makefile)) — a thin verb menu
+over `zig build` (building) and the python scripts (collection + analysis):
 
 ```sh
-make build                                     # build every algorithm into out/
+make build                                     # build every algorithm into out/ (one parallel zig build)
 make build   ML01                              #   …every algorithm of memory layout ML01
-make build   ML01.AF05.LP1-autovec.LP2-simple  #   …one algorithm (use the full ML01.<algo> name)
-make play    ML01.AF05.LP1-autovec.LP2-simple  # open the interactive raylib window
-make profile ML01.AF05.LP1-autovec.LP2-simple  # PMC cycle-attribution (macOS + Xcode)
+make build   ML01.AF02.LP1-autovec.LP2-simple  #   …one algorithm (use the full ML01.<algo> name)
+make play    ML01.AF02.LP1-autovec.LP2-simple  # open the interactive raylib window
+make bench   ML01.AF02.LP1-autovec.LP2-simple  # quick one-point bench table
+make check   ML01.AF02.LP1-autovec.LP2-simple  # invariant suite (PASS/FAIL)
+make profile ML01.AF02.LP1-autovec.LP2-simple  # cycle-attribution, one point (macOS Xcode / Linux perf)
 make report && make serve                      # build + serve the report on http://localhost:8000
 ```
 
-Under the hood each target shells out to
-`zig build -p out -Dmem_layout=<ML> -Dalgo=<algo> -Dmode=<play|bench|audit> -Doptimize=ReleaseFast`,
-producing `out/bin/dod-particles`. The algorithm registry lives in
+Under the hood each target calls
+`zig build -p out -Dselect=<ML|ML.<algo>|all> -Dmode=<play|bench> -Doptimize=ReleaseFast`,
+producing `out/bin/<ML>.<algo>.<mode>` (one binary per algorithm; behavior is
+runtime config). `make build` issues ONE zig invocation that builds every
+selected algorithm in parallel (zig's DAG runner, every core); a stamp gate
+short-circuits it when sources are unchanged. The algorithm registry lives in
 [`build.zig`](build.zig) (`algo_labels`) and [`src/main.zig`](src/main.zig)
 (`sim_map`); the buildable ML01 algorithms are listed in
 [`experiments/sweeps/ML01.algos`](experiments/sweeps/ML01.algos) (or
@@ -179,7 +183,7 @@ producing `out/bin/dod-particles`. The algorithm registry lives in
 Halide algorithms need the `halide` package (`uv sync`); the build runs the generator in
 `src/layouts/ML01/<base>_gen.py` to emit `out/halide/<base>.{h,a}`,
 then links it. For the full `dod-particles` bench-binary flag reference
-(`--json`, `--ns`, `--n`, `--threads`, `--check`, `--record`, `--bandwidth`,
+(`--json`, `--ns`, `--n`, `--threads`, `--check`, `--bandwidth`,
 `-Ddeath`), see [scripts/README.md § Bench binary flags](scripts/README.md#bench-binary-flags).
 
 ## Collect & analyze
@@ -224,8 +228,8 @@ experiments/
   golden/           stage1.bin + frame.sha256 (the byte-exact reference; tracked)
   report.html       the thin SPA (+ report.js + style.css) — machine+thread-scoped, fetches analysis/
 scripts/            all Python — collect.py (orchestrator) + atomics: algo, bench, profile (+ profile_xctrace),
-                    hardware_json; plus build_report, analyze_algo, algo_hash, run.py, sweep_config
-Makefile            make build|play|profile|report|serve|collect (target: algo|mem_layout|all)
+                    hardware_json; plus build_report, analyze_algo, algo_hash, sweep_config
+Makefile            make build|play|bench|check|collect|profile|report|serve (target: algo|mem_layout|all)
 vendor/raylib/      git submodule (the renderer)
 ```
 

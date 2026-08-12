@@ -1,100 +1,113 @@
 # Makefile — common actions for the DoD Particle Challenge.
 #
-# Each target accepts an optional positional target: a full algorithm name
-# (ML01.AF02.LP1-autovec.LP2-simple), a memory layout (ML01), or `all` (default). It's read
-# from any extra goal on the
-# command line, e.g.:
+# A thin verb menu over zig build (building) and python scripts (collection +
+# analysis). No loops, no target resolution — those live in build.zig / the
+# scripts. Positional target: an algorithm (ML01.AF01…), a memory layout (ML01),
+# or all (default).
 #
-#   make init                               # one-time setup: git submodules + python env (uv sync)
-#   make build                              # build every algorithm of every memory layout
-#   make build ML01                           # build every algorithm of ML01
-#   make build ML01.AF02.LP1-autovec.LP2-simple   # build one algorithm (full name; memory layouts share algo names)
-#   make play ML01.AF02.LP1-autovec.LP2-simple    # open the interactive raylib window
-#   make profile ML01.AF02.LP1-autovec.LP2-simple # cycle-attribution, one point (profiler backend: xctrace on macOS)
-#   make report                             # build the analysis tree + verify gate
-#   make serve                              # serve experiments/ on :8000 (open report.html)
-#   make clean                              # remove out/ and worker build dirs
+#   make init               # one-time: submodules + python env
+#   make build [target]     # build bench binaries (algo | ML<layout> | all)
+#   make play  [algo]       # build + open the raylib window
+#   make bench  [algo]      # build + run a quick bench table (one algorithm)
+#   make check  [algo]      # build + run the invariant suite (one algorithm)
+#   make collect [target]   # full sweep: bench + check + profile (prereq: build)
+#   make report             # build the dashboard (duckdb + LLM)
+#   make serve              # view the dashboard on :8000
+#   make profile [algo]     # hardware-counter profiling (macOS Xcode / Linux perf)
+#   make clean              # rm -rf out
 #
-# Heavy data-collection sweeps (timing + check + asm bundle, with parallelism,
-# resume, per-algo JSONL) use scripts/collect.py directly (or `make collect`).
-# Cycle attribution across the grid (the radar's data) is `make collect-profile`;
-# for `--with-profile` (timing + profile in one run) invoke collect.py directly.
-# See scripts/README.md.
-# A raw one-algorithm benchmark (build + run one point, no data append) is
-# `uv run python scripts/run.py bench <algorithm>`, also documented in scripts/README.md.
+# Target is positional & optional. play/bench/check/profile take a single
+# algorithm and default to the ML01 reference (ML01.AF02.LP1-autovec.LP2-simple).
+# `make build JOBS=8` caps zig's compile parallelism (defaults to every core).
 
-# uv run guarantees the project venv (duckdb, zai-sdk, halide — all installed by `uv sync`)
-# for every target and propagates it to child scripts via sys.executable. uv is a
-# documented prerequisite (README §Setup); `uv sync` provisions the env.
-PY := uv run python
+REF := ML01.AF02.LP1-autovec.LP2-simple
+ZIGFLAGS := -p out -Doptimize=ReleaseFast $(if $(JOBS),-j$(JOBS))
 
-# The extra positional goal (if any), with the known targets filtered out.
-KNOWN := init build profile play report serve clean help collect collect-profile
+# Extra positional goal (if any), with known targets filtered out, so
+# `make build ML01` doesn't try to build a file named ML01.
+KNOWN := init build play bench check collect report serve profile clean help
 TARGET := $(filter-out $(KNOWN),$(MAKECMDGOALS))
-
-# `make build ML01` would also try to build ML01 as a file target; neutralize that
-# with a silent no-op recipe so make doesn't print "Nothing to be done".
 $(TARGET): ; @:
 
-.PHONY: init build profile play report serve clean help collect collect-profile
+# Everything that needs the env gets init as an order-only prereq.
+# init is idempotent (submodule update + uv sync are no-ops when up-to-date).
+build play bench check collect report serve profile: | init
 
-# One-time setup: clone/update git submodules (raylib) + create the python venv
-# (duckdb + halide + zai-sdk via uv sync). Idempotent — safe to re-run anytime.
+.PHONY: init build play bench check collect report serve profile clean help
+
+# --- one-time setup (idempotent; safe to re-run) ---
 init:
-	@echo "==> git submodules (update --init --recursive)"
 	git submodule update --init --recursive
-	@test -f vendor/raylib/src/rcore.c || { echo "ERROR: vendor/raylib not populated (submodule init failed)"; exit 1; }
-	@echo "  OK: vendor/raylib populated"
-	@echo "==> python env (uv sync)"
 	uv sync
-	@echo "==> done. Next: 'make build ML01' or 'make help'."
 
-build:
-	$(PY) scripts/run.py build $(TARGET)
+# --- build bench binaries (timestamp-gated: skips entirely when sources are unchanged) ---
+# Coarse source prereq -> stamp gate -> ONE zig invocation. make short-circuits
+# (~50ms, no zig call) when the stamp is newer than every source; when stale,
+# zig's DAG runner compiles all selected algos in parallel (every core) and its
+# content cache rebuilds only what actually changed. NOT per-algo make targets:
+# each would be a separate `zig build` (many configure passes + .zig-cache
+# contention under -j — slower). The stamp is keyed by TARGET so build-ML01 /
+# build-all / build-<algo> don't share state.
+SOURCES := $(shell find src -name '*.zig') $(shell find src -name '*_gen.py') build.zig
+BUILD_STAMP := out/.build-$(or $(TARGET),all)-stamp
+build: $(BUILD_STAMP)
+$(BUILD_STAMP): $(SOURCES)
+	@mkdir -p out
+	zig build -Dselect=$(or $(TARGET),all) -Dmode=bench $(ZIGFLAGS) --summary all
+	@touch $(BUILD_STAMP)
 
+# --- interactive raylib window ---
 play:
-	$(PY) scripts/run.py play $(TARGET) $(if $(N),--n $(N))
+	zig build -Dselect=$(or $(TARGET),$(REF)) -Dmode=play $(ZIGFLAGS)
+	./out/bin/$(or $(TARGET),$(REF)).play $(if $(N),--n $(N))
 
-profile:
-	$(PY) scripts/run.py profile $(TARGET)
+# --- quick one-algorithm bench table (no JSONL, no sweep) ---
+bench:
+	zig build -Dselect=$(or $(TARGET),$(REF)) -Dmode=bench $(ZIGFLAGS)
+	./out/bin/$(or $(TARGET),$(REF)).bench --n 1000000 --q 0.1 --threads 1 --iters 100 --trial 1
 
+# --- invariant suite, one algorithm (default REF) ---
+check:
+	zig build -Dselect=$(or $(TARGET),$(REF)) -Dmode=bench $(ZIGFLAGS)
+	./out/bin/$(or $(TARGET),$(REF)).bench --check --q 0 --threads 1
+
+# --- full sweep: bench + check + profile per unit. Builds first. ---
+# profile is Mac-gated (xctrace); on Linux it degrades gracefully (no profile
+# rows, timing+check still run). Narrow via env: NS, TRIALS, THREADS,
+# DEATH_RATES, PROFILE_NS, PROFILE_THREADS, PROFILE_DEATH_RATES, PROFILE=0.
+collect: build
+	uv run python scripts/collect.py $(TARGET) --with-profile
+
+# --- analysis tree + verify gate (needs duckdb — runs under uv) ---
 report:
-	$(PY) scripts/build_report.py
+	uv run python scripts/build_report.py
 
+# --- serve the SPA ---
 serve:
-	@echo "serving experiments/ on http://localhost:8000 (open report.html)"
-	$(PY) -m http.server -d experiments 8000
+	uv run python -m http.server -d experiments 8000
+
+# --- hardware-counter profiling, one point (macOS: Xcode/xctrace; Linux: perf) ---
+profile:
+	uv run python scripts/profile.py $(or $(TARGET),$(REF)) --n 1000000 --q 0.1 --threads 1 --trial 1
 
 clean:
 	rm -rf out out.w*
 
-# Data-collection sweep (see scripts/README.md). Target is a memory layout (ML01), a
-# algorithm (ML01.AF02.LP1-autovec.LP2-simple), or empty = all memory layouts.
-collect:
-	$(PY) scripts/collect.py $(TARGET)
-
-# Cycle-attribution grid sweep (the radar's data; profiler backend, e.g. xctrace
-# on macOS). A separate target because `--only profile` would collide with the
-# `make profile` target name if threaded through `make collect ... --`.
-collect-profile:
-	$(PY) scripts/collect.py $(TARGET) --only profile
-
 help:
 	@echo "DoD Particle Challenge — common actions"
 	@echo ""
-	@echo "  make init               one-time setup: git submodules + python env (uv sync)"
-	@echo "  make build [target]     build algorithms into out/ (target: algorithm|memory layout|all)"
-	@echo "  make play  [algorithm]       open the interactive raylib window (N=<count> to size particles)"
-	@echo "  make profile [algorithm]     cycle-attribution, one point (profiler backend)"
-	@echo "  make report             build experiments/analysis/ + run the verify gate"
-	@echo "  make serve              serve experiments/ (open report.html)"
-	@echo "  make clean              rm -rf out out.w*"
+	@echo "  make init               one-time: submodules + python env (uv sync)"
+	@echo "  make build [target]     build bench binaries (algo | ML<layout> | all)"
+	@echo "  make play  [algo]       open the interactive raylib window (N=<count> to size)"
+	@echo "  make bench  [algo]      quick one-algorithm bench table"
+	@echo "  make check  [algo]      run the invariant suite (one algorithm)"
+	@echo "  make collect [target]   full sweep: bench + check + profile (builds first)"
+	@echo "  make report             build the dashboard (duckdb + LLM narratives)"
+	@echo "  make serve              serve experiments/ on :8000"
+	@echo "  make profile [algo]     hardware-counter profiling, one point (macOS Xcode / Linux perf)"
+	@echo "  make clean              rm -rf out"
 	@echo ""
-	@echo "  make collect [target]           data-collection sweep (timing + check + asm; target: algorithm|memory layout|all)"
-	@echo "  make collect-profile [target]   cycle-attribution grid sweep (the radar's data; profiler backend)"
-	@echo "  (for --with-profile, run: uv run python scripts/collect.py <target> --with-profile)"
-	@echo ""
-	@echo "Target may be an algorithm (ML01.AF02.LP1-autovec.LP2-simple), a memory layout (ML01),"
-	@echo "a memory layout (ML01), or all (default). See scripts/README.md for details."
+	@echo "  JOBS=8 caps build parallelism (default: every core)"
+	@echo "  Target is positional & optional: ML01.AF02.LP1-autovec.LP2-simple | ML01 | all."
 
 .DEFAULT_GOAL := help

@@ -87,7 +87,7 @@ def profile_point(algo, n, q, threads, trial=1, iters=None, machine_id=None,
         log(f"  skip {algo} N={n} q={q} T={threads} (current source_hash present)")
         return None
 
-    bp = bench.build_binary(algo, machine_id, host)
+    bp = bench.build_binary(algo)
     iters = iters or sweep_config.iters_for(n)
     mod = __import__(BACKENDS[chosen])
     raw = mod.measure(algo, n, q, threads, iters, trial, bp)

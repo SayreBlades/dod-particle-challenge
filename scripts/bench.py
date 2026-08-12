@@ -58,20 +58,20 @@ def bin_path(algo):
     return os.path.join(OUT, "bin", f"{algo}.bench")
 
 
-def build_binary(algo, machine_id, host):
-    """Build the bench binary into out/bin/. Always runs `zig build` — it's
-    idempotent (zig's cache keys on -Dsource_hash, so a source change forces a
-    rebuild; an unchanged source is a fast cache hit). Skipping on os.path.exists
-    would serve a stale binary after a source edit."""
+def build_binary(algo):
+    """Ensure the bench binary exists in out/bin/. Build-if-missing via -Dselect
+    (pure-zig). `make collect` relies on `make build` (the prereq) for the
+    authoritative parallel multi-build; this is a fallback for standalone atom
+    use. Staleness caveat: after a source edit, run `make build` (its stamp gate
+    rebuilds) rather than relying on this."""
     bp = bin_path(algo)
-    mem_layout, algo_part = split_algo(algo)
-    shash = source_hash(algo)
+    if os.path.exists(bp):
+        return bp
     env = os.environ.copy()
-    if "LP1-halide" in algo_part:
+    if "LP1-halide" in algo:
         env.setdefault("HALIDE_PYTHON", sys.executable)
-    cmd = ["zig", "build", "-p", OUT, f"-Dmem_layout={mem_layout}", f"-Dalgo={algo_part}",
-           "-Dmode=bench", "-Doptimize=ReleaseFast", f"-Dsource_hash={shash}",
-           f"-Dmachine_id={machine_id}", f"-Dhost={host}", "-Dhalide_prefix=out/halide"]
+    cmd = ["zig", "build", "-p", OUT, f"-Dselect={algo}",
+           "-Dmode=bench", "-Doptimize=ReleaseFast", "-Dhalide_prefix=out/halide"]
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, env=env)
     if r.returncode != 0 or not os.path.exists(bp):
         sys.exit(f"build failed for {algo}:\n" + (r.stderr or r.stdout)[-800:])
@@ -105,11 +105,12 @@ def have_points(runs_jsonl, algo, q, threads, shash):
     return have
 
 
-def run_point(bp, n, q, threads, iters, warmup, trial, run_id, ts_utc):
+def run_point(bp, n, q, threads, iters, warmup, trial, run_id, ts_utc, machine_id, host, shash):
     """Run one timing point; return the parsed json row dict (or None)."""
     cmd = [bp, "--n", str(n), "--q", str(q), "--threads", str(threads),
            "--iters", str(iters), "--warmup", str(warmup), "--trial", str(trial),
-           "--json", "--run-id", run_id, "--ts-utc", ts_utc]
+           "--json", "--run-id", run_id, "--ts-utc", ts_utc,
+           "--machine-id", machine_id, "--host", host, "--source-hash", shash]
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
     for line in (r.stdout + r.stderr).splitlines():
         if line.startswith("json,"):
@@ -152,7 +153,7 @@ def bench_column(algo, q, threads, n_list=None, trials=None, machine_id=None,
     machine_id = machine_id_arg(machine_id)
     host = host_of(machine_id)
     shash = source_hash(algo)
-    bp = build_binary(algo, machine_id, host)
+    bp = build_binary(algo)
     n_list = n_list or sweep_config.N_GRID
     trials = trials if trials is not None else 3
     now = datetime.datetime.now(datetime.timezone.utc)
@@ -171,7 +172,7 @@ def bench_column(algo, q, threads, n_list=None, trials=None, machine_id=None,
                 log(f"  skip {algo} N={n} trial={trial} (current source_hash present)")
                 continue
             log(f"  bench {algo} q={q} T={threads} N={n} trial={trial}")
-            row = run_point(bp, n, q, threads, iters, warmup, trial, run_id, ts_utc)
+            row = run_point(bp, n, q, threads, iters, warmup, trial, run_id, ts_utc, machine_id, host, shash)
             if row:
                 rows.append(row)
     log(f"  check {algo} q={q} T={threads}")

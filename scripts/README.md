@@ -26,9 +26,9 @@ measurements written by a few **atomic** scripts. `experiments/analysis/` is
 | [`analyze_algo.py`](#analyze_algopy) | per-algorithm: evidence `<algo>.json` + LLM narrative `<algo>.md` (reads asm from `data/`) |
 | [`algo_hash.py`](#algo_hashpy) | an algorithm's `@import`-closure SHA-256 → `source_hash` |
 | [`sweep_config.py`](#sweep_configpy) | the regime grid (N list, iters/warmup schedule, death rates) — single source |
-| [`run.py`](#runpy) | build / play / profile dispatcher (backing `make`) + raw one-point `bench` |
-
-Removed: `pmc_collect.py`/`pmc_sweep.py` (→ `profile.py`/`profile_xctrace.py`),
+Removed: `run.py` (resolution → `build.zig -Dselect`; verbs → the Makefile),
+`hardware_profile.py` (trivial printer over `hardware_json.py`),
+`pmc_collect.py`/`pmc_sweep.py` (→ `profile.py`/`profile_xctrace.py`),
 `migrate_data.py` (one-time, done). `migrate_to_per_algo.py` is a one-time
 cutover script (legacy `runs.jsonl`/`checks.jsonl` → per-algo files).
 
@@ -53,7 +53,7 @@ error (no silent default run).
 - **Timing (default)** requires `--n`, `--q`, `--threads`, `--iters`, `--trial`;
   `--warmup` (default 5) and `--json` (emit the row) are optional.
 - `--check` requires `--q`, `--threads` (runs the invariant suite, prints `checked=PASS|FAIL`).
-- `--bandwidth` / `--record` are standalone modes (streaming-BW microbench / ffmpeg video).
+- `--bandwidth` is a standalone mode (streaming-BW microbench).
 - `q` is **runtime** (one binary sweeps the whole death axis; `-Ddeath` is just the build default).
 
 ---
@@ -87,7 +87,6 @@ failure.
 | `TRIALS` | `3` | trials per point (the report keeps the min) |
 | `DEATH_RATES` | `0.01 0.05 0.1 0.25 0.5` (from `death_rates.txt`) | space-list of accident rates q |
 | `THREADS` | `1 2 4 8` | space-list; **parallel algorithms only** (serial algorithms run T=1) |
-| `PARALLEL` | *(cpu count)* | phase-1 build workers (zig's cache is concurrency-safe) |
 | `SKIP_DONE` | `1` | skip points already present at the current `source_hash` (resume) |
 | `REFRESH_HW` | `0` | rewrite `hardware.json` (re-measure `streaming_bw_gbs`) |
 | `VERBOSE` | `0` | `1` = per-step chatter instead of the live progress bar |
@@ -220,20 +219,6 @@ The regime grid — single source of truth (replaces the bench binary's old
 hardcoded `SWEEP`/`ITERS_PER_N`/`WARMUP_PER_N` consts): `N_GRID`, the per-N
 `ITERS`/`WARMUP` schedules, `THREADS_DEFAULT`, and `death_rates()`. Imported by
 both `collect.py` and `bench.py`.
-
-## run.py
-
-Build / play / profile dispatcher backing `make` (`make build`, `make play`,
-`make profile`). Also has a `bench` subcommand for a **raw one-point measurement**
-(build + run one point, no data append) — intentionally not a make target, since
-at the make level measurement is [`collect.py`](#collectpy).
-
-```sh
-uv run python scripts/run.py build ML01
-uv run python scripts/run.py play ML01.AF02.LP1-autovec.LP2-simple
-uv run python scripts/run.py profile ML01.AF02.LP1-autovec.LP2-simple   # one cycle point
-uv run python scripts/run.py bench ML01.AF02.LP1-autovec.LP2-simple     # one timing point, no append
-```
 
 ---
 
