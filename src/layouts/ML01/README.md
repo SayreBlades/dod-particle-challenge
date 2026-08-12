@@ -87,32 +87,33 @@ Every frame is built from five stages; an algorithm family fuses them into loops
 
 ### The loop-types
 
-Algorithm families fuse those stages into 1–3 loops. There are 9 distinct loop-types
+Algorithm families fuse those stages into 1–4 loops. There are 9 distinct loop-types
 by stage composition; an algorithm is a choice of loop-type per loop plus a
-per-loop axis assignment.
+per-loop axis assignment. (AF06 spans the mask/list/partition intermediates —
+each is its own loop-type below but shares the family's [I,D][R][N] topology.)
 
 | loop-type | stages fused | appears in | notes |
 |---|---|---|---|
-| **math** | Integrate | AF02·w1, AF06·w1 | per-particle independent → trivially data-parallel |
-| **math+decide+respawn** | Integrate+Decide+Respawn | AF01·w1, AF05·w1 | the "full" loop; the respawn branch is what branchy/blend differ on |
-| **decide+respawn** | Decide+Respawn | AF02·w2 | re-reads `age` across the seam — the cost AF03's mask was invented to kill |
-| **math+decide→mask** | Integrate+Decide → 1 B/p mask | AF03·w1, AF07·w1 | the mask is what makes the respawn loop parallelizable |
-| **mask-scan+respawn** | scan mask, respawn where set | AF03·w2, AF07·w2 | index-order → bit-exact; ranked-merge parallelizes it |
-| **math+decide→list** | Integrate+Decide → compact idx[] | AF04·w1, AF08·w1 | variable-length append → irregular, not Halide-expressible |
-| **respawn-dead-only** | loop the dead list, respawn each | AF04·w2, AF08·w2 | O(dead) not O(N) → wins at rare death, loses at common |
-| **render** | splat | AF01·w2, AF02·w3, AF03·w3, AF04·w3, AF08·w3 | `simple` (per-pixel) or `opt` (LUT + NEON `uqadd`); byte-identical |
-| **fused** | render inlined into the physics loop | AF05·w1, AF06·w2, AF07·w2, AF08·w2 | reads post-respawn pos from a register before eviction — the fusion win |
+| **math** | Integrate | AF04·w1, AF05·w1 | per-particle independent → trivially data-parallel |
+| **math+decide+respawn** | Integrate+Decide+Respawn | AF01·w1, AF02·w1 | the "full" loop; the respawn branch is what branchy/blend differ on |
+| **decide+respawn** | Decide+Respawn | AF05·w2 | re-reads `age` across the seam — the cost AF06's mask was invented to kill |
+| **math+decide→mask** | Integrate+Decide → 1 B/p mask | AF03·w1, AF06·w1 (mask) | the mask is what makes the respawn loop parallelizable |
+| **mask-scan+respawn** | scan mask, respawn where set | AF03·w2, AF06·w2 (mask) | index-order → bit-exact; ranked-merge parallelizes it |
+| **math+decide→list** | Integrate+Decide → compact idx[] | AF06·w1 (list, list-fused) | variable-length append → irregular, not Halide-expressible |
+| **respawn-dead-only** | loop the dead list, respawn each | AF06·w2 (list, list-fused) | O(dead) not O(N) → wins at rare death, loses at common |
+| **render** | splat | AF02·w2, AF05·w3, AF06·w3 (mask/list) | `simple` (per-pixel) or `opt` (LUT + NEON `uqadd`); byte-identical |
+| **fused** | render inlined into the physics loop | AF01·w1, AF03·w2, AF04·w2, AF06·w2 (list-fused) | reads post-respawn pos from a register before eviction — the fusion win |
 
 ### The per-loop axes
 
 Each loop carries four attributes (declared in the algorithm's `algo_meta`):
 
 - **impl** — `zig` or `halide`. Halide only where expressible: it cannot do
-  irregular list appends (AF04/AF08 list loops), fused framebuffer scatter
-  (AF05–AF08 fused loops), or branchy respawn (`select` is branchless).
+  irregular list appends (AF06 list variants), fused framebuffer scatter
+  (AF01/AF03/AF04/AF06 fused loops), or branchy respawn (`select` is branchless).
 - **schedule** — for compute loops: `scalar` (asm-boxed de-vec control),
   `auto` (let LLVM vectorize), `unroll` (manual loop unroll-by-4 via `inline for`;
-  isolates the unroll knob — see AF01.LP1-unroll), `vw4` (explicit `@Vector`); for Halide
+  isolates the unroll knob — see AF02.LP1-unroll), `vw4` (explicit `@Vector`); for Halide
   compute loops: `vw{1,2,4,8}` (vector width over the particle dim); for
   render loops: `simple` or `opt`; for fused loops: `fused`.
 - **variant** — only respawn-bearing loops: `branchy` (if-dead → respawn,
@@ -137,97 +138,103 @@ Each loop is written `impl·sched·variant·parallel`; loops separated by ` | `.
 
 ### The algorithms
 
+Grouped by family (AF01–AF06). Built algorithms (✓) link to source; the rest
+(✗) are expressible but not built. **AF06** spans the mask/list/partition
+intermediates — every AF06 entry carries the intermediate in the LP2 token
+(`LP2-mask` / `LP2-list` / `LP2-list-fused`).
+
 | algorithm | ex | loops |
 |---|---|---|
-| [AF01.LP1-scalar.LP2-simple](AF01.LP1-scalar.LP2-simple.zig) | ✓ | z·S·by·· \| z·simple·· |
-| [AF01.LP1-unroll.LP2-simple](AF01.LP1-unroll.LP2-simple.zig) | ✓ | z·U·by·· \| z·simple·· |
-| [AF01.LP1-autovec.LP2-simple](AF01.LP1-autovec.LP2-simple.zig) | ✓ | z·A·by·· \| z·simple·· |
-| [AF01.LP1-autovec.LP2-opt](AF01.LP1-autovec.LP2-opt.zig) | ✓ | z·A·by·· \| z·opt·· |
-| [AF01.LP1-autovec-par.LP2-simple](AF01.LP1-autovec-par.LP2-simple.zig) | ✓ | z·A·by·dp \| z·simple·· |
-| [AF01.LP1-blend.LP2-simple](AF01.LP1-blend.LP2-simple.zig) | ✓ | z·A·br·· \| z·simple·· |
-| [AF01.LP1-blend-par.LP2-simple](AF01.LP1-blend-par.LP2-simple.zig) | ✓ | z·A·br·dp \| z·simple·· |
-| [AF01.LP1-halide.LP2-simple](AF01.LP1-halide.LP2-simple.zig) | ✓ | h·1·br·· \| z·simple·· |
-| [AF01.LP1-halide.LP2-opt](AF01.LP1-halide.LP2-opt.zig) | ✓ | h·1·br·· \| z·opt·· |
-| [AF01.LP1-halide-par.LP2-simple](AF01.LP1-halide-par.LP2-simple.zig) | ✓ | h·1·br·dp \| z·simple·· |
-| `AF01.LP1-halide-vw4.LP2-simple` | ✗ | h·4·br·· \| z·simple·· |
-| `AF01.LP1-halide-vw2.LP2-simple` | ✗ | h·2·br·· \| z·simple·· |
-| `AF01.LP1-halide-vw8.LP2-simple` | ✗ | h·8·br·· \| z·simple·· |
-| `AF01.LP1-halide-vw4.LP2-opt` | ✗ | h·4·br·· \| z·opt·· |
-| `AF01.LP1-halide-vw4-par.LP2-simple` | ✗ | h·4·br·dp \| z·simple·· |
-| `AF01.LP1-halide-vw2-par.LP2-simple` | ✗ | h·2·br·dp \| z·simple·· |
-| `AF01.LP1-halide-vw8-par.LP2-simple` | ✗ | h·8·br·dp \| z·simple·· |
-| `AF01.LP1-halide-vw2.LP2-opt` | ✗ | h·2·br·· \| z·opt·· |
-| `AF01.LP1-halide-vw8.LP2-opt` | ✗ | h·8·br·· \| z·opt·· |
-| `AF01.LP1-scalar-par.LP2-simple` | ✗ | z·S·by·dp \| z·simple·· |
-| `AF01.LP1-blend.LP2-opt` | ✗ | z·A·br·· \| z·opt·· |
-| `AF01.LP1-blend-scalar.LP2-simple` | ✗ | z·S·br·· \| z·simple·· |
-| `AF01.LP1-vw4.LP2-simple` | ✗ | z·V4·by·· \| z·simple·· |
-| `AF01.LP1-scalar.LP2-opt` | ✗ | z·S·by·· \| z·opt·· |
-| `AF01.LP1-autovec-par.LP2-opt` | ✗ | z·A·by·dp \| z·opt·· |
-| `AF01.LP1-blend-par.LP2-opt` | ✗ | z·A·br·dp \| z·opt·· |
-| `AF01.LP1-vw4.{LP2-opt, LP2-par-simple, LP2-par-opt}` (3) | ✗ | z·V4·by·{·,dp} \| z·{simple,opt} |
-| `AF01.LP1-halide-vw{2,4,8}-par.LP2-opt` (3) | ✗ | h·{2,4,8}·br·dp \| z·opt |
-| `AF01.LP1-⟨each loop-1⟩.LP2-{simple,opt}-rr` (~18) | ✗ | … \| z·{simple,opt}··rr |
-| [AF02.LP1-autovec.LP2-simple](AF02.LP1-autovec.LP2-simple.zig) | ✓ | z·A··· \| z·A·by·· \| z·simple·· |
-| [AF02.LP1-autovec-par.LP2-simple](AF02.LP1-autovec-par.LP2-simple.zig) | ✓ | z·A···dp \| z·A·by·· \| z·simple·· |
-| [AF02.LP1-halide.LP2-simple](AF02.LP1-halide.LP2-simple.zig) | ✓ | h·1··· \| z·A·by·· \| z·simple·· |
-| [AF02.LP1-halide-par.LP2-simple](AF02.LP1-halide-par.LP2-simple.zig) | ✓ | h·1···dp \| z·A·by·· \| z·simple·· |
-| `AF02.LP1-halide-vw4.LP2-simple` | ✗ | h·4··· \| z·A·by·· \| z·simple·· |
-| `AF02.LP1-halide-vw2.LP2-simple` | ✗ | h·2··· \| … |
-| `AF02.LP1-halide-vw8.LP2-simple` | ✗ | h·8··· \| … |
-| `AF02.LP1-halide-vw4-par.LP2-simple` | ✗ | h·4···dp \| … |
-| `AF02.LP1-halide-vw{2,8}-{,par}.LP2-simple` + `vw4.LP2-opt` (5) | ✗ | various |
-| `AF02.LP1-scalar.LP2-simple` | ✗ | z·S··· \| z·A·by·· \| z·simple·· |
-| `AF02.LP1-vw4.LP2-simple` | ✗ | z·V4··· \| … |
-| `AF02.LP2-blend.LP3-simple` | ✗ | … \| z·A·br·· \| z·simple·· |
-| `AF02.LP2-blend-par.LP3-simple` | ✗ | … \| z·A·br·dp \| z·simple·· |
-| `AF02.LP3-render_reduce` family (~8) | ✗ | … \| z·{simple,opt}··rr |
-| [AF03.LP1-autovec.LP2-simple](AF03.LP1-autovec.LP2-simple.zig) | ✓ | z·A··· \| z·A·or·· \| z·simple·· |
-| [AF03.LP1-autovec-par.LP2-rmerge](AF03.LP1-autovec-par.LP2-rmerge.zig) | ✓ | z·A···dp \| z·A·or·rm \| z·simple·· |
-| [AF03.LP1-halide.LP2-simple](AF03.LP1-halide.LP2-simple.zig) | ✓ | h·1··· \| z·A·or·· \| z·simple·· |
-| `AF03.LP1-halide-vw4.LP2-simple` | ✗ | h·4··· \| z·A·or·· \| z·simple·· |
-| `AF03.LP1-halide-vw2.LP2-simple` | ✗ | h·2··· \| … |
-| `AF03.LP1-halide-vw8.LP2-simple` | ✗ | h·8··· \| … |
-| `AF03.LP1-halide-par.LP2-rmerge` | ✗ | h·{1,4}···dp \| z·A·or·rm \| z·simple·· |
-| `AF03.LP1-halide-vw4-par.LP2-rmerge` | ✗ | h·4···dp \| z·A·or·rm \| z·simple·· |
-| `AF03.LP1-halide-vw{2,8}-{,par}.LP2-{simple,rmerge}` (3) | ✗ | various |
-| `AF03.LP1-scalar.LP2-simple` | ✗ | z·S··· \| z·A·or·· \| z·simple·· |
-| `AF03.LP1-vw4.LP2-simple` | ✗ | z·V4··· \| … |
-| `AF03.LP2-scalar` | ✗ | … \| z·S·or·· \| … |
-| `AF03.LP3-render_reduce` family (~8) | ✗ | … \| z·{simple,opt}··rr |
-| [AF04.LP1-autovec.LP2-simple](AF04.LP1-autovec.LP2-simple.zig) | ✓ | z·A··· \| z·A·or·· \| z·simple·· |
-| [AF04.LP1-autovec-par.LP2-rmerge](AF04.LP1-autovec-par.LP2-rmerge.zig) | ✓ | z·A···dp \| z·A·or·rm \| z·simple·· |
-| `AF04.LP1-scalar.LP2-simple` | ✗ | z·S··· \| z·A·or·· \| z·simple·· |
-| `AF04.LP1-vw4.LP2-simple` | ✗ | z·V4··· \| … |
-| `AF04.LP1-scalar-par.LP2-rmerge` | ✗ | z·S···dp \| z·A·or·rm \| … |
-| `AF04.LP2-scalar` | ✗ | … \| z·S·or·· \| … |
-| `AF04.LP3-render_reduce` family (~4) | ✗ | … \| z·{simple,opt}··rr |
-| [AF05.LP1-fused](AF05.LP1-fused.zig) | ✓ | z·F·by·· |
-| `AF05.LP1-scalar-fused` | ✗ | z·(boxed-math)·by·· |
-| `AF05.LP1-blend-fused` | ✗ | z·F·br·· |
-| `AF05.LP1-fused-par` | ✗ | z·F·by·(dp+rr) |
-| `AF05.LP1-blend-fused-par` | ✗ | z·F·br·(dp+rr) |
-| `AF05.LP1-vw4-fused` | ✗ | z·V4·by·· |
-| [AF06.LP1-autovec.LP2-fused](AF06.LP1-autovec.LP2-fused.zig) | ✓ | z·A··· \| z·F·by·· |
-| `AF06.LP1-halide.LP2-fused` | ✗ | h·1··· \| z·F·by·· |
-| `AF06.LP1-halide-vw4.LP2-fused` | ✗ | h·4··· \| z·F·by·· |
-| `AF06.LP1-halide-par.LP2-fused` | ✗ | h·{1,4}···dp \| z·F·by·· |
-| `AF06.LP1-halide-vw{2,8}.{,par}.LP2-fused` (4) | ✗ | various |
-| `AF06.LP2-fused-par` | ✗ | z·A···{,dp} \| z·F·by·rr |
-| `AF06.LP2-blend-fused` | ✗ | z·A··· \| z·F·br·· |
-| `AF06.LP2-blend-fused-par` | ✗ | z·A··· \| z·F·br·(dp+rr) |
-| `AF06.LP1-scalar.LP2-fused` | ✗ | z·S··· \| z·F·by·· |
+| **AF01** — Integrate+Decide+Respawn+Render (1 loop, fully fused) | | |
+| [AF01.LP1-fused](AF01.LP1-fused.zig) | ✓ | z·F·by·· |
+| `AF01.LP1-scalar-fused` | ✗ | z·(boxed-math)·by·· |
+| `AF01.LP1-blend-fused` | ✗ | z·F·br·· |
+| `AF01.LP1-fused-par` | ✗ | z·F·by·(dp+rr) |
+| `AF01.LP1-blend-fused-par` | ✗ | z·F·br·(dp+rr) |
+| `AF01.LP1-vw4-fused` | ✗ | z·V4·by·· |
+| **AF02** — Integrate+Decide+Respawn \| Render (the reference family) | | |
+| [AF02.LP1-scalar.LP2-simple](AF02.LP1-scalar.LP2-simple.zig) | ✓ | z·S·by·· \| z·simple·· |
+| [AF02.LP1-unroll.LP2-simple](AF02.LP1-unroll.LP2-simple.zig) | ✓ | z·U·by·· \| z·simple·· |
+| [AF02.LP1-autovec.LP2-simple](AF02.LP1-autovec.LP2-simple.zig) | ✓ | z·A·by·· \| z·simple·· |
+| [AF02.LP1-autovec.LP2-opt](AF02.LP1-autovec.LP2-opt.zig) | ✓ | z·A·by·· \| z·opt·· |
+| [AF02.LP1-autovec-par.LP2-simple](AF02.LP1-autovec-par.LP2-simple.zig) | ✓ | z·A·by·dp \| z·simple·· |
+| [AF02.LP1-blend.LP2-simple](AF02.LP1-blend.LP2-simple.zig) | ✓ | z·A·br·· \| z·simple·· |
+| [AF02.LP1-blend-par.LP2-simple](AF02.LP1-blend-par.LP2-simple.zig) | ✓ | z·A·br·dp \| z·simple·· |
+| [AF02.LP1-halide.LP2-simple](AF02.LP1-halide.LP2-simple.zig) | ✓ | h·1·br·· \| z·simple·· |
+| [AF02.LP1-halide.LP2-opt](AF02.LP1-halide.LP2-opt.zig) | ✓ | h·1·br·· \| z·opt·· |
+| [AF02.LP1-halide-par.LP2-simple](AF02.LP1-halide-par.LP2-simple.zig) | ✓ | h·1·br·dp \| z·simple·· |
+| `AF02.LP1-halide-vw4.LP2-simple` | ✗ | h·4·br·· \| z·simple·· |
+| `AF02.LP1-halide-vw2.LP2-simple` | ✗ | h·2·br·· \| z·simple·· |
+| `AF02.LP1-halide-vw8.LP2-simple` | ✗ | h·8·br·· \| z·simple·· |
+| `AF02.LP1-halide-vw4.LP2-opt` | ✗ | h·4·br·· \| z·opt·· |
+| `AF02.LP1-halide-vw4-par.LP2-simple` | ✗ | h·4·br·dp \| z·simple·· |
+| `AF02.LP1-halide-vw2-par.LP2-simple` | ✗ | h·2·br·dp \| z·simple·· |
+| `AF02.LP1-halide-vw8-par.LP2-simple` | ✗ | h·8·br·dp \| z·simple·· |
+| `AF02.LP1-halide-vw2.LP2-opt` | ✗ | h·2·br·· \| z·opt·· |
+| `AF02.LP1-halide-vw8.LP2-opt` | ✗ | h·8·br·· \| z·opt·· |
+| `AF02.LP1-scalar-par.LP2-simple` | ✗ | z·S·by·dp \| z·simple·· |
+| `AF02.LP1-blend.LP2-opt` | ✗ | z·A·br·· \| z·opt·· |
+| `AF02.LP1-blend-scalar.LP2-simple` | ✗ | z·S·br·· \| z·simple·· |
+| `AF02.LP1-vw4.LP2-simple` | ✗ | z·V4·by·· \| z·simple·· |
+| `AF02.LP1-scalar.LP2-opt` | ✗ | z·S·by·· \| z·opt·· |
+| `AF02.LP1-autovec-par.LP2-opt` | ✗ | z·A·by·dp \| z·opt·· |
+| `AF02.LP1-blend-par.LP2-opt` | ✗ | z·A·br·dp \| z·opt·· |
+| `AF02.LP1-vw4.{LP2-opt, LP2-par-simple, LP2-par-opt}` (3) | ✗ | z·V4·by·{·,dp} \| z·{simple,opt} |
+| `AF02.LP1-halide-vw{2,4,8}-par.LP2-opt` (3) | ✗ | h·{2,4,8}·br·dp \| z·opt |
+| `AF02.LP1-⟨each loop-1⟩.LP2-{simple,opt}-rr` (~18) | ✗ | … \| z·{simple,opt}··rr |
+| **AF03** — Integrate+Decide \| Respawn+Render | | |
+| [AF03.LP1-autovec.LP2-fused](AF03.LP1-autovec.LP2-fused.zig) | ✓ | z·A··· \| z·F·or·· |
+| `AF03.LP1-halide.LP2-fused` | ✗ | h·1··· \| z·F·or·· |
+| `AF03.LP1-halide-vw4.LP2-fused` | ✗ | h·4··· \| z·F·or·· |
+| `AF03.LP1-halide-par.LP2-fused` | ✗ | h·{1,4}···dp \| z·F·or·· |
+| `AF03.LP1-halide-vw{2,8}.{,par}.LP2-fused` (4) | ✗ | various |
+| `AF03.LP2-fused-par` | ✗ | z·A···{,dp} \| z·F·or·(rm+rr) |
+| `AF03.LP1-scalar.LP2-fused` | ✗ | z·S··· \| z·F·or·· |
+| `AF03.LP1-vw4.LP2-fused` | ✗ | z·V4··· \| … |
+| **AF04** — Integrate \| Decide+Respawn+Render | | |
+| [AF04.LP1-autovec.LP2-fused](AF04.LP1-autovec.LP2-fused.zig) | ✓ | z·A··· \| z·F·by·· |
+| `AF04.LP1-halide.LP2-fused` | ✗ | h·1··· \| z·F·by·· |
+| `AF04.LP1-halide-vw4.LP2-fused` | ✗ | h·4··· \| z·F·by·· |
+| `AF04.LP1-halide-par.LP2-fused` | ✗ | h·{1,4}···dp \| z·F·by·· |
+| `AF04.LP1-halide-vw{2,8}.{,par}.LP2-fused` (4) | ✗ | various |
+| `AF04.LP2-fused-par` | ✗ | z·A···{,dp} \| z·F·by·rr |
+| `AF04.LP2-blend-fused` | ✗ | z·A··· \| z·F·br·· |
+| `AF04.LP2-blend-fused-par` | ✗ | z·A··· \| z·F·br·(dp+rr) |
+| `AF04.LP1-scalar.LP2-fused` | ✗ | z·S··· \| z·F·by·· |
+| `AF04.LP1-vw4.LP2-fused` | ✗ | z·V4··· \| … |
+| **AF05** — Integrate \| Decide+Respawn \| Render (the natural seam) | | |
+| [AF05.LP1-autovec.LP2-simple](AF05.LP1-autovec.LP2-simple.zig) | ✓ | z·A··· \| z·A·by·· \| z·simple·· |
+| [AF05.LP1-autovec-par.LP2-simple](AF05.LP1-autovec-par.LP2-simple.zig) | ✓ | z·A···dp \| z·A·by·· \| z·simple·· |
+| [AF05.LP1-halide.LP2-simple](AF05.LP1-halide.LP2-simple.zig) | ✓ | h·1··· \| z·A·by·· \| z·simple·· |
+| [AF05.LP1-halide-par.LP2-simple](AF05.LP1-halide-par.LP2-simple.zig) | ✓ | h·1···dp \| z·A·by·· \| z·simple·· |
+| `AF05.LP1-halide-vw4.LP2-simple` | ✗ | h·4··· \| z·A·by·· \| z·simple·· |
+| `AF05.LP1-halide-vw2.LP2-simple` | ✗ | h·2··· \| … |
+| `AF05.LP1-halide-vw8.LP2-simple` | ✗ | h·8··· \| … |
+| `AF05.LP1-halide-vw4-par.LP2-simple` | ✗ | h·4···dp \| … |
+| `AF05.LP1-halide-vw{2,8}-{,par}.LP2-simple` + `vw4.LP2-opt` (5) | ✗ | various |
+| `AF05.LP1-scalar.LP2-simple` | ✗ | z·S··· \| z·A·by·· \| z·simple·· |
+| `AF05.LP1-vw4.LP2-simple` | ✗ | z·V4··· \| … |
+| `AF05.LP2-blend.LP3-simple` | ✗ | … \| z·A·br·· \| z·simple·· |
+| `AF05.LP2-blend-par.LP3-simple` | ✗ | … \| z·A·br·dp \| z·simple·· |
+| `AF05.LP3-render_reduce` family (~8) | ✗ | … \| z·{simple,opt}··rr |
+| **AF06** — Integrate+Decide \| Respawn \| Render (mask / list / list-fused) | | |
+| [AF06.LP1-autovec.LP2-mask](AF06.LP1-autovec.LP2-mask.zig) | ✓ | z·A··· \| z·A·or·· \| z·simple·· |
+| [AF06.LP1-autovec-par.LP2-mask-rmerge](AF06.LP1-autovec-par.LP2-mask-rmerge.zig) | ✓ | z·A···dp \| z·A·or·rm \| z·simple·· |
+| [AF06.LP1-halide.LP2-mask](AF06.LP1-halide.LP2-mask.zig) | ✓ | h·1··· \| z·A·or·· \| z·simple·· |
+| `AF06.LP1-halide-vw4.LP2-mask` | ✗ | h·4··· \| z·A·or·· \| z·simple·· |
+| `AF06.LP1-halide-vw{2,8}.LP2-mask` (2) | ✗ | h·{2,8}··· \| … |
+| `AF06.LP1-halide-{par,vw4-par}.LP2-mask-rmerge` (2) | ✗ | h·{1,4}···dp \| z·A·or·rm \| z·simple·· |
+| `AF06.LP1-halide-vw{2,8}-{,par}.LP2-mask-{simple,rmerge}` (3) | ✗ | various |
+| `AF06.LP1-scalar.LP2-mask` | ✗ | z·S··· \| z·A·or·· \| z·simple·· |
+| `AF06.LP1-vw4.LP2-mask` | ✗ | z·V4··· \| … |
+| [AF06.LP1-autovec.LP2-list](AF06.LP1-autovec.LP2-list.zig) | ✓ | z·A··· \| z·A·or·· \| z·simple·· |
+| [AF06.LP1-autovec-par.LP2-list-rmerge](AF06.LP1-autovec-par.LP2-list-rmerge.zig) | ✓ | z·A···dp \| z·A·or·rm \| z·simple·· |
+| `AF06.LP1-scalar.LP2-list` | ✗ | z·S··· \| z·A·or·· \| z·simple·· |
+| `AF06.LP1-vw4.LP2-list` | ✗ | z·V4··· \| … |
+| `AF06.LP1-scalar-par.LP2-list-rmerge` | ✗ | z·S···dp \| z·A·or·rm \| … |
+| [AF06.LP1-autovec.LP2-list-fused](AF06.LP1-autovec.LP2-list-fused.zig) | ✓ | z·A··· \| z·F·or·· \| z·simple·· |
+| `AF06.LP2-fused-par` | ✗ | z·A···{,dp} \| z·F·or·(rm+rr) \| z·simple··rr |
+| `AF06.LP1-scalar.LP2-fused` | ✗ | z·S··· \| … |
 | `AF06.LP1-vw4.LP2-fused` | ✗ | z·V4··· \| … |
-| [AF07.LP1-autovec.LP2-fused](AF07.LP1-autovec.LP2-fused.zig) | ✓ | z·A··· \| z·F·or·· |
-| `AF07.LP1-halide.LP2-fused` | ✗ | h·1··· \| z·F·or·· |
-| `AF07.LP1-halide-vw4.LP2-fused` | ✗ | h·4··· \| z·F·or·· |
-| `AF07.LP1-halide-par.LP2-fused` | ✗ | h·{1,4}···dp \| z·F·or·· |
-| `AF07.LP1-halide-vw{2,8}.{,par}.LP2-fused` (4) | ✗ | various |
-| `AF07.LP2-fused-par` | ✗ | z·A···{,dp} \| z·F·or·(rm+rr) |
-| `AF07.LP1-scalar.LP2-fused` | ✗ | z·S··· \| z·F·or·· |
-| `AF07.LP1-vw4.LP2-fused` | ✗ | z·V4··· \| … |
-| [AF08.LP1-autovec.LP2-fused](AF08.LP1-autovec.LP2-fused.zig) | ✓ | z·A··· \| z·F·or·· \| z·simple·· |
-| `AF08.LP2-fused-par` | ✗ | z·A···{,dp} \| z·F·or·(rm+rr) \| z·simple··rr |
-| `AF08.LP1-scalar.LP2-fused` | ✗ | z·S··· \| … |
-| `AF08.LP1-vw4.LP2-fused` | ✗ | z·V4··· \| … |
-| `AF08.LP3-render_reduce` | ✗ | … \| z·simple··rr |
+| `AF06.LP2-scalar` (mask/list) (2) | ✗ | … \| z·S·or·· \| … |
+| `AF06.LP3-render_reduce` family (mask/list) (~12) | ✗ | … \| z·{simple,opt}··rr |
