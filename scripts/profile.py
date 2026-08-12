@@ -30,7 +30,7 @@ import sweep_config
 DATA = os.path.join(ROOT, "experiments", "data")
 
 # backend module name by backend id. A future `perf` backend registers here.
-BACKENDS = {"xctrace": "profile_xctrace"}
+BACKENDS = {"xctrace": "profile_xctrace", "perf": "profile_perf"}
 
 
 def available_backends():
@@ -41,6 +41,13 @@ def available_backends():
             import profile_xctrace
             if profile_xctrace.find_xctrace():
                 out.append("xctrace")
+        except ImportError:
+            pass
+    if platform.system() == "Linux":
+        try:
+            import profile_perf
+            if profile_perf.find_perf():
+                out.append("perf")
         except ImportError:
             pass
     return out
