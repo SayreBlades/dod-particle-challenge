@@ -4,6 +4,7 @@
 
 const std = @import("std");
 const Io = std.Io;
+const builtin = @import("builtin");
 
 pub const Facts = struct {
     cpu: [128]u8 = undefined,
@@ -20,7 +21,21 @@ pub const Facts = struct {
 };
 
 pub fn detect() Facts {
+    // Comptime switch: only the branch for THIS OS is semantically analyzed, so
+    // the macOS sysctl calls (and the Linux syscall helpers) are never even
+    // referenced on the other OS — which is what keeps this linking on both.
     var f = Facts{};
+    switch (builtin.os.tag) {
+        .macos => detectDarwin(&f),
+        .linux => detectLinux(&f),
+        // Other OSes: leave zeros — the authoritative profile is hardware.json
+        // (scripts/hardware_json.py), which this in-process Facts only echoes.
+        else => {},
+    }
+    return f;
+}
+
+fn detectDarwin(f: *Facts) void {
     f.cpu_len = readSysctlBytes("machdep.cpu.brand_string", &f.cpu);
     f.cachelinesize = readSysctlU64("hw.cachelinesize");
     f.l1dcachesize = readSysctlU64("hw.l1dcachesize");
@@ -31,7 +46,29 @@ pub fn detect() Facts {
     f.memsize = readSysctlU64("hw.memsize");
     f.physicalcpu = readSysctlU64("hw.physicalcpu");
     f.logicalcpu = readSysctlU64("hw.logicalcpu");
-    return f;
+}
+
+/// Linux: the bench binary stays I/O-free (no /proc parser in-process). The
+/// authoritative cache/memory/cpu profile comes from scripts/hardware_json.py,
+/// which already reads /proc/cpuinfo + /proc/meminfo + nproc. Here we fill only
+/// what is free at runtime (page size, logical CPU count, the de-facto x86
+/// cache-line size) so the binary links on Linux and the `--bandwidth` microbench
+/// (which sizes its buffer off L3/L2 with a safe 256 MB floor, and strides by
+/// cachelinesize or 64) runs correctly. (This function is never analyzed on macOS.)
+fn detectLinux(f: *Facts) void {
+    f.pagesize = @intCast(std.heap.pageSize());
+    f.cachelinesize = 64; // x86_64 de-facto; hardware.json carries the real value.
+    f.logicalcpu = linuxLogicalCpus();
+    f.physicalcpu = f.logicalcpu;
+}
+
+fn linuxLogicalCpus() u64 {
+    var set: std.os.linux.cpu_set_t = std.mem.zeroes(std.os.linux.cpu_set_t);
+    const size: u32 = @intCast(@sizeOf(std.os.linux.cpu_set_t));
+    if (std.os.linux.sched_getaffinity(0, size, &set) != 0) return 0;
+    var count: u64 = 0;
+    for (set) |word| count += @intCast(@popCount(word));
+    return count;
 }
 
 pub fn print(f: Facts) void {
