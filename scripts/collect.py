@@ -164,12 +164,10 @@ def main():
     if not algos:
         sys.exit("error: no algorithms to run.")
 
-    # --- hardware (host-level): ensure hardware.json exists, then read machine_id ---
-    hw_exists = any(os.path.exists(os.path.join(DATA, d, "hardware.json"))
-                    for d in os.listdir(DATA) if os.path.isdir(os.path.join(DATA, d)))
-    if a.refresh_hw or not hw_exists:
-        hardware_json.write_to_host_dir()  # detect + write (runs BW microbench ~0.7s)
+    # --- hardware (host-level): detect THIS machine, write hardware.json if needed ---
     machine_id, host = _machine_host()
+    if a.refresh_hw:
+        hardware_json.write_to_host_dir()  # re-measure streaming_bw_gbs
 
     short_sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"],
                                capture_output=True, text=True).stdout.strip() or "nogit"
@@ -265,12 +263,20 @@ def main():
 
 
 def _machine_host():
-    """Read machine_id + hostname from the single hardware.json under data/."""
-    ids = [d for d in os.listdir(DATA) if os.path.isdir(os.path.join(DATA, d))]
-    if len(ids) != 1:
-        sys.exit(f"expected one machine under {DATA}, found {ids}")
-    hw = json.load(open(os.path.join(DATA, ids[0], "hardware.json")))
-    return hw["machine_id"], hw.get("hostname", "")
+    """Return (machine_id, hostname) for the CURRENT machine.
+
+    Detects this host via hardware_json.detect() and looks up the
+    corresponding directory under data/.  If the repo also contains data
+    dirs for *other* machines (e.g. committed reference data from a
+    different host) they are silently ignored — we only care about the
+    machine we are actually running on."""
+    current = hardware_json.detect()
+    mid = current["machine_id"]
+    hw_path = os.path.join(DATA, mid, "hardware.json")
+    if not os.path.exists(hw_path):
+        # First run on this machine — write it now.
+        hardware_json.write_to_host_dir(current)
+    return mid, current.get("hostname", "")
 
 
 if __name__ == "__main__":

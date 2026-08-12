@@ -38,10 +38,9 @@ def source_hash(algo):
 def machine_id_arg(arg):
     if arg:
         return arg
-    ids = [d for d in os.listdir(DATA) if os.path.isdir(os.path.join(DATA, d))]
-    if len(ids) != 1:
-        sys.exit(f"expected one machine under {DATA}, found {ids}; pass --machine-id")
-    return ids[0]
+    # Auto-detect: use this host's machine_id (works with multi-machine data dirs).
+    import hardware_json
+    return hardware_json.detect()["machine_id"]
 
 
 def host_of(machine_id):

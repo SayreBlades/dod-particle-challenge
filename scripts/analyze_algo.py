@@ -49,10 +49,8 @@ def split_algo(algo):
 
 
 def machine_id():
-    ids = [d for d in os.listdir(DATA) if os.path.isdir(os.path.join(DATA, d))]
-    if len(ids) != 1:
-        sys.exit(f"expected one machine under {DATA}, found {ids}; pass -M <id>")
-    return ids[0]
+    import hardware_json
+    return hardware_json.detect()["machine_id"]
 
 
 def load_jsonl(path, algo=None, kind=None, source_hash=None):

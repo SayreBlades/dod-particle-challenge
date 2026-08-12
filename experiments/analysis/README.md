@@ -6,6 +6,7 @@ The only honest cross-machine view: each machine's hardware facts side by side. 
 
 | machine_id | cpu | streaming BW | L1d | L2 | L3 | layouts |
 |---|---|---|---|---|---|---|
+| [`M-GV2D7MWV6M-e720b02d`](M-GV2D7MWV6M-e720b02d/) | Apple M3 Pro | 23.69 GB/s | 64 KB | 4 MB | — | ML01 |
 | [`minibits-b7641c0e`](minibits-b7641c0e/) | Apple M4 | 25.22 GB/s | 64 KB | 4 MB | — | ML01 |
 
 Per machine: `<machine_id>/README.md` (overview) → `<machine_id>/<L>/README.md` (mem_layout) → `<machine_id>/<L>/<algo>.md` (the per-algo narrative).

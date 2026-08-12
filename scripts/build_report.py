@@ -86,26 +86,28 @@ def load(con):
     hws = sorted(glob.glob(os.path.join(DATA, "*", "hardware.json")))
     con.execute("CREATE TABLE hardware AS " +
                 " UNION ALL ".join(f"SELECT * FROM read_json_auto('{p}')" for p in hws))
-    # Keep only rows pinned to each algorithm's CURRENT source_hash — drops
-    # pre-versioning null rows and stale-source rows so the report never mixes
-    # measurement epochs (the min ns_particle stays within one source version).
-    import algo_hash
-    cur = []
-    for (algo,) in con.execute("SELECT DISTINCT algo FROM runs").fetchall():
-        try:
-            sh, _ = algo_hash.algo_hash(algo)
-        except (Exception, SystemExit):
-            continue  # source gone — drop this algo's rows
-        cur.append((algo, sh))
-    con.execute("CREATE TABLE current_source(algo VARCHAR, shash VARCHAR)")
-    if cur:
-        con.executemany("INSERT INTO current_source VALUES (?, ?)", cur)
+    # Keep only rows pinned to each algorithm's LATEST source_hash PER MACHINE
+    # — this allows historical data from machines that haven't re-collected yet
+    # (e.g. minibits with an older source_hash) to remain visible in the report,
+    # while still dropping pre-versioning null rows and truly stale duplicates
+    # within a single machine's timeline.
+    con.execute("""CREATE TABLE latest_source AS
+        SELECT algo, machine_id, source_hash AS shash
+        FROM (
+            SELECT algo, machine_id, source_hash,
+                   ROW_NUMBER() OVER (PARTITION BY algo, machine_id ORDER BY ts_utc DESC) AS rn
+            FROM runs
+            WHERE source_hash IS NOT NULL
+        )
+        WHERE rn = 1
+    """)
     con.execute("""CREATE TABLE report AS
         SELECT r.*, h.streaming_bw_gbs,
                (r.bytes_per_particle * r.N / NULLIF(r.ns_frame, 0)) AS achieved_bw_gbs
         FROM runs r
-        JOIN current_source cs ON r.algo = cs.algo AND r.source_hash = cs.shash
-        LEFT JOIN hardware h USING (machine_id)
+        JOIN latest_source ls ON r.algo = ls.algo AND r.machine_id = ls.machine_id
+                              AND r.source_hash = ls.shash
+        LEFT JOIN hardware h ON h.machine_id = r.machine_id
         WHERE r.kind = 'timing'""")
 
 

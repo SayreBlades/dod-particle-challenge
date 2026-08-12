@@ -1,10 +1,11 @@
 // report.js — machine/thread-scoped SPA over experiments/analysis/.
-// Routes: #/ (overview) · #/layout/<L> · #/algorithm/<algorithm>. Loads ECharts + marked.
+// Routes: #/<machine>/ (overview) · #/<machine>/layout/<L> · #/<machine>/algorithm/<algorithm> · #/<machine>/rank/<N>/<q>. Loads ECharts + marked.
 const $ = (id) => document.getElementById(id);
 const status = (m) => ($("status").textContent = m);
 const short = (algo) => algo.split(".").slice(1).join(".");
 const fmtq = (d) => (d === 0 ? "0" : String(d));
 const fmtN = (n) => n >= 1e6 ? `${n / 1e6}M` : n >= 1e3 ? `${n / 1e3}K` : `${n}`;
+const mhref = (path) => `#/${machine}/${path}`;  // machine-scoped hash link
 const axisTooltip = { trigger: "axis", formatter(params) { const p = Array.isArray(params) ? params : [params]; const hdr = `<div style="text-align:center;margin-bottom:4px">${fmtN(Math.round(p[0].axisValue))} Particles</div>`; return hdr + p.filter(x => x.seriesName !== '__cache' && x.seriesName !== '__marks').map(x => { const name = x.seriesName.startsWith('q=') ? '' : x.seriesName + ': '; return `${x.marker} ${name}${x.value[1] != null ? x.value[1].toFixed(2) : '-'}`; }).join('<br/>'); } };
 const charts = [];
 window.addEventListener("resize", () => charts.forEach((c) => c.resize()));
@@ -18,7 +19,7 @@ const fetchText = (u) => fetch(u).then((r) => r.ok ? r.text() : "");
 
 function getOverview(m)   { return ovCache[m]   ?? (ovCache[m]   = fetchJSON(`analysis/${m}/overview.json`)); }
 function getMemLayout(m, L)  { return layCache[m+L]?? (layCache[m+L]= fetchJSON(`analysis/${m}/${L}/mem_layout.json`)); }
-function getAlgoJson(m, c){ return algoCache[c] ?? (algoCache[c]= (async()=>{const L=c.split(".")[0],s=short(c);return fetchJSON(`analysis/${m}/${L}/${s}.json`);})()); }
+function getAlgoJson(m, c){ const k=m+"/"+c; return algoCache[k] ?? (algoCache[k]= (async()=>{const L=c.split(".")[0],s=short(c);return fetchJSON(`analysis/${m}/${L}/${s}.json`);})()); }
 const gridCache = {};
 const getGrid = (m) => gridCache[m] ?? (gridCache[m] = fetchJSON(`analysis/${m}/grid.json`));
 
@@ -77,7 +78,7 @@ async function renderOverview() {
       const best = top3.length ? top3[0].ns_particle : null;
       const tint = best != null ? `hsla(${120 * (1 - Math.min(1, (best - lo) / (hi - lo)))},60%,45%,0.20)` : null;
       html += `<td${tint ? ` style="background:${tint}"` : ""} data-n="${n}" data-q="${d}">${
-        top3.map((c) => `<div class="prow"><a href="#/algorithm/${c.algo}">${short(c.algo)}</a><span class="n">${c.ns_particle.toFixed(2)}</span></div>`).join("") || "—"}</td>`;
+        top3.map((c) => `<div class="prow"><a href="${mhref('algorithm/' + c.algo)}">${short(c.algo)}</a><span class="n">${c.ns_particle.toFixed(2)}</span></div>`).join("") || "—"}</td>`;
     }
     html += `</tr>`;
   }
@@ -105,13 +106,13 @@ async function renderMemLayout(L) {
       const top3 = [1, 2, 3].map((rk) => algo(n, d, rk)).filter(Boolean);
       const best = top3.length ? top3[0].ns_particle : null;
       const tint = best != null ? `hsla(${120 * (1 - Math.min(1, (best - lo) / (hi - lo)))},60%,45%,0.20)` : null;
-      podium += `<td${tint ? ` style="background:${tint}"` : ""}>${top3.map((c) => `<div class="prow"><a href="#/algorithm/${c.algo}">${short(c.algo)}</a><span class="n">${c.ns_particle.toFixed(2)}</span></div>`).join("") || "—"}</td>`;
+      podium += `<td${tint ? ` style="background:${tint}"` : ""}>${top3.map((c) => `<div class="prow"><a href="${mhref('algorithm/' + c.algo)}">${short(c.algo)}</a><span class="n">${c.ns_particle.toFixed(2)}</span></div>`).join("") || "—"}</td>`;
     }
     podium += `</tr>`;
   }
   podium += `</tbody></table>`;
-  const feat = lb.featured.map((f) => `<div class="feat"><a href="#/algorithm/${f.algo}"><b>${short(f.algo)}</b> <span class="n">${f.ns} ns/p</span></a><div class="tease">${f.teaser}${f.teaser ? `…` : ""}</div></div>`).join("");
-  const algos = lb.algos.map((c) => `<a class="celllink" href="#/algorithm/${c}">${short(c)}</a>`).join(" ");
+  const feat = lb.featured.map((f) => `<div class="feat"><a href="${mhref('algorithm/' + f.algo)}"><b>${short(f.algo)}</b> <span class="n">${f.ns} ns/p</span></a><div class="tease">${f.teaser}${f.teaser ? `…` : ""}</div></div>`).join("");
+  const algos = lb.algos.map((c) => `<a class="celllink" href="${mhref('algorithm/' + c)}">${short(c)}</a>`).join(" ");
   $("page").innerHTML = `
     <section><h2>${L} <span class="sub">top-3 per num-particles × death · T=${threads}</span></h2>${podium}</section>
     <section><h3>Featured</h3>${feat || "<p class=hint>(no champions featured)</p>"}</section>
@@ -589,7 +590,7 @@ async function renderRank(N, q) {
     .sort((a, b) => a.ns_particle - b.ns_particle);
   const title = `All algorithms · ${fmtN(N)} particles · ${Math.round(q * 100)}% death rate · ${threads} thread${threads === 1 ? "" : "s"}`;
   let html = `<section class="cellhead"><h2>${title}</h2>`
-    + `<p class="hint"><a href="#/">← All Winners</a> · ranked by ns/particle (best trial). `
+    + `<p class="hint"><a href="${mhref('')}">← All Winners</a> · ranked by ns/particle (best trial). `
     + `Click a bar for the algorithm deep-dive.</p></section>`;
   if (!pts.length) {
     html += `<section><p class="hint">No algorithms measured at this intersection.</p></section>`;
@@ -659,22 +660,39 @@ function drawRankCharts(pts, ceil) {
     return order[idx]?.algo ?? null;
   };
   zr?.on("mousemove", (e) => { zr.setCursorStyle(rowAt(e.offsetY != null ? e.offsetY : e.event?.offsetY) ? "pointer" : "default"); });
-  zr?.on("click", (e) => { const algo = rowAt(e.offsetY != null ? e.offsetY : e.event?.offsetY); if (algo) location.hash = `#/algorithm/${algo}`; });
+  zr?.on("click", (e) => { const algo = rowAt(e.offsetY != null ? e.offsetY : e.event?.offsetY); if (algo) location.hash = mhref(`algorithm/${algo}`); });
 }
 
 // ---------------- router ----------------
+// Hash format: #/<machine_id>/<view>/<args…>
+// Legacy (no machine prefix) redirects to the current/default machine.
 function route() {
   charts.length = 0;
   $("page").innerHTML = "";
-  renderTopCard();
-  const parts = location.hash.replace(/^#\/?/, "").split("/");
-  const [r, a, b] = parts;
-  status("loading…");
-  if (r === "rank" && a != null && b != null) renderRank(parseInt(a, 10), parseFloat(b));
-  else if (!r || (r === "layout" && !a)) renderOverview();
-  else if (r === "layout") renderMemLayout(a);
-  else if (r === "algorithm") renderAlgo(decodeURIComponent(a));
-  else renderOverview();
+  const raw = location.hash.replace(/^#\/?/, "");
+  const parts = raw.split("/");
+
+  // Detect if first segment is a known machine_id
+  const knownIds = MACHINES.machines.map((m) => m.machine_id);
+  if (parts[0] && knownIds.includes(parts[0])) {
+    machine = parts[0];
+    $("machine").value = machine;
+    const [, r, a, b] = parts;
+    renderTopCard();
+    status("loading…");
+    if (r === "rank" && a != null && b != null) renderRank(parseInt(a, 10), parseFloat(b));
+    else if (!r || (r === "layout" && !a)) renderOverview();
+    else if (r === "layout") renderMemLayout(a);
+    else if (r === "algorithm") renderAlgo(decodeURIComponent(a));
+    else renderOverview();
+  } else {
+    // Legacy route (no machine prefix) — redirect to current machine
+    const view = parts.filter(Boolean).join("/");
+    location.replace(`#/${machine}/${view}`);
+    // location.replace with hash doesn't always fire hashchange synchronously,
+    // so re-enter route to render immediately.
+    return route();
+  }
 }
 
 // godbolt side-by-side: hover a source line / asm row → highlight its whole
@@ -686,7 +704,7 @@ document.addEventListener("mouseout",  (e) => { const el = e.target.closest?.("[
 document.addEventListener("click", (e) => {
   if (e.target.closest("a")) return;                  // name links navigate to the algorithm page
   const td = e.target.closest("td[data-n]");
-  if (td) location.hash = `#/rank/${td.dataset.n}/${td.dataset.q}`;
+  if (td) location.hash = mhref(`rank/${td.dataset.n}/${td.dataset.q}`);
 });
 
 (async () => {
@@ -694,11 +712,24 @@ document.addEventListener("click", (e) => {
     MACHINES = await fetchJSON("analysis/machines.json");
     const ms = $("machine");
     MACHINES.machines.forEach((m) => { const o = document.createElement("option"); o.value = m.machine_id; o.textContent = `${m.cpu} · ${m.machine_id}`; ms.add(o); });
-    machine = MACHINES.machines[0].machine_id;
+    // Default machine: prefer what's in the URL hash, else first in list
+    const initHash = location.hash.replace(/^#\/?/, "").split("/")[0];
+    const knownIds = MACHINES.machines.map((m) => m.machine_id);
+    machine = knownIds.includes(initHash) ? initHash : MACHINES.machines[0].machine_id;
+    ms.value = machine;
     const ts = $("threads");
     [1, 2, 4, 8].forEach((t) => { const o = document.createElement("option"); o.value = t; o.textContent = `T=${t}`; ts.add(o); });
     ts.value = threads;
-    ms.onchange = () => { machine = ms.value; ovCache._cur = null; route(); };
+    ms.onchange = () => {
+      machine = ms.value;
+      ovCache._cur = null;
+      // Swap machine segment in current hash, preserve the view path
+      const raw = location.hash.replace(/^#\/?/, "");
+      const parts = raw.split("/");
+      const knownIds = MACHINES.machines.map((m) => m.machine_id);
+      const view = knownIds.includes(parts[0]) ? parts.slice(1).join("/") : parts.join("/");
+      location.hash = `#/${machine}/${view}`;
+    };
     ts.onchange = () => { threads = +ts.value; route(); };
     window.addEventListener("hashchange", route);
     route();

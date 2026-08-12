@@ -41,11 +41,9 @@ def source_hash(algo):
 
 
 def machine_id():
-    """The single host dir under data/ (one host per dir, as today)."""
-    ids = [d for d in os.listdir(DATA) if os.path.isdir(os.path.join(DATA, d))]
-    if len(ids) != 1:
-        sys.exit(f"expected one machine under {DATA}, found {ids}; pass -M <id>")
-    return ids[0]
+    """Return this host's machine_id (auto-detected, works with multi-machine data dirs)."""
+    import hardware_json
+    return hardware_json.detect()["machine_id"]
 
 
 # ---- assembly: build (cached) + disassemble step ----
