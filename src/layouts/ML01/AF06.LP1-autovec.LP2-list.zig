@@ -1,4 +1,4 @@
-// Algorithm ML01.AF04.LP1-autovec.LP2-simple — AF04 (math+decide→list | respawn-dead-only | render),
+// Algorithm ML01.AF06.LP1-autovec.LP2-list — AF06 (math+decide→list | respawn-dead-only | render),
 // loop 1 autovec, loop 2 autovec ordered, loop 3 r0 splat. SERIAL.
 //
 // Golden: bit-exact. The dead-list variant: loop 1 does math + decide → a
@@ -7,7 +7,7 @@
 // order (= index order = serial RNG order). Wins when death is rare (loop 2
 // is ~N·p work, not N); loses when death is common (list is long + append
 // overhead). The list is the declared intermediate (compact idx[]).
-// Diff vs AF03: list vs mask (isolates the intermediate axis).
+// Diff vs AF06: list vs mask (isolates the intermediate axis).
 //
 // The list is built by a branchy append in loop 1 (irregular — not
 // Halide-expressible, §5). Self-contained (§8 rule 2).
@@ -23,7 +23,7 @@ const Data = layout.Data;
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
         .mem_layout = "ML01",
-        .algo_fam = .AF04,
+        .algo_fam = .AF06,
         .ordering = .identity,
         .intermediates = .list,
         .loops = &.{

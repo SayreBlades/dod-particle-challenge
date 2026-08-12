@@ -1,9 +1,9 @@
-// Algorithm ML01.AF07.LP1-autovec.LP2-fused — AF07 (math+decide→mask | mask-scan+respawn+render fused),
+// Algorithm ML01.AF03.LP1-autovec.LP2-fused — AF03 (math+decide→mask | mask-scan+respawn+render fused),
 // loop 1 math+decide→mask, loop 2 fused mask-scan+respawn+splat.
 //
 // Golden: framebuffer_only. The mask variant with fused render: loop 1
 // produces the dead mask; loop 2 scans it, respawns, and splats — the splat
-// reads post-respawn pos from a register. Diff vs AF05: the mask intermediate
+// reads post-respawn pos from a register. Diff vs AF01: the mask intermediate
 // (does the two-phase structure change the fusion win?).
 
 const std = @import("std");
@@ -17,7 +17,7 @@ const Data = layout.Data;
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
         .mem_layout = "ML01",
-        .algo_fam = .AF07,
+        .algo_fam = .AF03,
         .ordering = .identity,
         .intermediates = .mask,
         .loops = &.{

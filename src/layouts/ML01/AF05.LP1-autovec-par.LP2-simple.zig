@@ -1,21 +1,16 @@
-// Algorithm ML01.AF01.LP1-blend-par.LP2-simple — AF01 (math+decide+respawn | render),
-// loop 1 Zig branchless blend (data-parallel), loop 2 r0 splat (serial).
+// Algorithm ML01.AF05.LP1-autovec-par.LP2-simple — AF05 (math | decide+respawn | render),
+// loop 1 data-parallel math, loop 2 serial decide+respawn, loop 3 r0 splat.
 //
-// Golden: statistical. The blend is per-particle independent (hash RNG over
-// (i, frame) — no shared state), so loop 1 parallelizes trivially with no
-// coordination: each worker blends its chunk, the result is identical to
-// the serial blend at any worker count. Loop 2 (splat) is serial r0. Diff
-// vs AF01.LP1-blend.LP2-simple: loop-1 parallel = data_parallel.
-//
-// (A fully-parallel variant with render-reduce loop 2 would be a separate
-// schedule variant; this cell's name encodes LP2-simple = serial splat.)
+// Golden: bit-exact. Loop 1 (math) is per-particle independent → parallel with
+// no coordination; loop 2 (decide+respawn) is serial (RNG-order). The seam
+// re-read is still here (loop 2 re-reads age), just loop 1 is parallel.
+// Diff vs AF05.LP1-autovec.LP2-simple: loop-1 parallel = data_parallel.
 
 const std = @import("std");
 const fw = @import("../../framework/sim.zig");
 const config = @import("../../framework/config.zig");
 const pool_mod = @import("../../framework/pool.zig");
 const layout = @import("data.zig");
-const hash = @import("hash_rng.zig");
 const r0 = @import("../common/render_simple.zig");
 
 const Data = layout.Data;
@@ -24,15 +19,16 @@ const CHUNK_ALIGN: usize = 32;
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
         .mem_layout = "ML01",
-        .algo_fam = .AF01,
+        .algo_fam = .AF05,
         .ordering = .identity,
         .intermediates = .none,
         .loops = &.{
-            .{ .impl = .zig, .schedule = .auto, .parallel = .data_parallel, .variant = .blend },
+            .{ .impl = .zig, .schedule = .auto, .parallel = .data_parallel, .variant = .none },
+            .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .branchy },
             .{ .impl = .zig, .schedule = .r0, .parallel = .none, .variant = .none },
         },
-        .golden = .statistical,
-        .halide_expressible = "loop1 yes; loop2 n/a",
+        .golden = .bit_exact,
+        .halide_expressible = "loop1 yes; loop2 no (RNG-order); loop3 n/a",
     };
 
     pub const Extra = struct {
@@ -53,13 +49,17 @@ pub const H = struct {
 
     pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {
         sim.extra.cur_dt = dt;
-        // loop 1: parallel branchless blend (per-particle independent).
+        // loop 1: parallel math (per-particle independent).
         if (sim.extra.pool) |p| {
             p.run(sim, phase1Task);
         } else {
             phase1Range(sim, 0, sim.data.n);
         }
-        // loop 2: serial r0 splat pass.
+        // loop 2: serial decide + respawn (RNG-order).
+        for (sim.data.particles, 0..) |*p, i| {
+            if (config.isDead(p.age, &sim.kill_rng)) sim.data.spawn(&sim.rng, i);
+        }
+        // loop 3: r0 splat pass.
         for (sim.data.particles) |p| {
             r0.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
         }
@@ -77,8 +77,6 @@ pub const H = struct {
     fn phase1Range(sim: anytype, lo: usize, hi: usize) void {
         const data = &sim.data;
         const dt = sim.extra.cur_dt;
-        const frame = sim.frame;
-        const q = config.q;
         var i: usize = lo;
         while (i < hi) : (i += 1) {
             const p = &data.particles[i];
@@ -89,26 +87,7 @@ pub const H = struct {
                 .y = v.y + (config.gravity.y + config.drag * v.y) * dt,
                 .z = v.z + (config.gravity.z + config.drag * v.z) * dt,
             };
-            const age_new = p.age + dt;
-            p.age = age_new;
-            var dead: bool = age_new >= config.kill_age;
-            if (q > 0.0) {
-                if (age_new < config.kill_age) {
-                    dead = dead or (hash.killFloat(i, frame) < q);
-                }
-            }
-            const r = hash.respawn(i, frame);
-            const imp = config.impulse[r.kind];
-            const col = layout.kindColor(@enumFromInt(r.kind));
-            if (dead) {
-                p.pos = .{ .x = 0, .y = 0, .z = 0 };
-                p.vel = .{ .x = imp.x + r.jx, .y = imp.y + r.jy, .z = imp.z };
-                p.age = r.age * config.kill_age;
-                p.kind = @enumFromInt(r.kind);
-                p.color = col;
-                p.life = config.kill_age;
-                p.seed = @intCast(i);
-            }
+            p.age += dt;
         }
     }
 };

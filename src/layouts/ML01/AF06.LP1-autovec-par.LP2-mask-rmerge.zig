@@ -1,4 +1,4 @@
-// Algorithm ML01.AF03.LP1-autovec-par.LP2-rmerge — AF03 (math+decide→mask | mask-scan+respawn | render),
+// Algorithm ML01.AF06.LP1-autovec-par.LP2-mask-rmerge — AF06 (math+decide→mask | mask-scan+respawn | render),
 // loop 1 data-parallel, loop 2 ranked-merge (serial scan = degenerate T=1), loop 3 serial.
 //
 // Golden: bit-exact. The two-phase discipline: phase 1 (parallel) does math +
@@ -7,7 +7,7 @@
 // from the shared spawn RNG in exactly the serial algorithm's order.
 //
 // The DE-RISK cell (Phase 0.5.3): validates pool.zig with the current Strategy
-// harness before the parallel pattern replicates across AF01/AF02/AF04. The serial
+// harness before the parallel pattern replicates across AF02/AF05/AF06. The serial
 // respawn is the bit-exact floor; true parallel ranked-merge (parallel count →
 // prefix sum → parallel respawn-by-rank) is a future schedule variant that
 // parallelizes the O(dead) respawn work — the mask structure already enables it.
@@ -15,7 +15,7 @@
 // Chunking: ranges snap to 32 particles (32 × 68 B = 2176 B = exactly 17 cache
 // lines), so no line is split across workers. The dead mask adds 1 B/p
 // (bytes/p 68 → 69) — the structural cost of two-phase, isolated by the T=1
-// row against plain AF01.LP1-autovec.LP2-simple (the pool-overhead check).
+// row against plain AF02.LP1-autovec.LP2-simple (the pool-overhead check).
 //
 // -Ddeath=q under parallel: each chunk draws kill decisions from a chunk-local
 // RNG (kill_seed ^ chunk_lo) — deterministic per (T, chunk), independent of
@@ -34,7 +34,7 @@ const CHUNK_ALIGN: usize = 32; // chunk starts snap to 32 particles (17 lines)
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
         .mem_layout = "ML01",
-        .algo_fam = .AF03,
+        .algo_fam = .AF06,
         .ordering = .identity,
         .intermediates = .mask,
         .loops = &.{
@@ -74,7 +74,7 @@ pub const H = struct {
         return 1; // the dead mask, 1 B/p
     }
 
-    /// AF03 step: loop 1 (parallel math+decide→mask), loop 2 (serial mask-scan+
+    /// AF06 step: loop 1 (parallel math+decide→mask), loop 2 (serial mask-scan+
     /// respawn), loop 3 (serial splat). Always splats (§17.7).
     pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {
         sim.extra.cur_dt = dt;
@@ -115,7 +115,7 @@ pub const H = struct {
         var i: usize = lo;
         while (i < hi) : (i += 1) {
             const p = &data.particles[i];
-            // math: integrate + forces + age (identical to AF01.LP1-autovec).
+            // math: integrate + forces + age (identical to AF02.LP1-autovec).
             p.pos = p.pos.add(p.vel.scale(dt));
             const v = p.vel;
             p.vel = .{
@@ -130,7 +130,7 @@ pub const H = struct {
     }
 
     /// Phase 2 (SERIAL): scan dead mask in index order, respawn from shared
-    /// spawn RNG. The RNG draw sequence is identical to AF01.LP1-autovec's, so
+    /// spawn RNG. The RNG draw sequence is identical to AF02.LP1-autovec's, so
     /// the sim is bit-exact at any worker count. Block-wise zero-skip (32 B
     /// blocks): death is sparse at natural churn, so nearly every block
     /// reduces to zero and is skipped at vector speed.

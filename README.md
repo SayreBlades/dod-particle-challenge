@@ -160,9 +160,9 @@ The common actions are `make` targets ([Makefile](Makefile));
 ```sh
 make build                                     # build every algorithm into out/
 make build   ML01                              #   …every algorithm of memory layout ML01
-make build   ML01.AF01.LP1-autovec.LP2-simple  #   …one algorithm (use the full ML01.<algo> name)
-make play    ML01.AF01.LP1-autovec.LP2-simple  # open the interactive raylib window
-make profile ML01.AF01.LP1-autovec.LP2-simple  # PMC cycle-attribution (macOS + Xcode)
+make build   ML01.AF02.LP1-autovec.LP2-simple  #   …one algorithm (use the full ML01.<algo> name)
+make play    ML01.AF02.LP1-autovec.LP2-simple  # open the interactive raylib window
+make profile ML01.AF02.LP1-autovec.LP2-simple  # PMC cycle-attribution (macOS + Xcode)
 make report && make serve                      # build + serve the report on http://localhost:8000
 ```
 

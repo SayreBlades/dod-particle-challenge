@@ -1,12 +1,12 @@
-// Algorithm ML01.AF04.LP1-autovec-par.LP2-rmerge — AF04 (math+decide→list | respawn-dead-only | render),
+// Algorithm ML01.AF06.LP1-autovec-par.LP2-list-rmerge — AF06 (math+decide→list | respawn-dead-only | render),
 // loop 1 data-parallel, loop 2 ranked-merge, loop 3 r0 splat.
 //
-// Golden: bit-exact. Parallel AF04: loop 1 (math + decide → per-chunk dead
+// Golden: bit-exact. Parallel AF06: loop 1 (math + decide → per-chunk dead
 // lists) is data-parallel; loop 2 is a ranked-merge — concatenate the
 // per-chunk lists in chunk order (rank order = serial index order = serial
 // RNG order), then respawn each. The list intermediate makes loop 2
 // O(dead) work, parallelizable across chunks. Zig-only (irregular append,
-// §5). Diff vs AF03.LP1-autovec-par.LP2-rmerge: list vs mask.
+// §5). Diff vs AF06.LP1-autovec-par.LP2-mask-rmerge: list vs mask.
 //
 // Self-contained (§8 rule 2). Scavenges the pool discipline.
 
@@ -23,7 +23,7 @@ const CHUNK_ALIGN: usize = 32;
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
         .mem_layout = "ML01",
-        .algo_fam = .AF04,
+        .algo_fam = .AF06,
         .ordering = .identity,
         .intermediates = .list,
         .loops = &.{

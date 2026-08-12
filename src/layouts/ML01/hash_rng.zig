@@ -1,7 +1,7 @@
-// hash_rng.zig — the per-particle hash RNG for the blend variants (AF01-blend,
+// hash_rng.zig — the per-particle hash RNG for the blend variants (AF02-blend,
 // and any cell using the branchless-respawn model). splitmix64 over
 // (i, frame), bit-sliced into kind/jx/jy/age — the SAME model the Halide
-// AF01 generator uses (AF01.LP1-halide_gen.py), so the Zig blend and Halide blend
+// AF02 generator uses (AF02.LP1-halide_gen.py), so the Zig blend and Halide blend
 // are statistical-class twins: identical physics + respawn distributions,
 // trajectories diverge from the branchy reference by design.
 //

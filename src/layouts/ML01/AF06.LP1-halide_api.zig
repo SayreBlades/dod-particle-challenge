@@ -1,5 +1,5 @@
-// AF03.LP1-halide_api.zig — the Halide FFI binding for the AF03 math+decide loop
-// (shared by the AF03 halide cells). Math + competing-risks decide → dead mask.
+// AF06.LP1-halide_api.zig — the Halide FFI binding for the AF06 math+decide loop
+// (shared by the AF06 halide cells). Math + competing-risks decide → dead mask.
 // The cell's `step` calls `run()` for loop 1 (passing the mask buffer), then
 // runs the Zig mask-scan+respawn loop 2 + the Zig splat loop 3.
 //
@@ -25,7 +25,7 @@ const halide_buffer_t = extern struct {
     padding: ?*anyopaque = null,
 };
 
-extern fn halide_b3_mask(
+extern fn halide_b6_mask(
     data: *halide_buffer_t,
     dt: f32,
     kill_age: f32,
@@ -48,7 +48,7 @@ fn out1d(host: [*]u8, n: usize, stride: i32, t: halide_type_t, d: *[1]halide_dim
     return .{ .host = host, .type = t, .dimensions = 1, .dim = d };
 }
 
-/// Run the Halide AF03 math+decide loop over the whole particle array in place.
+/// Run the Halide AF06 math+decide loop over the whole particle array in place.
 /// Writes updated pos/vel/age and the dead mask (1 B/p, tightly packed).
 pub fn run(data: *Data, dt: f32, dead: []u8) void {
     const n = data.n;
@@ -80,6 +80,6 @@ pub fn run(data: *Data, dt: f32, dead: []u8) void {
     var buf_age = out1d(base + @offsetOf(Particle, "age"), n, stride_floats, FLOAT32, &dag);
     var buf_dead = out1d(dead.ptr, n, 1, UINT8, &ddd);
 
-    const rc = halide_b3_mask(&buf_in, dt, config.kill_age, config.q, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_dead);
+    const rc = halide_b6_mask(&buf_in, dt, config.kill_age, config.q, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_dead);
     std.debug.assert(rc == 0);
 }

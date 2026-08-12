@@ -1,4 +1,4 @@
-// Algorithm ML01.AF01.LP1-halide.LP2-opt — AF01 (math+decide+respawn | render),
+// Algorithm ML01.AF02.LP1-halide.LP2-opt — AF02 (math+decide+respawn | render),
 // loop 1 Halide branchless blend, loop 2 optimized r1 splat.
 //
 // Golden: statistical. Halide blend + r1 splat (byte-identical output to
@@ -7,7 +7,7 @@
 const std = @import("std");
 const fw = @import("../../framework/sim.zig");
 const layout = @import("data.zig");
-const halide = @import("AF01.LP1-halide_api.zig");
+const halide = @import("AF02.LP1-halide_api.zig");
 const r1 = @import("../common/render_opt.zig");
 
 const Data = layout.Data;
@@ -15,7 +15,7 @@ const Data = layout.Data;
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
         .mem_layout = "ML01",
-        .algo_fam = .AF01,
+        .algo_fam = .AF02,
         .ordering = .identity,
         .intermediates = .none,
         .loops = &.{

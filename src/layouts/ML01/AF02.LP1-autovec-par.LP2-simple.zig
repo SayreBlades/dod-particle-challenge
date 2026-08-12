@@ -1,10 +1,19 @@
-// Algorithm ML01.AF02.LP1-autovec-par.LP2-simple — AF02 (math | decide+respawn | render),
-// loop 1 data-parallel math, loop 2 serial decide+respawn, loop 3 r0 splat.
+// Algorithm ML01.AF02.LP1-autovec-par.LP2-simple — AF02 (math+decide+respawn | render),
+// loop 1 data-parallel, loop 2 r0 splat (serial).
 //
-// Golden: bit-exact. Loop 1 (math) is per-particle independent → parallel with
-// no coordination; loop 2 (decide+respawn) is serial (RNG-order). The seam
-// re-read is still here (loop 2 re-reads age), just loop 1 is parallel.
-// Diff vs AF02.LP1-autovec.LP2-simple: loop-1 parallel = data_parallel.
+// Golden: bit-exact. AF02 fuses math+decide+respawn into one loop, but
+// parallelism splits it into two phases (the structural cost of parallel
+// AF02): phase 1 (parallel) does math + decide → dead mask, NO spawn RNG
+// drawn; phase 2 (serial) scans the dead mask in index order, respawning
+// from the shared spawn RNG in exactly the serial algorithm's order —
+// bit-exact at any worker count. The mask is parallel-scratch (1 B/p),
+// not a declared intermediate (the algorithm family is still AF02, intermediates =
+// none); the declaration's loop-1 parallel = data_parallel is what carries
+// the two-phase structure. Diff vs AF06.LP1-autovec-par.LP2-mask-rmerge: AF06's mask
+// IS the declared intermediate (the algorithm family makes it first-class); here
+// it's an implementation detail of parallelizing a fused loop.
+//
+// Self-contained (§8 rule 2). Scavenges the AF06-par pool discipline.
 
 const std = @import("std");
 const fw = @import("../../framework/sim.zig");
@@ -14,7 +23,7 @@ const layout = @import("data.zig");
 const r0 = @import("../common/render_simple.zig");
 
 const Data = layout.Data;
-const CHUNK_ALIGN: usize = 32;
+const CHUNK_ALIGN: usize = 32; // chunk starts snap to 32 particles (17 lines)
 
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
@@ -23,43 +32,52 @@ pub const H = struct {
         .ordering = .identity,
         .intermediates = .none,
         .loops = &.{
-            .{ .impl = .zig, .schedule = .auto, .parallel = .data_parallel, .variant = .none },
-            .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .branchy },
+            .{ .impl = .zig, .schedule = .auto, .parallel = .data_parallel, .variant = .branchy },
             .{ .impl = .zig, .schedule = .r0, .parallel = .none, .variant = .none },
         },
         .golden = .bit_exact,
-        .halide_expressible = "loop1 yes; loop2 no (RNG-order); loop3 n/a",
+        .halide_expressible = "loop1 no (branchy respawn); loop2 n/a",
     };
 
     pub const Extra = struct {
+        dead: []u8, // parallel-phase kill flags (parallel-scratch, not a declared intermediate)
         pool: ?*pool_mod.Pool,
+        kill_seed: u64,
         cur_dt: f32,
     };
 
-    pub fn initExtra(sim: anytype, _: fw.Desc) !void {
+    pub fn initExtra(sim: anytype, desc: fw.Desc) !void {
+        const dead = try sim.alloc.alloc(u8, desc.n);
+        errdefer sim.alloc.free(dead);
         sim.extra = .{
+            .dead = dead,
             .pool = if (sim.threads > 1) try pool_mod.Pool.create(sim.alloc, sim.threads) else null,
+            .kill_seed = desc.seed ^ 0xDEAD_BEEF,
             .cur_dt = config.dt,
         };
     }
 
     pub fn deinitExtra(sim: anytype) void {
         if (sim.extra.pool) |p| p.destroy(sim.alloc);
+        sim.alloc.free(sim.extra.dead);
+    }
+
+    pub fn scratchBytes(sim: *const Sim) usize {
+        _ = sim;
+        return 1; // the dead mask, 1 B/p (parallel-scratch)
     }
 
     pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {
         sim.extra.cur_dt = dt;
-        // loop 1: parallel math (per-particle independent).
+        // loop 1 (parallel): math + decide → dead mask (no spawn RNG).
         if (sim.extra.pool) |p| {
             p.run(sim, phase1Task);
         } else {
             phase1Range(sim, 0, sim.data.n);
         }
-        // loop 2: serial decide + respawn (RNG-order).
-        for (sim.data.particles, 0..) |*p, i| {
-            if (config.isDead(p.age, &sim.kill_rng)) sim.data.spawn(&sim.rng, i);
-        }
-        // loop 3: r0 splat pass.
+        // loop 1 (serial tail): mask-scan + respawn in index order (bit-exact).
+        phase2Respawn(sim);
+        // loop 2: r0 splat pass (no clear — the driver owns it).
         for (sim.data.particles) |p| {
             r0.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
         }
@@ -71,12 +89,15 @@ pub const H = struct {
         const chunk = std.mem.alignForward(usize, n / n_workers, CHUNK_ALIGN);
         const lo = worker * chunk;
         if (lo >= n) return;
-        phase1Range(sim, lo, @min(n, lo + chunk));
+        const hi = @min(n, lo + chunk);
+        phase1Range(sim, lo, hi);
     }
 
     fn phase1Range(sim: anytype, lo: usize, hi: usize) void {
         const data = &sim.data;
+        const dead = sim.extra.dead;
         const dt = sim.extra.cur_dt;
+        var kr = std.Random.DefaultPrng.init(sim.extra.kill_seed ^ @as(u64, lo));
         var i: usize = lo;
         while (i < hi) : (i += 1) {
             const p = &data.particles[i];
@@ -88,6 +109,25 @@ pub const H = struct {
                 .z = v.z + (config.gravity.z + config.drag * v.z) * dt,
             };
             p.age += dt;
+            dead[i] = @intFromBool(config.isDead(p.age, &kr));
+        }
+    }
+
+    fn phase2Respawn(sim: anytype) void {
+        const dead = sim.extra.dead;
+        const n = sim.data.n;
+        const B = 32;
+        var i: usize = 0;
+        while (i + B <= n) : (i += B) {
+            const block: @Vector(B, u8) = dead[i..][0..B].*;
+            if (@reduce(.Or, block) == 0) continue;
+            var j: usize = i;
+            while (j < i + B) : (j += 1) {
+                if (dead[j] != 0) sim.data.spawn(&sim.rng, j);
+            }
+        }
+        while (i < n) : (i += 1) {
+            if (dead[i] != 0) sim.data.spawn(&sim.rng, i);
         }
     }
 };

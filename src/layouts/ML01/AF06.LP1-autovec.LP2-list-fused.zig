@@ -1,10 +1,10 @@
-// Algorithm ML01.AF08.LP1-autovec.LP2-fused — AF08 (math+decide→list | respawn+render(dead) fused | render(live)),
+// Algorithm ML01.AF06.LP1-autovec.LP2-list-fused — AF06 (math+decide→list | respawn+render(dead) fused | render(live)),
 // loop 1 math+decide→list, loop 2 fused respawn+render(dead only), loop 3 render(live, mask-tested).
 //
 // Golden: framebuffer_only. The most complex algorithm family: the list intermediate
 // + a dead/live render split. Loop 2 renders ONLY the dead (just respawned —
 // reads post-respawn pos from a register); loop 3 renders the live (those not
-// in the dead list). The dead/live split needs a live test — AF08 carries the
+// in the dead list). The dead/live split needs a live test — AF06 carries the
 // mask AND the list (declared intermediates: list + mask). Loop 3 splats a
 // live particle only if its mask bit is clear (not respawned this frame).
 //
@@ -24,7 +24,7 @@ const Data = layout.Data;
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
         .mem_layout = "ML01",
-        .algo_fam = .AF08,
+        .algo_fam = .AF06,
         .ordering = .identity,
         .intermediates = .mask_and_list,
         .loops = &.{

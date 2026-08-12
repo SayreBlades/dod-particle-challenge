@@ -1,4 +1,4 @@
-// Algorithm ML01.AF01.LP1-scalar.LP2-simple — AF01 (math+decide+respawn | render),
+// Algorithm ML01.AF02.LP1-scalar.LP2-simple — AF02 (math+decide+respawn | render),
 // loop 1 scalar branchy, loop 2 r0 splat.
 //
 // Golden: bit-exact. Same algorithm as LP2-simple but every scalar intermediate
@@ -18,7 +18,7 @@ const Data = layout.Data;
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
         .mem_layout = "ML01",
-        .algo_fam = .AF01,
+        .algo_fam = .AF02,
         .ordering = .identity,
         .intermediates = .none,
         .loops = &.{

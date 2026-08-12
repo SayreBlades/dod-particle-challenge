@@ -1,9 +1,9 @@
-// Algorithm ML01.AF06.LP1-autovec.LP2-fused — AF06 (math | decide+respawn+render fused),
+// Algorithm ML01.AF04.LP1-autovec.LP2-fused — AF04 (math | decide+respawn+render fused),
 // loop 1 math, loop 2 fused decide+respawn+splat.
 //
 // Golden: framebuffer_only. Loop 1 is pure math (separable); loop 2 fuses
 // decide+respawn+render so the splat reads post-respawn pos from a register.
-// Diff vs AF05: the math/decide seam (isolates whether fusing just the
+// Diff vs AF01: the math/decide seam (isolates whether fusing just the
 // decide+respawn+render, without fusing math, still wins).
 
 const std = @import("std");
@@ -17,7 +17,7 @@ const Data = layout.Data;
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
         .mem_layout = "ML01",
-        .algo_fam = .AF06,
+        .algo_fam = .AF04,
         .ordering = .identity,
         .intermediates = .none,
         .loops = &.{

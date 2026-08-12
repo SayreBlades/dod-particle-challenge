@@ -1,14 +1,13 @@
-// Algorithm ML01.AF02.LP1-halide-par.LP2-simple — AF02 (math | decide+respawn | render),
-// loop 1 Halide math, loop 2 Zig decide+respawn, loop 3 r0 splat. SERIAL.
+// Algorithm ML01.AF02.LP1-halide-par.LP2-simple — AF02 (math+decide+respawn | render),
+// loop 1 Halide branchless blend, loop 2 r0 splat.
 //
-// Golden: bit-exact. The "natural seam": Halide does the math (StrictFloat,
-// bit-identical to the Zig cells), Zig keeps decide+respawn (RNG-order). The
-// cost on AoS is the second loop (the seam), not Halide's codegen. Diff vs
-// AF02.LP1-autovec.LP2-simple: loop-1 impl zig → halide (isolates impl, math-only).
+// Golden: statistical (different RNG model by design — per-particle hash RNG
+// vs the branchy variant's ordered spawn stream). Diff vs AF02.LP1-autovec.LP2-simple:
+// loop-1 impl zig → halide AND variant branchy → blend (isolates the
+// impl+variant axes; the statistical golden is the cost of that isolation).
 
 const std = @import("std");
 const fw = @import("../../framework/sim.zig");
-const config = @import("../../framework/config.zig");
 const layout = @import("data.zig");
 const halide = @import("AF02.LP1-halide_api.zig");
 const r0 = @import("../common/render_simple.zig");
@@ -22,12 +21,11 @@ pub const H = struct {
         .ordering = .identity,
         .intermediates = .none,
         .loops = &.{
-            .{ .impl = .halide, .schedule = .scalar, .parallel = .data_parallel, .variant = .none },
-            .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .branchy },
+            .{ .impl = .halide, .schedule = .scalar, .parallel = .data_parallel, .variant = .blend },
             .{ .impl = .zig, .schedule = .r0, .parallel = .none, .variant = .none },
         },
-        .golden = .bit_exact,
-        .halide_expressible = "loop1 yes (math); loop2 no (RNG-order); loop3 n/a",
+        .golden = .statistical,
+        .halide_expressible = "loop1 yes (branchless blend, per-particle hash RNG); loop2 n/a (render)",
     };
 
     /// Cap the Halide runtime pool so the `-par` kernel honors `--threads`
@@ -43,13 +41,9 @@ pub const H = struct {
 
     pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {
         const data = &sim.data;
-        // loop 1: Halide math (integrate pos/vel/age; no decide).
-        halide.run(data, dt);
-        // loop 2: Zig decide + respawn (branchy, RNG-order).
-        for (data.particles, 0..) |*p, i| {
-            if (config.isDead(p.age, &sim.kill_rng)) data.spawn(&sim.rng, i);
-        }
-        // loop 3: r0 splat pass.
+        // loop 1: Halide branchless blend (math + decide + respawn in one pipeline).
+        halide.run(data, dt, sim.frame);
+        // loop 2: r0 splat pass (no clear — the driver owns it).
         for (data.particles) |p| {
             r0.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
         }

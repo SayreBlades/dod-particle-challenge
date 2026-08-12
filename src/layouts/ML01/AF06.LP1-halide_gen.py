@@ -1,6 +1,6 @@
-# AF03.LP1-halide_gen.py — the AF03 Halide math+decide loop (loop 1 only).
+# AF06.LP1-halide_gen.py — the AF06 Halide math+decide loop (loop 1 only).
 #
-# AF03's loop 1 is math + decide → dead mask (no respawn; respawn is the Zig
+# AF06's loop 1 is math + decide → dead mask (no respawn; respawn is the Zig
 # loop 2). This generator emits the math (integrate pos/vel/age) AND the
 # decide (competing-risks death test) → a dead-mask output buffer (u8, 1 per
 # particle). The cell's `step` calls this for loop 1, then runs the Zig
@@ -9,7 +9,7 @@
 # The decide uses the per-chunk kill-RNG discipline (splitmix64) so the parallel
 # variant is deterministic per (T, chunk). q=0 prunes to age-only (no kill hash).
 #
-# Usage: python AF03.LP1-halide_gen.py <out_prefix> [schedule_json] [q]
+# Usage: python AF06.LP1-halide_gen.py <out_prefix> [schedule_json] [q]
 
 import halide as hl
 import json, sys, os
@@ -84,5 +84,5 @@ if par:
         f.parallel(i)
 
 hl.Pipeline(outs).compile_to_static_library(
-    out, [data, dt, kill_age, q], "halide_b3_mask", target)
-print(f"emitted {out}.h {out}.a (vw={vw} parallel={par} q=runtime AF03-math+mask)")
+    out, [data, dt, kill_age, q], "halide_b6_mask", target)
+print(f"emitted {out}.h {out}.a (vw={vw} parallel={par} q=runtime AF06-math+mask)")

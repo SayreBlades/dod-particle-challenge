@@ -1,8 +1,8 @@
-// Algorithm ML01.AF05.LP1-fused — AF05 (math+decide+respawn+render, fully fused),
+// Algorithm ML01.AF01.LP1-fused — AF01 (math+decide+respawn+render, fully fused),
 // single loop, splat inlined into the physics loop.
 //
 // Golden: framebuffer_only. The sim golden passes trivially (respawn RNG
-// order unchanged from AF01.LP1-autovec — the splat reads pos after respawn,
+// order unchanged from AF02.LP1-autovec — the splat reads pos after respawn,
 // doesn't perturb it); the FRAME golden is the fusion-relevant check (does
 // the interleaved splat still produce a byte-identical frame?).
 //
@@ -25,7 +25,7 @@ const Data = layout.Data;
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
         .mem_layout = "ML01",
-        .algo_fam = .AF05,
+        .algo_fam = .AF01,
         .ordering = .identity,
         .intermediates = .none,
         .loops = &.{
@@ -35,7 +35,7 @@ pub const H = struct {
         .halide_expressible = "no (scatter reduction — fused render is not Halide-expressible)",
     };
 
-    /// AF05: one fused loop — math + decide + respawn, then splat the (possibly
+    /// AF01: one fused loop — math + decide + respawn, then splat the (possibly
     /// respawned) particle in the same iteration. The splat reads post-respawn
     /// pos from a register before the next iteration evicts it.
     pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {

@@ -1,4 +1,4 @@
-// Algorithm ML01.AF01.LP1-blend.LP2-simple — AF01 (math+decide+respawn | render),
+// Algorithm ML01.AF02.LP1-blend.LP2-simple — AF02 (math+decide+respawn | render),
 // loop 1 Zig branchless blend, loop 2 r0 splat.
 //
 // Golden: statistical. The branchless blend computes respawn values for EVERY
@@ -6,7 +6,7 @@
 // selects them in only for the dead — no branch, vectorizable. The cost: the
 // respawn RNG model differs from the branchy reference's ordered stream, so
 // trajectories diverge by design (distributions identical). This is the Zig
-// control for the Halide blend (AF01.LP1-halide.LP2-simple): same math + RNG
+// control for the Halide blend (AF02.LP1-halide.LP2-simple): same math + RNG
 // model, isolates impl (zig vs halide) with variant held at blend.
 //
 // Self-contained (§8 rule 2): physics + branchless respawn inlined here; the
@@ -25,7 +25,7 @@ const Particle = layout.Particle;
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
         .mem_layout = "ML01",
-        .algo_fam = .AF01,
+        .algo_fam = .AF02,
         .ordering = .identity,
         .intermediates = .none,
         .loops = &.{
@@ -36,7 +36,7 @@ pub const H = struct {
         .halide_expressible = "loop1 yes (branchless blend, per-particle hash RNG); loop2 n/a",
     };
 
-    /// AF01-blend, unfused: one physics loop with branchless respawn (select),
+    /// AF02-blend, unfused: one physics loop with branchless respawn (select),
     /// then a separate splat pass. The splat always runs.
     pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {
         const data = &sim.data;

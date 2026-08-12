@@ -1,4 +1,4 @@
-// Algorithm ML01.AF01.LP1-autovec.LP2-opt — AF01 (math+decide+respawn | render),
+// Algorithm ML01.AF02.LP1-autovec.LP2-opt — AF02 (math+decide+respawn | render),
 // loop 1 autovec branchy, loop 2 optimized r1 splat.
 //
 // Golden: bit-exact. r1 splat (comptime color LUT + NEON uqadd) on the
@@ -16,7 +16,7 @@ const Data = layout.Data;
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
         .mem_layout = "ML01",
-        .algo_fam = .AF01,
+        .algo_fam = .AF02,
         .ordering = .identity,
         .intermediates = .none,
         .loops = &.{
