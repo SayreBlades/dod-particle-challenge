@@ -8,13 +8,17 @@
 // (NEON fmul.s and fmul.4s lanes are both IEEE single — same ops, same order.)
 
 const std = @import("std");
-const builtin = @import("builtin");
 const fw = @import("../../framework/sim.zig");
 const config = @import("../../framework/config.zig");
 const layout = @import("data.zig");
 const r0 = @import("../common/render_simple.zig");
+const devec = @import("../common/devec.zig");
 
 const Data = layout.Data;
+// Scalar de-vec barrier (opaque identity through a SIMD register), shared from
+// layouts/common/devec.zig. Aliased locally so the dense math in step() stays
+// readable — `box(x)` is a no-op at runtime, purely an optimization barrier.
+const box = devec.box;
 
 pub const H = struct {
     pub const algo_meta: fw.AlgorithmMeta = .{
@@ -29,27 +33,6 @@ pub const H = struct {
         .golden = .bit_exact,
         .halide_expressible = "loop1 no (branchy respawn, de-vec control); loop2 n/a",
     };
-
-    /// An OPAQUE identity: the value emerges from an asm output operand, so
-    /// the optimizer cannot prove it equals the input — SLP can't pack
-    /// producer or consumer chains across the box.
-    inline fn box(x: f32) f32 {
-        // De-vectorization barrier: force the value through a SIMD register so
-        // LLVM can't prove it equals the input (defeats SLP auto-vectorization).
-        // The register-class constraint is arch-specific (NEON "w" on ARM64, SSE
-        // "x" on x86_64); the comptime switch keeps only the live arm analyzed.
-        return switch (builtin.cpu.arch) {
-            .aarch64 => asm volatile (""
-                : [ret] "=w" (-> f32)
-                : [in] "w" (x)
-            ),
-            .x86_64 => asm volatile (""
-                : [ret] "=x" (-> f32)
-                : [in] "x" (x)
-            ),
-            else => x, // no SIMD barrier available: vectorization may still occur
-        };
-    }
 
     pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {
         const data = &sim.data;

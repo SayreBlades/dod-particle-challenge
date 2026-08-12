@@ -18,7 +18,14 @@ EVENT SET: AMD Zen 2 (Family 17h, Model 71h — e.g. Ryzen 9 3900X). Six events,
 which fits the 6 general-purpose PMCs per core → no multiplexing → every counter
 is 100%-counted → cycle-accurate attribution. On other µarches these named
 events may be unsupported; `measure()` raises and collect.py logs PROFILE FAIL
-(graceful — the row is simply not written).
+(graceful — the row is simply not written). `measure()` also raises if perf
+silently dropped or scaled any event (e.g. the NMI watchdog stealing a GP PMC
+and forcing multiplexing) — that would otherwise collapse the buckets to a
+misleading all-`compute` row.
+
+Requires: `perf` on PATH and permission to read PMCs —
+`kernel.perf_event_paranoid <= 1` (or `CAP_PERFMON`), and
+`kernel.nmi_watchdog=0` so all 6 GP PMCs are free for the event set.
 
 CAVEAT: on Zen 2, `ic_fetch_stall.ic_stall_any` counts cycles the front end did
 not supply ops, INCLUDING cycles where the back end was not consuming — so the
@@ -49,7 +56,9 @@ def find_perf():
 
 
 def _parse_perf_csv(stderr_text):
-    """Parse `perf stat -x,` stderr into {event: count}. perf appends ':u'."""
+    """Parse `perf stat -x,` stderr into {event: count}. Events are requested
+    bare, but perf may render some with a trailing ':u' modifier, so get()
+    accepts either the bare or the ':u'-suffixed name."""
     counts = {}
     for line in stderr_text.splitlines():
         f = line.split(",")
@@ -80,6 +89,23 @@ def measure(algo, n, q, threads, iters, trial, bin_path):
     )
     # perf stat writes counts to stderr; rc is nonzero only on tool error.
     counts = _parse_perf_csv(r.stderr)
+
+    # Guard: every event must have been counted. perf emits "<not supported>"
+    # (wrong µarch — these are AMD 17h/71h named events) or "<not counted>"
+    # (multiplexed — the NMI watchdog can steal a GP PMC, dropping us from 6
+    # free counters to 5, so the 6 events no longer fit) on hosts that aren't
+    # this exact Zen 2 config. _parse_perf_csv drops those lines; without this
+    # check get() would silently return 0 and the buckets would collapse to a
+    # misleading all-`compute` row. Fail loudly instead — collect.py logs
+    # PROFILE FAIL and no row is written.
+    missing = [e for e in EVENTS if not (counts.get(e) or counts.get(e + ":u"))]
+    if missing:
+        raise RuntimeError(
+            f"perf did not count every event on this host (unsupported µarch or "
+            f"multiplexing — check kernel.perf_event_paranoid<=1 and "
+            f"kernel.nmi_watchdog=0): missing={missing}; "
+            f"stderr: {r.stderr.strip()[:300]}"
+        )
 
     def get(name):
         return counts.get(name) or counts.get(name + ":u") or 0
@@ -115,3 +141,31 @@ def measure(algo, n, q, threads, iters, trial, bin_path):
         "frontend_stall": frontend_stall,
         "branch_flush": branch_flush,
     }
+
+
+def _selftest():
+    """Parser smoke test — run via `python scripts/profile_perf.py` (no deps).
+    Covers: plain rows, the ':u' suffix, <not supported> drop, non-numeric
+    value drop, and the <3-field drop."""
+    sample = "\n".join([
+        "1234567890,,cycles,100.00",                                  # plain
+        "555,,ic_fetch_stall.ic_stall_any:u,100.00",                  # :u suffix kept
+        "<not supported>,,ex_ret_brn_resync,0.00",                    # dropped (<not...>)
+        "oops,,de_dis_dispatch_token_stalls1.load_queue_token_stall,100.00",  # dropped (non-int)
+        "short line",                                                 # dropped (<3 fields)
+        "42,,de_dis_dispatch_token_stalls1.store_queue_token_stall,100.00",
+        "8,,de_dis_dispatch_token_stalls1.fp_sch_rsrc_stall,100.00",
+        "",
+    ])
+    c = _parse_perf_csv(sample)
+    assert c == {
+        "cycles": 1234567890,
+        "ic_fetch_stall.ic_stall_any:u": 555,
+        "de_dis_dispatch_token_stalls1.store_queue_token_stall": 42,
+        "de_dis_dispatch_token_stalls1.fp_sch_rsrc_stall": 8,
+    }, c
+    print("profile_perf._parse_perf_csv: ok")
+
+
+if __name__ == "__main__":
+    _selftest()

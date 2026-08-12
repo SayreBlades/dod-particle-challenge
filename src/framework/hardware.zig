@@ -59,6 +59,13 @@ fn detectLinux(f: *Facts) void {
     f.pagesize = @intCast(std.heap.pageSize());
     f.cachelinesize = 64; // x86_64 de-facto; hardware.json carries the real value.
     f.logicalcpu = linuxLogicalCpus();
+    // sched_getaffinity returns LOGICAL cpus (SMT threads included), and there
+    // is no I/O-free way to count physical cores on Linux. We deliberately set
+    // physicalcpu = logicalcpu (so on an SMT part this over-reports physical
+    // cores) rather than parse /sys — the authoritative value lives in
+    // hardware.json (scripts/hardware_json.py). Treat in-process
+    // Facts.physicalcpu on Linux as "logical only"; do NOT divide
+    // logical/physical to detect SMT.
     f.physicalcpu = f.logicalcpu;
 }
 
