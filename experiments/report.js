@@ -162,14 +162,14 @@ async function drawBandwidthMemLayout(lb) {
 // ---------------- algorithm ----------------
 // ---- Algorithm section (deterministic, from algo_meta + name) ----
 const ALGO_FAMS = {
-  AF01: [["Integrate", "Decide", "Respawn"], ["Render"], null],
-  AF02: [["Integrate"], ["Decide", "Respawn"], ["Render"]],
-  AF03: [["Integrate", "Decide→mask"], ["scan mask", "Respawn"], ["Render"]],
-  AF04: [["Integrate", "Decide→list"], ["Respawn (dead only)"], ["Render"]],
-  AF05: [["Integrate", "Decide", "Respawn", "Render"], null, null],
-  AF06: [["Integrate"], ["Decide", "Respawn", "Render"], null],
-  AF07: [["Integrate", "Decide→mask"], ["scan mask", "Respawn", "Render"], null],
-  AF08: [["Integrate", "Decide→list"], ["Respawn", "Render (dead)"], ["Render (live)"]],
+  AF01: [["Integrate", "Decide", "Respawn", "Render"], null, null],
+  AF02: [["Integrate", "Decide", "Respawn"], ["Render"], null],
+  AF03: [["Integrate", "Decide→mask"], ["scan mask", "Respawn", "Render"], null],
+  AF04: [["Integrate"], ["Decide", "Respawn", "Render"], null],
+  AF05: [["Integrate"], ["Decide", "Respawn"], ["Render"]],
+  AF06: [["Integrate", "Decide→mask/list"], ["Respawn"], ["Render"]],
+  AF07: [["Integrate"], ["Decide"], ["Respawn", "Render"]],
+  AF08: [["Integrate"], ["Decide"], ["Respawn"], ["Render"]],
 };
 function loopSchedules(algo) {
   const algoPart = algo.split(".").slice(1).join(".");

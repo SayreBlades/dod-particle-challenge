@@ -1,16 +1,16 @@
 # Makefile — common actions for the DoD Particle Challenge.
 #
 # Each target accepts an optional positional target: a full algorithm name
-# (ML01.AF01.LP1-autovec.LP2-simple), a memory layout (ML01), or `all` (default). It's read
+# (ML01.AF02.LP1-autovec.LP2-simple), a memory layout (ML01), or `all` (default). It's read
 # from any extra goal on the
 # command line, e.g.:
 #
 #   make init                               # one-time setup: git submodules + python env (uv sync)
 #   make build                              # build every algorithm of every memory layout
 #   make build ML01                           # build every algorithm of ML01
-#   make build ML01.AF01.LP1-autovec.LP2-simple   # build one algorithm (full name; memory layouts share algo names)
-#   make play ML01.AF01.LP1-autovec.LP2-simple    # open the interactive raylib window
-#   make profile ML01.AF01.LP1-autovec.LP2-simple # cycle-attribution, one point (profiler backend: xctrace on macOS)
+#   make build ML01.AF02.LP1-autovec.LP2-simple   # build one algorithm (full name; memory layouts share algo names)
+#   make play ML01.AF02.LP1-autovec.LP2-simple    # open the interactive raylib window
+#   make profile ML01.AF02.LP1-autovec.LP2-simple # cycle-attribution, one point (profiler backend: xctrace on macOS)
 #   make report                             # build the analysis tree + verify gate
 #   make serve                              # serve experiments/ on :8000 (open report.html)
 #   make clean                              # remove out/ and worker build dirs
@@ -69,7 +69,7 @@ clean:
 	rm -rf out out.w*
 
 # Data-collection sweep (see scripts/README.md). Target is a memory layout (ML01), a
-# algorithm (ML01.AF01.LP1-autovec.LP2-simple), or empty = all memory layouts.
+# algorithm (ML01.AF02.LP1-autovec.LP2-simple), or empty = all memory layouts.
 collect:
 	$(PY) scripts/collect.py $(TARGET)
 
@@ -94,7 +94,7 @@ help:
 	@echo "  make collect-profile [target]   cycle-attribution grid sweep (the radar's data; profiler backend)"
 	@echo "  (for --with-profile, run: uv run python scripts/collect.py <target> --with-profile)"
 	@echo ""
-	@echo "Target may be an algorithm (ML01.AF01.LP1-autovec.LP2-simple), a memory layout (ML01),"
+	@echo "Target may be an algorithm (ML01.AF02.LP1-autovec.LP2-simple), a memory layout (ML01),"
 	@echo "a memory layout (ML01), or all (default). See scripts/README.md for details."
 
 .DEFAULT_GOAL := help

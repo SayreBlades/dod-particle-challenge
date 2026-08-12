@@ -1,13 +1,12 @@
-// Algorithm ML01.AF02.LP1-autovec.LP2-simple — AF02 (math | decide+respawn | render),
-// loop 1 autovec math, loop 2 autovec decide+respawn (branchy), loop 3 r0 splat.
+// Algorithm ML01.AF02.LP1-autovec.LP2-simple — AF02 (math+decide+respawn | render),
+// loop 1 autovec branchy, loop 2 r0 splat.
 //
-// Golden: bit-exact. The "natural seam": math is separable from decide+respawn,
-// so loop 1 reads {pos, vel, age} and writes {pos, vel, age}; loop 2 re-reads
-// age across the seam to decide death + respawn. The cost AF03's mask was
-// invented to kill: loop 2 re-reads `age` (a second pass over the field).
-// Diff vs AF01.LP1-autovec.LP2-simple: the math/decide seam (isolates fusion).
+// The reference sim (generates experiments/golden/stage1.bin + experiments/golden/frame.sha256).
+// Golden: bit-exact. Same algorithm family as the other AF02 cells; differs only in
+// loop attributes (read the declaration diff for the attribution).
 //
-// Self-contained (§8 rule 2): both loops inlined; the splat calls r0.
+// Self-contained (§8 rule 2): the physics is inlined here, not aliased from
+// a loop file. The splat calls the shared r0 pass in layouts/common/.
 
 const std = @import("std");
 const fw = @import("../../framework/sim.zig");
@@ -25,34 +24,39 @@ pub const H = struct {
         .ordering = .identity,
         .intermediates = .none,
         .loops = &.{
-            .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .none },
             .{ .impl = .zig, .schedule = .auto, .parallel = .none, .variant = .branchy },
             .{ .impl = .zig, .schedule = .r0, .parallel = .none, .variant = .none },
         },
         .golden = .bit_exact,
-        .halide_expressible = "loop1 yes (math); loop2 no (RNG-order decide+respawn); loop3 n/a",
+        .halide_expressible = "loop1 no (branchy respawn — select is branchless); loop2 n/a (render)",
     };
 
+    /// AF02, unfused: physics loop, then a separate splat pass. The splat always
+    /// runs (the driver provided a real fb and cleared it).
     pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {
         const data = &sim.data;
-        // loop 1: math only (integrate + forces + age; no decide, no respawn).
+        // loop 1: math + decide + respawn (branchy)
         for (data.particles) |*p| {
+            // 1. Integrate: pos += vel * dt
             p.pos = p.pos.add(p.vel.scale(dt));
+
+            // 2. Forces: vel += (gravity + drag*vel) * dt
             const v = p.vel;
             p.vel = .{
                 .x = v.x + (config.gravity.x + config.drag * v.x) * dt,
                 .y = v.y + (config.gravity.y + config.drag * v.y) * dt,
                 .z = v.z + (config.gravity.z + config.drag * v.z) * dt,
             };
+
+            // 3. Age
             p.age += dt;
-        }
-        // loop 2: decide + respawn (branchy). Re-reads age across the seam.
-        for (data.particles, 0..) |*p, i| {
+
+            // 4. Kill → respawn (in place; seed % len == i by construction)
             if (config.isDead(p.age, &sim.kill_rng)) {
-                data.spawn(&sim.rng, i);
+                data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));
             }
         }
-        // loop 3: r0 splat pass (no clear — the driver owns it).
+        // loop 2: r0 splat pass (no clear — the driver owns it).
         for (data.particles) |p| {
             r0.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);
         }

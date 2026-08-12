@@ -17,7 +17,7 @@ Graceful absence: where no profiler backend is available, the row is not written
 profile_point().
 
 Usage:
-    scripts/profile.py ML01.AF01.LP1-autovec.LP2-simple --n 1000000 --q 0.1 --threads 1 --trial 1
+    scripts/profile.py ML01.AF05.LP1-autovec.LP2-simple --n 1000000 --q 0.1 --threads 1 --trial 1
 """
 from __future__ import annotations
 import argparse, datetime, json, os, platform, sys

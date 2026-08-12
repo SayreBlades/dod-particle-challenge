@@ -12,8 +12,8 @@ kind-discriminated (no separate checks file). Rows are append-only; --skip-done
 skips a point already present at the current source_hash (resume without dupes).
 
 Usage:
-    scripts/bench.py ML01.AF01.LP1-autovec.LP2-simple --q 0.1 --threads 1
-    scripts/bench.py ML01.AF01.LP1-autovec-par.LP2-simple --q 0.25 --threads 4 --trials 3 --skip-done
+    scripts/bench.py ML01.AF02.LP1-autovec.LP2-simple --q 0.1 --threads 1
+    scripts/bench.py ML01.AF02.LP1-autovec-par.LP2-simple --q 0.25 --threads 4 --trials 3 --skip-done
 """
 from __future__ import annotations
 import argparse, datetime, json, os, platform, subprocess, sys

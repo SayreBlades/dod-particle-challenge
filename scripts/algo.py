@@ -14,8 +14,8 @@ The disassembly functions here are the canonical home; analyze_algo.py will
 import them (Phase E) instead of carrying its own copy.
 
 Usage:
-    scripts/algo.py ML01.AF01.LP1-autovec.LP2-simple           # write <algo>.json
-    scripts/algo.py ML01.AF01.LP1-autovec.LP2-simple --force    # rebuild even if current
+    scripts/algo.py ML01.AF02.LP1-autovec.LP2-simple           # write <algo>.json
+    scripts/algo.py ML01.AF02.LP1-autovec.LP2-simple --force    # rebuild even if current
 """
 from __future__ import annotations
 import json, os, re, subprocess, sys

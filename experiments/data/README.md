@@ -23,7 +23,7 @@ pure derivation from this layer (no toolchain needed at report time).
                          #    branch_flush, *_pct}
 ```
 
-`<algo>` is the full algorithm name, e.g. `ML01.AF01.LP1-autovec.LP2-simple`.
+`<algo>` is the full algorithm name, e.g. `ML01.AF02.LP1-autovec.LP2-simple`.
 
 **Writers** — all orchestrated by [`collect.py`](../../scripts/README.md#collectpy);
 each is also a standalone atomic script:
