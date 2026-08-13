@@ -18,8 +18,8 @@ const fetchJSON = (u) => fetch(u).then((r) => r.ok ? r.json() : null);
 const fetchText = (u) => fetch(u).then((r) => r.ok ? r.text() : "");
 
 function getOverview(m)   { return ovCache[m]   ?? (ovCache[m]   = fetchJSON(`analysis/${m}/overview.json`)); }
-function getMemLayout(m, L)  { return layCache[m+L]?? (layCache[m+L]= fetchJSON(`analysis/${m}/${L}/mem_layout.json`)); }
-function getAlgoJson(m, c){ const k=m+"/"+c; return algoCache[k] ?? (algoCache[k]= (async()=>{const L=c.split(".")[0],s=short(c);return fetchJSON(`analysis/${m}/${L}/${s}.json`);})()); }
+function getMemLayout(m, L)  { return layCache[m+L]?? (layCache[m+L]= fetchJSON(`analysis/${m}/${L}.mem_layout.json`)); }
+function getAlgoJson(m, c){ const k=m+"/"+c; return algoCache[k] ?? (algoCache[k]= (async()=>{return fetchJSON(`analysis/${m}/${c}.json`);})()); }
 const gridCache = {};
 const getGrid = (m) => gridCache[m] ?? (gridCache[m] = fetchJSON(`analysis/${m}/grid.json`));
 
@@ -408,9 +408,9 @@ function setupLinked() {
 }
 
 async function renderAlgo(algo) {
-  const L = algo.split(".")[0], s = short(algo);
+  const L = algo.split(".")[0];
   const [j, md, lb] = await Promise.all([
-    getAlgoJson(machine, algo), fetchText(`analysis/${machine}/${L}/${s}.md`), getMemLayout(machine, L)]);
+    getAlgoJson(machine, algo), fetchText(`analysis/${machine}/${algo}.md`), getMemLayout(machine, L)]);
   if (!j) { $("page").innerHTML = `<section><p>No analysis bundle for ${algo}.</p></section>`; status("missing"); return; }
   renderMeta(j.hardware);
   const d = j.algo_meta;

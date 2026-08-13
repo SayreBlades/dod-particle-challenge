@@ -309,7 +309,6 @@ def read_mem_layout_algos(mem_layout):
 
 
 def process_algo(algo, m, hw, model, json_only, prompt_only, force=False):
-    mem_layout, algo_part = split_algo(algo)
     shash = source_hash(algo)
     # only rows pinned to the CURRENT source (drops null/stale-source rows)
     runs = load_jsonl(os.path.join(DATA, m, f"{algo}.runs.jsonl"), algo, kind="timing", source_hash=shash)
@@ -327,10 +326,10 @@ def process_algo(algo, m, hw, model, json_only, prompt_only, force=False):
         print(f"  no asm bundle for {algo} — building on the fly", file=sys.stderr)
         asm = _algo.build_asm(algo, shash)
     evidence = build_evidence(algo, m, hw, runs, prof, asm)
-    outdir = os.path.join(ROOT, "experiments", "analysis", m, mem_layout)
+    outdir = os.path.join(ROOT, "experiments", "analysis", m)
     os.makedirs(outdir, exist_ok=True)
-    jpath = os.path.join(outdir, f"{algo_part}.json")
-    mpath = os.path.join(outdir, f"{algo_part}.md")
+    jpath = os.path.join(outdir, f"{algo}.json")
+    mpath = os.path.join(outdir, f"{algo}.md")
     new_json = json.dumps(evidence, indent=2)
     old_json = open(jpath).read() if os.path.exists(jpath) else None
     if old_json != new_json:
@@ -468,10 +467,9 @@ def prose_numbers(md):
 
 
 def verify_algo(algo, m):
-    mem_layout, algo_part = split_algo(algo)
-    base = os.path.join(ROOT, "experiments", "analysis", m, mem_layout)
-    jpath = os.path.join(base, f"{algo_part}.json")
-    mpath = os.path.join(base, f"{algo_part}.md")
+    base = os.path.join(ROOT, "experiments", "analysis", m)
+    jpath = os.path.join(base, f"{algo}.json")
+    mpath = os.path.join(base, f"{algo}.md")
     if not os.path.exists(jpath):
         return "MISS", ["no .json bundle"], []
     if not os.path.exists(mpath):

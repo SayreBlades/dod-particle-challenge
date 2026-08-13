@@ -70,10 +70,10 @@ def rename_files():
                for b in BASES for e in (".json",".runs.jsonl",".profile.jsonl")
                if os.path.exists(os.path.join(d,"ML01."+b+e))]
         if pairs: two_phase(pairs) if not DRY else None; n+=len(pairs)
-    for d in glob.glob("experiments/analysis/*/ML01/"):  # AFxx.<name>.{json,md}
+    for d in glob.glob("experiments/analysis/*/"):   # ML01.AFxx.<name>.{json,md} (flat, mirrors data/)
         for e in (".json",".md"):
-            pairs=[(os.path.join(d,b+e), os.path.join(d,FILEMAP[b]+e)) for b in BASES
-                   if os.path.exists(os.path.join(d,b+e))]
+            pairs=[(os.path.join(d,"ML01."+b+e), os.path.join(d,"ML01."+FILEMAP[b]+e)) for b in BASES
+                   if os.path.exists(os.path.join(d,"ML01."+b+e))]
             if pairs: two_phase(pairs) if not DRY else None; n+=len(pairs)
     return n
 

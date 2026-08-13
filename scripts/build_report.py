@@ -229,12 +229,11 @@ def inject_verified(machine, mem_layout, verify_results):
     the schema and rewrites the .json each run — this runs after.)"""
     if not mem_layout:
         return
-    base = os.path.join(OUT, machine, mem_layout)
+    base = os.path.join(OUT, machine)
     for algo, v in verify_results.items():
         if algo.split(".")[0] != mem_layout:
             continue
-        algo_part = algo.split(".", 1)[1]
-        jpath = os.path.join(base, f"{algo_part}.json")
+        jpath = os.path.join(base, f"{algo}.json")
         if not os.path.exists(jpath):
             continue
         try:
@@ -288,8 +287,8 @@ def build_machines_index(con):
                      f"{', '.join(m['layouts'])} |")
     lines.append("")
     lines.append("Per machine: `<machine_id>/README.md` (overview) → "
-                 "`<machine_id>/<L>/README.md` (mem_layout) → "
-                 "`<machine_id>/<L>/<algo>.md` (the per-algo narrative).")
+                 "`<machine_id>/<L>.mem_layout.md` (mem_layout) → "
+                 "`<machine_id>/<algo>.md` (the per-algo narrative).")
     open(os.path.join(OUT, "README.md"), "w").write("\n".join(lines) + "\n")
     print(f"  wrote analysis/README.md + analysis/machines.json ({len(mlist)} machine(s))",
           file=sys.stderr)
@@ -318,7 +317,7 @@ def build_overview(con, mid):
                  f"L2 {hw['l2cachesize'] // 1048576:.0f} MB · "
                  f"{hw['logicalcpu']} logical cores.")
     lines.append("")
-    lines.append(f"Memory layouts measured: {', '.join(f'[{L}]({L}/)' for L in layouts)}.")
+    lines.append(f"Memory layouts measured: {', '.join(f'[{L}]({L}.mem_layout.md)' for L in layouts)}.")
     lines.append("")
     lines.append(f"## Winners (top-3) (T={default_t})")
     lines.append("")
@@ -341,15 +340,14 @@ def build_mem_layout_bundle(con, mid, L):
         if r["rk"] == 1 and r["threads"] == default_t:
             c = r["algo"]
             if not any(f["algo"] == c for f in featured):
-                algo_part = c.split(".", 1)[1]
                 featured.append({"algo": c, "ns": round(r["ns_particle"], 2),
-                                 "teaser": teaser(os.path.join(OUT, mid, L, f"{algo_part}.md"))})
+                                 "teaser": teaser(os.path.join(OUT, mid, f"{c}.md"))})
     lb = {"machine_id": mid, "mem_layout": L, "death_rates": deaths, "n_values": nvals,
           "thread_groups": threads, "streaming_bw_gbs": hw["streaming_bw_gbs"],
           "memory_layout": MEM_LAYOUT_MEMORY.get(L, ""), "champions": champs,
           "algos": algos_all, "featured": featured}
-    os.makedirs(os.path.join(OUT, mid, L), exist_ok=True)
-    json.dump(lb, open(os.path.join(OUT, mid, L, "mem_layout.json"), "w"), indent=2)
+    os.makedirs(os.path.join(OUT, mid), exist_ok=True)
+    json.dump(lb, open(os.path.join(OUT, mid, f"{L}.mem_layout.json"), "w"), indent=2)
 
     lines = [f"# Memory layout {L} on {hw['cpu']} (`{mid}`)", ""]
     lines.append(f"## Champion grid (T={default_t})")
@@ -360,19 +358,17 @@ def build_mem_layout_bundle(con, mid, L):
     lines.append("")
     if featured:
         for f in featured:
-            algo_part = f["algo"].split(".", 1)[1]
             t = f" — {f['teaser']}…" if f["teaser"] else ""
-            lines.append(f"- **[{f['algo']}]({algo_part}.md)** — {f['ns']} ns/p{t}")
+            lines.append(f"- **[{f['algo']}]({f['algo']}.md)** — {f['ns']} ns/p{t}")
     else:
         lines.append("_(no featured algos)_")
     lines.append("")
     lines.append("## All algos")
     lines.append("")
     for c in algos_all:
-        algo_part = c.split(".", 1)[1]
-        lines.append(f"- [{c}]({algo_part}.md)")
-    open(os.path.join(OUT, mid, L, "README.md"), "w").write("\n".join(lines) + "\n")
-    print(f"  wrote analysis/{mid}/{L}/README.md + mem_layout.json "
+        lines.append(f"- [{c}]({c}.md)")
+    open(os.path.join(OUT, mid, f"{L}.mem_layout.md"), "w").write("\n".join(lines) + "\n")
+    print(f"  wrote analysis/{mid}/{L}.mem_layout.md + {L}.mem_layout.json "
           f"({len(algos_all)} algos)", file=sys.stderr)
 
 
@@ -399,7 +395,7 @@ def _grid_md(champs, nvals, deaths):
                 c = byk.get((n, d, rk))
                 if c:
                     algo_part = c["algo"].split(".", 1)[1]
-                    algotxt.append(f"[{algo_part}]({algo_part}.md) {c['ns_particle']:.2f}")
+                    algotxt.append(f"[{algo_part}]({c['algo']}.md) {c['ns_particle']:.2f}")
             row.append("<br>".join(algotxt) or "—")
         out.append("| " + " | ".join(row) + " |")
     return "\n".join(out)
