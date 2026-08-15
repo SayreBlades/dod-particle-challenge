@@ -141,17 +141,27 @@ pub const Pool = struct {
 
 fn waitWhile(v: *const std.atomic.Value(u32), cur: u32) void {
     // Sleep only if the value is still `cur` (race-free re-check inside the
-    // syscall). Returns on any change, spurious wake, or error — the caller
-    // re-reads. Only the branch for THIS OS is analyzed (comptime switch), so
-    // the ulock externs are never referenced on Linux and the futex call is
-    // never referenced on macOS.
+    // syscall), with a BOUNDED ~100µs timeout: a lost wakeup (observed on Linux
+    // — a worker stays parked on `generation` after WAKE_ALL, reproducible
+    // with ≥3 workers; the re-load loop cannot cure a wakeup that never
+    // arrives) self-heals within one timeout instead of deadlocking. The
+    // caller re-reads on any return — change, timeout, spurious wake, error.
+    // Only the branch for THIS OS is analyzed (comptime switch), so the ulock
+    // externs are never referenced on Linux and the futex call is never
+    // referenced on macOS.
     switch (builtin.os.tag) {
         .macos => {
-            _ = __ulock_wait(UL_COMPARE_AND_WAIT, @ptrCast(&v.raw), cur, 0);
+            // timeout_us = 100 (100µs); 0 would mean wait-forever.
+            _ = __ulock_wait(UL_COMPARE_AND_WAIT, @ptrCast(&v.raw), cur, 1000);
         },
         .linux => {
             const op: std.os.linux.FUTEX_OP = .{ .cmd = .WAIT, .private = true };
-            _ = std.os.linux.futex_3arg(@ptrCast(&v.raw), op, cur);
+            // 4-arg form + explicit timeout. futex_3arg issues syscall3,
+            // leaving the timeout register (r10) as garbage — the kernel
+            // dereferences it for WAIT unconditionally (EINVAL churn = livelock,
+            // or a bogus planted timeout). A real 1ms timespec bounds the wait.
+            var ts: std.os.linux.timespec = .{ .sec = 0, .nsec = 100_000 };
+            _ = std.os.linux.futex_4arg(@ptrCast(&v.raw), op, cur, &ts);
         },
         // No parking primitive: callers already spin (SPIN) before reaching here,
         // so a no-op keeps the pool correct (busy) on other OSes.
@@ -166,7 +176,9 @@ fn wakeAll(v: *const std.atomic.Value(u32)) void {
         },
         .linux => {
             const op: std.os.linux.FUTEX_OP = .{ .cmd = .WAKE, .private = true };
-            _ = std.os.linux.futex_3arg(@ptrCast(&v.raw), op, std.math.maxInt(u32));
+            // 4-arg + null for uniformity (WAKE ignores the timeout register,
+            // but be explicit rather than leak garbage into a syscall).
+            _ = std.os.linux.futex_4arg(@ptrCast(&v.raw), op, std.math.maxInt(u32), null);
         },
         else => {},
     }

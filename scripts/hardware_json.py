@@ -45,6 +45,48 @@ def _linux_meminfo_bytes():
     return 0
 
 
+def _linux_caches():
+    """Cache geometry from sysfs (per-core values from cpu0; max across indices
+    for hybrid parts) + the physical-core count (unique (package, core) pairs
+    across all threads). Best-effort — zeros where sysfs is unavailable."""
+    out = {"cacheline": 0, "physical_cores": 0, "l1d": 0, "l1i": 0, "l2": 0, "l3": 0}
+    mult = {"K": 1024, "M": 1024 ** 2, "G": 1024 ** 3}
+    base = "/sys/devices/system/cpu/cpu0/cache"
+    try:
+        for idx in sorted(os.listdir(base)):
+            d = os.path.join(base, idx)
+            try:
+                lvl = open(os.path.join(d, "level")).read().strip()
+                typ = open(os.path.join(d, "type")).read().strip()
+                size = open(os.path.join(d, "size")).read().strip()
+            except OSError:
+                continue
+            b = int(size) if size.isdigit() else int(size[:-1]) * mult.get(size[-1].upper(), 1)
+            suffix = "d" if typ == "Data" else "i" if typ == "Instruction" else ""
+            key = f"l{lvl}{suffix}"
+            out[key] = max(out.get(key, 0), b)
+            cl = os.path.join(d, "coherency_line_size")
+            if os.path.exists(cl):
+                out["cacheline"] = max(out["cacheline"], int(open(cl).read().strip()))
+    except Exception:
+        pass
+    try:
+        pairs = set()
+        for c in os.listdir("/sys/devices/system/cpu"):
+            if not (c.startswith("cpu") and c[3:].isdigit()):
+                continue
+            t = f"/sys/devices/system/cpu/{c}/topology"
+            try:
+                pairs.add((open(f"{t}/physical_package_id").read().strip(),
+                           open(f"{t}/core_id").read().strip()))
+            except OSError:
+                continue
+        out["physical_cores"] = len(pairs)
+    except Exception:
+        pass
+    return out
+
+
 def detect():
     f = {}
     f["hostname"] = platform.node().split(".")[0]
@@ -67,14 +109,15 @@ def detect():
             cores = int(sh(["nproc"]))
         except Exception:
             pass
+        caches = _linux_caches()
         f["cpu"] = _linux_cpu()
-        f["physicalcpu"] = cores
+        f["physicalcpu"] = caches["physical_cores"] or cores
         f["logicalcpu"] = cores
-        f["cachelinesize"] = 0
-        f["l1dcachesize"] = 0
-        f["l1icachesize"] = 0
-        f["l2cachesize"] = 0
-        f["l3cachesize"] = 0
+        f["cachelinesize"] = caches["cacheline"]
+        f["l1dcachesize"] = caches["l1d"]
+        f["l1icachesize"] = caches["l1i"]
+        f["l2cachesize"] = caches["l2"]
+        f["l3cachesize"] = caches["l3"]
         f["pagesize"] = 4096
         f["memsize_bytes"] = _linux_meminfo_bytes()
     # machine_id: hostname + short hash of the identifying facts.

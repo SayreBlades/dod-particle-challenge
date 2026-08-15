@@ -103,15 +103,14 @@ def measure(algo, n, q, threads, iters, trial, bin_path):
     # perf stat writes counts to stderr; rc is nonzero only on tool error.
     counts = _parse_perf_csv(r.stderr)
 
-    # Guard: every event must have been counted. perf emits "<not supported>"
-    # (wrong µarch — these are AMD 17h/71h named events) or "<not counted>"
-    # (multiplexed — the NMI watchdog can steal a GP PMC, dropping us from 6
-    # free counters to 5, so the 6 events no longer fit) on hosts that aren't
-    # this exact Zen 2 config. _parse_perf_csv drops those lines; without this
-    # check get() would silently return 0 and the buckets would collapse to a
-    # misleading all-`compute` row. Fail loudly instead — collect.py logs
-    # PROFILE FAIL and no row is written.
-    missing = [e for e in EVENTS if not (counts.get(e) or counts.get(e + ":u"))]
+    # Guard: every event must have been COUNTED. perf emits "<not Supported>"
+    # (wrong µarch) or "<not counted>" (multiplexed — e.g. the NMI watchdog
+    # stealing a GP PMC) on hosts that can't schedule the full set; the parser
+    # drops those lines, so ABSENCE from `counts` = never counted → fail loudly
+    # (a silent 0 would collapse the buckets to all-compute). Note a counted
+    # event may legitimately read 0 (e.g. fp_sch_rsrc_stall on integer-only
+    # short runs) — presence in `counts`, not truthiness, is the test.
+    missing = [e for e in EVENTS if e not in counts and e + ":u" not in counts]
     if missing:
         raise RuntimeError(
             f"perf did not count every event on this host (unsupported µarch or "
@@ -121,7 +120,7 @@ def measure(algo, n, q, threads, iters, trial, bin_path):
         )
 
     def get(name):
-        return counts.get(name) or counts.get(name + ":u") or 0
+        return counts[name] if name in counts else counts.get(name + ":u", 0)
 
     cycles = get("cycles")
     if cycles == 0:

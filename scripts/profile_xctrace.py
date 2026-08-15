@@ -75,7 +75,7 @@ def _record_export_parse(xctrace, bin_path, trace, trace_xml, n, q, threads, ite
                 [xctrace, "record", "--template", "CPU Counters", "--launch", "--",
                  bin_path, "--n", str(n), "--q", str(q), "--threads", str(threads),
                  "--iters", str(iters), "--trial", str(trial)],
-                cwd=tmp, capture_output=True, timeout=120,
+                cwd=tmp, capture_output=True, timeout=180,
             )
             found = glob.glob(os.path.join(tmp, "Launch_*.trace"))
             if not found:
@@ -133,6 +133,10 @@ def measure(algo, n, q, threads, iters, trial, bin_path):
                 "frontend_stall": delivery,
                 "branch_flush": discarded,
             }
-        except (RuntimeError, ET.ParseError) as e:
+        except (RuntimeError, ET.ParseError, subprocess.SubprocessError, OSError) as e:
+            # SubprocessError covers xctrace hangs (TimeoutExpired — the run is
+            # killed by subprocess.run; without this catch a single wedged
+            # xctrace session used to abort the WHOLE collect). OSError covers
+            # spawn failures (e.g. fork pressure).
             last_err = e
     raise RuntimeError(f"xctrace failed after 3 attempts: {last_err}")
