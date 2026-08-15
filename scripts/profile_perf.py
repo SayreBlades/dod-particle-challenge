@@ -34,7 +34,7 @@ add Intel/other-AMD maps) for tighter attribution; the schema is unchanged.
 Penalty constants are documented approximations from the AMD 17h PPR.
 """
 from __future__ import annotations
-import os, shutil, subprocess
+import glob, os, shutil, subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -52,7 +52,20 @@ RESYNC_PENALTY_CYCLES = 16
 
 
 def find_perf():
-    return shutil.which("perf")
+    """Locate `perf`. Prefers PATH; falls back to the version-specific
+    linux-tools install path (common on Ubuntu/Pop, where `perf` isn't on PATH
+    and the `linux-tools-generic` metapackage may point at a mismatched kernel).
+    A slightly older perf binary works fine for `perf stat` on a newer kernel."""
+    p = shutil.which("perf")
+    if p:
+        return p
+    # Probe the running kernel's dir first, then newest available.
+    import platform
+    kver = platform.release().split("-", 1)[0]
+    for cand in [f"/usr/lib/linux-tools-{kver}/perf", *sorted(glob.glob("/usr/lib/linux-tools-*/perf"), reverse=True)]:
+        if os.path.exists(cand):
+            return cand
+    return None
 
 
 def _parse_perf_csv(stderr_text):

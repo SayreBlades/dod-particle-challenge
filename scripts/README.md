@@ -44,10 +44,10 @@ error (no silent default run).
 
 ```sh
 ./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --help                       # algo_meta + options
-./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --n 65000 --q 0.1 --threads 1 --iters 100 --trial 1 --json  # one timing row
+./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --n 100000 --q 0.1 --threads 1 --iters 100 --trial 1 --json  # one timing row
 ./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --check --q 0.1 --threads 1  # invariant suite (PASS/FAIL)
 ./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --bandwidth                  # streaming-BW microbench
-./out/bin/ML01.AF02.LP1-autovec-par.LP2-simple.bench --n 65000 --q 0.1 --threads 4 --iters 100 --trial 1 --json
+./out/bin/ML01.AF02.LP1-autovec-par.LP2-simple.bench --n 100000 --q 0.1 --threads 4 --iters 100 --trial 1 --json
 ```
 
 - **Timing (default)** requires `--n`, `--q`, `--threads`, `--iters`, `--trial`;
@@ -67,11 +67,12 @@ ensure data/<id>/ ; hardware (once)
 for algo in algos:
   algo  → <algo>.json              # when source_hash changes
   for q in DEATH_RATES:
-    for T in threads_for(algo):    # {1} serial; {1,2,4,8} -par
+    for T in threads_for(algo):    # {1} serial; {1,4,8} -par
       bench → timing + check rows  # unless SKIP_DONE
     if --with-profile:             # where a profiler backend exists
-      for N in N_GRID (T=1):
-        profile → cycle row
+      for T in threads_for(algo):
+        for N in N_GRID:
+          profile → cycle row
 ```
 
 Default run = timing + check + algo + hardware, **no profiling**. `--with-profile`
@@ -83,10 +84,10 @@ failure.
 
 | knob | default | meaning |
 |------|---------|---------|
-| `NS` | `sweep_config.N_GRID` | comma-list of N, e.g. `4000,65000,1000000` |
+| `NS` | `sweep_config.N_GRID` | comma-list of N, e.g. `10000,1000000` |
 | `TRIALS` | `3` | trials per point (the report keeps the min) |
-| `DEATH_RATES` | `0.01 0.05 0.1 0.25 0.5` (from `death_rates.txt`) | space-list of accident rates q |
-| `THREADS` | `1 2 4 8` | space-list; **parallel algorithms only** (serial algorithms run T=1) |
+| `DEATH_RATES` | `sweep_config.DEATH_RATES` (`0.01 0.1 0.25 0.5`) | space-list of accident rates q |
+| `THREADS` | `1 4 8` | space-list; **parallel algorithms only** (serial algorithms run T=1) |
 | `SKIP_DONE` | `1` | skip points already present at the current `source_hash` (resume) |
 | `REFRESH_HW` | `0` | rewrite `hardware.json` (re-measure `streaming_bw_gbs`) |
 | `VERBOSE` | `0` | `1` = per-step chatter instead of the live progress bar |
@@ -97,7 +98,7 @@ uv run python scripts/collect.py ML01                               # one memory
 uv run python scripts/collect.py ML01.AF02.LP1-autovec.LP2-simple    # one algorithm
 uv run python scripts/collect.py ML01 --with-profile                 # + cycle attribution
 uv run python scripts/collect.py ML01 --only profile                 # just the profile loop
-NS=4000,65000 TRIALS=5 uv run python scripts/collect.py ML01          # quick subset
+NS=10000,1000000 TRIALS=5 uv run python scripts/collect.py ML01          # quick subset
 ```
 
 Two phases: **(1) build** one binary per algorithm (parallel); **(2) measure**
@@ -168,9 +169,11 @@ Pure derivation: reads `experiments/data/` (no toolchain) and builds the
 
 - **per-algorithm bundles** — delegated to [`analyze_algo.py`](#analyze_algopy):
   the evidence `<algo>.json` + LLM narrative `<algo>.md`.
-- **aggregation bundles** — `machines.json`, per-machine `overview.json`,
-  per-layout `mem_layout.json` (champions partitioned by thread group), a
-  browsable markdown tree, + `queries.sql`.
+- **aggregation bundles** — `machines.json` (the SPA's slim discovery index:
+  machine_id + cpu), per-machine `overview.json` (hardware projected verbatim
+  from `data/<mid>/hardware.json`), per-layout `mem_layout.json` (champions
+  partitioned by thread group), a browsable markdown tree. (The champion-grid
+  SQL lives in `champs_sql()` in this script — its single source of truth.)
 - **the `--verify` gate** — every narrative is checked; failures retry once, then
   are marked `verified: false` (the SPA banners them). Nonzero exit if any remain
   unverified — loud, but never blocks the deterministic aggregation.
@@ -215,17 +218,22 @@ uv run python scripts/algo_hash.py ML01.AF02.LP1-autovec.LP2-simple --files  # a
 
 ## sweep_config.py
 
-The regime grid — single source of truth (replaces the bench binary's old
-hardcoded `SWEEP`/`ITERS_PER_N`/`WARMUP_PER_N` consts): `N_GRID`, the per-N
-`ITERS`/`WARMUP` schedules, `THREADS_DEFAULT`, and `death_rates()`. Imported by
-both `collect.py` and `bench.py`.
+The single source of truth for the collection grid (replaces the bench binary's
+old hardcoded `SWEEP`/`ITERS_PER_N`/`WARMUP_PER_N` consts): `N_GRID`, the per-N
+`ITERS`/`WARMUP` schedules, `THREADS_DEFAULT`, `DEATH_RATES`, and the algorithm
+roster (`algo_roster()`/`mem_layout_algos()` — parsed from build.zig's
+`algo_labels` registry, so what can build is exactly what gets swept). Imported
+by `collect.py`, `bench.py`, and `analyze_algo.py`. (The legacy
+`experiments/sweeps/` config files — `death_rates.txt` + `<ML>.algos` rosters —
+were consolidated here; subset sweeps are a CLI concern: pass targets to
+`collect.py`.)
 
 ---
 
 ## The full sweep workflow
 
 ```sh
-# 1. Collect — algorithms × {0.01,0.05,0.1,0.25,0.5} × {4K,65K,262K,1M,4M} × {1,2,4,8}
+# 1. Collect — algorithms × {0.01,0.1,0.25,0.5} × {10K,100K,1M,10M} × {1,4,8}
 #    (parallel only) → per-algo files under experiments/data/<machine_id>/:
 uv run python scripts/collect.py ML01
 #    resume without duplicating (default on): SKIP_DONE=1 is the default.

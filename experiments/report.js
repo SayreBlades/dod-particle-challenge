@@ -20,6 +20,8 @@ const fetchText = (u) => fetch(u).then((r) => r.ok ? r.text() : "");
 function getOverview(m)   { return ovCache[m]   ?? (ovCache[m]   = fetchJSON(`analysis/${m}/overview.json`)); }
 function getMemLayout(m, L)  { return layCache[m+L]?? (layCache[m+L]= fetchJSON(`analysis/${m}/${L}.mem_layout.json`)); }
 function getAlgoJson(m, c){ const k=m+"/"+c; return algoCache[k] ?? (algoCache[k]= (async()=>{return fetchJSON(`analysis/${m}/${c}.json`);})()); }
+const asmCache = {};
+const getAlgoAsm = (m, c) => { const k=m+"/"+c; return asmCache[k] ?? (asmCache[k] = fetchJSON(`data/${m}/${c}.json`)); };
 const gridCache = {};
 const getGrid = (m) => gridCache[m] ?? (gridCache[m] = fetchJSON(`analysis/${m}/grid.json`));
 
@@ -46,14 +48,16 @@ function chart(id, opt, group) {
   return c;
 }
 
-function machineCard() {
-  const m = (MACHINES.machines || []).find((x) => x.machine_id === machine) || {};
-  if (!m.cpu) return "";
+async function machineCard() {
+  // Hardware facts come from the (cached) machine overview — machines.json is
+  // only the discovery index (machine_id + cpu label), nothing duplicated.
+  const m = await getOverview(machine);
+  if (!m || !m.cpu) return "";
   return `<section class="cellhead machinecard"><h2>${m.cpu}</h2><div class="machinfo"><div><b>Mem Bandwidth</b> <code>${m.streaming_bw_gbs ?? "?"} GB/s</code></div><div><b>Mem Cache</b> L1d <code>${(m.l1dcachesize / 1024) | 0} KB</code></div><div><b>Mem Cache</b> L2 <code>${(m.l2cachesize / 1048576) | 0} MB</code></div><div><b>DRAM</b> <code>${(m.memsize_bytes / 1073741824) | 0} GB</code></div></div></section>`;
 }
 
 // persistent machine card above the banner; refreshed on every route
-function renderTopCard() { const el = $("topcard"); if (el) el.innerHTML = machineCard(); }
+async function renderTopCard() { const el = $("topcard"); if (el) el.innerHTML = await machineCard(); }
 
 // ---------------- overview ----------------
 async function renderOverview() {
@@ -91,7 +95,9 @@ async function renderOverview() {
 async function renderMemLayout(L) {
   const lb = await getMemLayout(machine, L);
   if (!lb) { status(`no bundle for ${L}`); return; }
-  renderMeta({ ...lb, cpu: (MACHINES.machines.find((m) => m.machine_id === machine) || {}).cpu });
+  // lb carries streaming_bw but not the cache fields — renderMeta's machine
+  // facts come from the (cached) overview instead.
+  renderMeta((await getOverview(machine)) || lb);
   const champs = lb.champions.filter((c) => c.threads === threads);
   // color scale spans the WINNING (rank-1) times only: best winner → green, worst → red.
   const w = champs.filter((c) => c.rk === 1);
@@ -409,9 +415,12 @@ function setupLinked() {
 
 async function renderAlgo(algo) {
   const L = algo.split(".")[0];
-  const [j, md, lb] = await Promise.all([
-    getAlgoJson(machine, algo), fetchText(`analysis/${machine}/${algo}.md`), getMemLayout(machine, L)]);
+  const [j, md, lb, ov, asmB] = await Promise.all([
+    getAlgoJson(machine, algo), fetchText(`analysis/${machine}/${algo}.md`),
+    getMemLayout(machine, L), getOverview(machine), getAlgoAsm(machine, algo)]);
   if (!j) { $("page").innerHTML = `<section><p>No analysis bundle for ${algo}.</p></section>`; status("missing"); return; }
+  j.asm = asmB ? asmB.asm : null;   // asm lives in data/ now (not the bundle); null = not published
+  j.hardware = ov;                 // hardware from the machine overview, not the bundle
   renderMeta(j.hardware);
   const d = j.algo_meta;
   const decl = `<div class="decl"><span><b>algo_fam</b> ${d.algo_fam}</span><span><b>ordering</b> ${d.ordering}</span><span><b>intermediates</b> ${d.intermediates}</span><span><b>golden</b> ${d.golden_class}</span><span><b>bytes/p</b> ${j.bytes_per_particle}</span><span><b>source_hash</b> <code>${(j.source_hash || "").slice(0, 12)}</code></span></div>`;
@@ -436,13 +445,13 @@ async function renderAlgo(algo) {
     <section class="narrative"><h3>Latency</h3>${mp("Cache saturation")}<div id="cacheplot" class="chart"></div></section>
     <section class="narrative"><h3>Bandwidth</h3>${mp("Bandwidth")}<div id="bwplot" class="chart"></div></section>
 ${(j.profile || []).length ? `<section class="narrative"><h3>Bottleneck radar <span class="sub">goodness per axis (bigger = better)</span></h3><div style="margin:6px 0;display:flex;gap:12px;align-items:center;font-size:12px;color:#9aa"><label>N <select id=\"radarN\"></select></label><label>q <select id=\"radarQ\"></select></label> <span id="radarcap" class="sub"></span></div><div id="radar" class="chart" style="height:380px"></div></section>` : `<section class="narrative"><h3>Bottleneck radar</h3><p class="hint">No cycle-attribution data for ${short(algo)} — run <code>scripts/collect.py ${algo} --only profile</code> to populate it.</p></section>`}
-    <section class="narrative"><h3>Assembly</h3>${mp("Assembly")}<div id="asmplot" class="chart small"></div>${asmViewer(j)}</section>`;
-  status(`${algo} · ${j.asm.n_instructions} asm insns`);
+    <section class="narrative"><h3>Assembly</h3>${mp("Assembly")}<div id="asmplot" class="chart small"></div>${j.asm ? asmViewer(j) : `<p class="hint">asm bundle <code>data/${machine}/${algo}.json</code> not found — run <code>make collect</code> or check the Pages publish step.</p>`}</section>`;
+  status(j.asm ? `${algo} · ${j.asm.n_instructions} asm insns` : algo);
   drawCachePlot(j);
   drawBandwidthAlgo(j);
   if ((j.profile || []).length) drawRadar(j);
-  drawAsm(j);
-  wireAsmViewer(j);
+  if (j.asm) drawAsm(j);
+  if (j.asm) wireAsmViewer(j);
 }
 
 function cacheBands(j) {
@@ -512,18 +521,19 @@ function drawAsm(j) {
 
 // ---------------- bottleneck radar (algo page) ----------------
 // 5 goodness axes (0–100, bigger = better). Compute/Latency/Control come from
-// cycle attribution (profile, always T=1); Bandwidth/Sync come from timing at
-// the global thread count. Per (N, q) — the character shifts with both: high q
-// raises branch_flush (Control drops); high N raises backend_stall (Latency drops).
-function profAt(j, N, q) {
-  return (j.profile || []).find((p) => p.N === N && Math.abs(p.death_q - q) < 1e-9 && p.threads === 1);
+// cycle attribution (profile) at the selected T; Bandwidth/Sync come from timing
+// at the global thread count. Per (N, q, T) — the character shifts with all
+// three: high q raises branch_flush (Control drops); high N raises backend_stall
+// (Latency drops); high T raises backend_stall under saturation (Latency drops).
+function profAt(j, N, q, T) {
+  return (j.profile || []).find((p) => p.N === N && Math.abs(p.death_q - q) < 1e-9 && p.threads === T);
 }
 function seriesAt(j, q, N, T) {
   return (j.series[String(q)] || []).find((r) => r.N === N && r.threads === T);
 }
 function radarScores(j, N, q, T) {
   const ceil = j.hardware.streaming_bw_gbs;
-  const p = profAt(j, N, q), rT = seriesAt(j, q, N, T), r1 = seriesAt(j, q, N, 1);
+  const p = profAt(j, N, q, T), rT = seriesAt(j, q, N, T), r1 = seriesAt(j, q, N, 1);
   const compute = p ? +p.compute_pct : null;
   const latency = p ? 100 - +p.backend_stall_pct : null;
   const control = p ? 100 - +p.branch_flush_pct : null;
@@ -548,8 +558,8 @@ function drawRadar(j) {
     const s = radarScores(j, N, q, threads);
     const cap = $("radarcap");
     if (cap) cap.innerHTML = s.compute == null
-      ? `<span style="color:#e74c3c">no cycle attribution at N=${fmtN(N)}, q=${fmtq(q)}</span>`
-      : `cycle attribution @ T=1 via <b>${s.profiler || "?"}</b> · bandwidth/sync @ T=<b>${threads}</b>`;
+      ? `<span style="color:#e74c3c">no cycle attribution at N=${fmtN(N)}, q=${fmtq(q)}, T=${threads}</span>`
+      : `cycle attribution @ T=${threads} via <b>${s.profiler || "?"}</b> · bandwidth/sync @ T=<b>${threads}</b>`;
     const opt = s.compute == null
       ? { title: { text: "—", left: "center", top: "center", textStyle: { color: "#444" } } }
       : {
@@ -581,7 +591,7 @@ function drawRadar(j) {
 // ---------------- rank: every algorithm at one (N, death_q, threads) ----------------
 async function renderRank(N, q) {
   const g = await getGrid(machine);
-  const ment = (MACHINES.machines.find((m) => m.machine_id === machine) || {});
+  const ment = (await getOverview(machine)) || {};
   if (g) renderMeta(ment);
   if (!g) { status("no grid.json for " + machine); return; }
   const ceil = g.streaming_bw_gbs;
@@ -718,7 +728,7 @@ document.addEventListener("click", (e) => {
     machine = knownIds.includes(initHash) ? initHash : MACHINES.machines[0].machine_id;
     ms.value = machine;
     const ts = $("threads");
-    [1, 2, 4, 8].forEach((t) => { const o = document.createElement("option"); o.value = t; o.textContent = `T=${t}`; ts.add(o); });
+    [1, 4, 8].forEach((t) => { const o = document.createElement("option"); o.value = t; o.textContent = `T=${t}`; ts.add(o); });
     ts.value = threads;
     ms.onchange = () => {
       machine = ms.value;

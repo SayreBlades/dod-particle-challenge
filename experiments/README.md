@@ -8,7 +8,7 @@ Three layers, changing on different clocks (see
 | [`data/`](data/) | **RAW** — per-algo `<algo>.{json,runs.jsonl,profile.jsonl}` + `hardware.json` | every sweep | atomic scripts (`algo`/`bench`/`profile`/`hardware`), orchestrated by `collect.py` |
 | [`analysis/`](analysis/) | **DERIVED** — per-algorithm bundles + machine/memory layout aggregations + a browsable markdown tree | every report-build | `build_report.py` (+ `analyze_algo.py`) |
 | [`report.html`](report.html) + [`report.js`](report.js) + [`style.css`](style.css) | the **SPA** — thin: stores no data, fetches `analysis/` | hand-edited (rare) | (source) |
-| [`sweeps/`](sweeps/) | the regime grid + `<memory layout>.algos` rosters + sweep-knob docs | when the sweep policy changes | (source) |
+| [`build.zig`](../build.zig) → `algo_labels` | the algorithm registry (the sweep roster — parsed by `sweep_config.py`) | when an algorithm is added/removed | (source) |
 | [`golden/`](golden/) | `stage1.bin` + `frame.sha256` (the byte-exact reference) | when the reference algorithm changes | `correctness.zig` |
 
 `collect.py` orchestrates the atomic measurement scripts (`hardware`, `algo`,
@@ -33,7 +33,9 @@ resolve. Or `make serve`.)
 stores **no data** — every route fetches from `analysis/`:
 
 - Two persistent selectors at the top: **machine** (from
-  `analysis/machines.json`) and **thread group** {1, 2, 4, 8}. Champions are
+  `analysis/machines.json` — a slim discovery index: machine_id + cpu label;
+  hardware facts live in each machine's `overview.json`, projected verbatim
+  from `data/<machine_id>/hardware.json`) and **thread group** {1, 4, 8}. Champions are
   partitioned by thread group (a parallel algorithm's T=8 and a serial algorithm's T=1
   never share a podium).
 - **`#/`** — global top-3 per (regime × death_q) on the selected
@@ -52,8 +54,7 @@ stores **no data** — every route fetches from `analysis/`:
 ```
 analysis/
   README.md                 machine index (the only honest cross-machine view)
-  machines.json             the SPA's machine selector source
-  queries.sql               the canonical champion-grid SQL (documentary)
+  machines.json             the SPA's machine-selector discovery index (id + cpu)
   <machine_id>/
     README.md               this machine's overview
     overview.json           global top-3 + meta

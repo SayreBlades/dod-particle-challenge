@@ -5,7 +5,7 @@ Two-stage model (reporting-and-analysis.md §0/§6):
   - collect.py        = pure measurement (unchanged; writes only data/)
   - THIS script       = all analysis: per-algo bundles (delegated to
                         analyze_algo.py via subprocess), the machine/mem_layout
-                        aggregations, the markdown narrative tree, queries.sql,
+                        aggregations, the markdown narrative tree,
                         and the --verify integrity gate.
 
 Per-algo bundles (<algo>.json evidence + <algo>.md narrative) are produced by
@@ -42,7 +42,7 @@ ANALYZE = os.path.join(ROOT, "scripts", "analyze_algo.py")
 RETRY_MAX_TOKENS = "24000"   # bump on verify-fail retry (reasoning model headroom)
 
 # Death-rate points EXCLUDED from the report. Legacy sweep values not in
-# experiments/sweeps/death_rates.txt; raw data retains them. Both the duckdb
+# sweep_config.DEATH_RATES; raw data retains them. Both the duckdb
 # aggregation (here) and the per-algo bundles (analyze_algo.py) drop them so the
 # SPA never surfaces them. Keep in sync with analyze_algo.py.
 EXCLUDE_DEATH_Q = (0.0, 0.75)
@@ -252,15 +252,18 @@ def build_machines_index(con):
     os.makedirs(OUT, exist_ok=True)
     mids = [r[0] for r in con.execute(
         "SELECT DISTINCT machine_id FROM hardware ORDER BY machine_id").fetchall()]
+    entries = []  # [(hw, layouts)] — read once, feeds both outputs below
     mlist = []
     for mid in mids:
         hw = json.load(open(os.path.join(DATA, mid, "hardware.json")))
         layouts = distinct(con, "mem_layout", mid)
-        m = {k: hw.get(k) for k in ("machine_id", "cpu", "streaming_bw_gbs",
-             "l1dcachesize", "l2cachesize", "l3cachesize", "cachelinesize",
-             "logicalcpu", "memsize_bytes")}
-        m["layouts"] = layouts
-        mlist.append(m)
+        entries.append((hw, layouts))
+        mlist.append({"machine_id": hw.get("machine_id", mid), "cpu": hw.get("cpu")})
+    # machines.json — the SPA's DISCOVERY index only: which machines exist + a
+    # selector label. Hardware facts are NOT duplicated here; they live in
+    # data/<mid>/hardware.json (raw) and flow verbatim into each machine's
+    # overview.json (derived). A static-file SPA can't glob data/ over HTTP, so
+    # this one small root index has to exist.
     json.dump({"machines": mlist}, open(os.path.join(OUT, "machines.json"), "w"), indent=2)
 
     # analysis/README.md — the machine index (the only honest cross-machine view)
@@ -280,11 +283,11 @@ def build_machines_index(con):
     lines.append("")
     lines.append("| machine_id | cpu | streaming BW | L1d | L2 | L3 | layouts |")
     lines.append("|---|---|---|---|---|---|---|")
-    for m in mlist:
-        lines.append(f"| [`{m['machine_id']}`]({m['machine_id']}/) | {m['cpu']} | "
-                     f"{m['streaming_bw_gbs']} GB/s | {kb(m['l1dcachesize'])} | "
-                     f"{mb(m['l2cachesize'])} | {m['l3cachesize'] or '—'} | "
-                     f"{', '.join(m['layouts'])} |")
+    for hw, layouts in entries:
+        lines.append(f"| [`{hw['machine_id']}`]({hw['machine_id']}/) | {hw['cpu']} | "
+                     f"{hw['streaming_bw_gbs']} GB/s | {kb(hw['l1dcachesize'])} | "
+                     f"{mb(hw['l2cachesize'])} | {hw['l3cachesize'] or '—'} | "
+                     f"{', '.join(layouts)} |")
     lines.append("")
     lines.append("Per machine: `<machine_id>/README.md` (overview) → "
                  "`<machine_id>/<L>.mem_layout.md` (mem_layout) → "
@@ -302,10 +305,9 @@ def build_overview(con, mid):
     nvals = distinct(con, "N", mid)
     threads = distinct(con, "threads", mid)
     champs = rows(con, *champs_sql(mid))
-    mentry = {k: hw.get(k) for k in ("machine_id", "cpu", "streaming_bw_gbs",
-              "l1dcachesize", "l2cachesize", "l3cachesize", "cachelinesize",
-              "logicalcpu", "memsize_bytes")}
-    overview = {**mentry, "layouts": layouts, "death_rates": deaths,
+    # Hardware flows VERBATIM from data/<mid>/hardware.json — no hand-picked
+    # field subset to drift out of sync when hardware.json grows a field.
+    overview = {**hw, "layouts": layouts, "death_rates": deaths,
                 "n_values": nvals, "thread_groups": threads, "champions": champs}
     os.makedirs(os.path.join(OUT, mid), exist_ok=True)
     json.dump(overview, open(os.path.join(OUT, mid, "overview.json"), "w"), indent=2)
@@ -427,32 +429,7 @@ def build_grid(con, mid):
           file=sys.stderr)
 
 
-def render_queries(con):
-    """The canonical SQL (documentary): the global top-3 + the mem_layout top-K,
-    both partitioned by threads (decision 8)."""
-    sql = """-- Canonical queries for the analysis bundles.
--- Champions are partitioned by `threads` (decision 8): a parallel algo's
--- T=10 run and a serial algo's T=1 run never share a podium. min ns_particle
--- across trials; one row per (N, death_q, threads).
-
--- Global top-3 per (N, death_q, threads) on ONE machine:
-WITH ranked AS (
-  SELECT algo, mem_layout, death_q, threads, N,
-    min(ns_particle) AS ns_particle, min(achieved_bw_gbs) AS achieved_bw_gbs,
-    row_number() OVER (PARTITION BY N, death_q, threads ORDER BY min(ns_particle)) AS rk
-  FROM report
-  WHERE machine_id = '<machine_id>'           -- :scope
-  GROUP BY algo, mem_layout, death_q, threads, N
-)
-SELECT N, death_q, threads, rk, algo, mem_layout,
-       round(ns_particle, 3) AS ns_particle,
-       round(achieved_bw_gbs, 2) AS achieved_bw_gbs
-FROM ranked WHERE rk <= 3 ORDER BY threads, N, death_q, rk;
-
--- Same, scoped to ONE mem_layout (add: AND mem_layout = '<L>').
-"""
-    open(os.path.join(OUT, "queries.sql"), "w").write(sql)
-    print(f"  wrote analysis/queries.sql", file=sys.stderr)
+# ---- main ----
 
 
 # ---- main ----
@@ -498,7 +475,6 @@ def main():
             if only_mem_layout and L != only_mem_layout:
                 continue
             build_mem_layout_bundle(con, mid, L)
-    render_queries(con)
 
     print("done.", file=sys.stderr)
     sys.exit(1 if n_fail else 0)

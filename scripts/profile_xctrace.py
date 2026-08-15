@@ -63,9 +63,51 @@ def parse_counters(trace_xml):
     return totals[0], totals[1], totals[2], totals[3]
 
 
+def _record_export_parse(xctrace, bin_path, trace, trace_xml, n, q, threads, iters, trial):
+    """One record + export + parse attempt. Returns (useful, processing, delivery,
+    discarded) or raises. Cleans up the bulky trace artifacts in finally (on both
+    success and failure)."""
+    try:
+        # xctrace ignores --output when launching (known quirk): launch from a
+        # temp dir (it writes Launch_*.trace to CWD) and move the result.
+        with tempfile.TemporaryDirectory(prefix="profile_") as tmp:
+            subprocess.run(
+                [xctrace, "record", "--template", "CPU Counters", "--launch", "--",
+                 bin_path, "--n", str(n), "--q", str(q), "--threads", str(threads),
+                 "--iters", str(iters), "--trial", str(trial)],
+                cwd=tmp, capture_output=True, timeout=120,
+            )
+            found = glob.glob(os.path.join(tmp, "Launch_*.trace"))
+            if not found:
+                raise RuntimeError("xctrace produced no trace")
+            shutil.move(found[0], trace)
+
+        with open(trace_xml, "wb") as f:
+            subprocess.run([xctrace, "export", "--input", trace,
+                            "--xpath", "//trace-toc/run[@number=1]/data/"
+                                       'table[@schema="CounterMetricAggregatedForProcess"]'],
+                           cwd=ROOT, stdout=f, stderr=subprocess.PIPE)
+        if os.path.getsize(trace_xml) == 0:
+            raise RuntimeError("xctrace export produced empty xml (malformed trace)")
+        useful, processing, delivery, discarded = parse_counters(trace_xml)
+        if useful + processing + delivery + discarded == 0:
+            raise RuntimeError("xctrace reported zero cycles")
+        return useful, processing, delivery, discarded
+    finally:
+        # delete the bulky artifacts; keep only the numbers. The `.trace` is a
+        # directory bundle — `os.remove` raises IsADirectoryError (an OSError),
+        # which the old `except OSError: pass` silently swallowed, leaking every
+        # trace (6.7GB / 579 dirs had accumulated). rmtree removes the bundle.
+        shutil.rmtree(trace, ignore_errors=True)
+        try:
+            os.remove(trace_xml)
+        except OSError:
+            pass
+
+
 def measure(algo, n, q, threads, iters, trial, bin_path):
     """Run xctrace over one point; return {cycles, compute, backend_stall,
-    frontend_stall, branch_flush}. Raises on failure."""
+    frontend_stall, branch_flush}. Raises on failure after retries."""
     xctrace = find_xctrace()
     if not xctrace:
         raise RuntimeError("xctrace not found (macOS + Xcode required)")
@@ -73,44 +115,24 @@ def measure(algo, n, q, threads, iters, trial, bin_path):
     os.makedirs(outdir, exist_ok=True)
     tag = algo.replace(".", "_")
     trace = os.path.join(outdir, f"{tag}_n{n}_q{q}_T{threads}_t{trial}.trace")
-
-    # xctrace ignores --output when launching (known quirk): launch from a temp
-    # dir (it writes Launch_*.trace to CWD) and move the result.
-    with tempfile.TemporaryDirectory(prefix="profile_") as tmp:
-        subprocess.run(
-            [xctrace, "record", "--template", "CPU Counters", "--launch", "--",
-             bin_path, "--n", str(n), "--q", str(q), "--threads", str(threads),
-             "--iters", str(iters), "--trial", str(trial)],
-            cwd=tmp, capture_output=True, timeout=120,
-        )
-        found = glob.glob(os.path.join(tmp, "Launch_*.trace"))
-        if not found:
-            raise RuntimeError("xctrace produced no trace")
-        shutil.move(found[0], trace)
-
     trace_xml = trace + ".xml"
-    try:
-        with open(trace_xml, "wb") as f:
-            subprocess.run([xctrace, "export", "--input", trace,
-                            "--xpath", "//trace-toc/run[@number=1]/data/"
-                                       'table[@schema="CounterMetricAggregatedForProcess"]'],
-                           cwd=ROOT, stdout=f, stderr=subprocess.PIPE)
-        useful, processing, delivery, discarded = parse_counters(trace_xml)
-    finally:
-        # delete the bulky artifacts; keep only the numbers
-        for p in (trace, trace_xml):
-            try:
-                os.remove(p)
-            except OSError:
-                pass
 
-    cycles = useful + processing + delivery + discarded
-    if cycles == 0:
-        raise RuntimeError("xctrace reported zero cycles")
-    return {
-        "cycles": cycles,
-        "compute": useful,
-        "backend_stall": processing,
-        "frontend_stall": delivery,
-        "branch_flush": discarded,
-    }
+    # xctrace intermittently emits an empty/malformed trace — under contention,
+    # and occasionally even idle. Without a retry that point is silently dropped
+    # (collect.py logs PROFILE FAIL, no row written, the radar lacks that cell).
+    # Retry the whole record+export+parse a couple of times before giving up.
+    last_err = None
+    for _attempt in range(3):  # 1 initial + 2 retries
+        try:
+            useful, processing, delivery, discarded = _record_export_parse(
+                xctrace, bin_path, trace, trace_xml, n, q, threads, iters, trial)
+            return {
+                "cycles": useful + processing + delivery + discarded,
+                "compute": useful,
+                "backend_stall": processing,
+                "frontend_stall": delivery,
+                "branch_flush": discarded,
+            }
+        except (RuntimeError, ET.ParseError) as e:
+            last_err = e
+    raise RuntimeError(f"xctrace failed after 3 attempts: {last_err}")

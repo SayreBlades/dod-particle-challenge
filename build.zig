@@ -173,9 +173,9 @@ const algo_labels = [_]AlgoEntry{
 /// - selection = <full algo>  → the one (validated against algo_labels).
 /// - selection unset          → single-algo from -Dmem_layout/-Dalgo (defaults
 ///                              ML01 / AF02.LP1-autovec.LP2-simple), backward compat.
-/// Uses the in-build.zig algo_labels registry (the buildable superset) rather
-/// than reading experiments/sweeps/<ml>.algos — avoids configure-time file I/O
-/// and stays self-contained. Allocated via b.allocator (lives for the build).
+/// Uses the in-build.zig algo_labels registry — no configure-time file I/O,
+/// stays self-contained (sweep_config.py parses the same registry for the
+/// collection roster). Allocated via b.allocator (lives for the build).
 fn resolveSelection(
     allocator: std.mem.Allocator,
     selection: ?[]const u8,

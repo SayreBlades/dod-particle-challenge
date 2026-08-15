@@ -13,6 +13,7 @@ on:
       - 'experiments/report.js'
       - 'experiments/style.css'
       - 'experiments/analysis/**'
+      - 'experiments/data/**'   # the asm bundles (<algo>.json) the SPA fetches
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch: {}
 
@@ -38,6 +39,11 @@ jobs:
           cp experiments/report.js  site/
           cp experiments/style.css  site/
           cp -r experiments/analysis site/
+          # The SPA fetches the asm bundles from data/<machine_id>/<algo>.json
+          # (analysis bundles no longer embed asm). Publish just those +
+          # hardware.json — NOT the runs/profile JSONL rows (raw data, 5.5MB,
+          # not consumed by the SPA). ~2.1MB.
+          (cd experiments && find data -name '*.json' -exec cp --parents {} ../site/ \;)
           touch site/.nojekyll     # skip Jekyll (dotted/special filenames)
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

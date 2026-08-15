@@ -176,9 +176,8 @@ runtime config). `make build` issues ONE zig invocation that builds every
 selected algorithm in parallel (zig's DAG runner, every core); a stamp gate
 short-circuits it when sources are unchanged. The algorithm registry lives in
 [`build.zig`](build.zig) (`algo_labels`) and [`src/main.zig`](src/main.zig)
-(`sim_map`); the buildable ML01 algorithms are listed in
-[`experiments/sweeps/ML01.algos`](experiments/sweeps/ML01.algos) (or
-`zig build manifests` → prints the registered roster to stdout).
+(`sim_map`) — the registry IS the sweep roster (`sweep_config.py` parses it;
+`zig build manifests` prints it to stdout as a diagnostic).
 
 Halide algorithms need the `halide` package (`uv sync`); the build runs the generator in
 `src/layouts/ML01/<base>_gen.py` to emit `out/halide/<base>.{h,a}`,
@@ -222,7 +221,6 @@ src/
   bindings/         raylib.zig (hand-written extern)
   main.zig          comptime registry: algo-name -> Sim
 experiments/
-  sweeps/           <mem_layout>.algos lists + death_rates.txt + regime-grid docs
   data/             source-of-truth measurements: <machine_id>/{<algo>.runs,<algo>.profile}.jsonl + <algo>.json + hardware.json (RAW — atomic scripts via collect.py)
   analysis/         derived analysis tree: <m>/<ML>/<algo>.{md,json} + machine/mem-layout bundles (rebuilt by build_report.py)
   golden/           stage1.bin + frame.sha256 (the byte-exact reference; tracked)

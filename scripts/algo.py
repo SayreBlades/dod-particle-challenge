@@ -18,13 +18,16 @@ Usage:
     scripts/algo.py ML01.AF02.LP1-autovec.LP2-simple --force    # rebuild even if current
 """
 from __future__ import annotations
-import json, os, re, subprocess, sys
+import json, os, platform, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "experiments", "data")
 ASM_CACHE = os.path.join(ROOT, ".scratch", "asm_cache")
 ADDR = re.compile(r"^[0-9a-f]{16}$")
-OBJDUMP = ["xcrun", "llvm-objdump"]
+IS_LINUX = platform.system() == "Linux"
+OBJDUMP = ["objdump"] if IS_LINUX else ["xcrun", "llvm-objdump"]
+# GNU objdump (Linux) vs llvm-objdump (macOS dSYM) source-interleave flags.
+OBJDUMP_SOURCE = ["-S", "-l"] if IS_LINUX else ["--source"]
 
 
 def sh(cmd):
@@ -64,10 +67,14 @@ def ensure_binary(algo, shash):
 
 
 def step_symbol(algo_part):
-    return f"_framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.{algo_part}.H).step"
+    # Mach-O prefixes every symbol with "_"; ELF (Linux) does not.
+    sym = f"framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.{algo_part}.H).step"
+    return sym if IS_LINUX else "_" + sym
 
 
 def disasm_step(binp, algo_part):
+    if IS_LINUX:
+        return disasm_step_linux(binp, algo_part)
     sym = step_symbol(algo_part)
     nm = sh(["nm", binp])
     if sym not in nm:
@@ -83,6 +90,28 @@ def disasm_step(binp, algo_part):
             break
         body.append(l)
     return body
+
+
+# GNU objdump instruction line:  "  401120:\tpush   rbp" (intel syntax,
+# --no-show-raw-insn). Normalized below into the otool-ish tab form the
+# histogram/attributed_asm parsers already consume: "<addr16>\t<mnem>\t<ops>".
+_OBJDUMP_INSN = re.compile(r"^\s*([0-9a-f]+):\s*(\S+)(?:\s+(.*))?$")
+
+def disasm_step_linux(binp, algo_part):
+    """Scoped objdump -d of the step symbol, via its nm address range."""
+    start, stop = step_addr_range(binp, algo_part)
+    if start is None:
+        return None
+    out = sh(["objdump", "-d", "-M", "intel", "--no-show-raw-insn",
+              f"--start-address=0x{start:x}", f"--stop-address=0x{stop:x}", binp])
+    body = []
+    for l in out.splitlines():
+        m = _OBJDUMP_INSN.match(l)
+        if not m:
+            continue  # file headers, blank lines, the symbol label
+        addr, mnem, ops = m.group(1), m.group(2), (m.group(3) or "").strip()
+        body.append(f"{int(addr, 16):016x}\t{mnem}\t{ops}")
+    return body or None
 
 
 def histogram(body):
@@ -108,11 +137,20 @@ def histogram(body):
 
 def ensure_debug_binary(algo, shash):
     """Build the strip=false (same ReleaseFast codegen) variant + its dSYM.
-    Cached at asm_cache/<shash>/bin-debug/. Returns (binp, dwarffile) or (None,None)."""
+    Cached at asm_cache/<shash>/bin-debug/. Returns (binp, dwarffile) or (None,None).
+    Linux: no dsymutil — DWARF stays in the ELF and objdump reads it in place."""
     mem_layout, _ = split_algo(algo)
     cache = os.path.join(ASM_CACHE, shash)
     dbgprefix = os.path.join(cache, "bin-debug")
     binp = os.path.join(dbgprefix, "bin", f"{algo}.bench")
+    if IS_LINUX:
+        if os.path.exists(binp):
+            return binp, binp
+        cmd = ["zig", "build", "-p", dbgprefix, f"-Dmem_layout={mem_layout}", f"-Dalgo={algo.split('.',1)[1]}",
+               "-Dmode=bench", "-Doptimize=ReleaseFast", "-Dkeep-debug=true"]
+        if subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True).returncode != 0:
+            return None, None
+        return (binp, binp) if os.path.exists(binp) else (None, None)
     dwarffile = os.path.join(dbgprefix, "dod.dSYM", "Contents", "Resources", "DWARF", f"{algo}.bench")
     if os.path.exists(dwarffile):
         return binp, dwarffile
@@ -144,17 +182,30 @@ def step_addr_range(binp, algo_part):
 
 
 def source_map(dwarffile, start, stop):
-    """{addr_int: source_line} from llvm-objdump --source."""
-    r = subprocess.run(OBJDUMP + ["--source", f"--start-address=0x{start:x}",
-                                  f"--stop-address=0x{stop:x}", dwarffile],
+    """{addr_int: source_line} from objdump --source (llvm on the dSYM, GNU -S -l
+    on the ELF). GNU -S interleaves: flush-left `file:line` labels, indented
+    source text, `  addr:` instruction lines — the llvm branch below instead keys
+    off ';' lines."""
+    r = subprocess.run(OBJDUMP + OBJDUMP_SOURCE +
+                       [f"--start-address=0x{start:x}",
+                        f"--stop-address=0x{stop:x}", dwarffile],
                        capture_output=True, text=True)
     out, cur = {}, None
     for l in r.stdout.splitlines():
         s = l.strip()
-        if s.startswith(";"):
-            cur = s[1:].strip() or cur
-        elif (m := re.match(r"^([0-9a-f]+):", s)):
+        if not s:
+            continue
+        m = re.match(r"^([0-9a-f]+):", s)
+        if m:
             out[int(m.group(1), 16)] = cur
+            continue
+        if IS_LINUX:
+            # GNU: skip flush-left file:line labels, keep source text as cur.
+            if re.match(r"^[^\s:]+:\d+", s):
+                continue
+            cur = s
+        elif s.startswith(";"):
+            cur = s[1:].strip() or cur
     return out
 
 

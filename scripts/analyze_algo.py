@@ -24,13 +24,16 @@ from __future__ import annotations
 import json, os, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import sweep_config
+
 DATA = os.path.join(ROOT, "experiments", "data")
 ASM_CACHE = os.path.join(ROOT, ".scratch", "asm_cache")
 DEFAULT_MODEL = "glm-5.2"
 ADDR = re.compile(r"^[0-9a-f]{16}$")
 
 # Death-rate points EXCLUDED from per-algo bundles (legacy sweep values not in
-# experiments/sweeps/death_rates.txt). Raw data retains them. Keep in sync with
+# sweep_config.DEATH_RATES). Raw data retains them. Keep in sync with
 # build_report.py.
 EXCLUDE_DEATH_Q = (0.0, 0.75)
 
@@ -301,11 +304,9 @@ def is_mem_layout_id(s):
 
 
 def read_mem_layout_algos(mem_layout):
-    """experiments/sweeps/<mem_layout>.algos -> full algo names, as-is
-    (the file already stores 'L1.<algo_part>' lines; comments/blanks skipped)."""
-    p = os.path.join(ROOT, "experiments", "sweeps", f"{mem_layout}.algos")
-    return [c.strip() for c in open(p)
-            if c.strip() and not c.strip().startswith("#")]
+    """The sweep roster for one memory layout — sweep_config's parse of
+    build.zig's algo_labels registry (the single source of truth)."""
+    return sweep_config.mem_layout_algos(mem_layout)
 
 
 def process_algo(algo, m, hw, model, json_only, prompt_only, force=False):
@@ -330,7 +331,10 @@ def process_algo(algo, m, hw, model, json_only, prompt_only, force=False):
     os.makedirs(outdir, exist_ok=True)
     jpath = os.path.join(outdir, f"{algo}.json")
     mpath = os.path.join(outdir, f"{algo}.md")
-    new_json = json.dumps(evidence, indent=2)
+    # asm + hardware live in data/ (immutable there); strip from the on-disk
+    # bundle to avoid duplication. Kept in-memory in `evidence` for the prompt.
+    slim = {k: v for k, v in evidence.items() if k not in ("asm", "hardware")}
+    new_json = json.dumps(slim, indent=2)
     old_json = open(jpath).read() if os.path.exists(jpath) else None
     if old_json != new_json:
         with open(jpath, "w") as f:
@@ -475,6 +479,10 @@ def verify_algo(algo, m):
     if not os.path.exists(mpath):
         return "MISS", ["no .md narrative"], []
     e = json.load(open(jpath))
+    # asm + hardware are stripped from the bundle (they live in data/); re-attach
+    # for the citation/number checks below.
+    e["asm"] = json.load(open(os.path.join(DATA, m, f"{algo}.json")))["asm"]
+    e["hardware"] = json.load(open(os.path.join(DATA, m, "hardware.json")))
     md = open(mpath).read()
     errs = []
     for s in SECTIONS:

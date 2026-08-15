@@ -23,8 +23,8 @@ Usage:
     scripts/collect.py ML01.AF05.LP1-autovec.LP2-simple   # one algorithm
     scripts/collect.py ML01 --with-profile           # + cycle attribution
     scripts/collect.py ML01 --only profile           # just the profile loop
-    NS=4000,65000 TRIALS=5 scripts/collect.py ML01
-    THREADS="1 2 4 8" scripts/collect.py ML01
+    NS=10000,1000000 TRIALS=5 scripts/collect.py ML01
+    THREADS="1 4 8" scripts/collect.py ML01
 """
 from __future__ import annotations
 import argparse, datetime, json, os, re, subprocess, sys, threading, time
@@ -48,12 +48,6 @@ def mem_layout_ids():
                   if re.fullmatch(r"ML\d+", d) and os.path.isdir(os.path.join(base, d)))
 
 
-def read_algos(mem_layout):
-    path = os.path.join(ROOT, "experiments", "sweeps", f"{mem_layout}.algos")
-    return [l.strip() for l in open(path, encoding="utf-8")
-            if l.strip() and not l.strip().startswith("#")]
-
-
 def resolve(target):
     """target -> list of full algorithm names. Accepts ''|'all' (every memory
     layout), a memory layout (ML01), a full algo name, or a space-list of those."""
@@ -62,12 +56,12 @@ def resolve(target):
     if not tokens or tokens == ["all"]:
         out = []
         for ml in known:
-            out.extend(read_algos(ml))
+            out.extend(sweep_config.mem_layout_algos(ml))
         return out
     out = []
     for tok in tokens:
         if tok in known:
-            out.extend(read_algos(tok))
+            out.extend(sweep_config.mem_layout_algos(tok))
         elif "." in tok and tok.split(".", 1)[0] in known:
             out.append(tok)
         else:
@@ -202,7 +196,7 @@ def main():
         if do_bench:
             u += len(rates) * len(threads_for(al, a.threads))
         if do_profile:
-            u += len(n_list) * len(rates)
+            u += len(n_list) * len(rates) * len(threads_for(al, a.threads))
         return u
 
     total = sum(_units(al) for al in algos)
@@ -248,14 +242,15 @@ def main():
                     bar.update(f"{tag} {al} q={q} T={T}")
         if do_profile:
             for q in rates:
-                for n in n_list:
-                    try:
-                        profile.profile_point(al, n, q, 1, machine_id=machine_id,
-                                              run_id=run_id, ts_utc=ts_utc,
-                                              skip_done=a.skip_done, verbose=a.verbose)
-                    except (SystemExit, RuntimeError) as e:
-                        print(f"\n    PROFILE FAIL {al} N={n} q={q}: {e}", file=sys.stderr)
-                    bar.update(f"{tag} {al} N={n} q={q}")
+                for T in threads_for(al, a.threads):
+                    for n in n_list:
+                        try:
+                            profile.profile_point(al, n, q, T, machine_id=machine_id,
+                                                  run_id=run_id, ts_utc=ts_utc,
+                                                  skip_done=a.skip_done, verbose=a.verbose)
+                        except (SystemExit, RuntimeError) as e:
+                            print(f"\n    PROFILE FAIL {al} N={n} q={q} T={T}: {e}", file=sys.stderr)
+                        bar.update(f"{tag} {al} N={n} q={q} T={T}")
     bar.finish()
     print(f"=== done: {counts}", file=sys.stderr)
     print("  report: scripts/build_report.py  (then serve experiments/)", file=sys.stderr)
