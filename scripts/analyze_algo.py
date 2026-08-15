@@ -533,10 +533,18 @@ def main():
         i = argv.index("--verify-json")
         json_out = argv[i + 1] if i + 1 < len(argv) else None
         del argv[i:i + 2]
+    # --machine <id>: analyze THAT machine's data dir (multi-machine repos;
+    # default = this host). build_report passes it per machine so `make report`
+    # generates bundles for every machine with data, not just the local host.
+    machine_arg = None
+    if "--machine" in argv:
+        i = argv.index("--machine")
+        machine_arg = argv[i + 1] if i + 1 < len(argv) else None
+        del argv[i:i + 2]
     argv = [a for a in argv if not a.startswith("--") and not a.startswith("-")]
     target = argv[0] if argv else "ML01.AF02.LP1-autovec.LP2-opt"
     model = os.environ.get("MODEL", DEFAULT_MODEL)
-    m = machine_id()
+    m = machine_arg or machine_id()
     if verify_mode:
         sys.exit(run_verify(target, m, json_out=json_out))
     hw = json.load(open(os.path.join(DATA, m, "hardware.json")))

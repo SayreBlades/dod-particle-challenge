@@ -172,55 +172,65 @@ def run_analyze(args, env=None):
     return r.returncode
 
 
-def generate_algo_bundles(layouts, force):
-    """Per mem_layout: analyze_algo.py <L> [--force]. Resume-skips algos whose .md
-    exists (default); --force regenerates all narratives."""
-    flag = ["--force"] if force else []
-    for L in layouts:
-        print(f"== per-algo bundles: {L} ==", file=sys.stderr)
-        run_analyze([L] + flag)
+def generate_algo_bundles(mids, layouts, force, narratives=False):
+    """Per (machine, mem_layout): analyze_algo.py --machine <mid> <L> [--force].
+    Default: --json-only — the evidence .json for EVERY machine with data (asm,
+    runs, profile; no LLM, no narrative). --narratives adds the LLM .md pass
+    (slow + costs tokens; also regenerates missing narratives). Resume-skips
+    existing work either way; --force regenerates all narratives."""
+    flags = (["--force"] if force else []) + ([] if narratives else ["--json-only"])
+    for mid in mids:
+        for L in layouts:
+            print(f"== per-algo bundles ({'narratives' if narratives else 'evidence-only'}): {mid} / {L} ==", file=sys.stderr)
+            run_analyze(["--machine", mid, L] + flags)
 
 
-def verify_mem_layout(L, machine_hint=None):
-    """Run analyze_algo.py <L> --verify --verify-json <tmp>; return {algo: {...}}."""
+def verify_mem_layout(mid, target, machine_hint=None):
+    """Run analyze_algo.py --machine <mid> <target> --verify --verify-json <tmp>;
+    return {algo: {...}}. `target` is a mem_layout (all its algos) or one algo."""
     with tempfile.NamedTemporaryFile("w+", suffix=".json", delete=False) as f:
         path = f.name
     try:
-        run_analyze([L, "--verify", "--verify-json", path])
+        run_analyze(["--machine", mid, target, "--verify", "--verify-json", path])
         return json.load(open(path))
     except Exception as e:
-        print(f"  verify failed for {L}: {e}", file=sys.stderr)
+        print(f"  verify failed for {mid}/{target}: {e}", file=sys.stderr)
         return {}
     finally:
         os.unlink(path)
 
 
-def retry_algo(algo):
+def retry_algo(mid, algo):
     """One retry at a higher token budget (covers truncation + fresh re-roll
     for hallucination)."""
-    print(f"  retry (MAX_TOKENS={RETRY_MAX_TOKENS}): {algo}", file=sys.stderr)
-    run_analyze([algo, "--force"], env={"MAX_TOKENS": RETRY_MAX_TOKENS})
+    print(f"  retry (MAX_TOKENS={RETRY_MAX_TOKENS}): {mid}/{algo}", file=sys.stderr)
+    run_analyze(["--machine", mid, algo, "--force"], env={"MAX_TOKENS": RETRY_MAX_TOKENS})
 
 
-def run_gate(layouts):
-    """Verify → retry FAILs once → re-verify those → return {algo: {...}}
-    with final statuses. Nonzero-failing algos are NOT regenerated again —
-    they keep their (best-effort) narrative, marked unverified."""
-    final = {}
-    for L in layouts:
-        res = verify_mem_layout(L)
-        fails = [c for c, v in res.items() if v["status"] == "FAIL"]
-        for c in fails:
-            retry_algo(c)
-        if fails:
-            # re-verify just the retried algos, one per call (single-algo verify)
+def run_gate(mids, layouts):
+    """Per machine: verify → retry FAILs once → re-verify those. Returns
+    ({mid: {algo: {...}}}, total_fail). Nonzero-failing algos are NOT regenerated
+    again — they keep their (best-effort) narrative, marked unverified."""
+    final_by_mid = {}
+    n_fail_total = 0
+    for mid in mids:
+        final = {}
+        for L in layouts:
+            res = verify_mem_layout(mid, L)
+            fails = [c for c, v in res.items() if v["status"] == "FAIL"]
             for c in fails:
-                res[c] = verify_mem_layout(c).get(c, res[c])
-        final.update(res)
-    n_fail = sum(1 for v in final.values() if v["status"] == "FAIL")
-    n_miss = sum(1 for v in final.values() if v["status"] == "MISS")
-    print(f"== gate: {len(final)} algos, {n_fail} FAIL, {n_miss} MISS ==", file=sys.stderr)
-    return final, n_fail
+                retry_algo(mid, c)
+            if fails:
+                # re-verify just the retried algos, one per call (single-algo verify)
+                for c in fails:
+                    res[c] = verify_mem_layout(mid, c).get(c, res[c])
+            final.update(res)
+        n_fail = sum(1 for v in final.values() if v["status"] == "FAIL")
+        n_miss = sum(1 for v in final.values() if v["status"] == "MISS")
+        n_fail_total += n_fail
+        print(f"== gate[{mid}]: {len(final)} algos, {n_fail} FAIL, {n_miss} MISS ==", file=sys.stderr)
+        final_by_mid[mid] = final
+    return final_by_mid, n_fail_total
 
 
 def inject_verified(machine, mem_layout, verify_results):
@@ -233,6 +243,8 @@ def inject_verified(machine, mem_layout, verify_results):
     for algo, v in verify_results.items():
         if algo.split(".")[0] != mem_layout:
             continue
+        if v["status"] == "MISS":
+            continue  # no narrative to verify — leave unstamped (no SPA banner)
         jpath = os.path.join(base, f"{algo}.json")
         if not os.path.exists(jpath):
             continue
@@ -438,6 +450,7 @@ def main():
     argv = [a for a in sys.argv[1:] if not a.startswith("-")]
     no_algos = "--no-algos" in sys.argv
     force = "--force" in sys.argv
+    narratives = "--narratives" in sys.argv
     verify_only = "--verify-only" in sys.argv
     only_mem_layout = argv[0] if argv else None
 
@@ -452,19 +465,20 @@ def main():
     if only_mem_layout:
         layouts = [L for L in layouts if L == only_mem_layout]
 
-    # 1. per-algo bundles (delegated to analyze_algo.py via subprocess)
+    # 1. per-algo evidence bundles for every machine (json-only, no LLM);
+    #    --narratives adds the LLM .md pass
     if not verify_only and not no_algos:
-        generate_algo_bundles(layouts, force)
+        generate_algo_bundles(mids, layouts, force, narratives=narratives)
 
     # 2. verify gate: verify -> retry FAILs once -> re-verify. Final per-algo
     #    status + fail count. (Q2: warn+mark+nonzero; report still written.)
-    gate_results, n_fail = (run_gate(layouts) if not no_algos else ({}, 0))
+    gate_results, n_fail = (run_gate(mids, layouts) if not no_algos else ({}, 0))
 
     # 3. stamp verified status into each algo .json (SPA banners unverified)
     for mid in mids:
         for L in layouts:
             if distinct(con, "algo", mid, L):
-                inject_verified(mid, L, gate_results)
+                inject_verified(mid, L, gate_results.get(mid, {}))
 
     # 4. aggregation bundles + markdown tree
     build_machines_index(con)
