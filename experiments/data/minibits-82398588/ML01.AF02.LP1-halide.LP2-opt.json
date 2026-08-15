@@ -1,0 +1,864 @@
+{
+  "source_hash": "6d114902396510160edcfc4af14e6026d98efb689d25d854a28da438ae6f0f6b",
+  "asm": {
+    "source_hash": "6d114902396510160edcfc4af14e6026d98efb689d25d854a28da438ae6f0f6b",
+    "symbol": "_framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step",
+    "n_instructions": 353,
+    "histogram": {
+      "str": 77,
+      "add": 65,
+      "stp": 35,
+      "cmp": 20,
+      "ldr": 16,
+      "strb": 16,
+      "mov": 13,
+      "ldrb": 13,
+      "b": 12,
+      "csel": 12,
+      "adrp": 8,
+      "fmov": 6,
+      "lsl": 6,
+      "ldp": 6,
+      "sub": 5,
+      "ccmp": 5,
+      "fmul": 4,
+      "bfi": 4,
+      "stur": 3,
+      "tbnz": 3,
+      "umov": 3,
+      "movk": 2,
+      "movi": 2,
+      "ucvtf": 2,
+      "uqadd": 2,
+      "fcvtzs": 2,
+      "umull": 2,
+      "bl": 1,
+      "cbz": 1,
+      "umaddl": 1,
+      "subs": 1,
+      "fadd": 1,
+      "fsub": 1,
+      "orr": 1,
+      "sxtw": 1,
+      "ret": 1
+    },
+    "vector_insns": 2,
+    "excerpt": "000000010004f57c\tstp\td9, d8, [sp, #-0x50]!\n000000010004f580\tstp\tx24, x23, [sp, #0x10]\n000000010004f584\tstp\tx22, x21, [sp, #0x20]\n000000010004f588\tstp\tx20, x19, [sp, #0x30]\n000000010004f58c\tstp\tx29, x30, [sp, #0x40]\n000000010004f590\tadd\tx29, sp, #0x40\n000000010004f594\tsub\tsp, sp, #0x3f0\n000000010004f598\tmov\tx19, x4\n000000010004f59c\tmov\tx21, x3\n000000010004f5a0\tmov\tx22, x2\n000000010004f5a4\tmov\tx23, x1\n000000010004f5a8\tmov\tx20, x0\n000000010004f5ac\tldr\tx2, [x0, #0x68]\n000000010004f5b0\tldr\tx8, [x0, #0x10]\n000000010004f5b4\tadrp\tx10, 14 ; 0x10005d000\n000000010004f5b8\tadd\tx10, x10, #0x618\n000000010004f5bc\tldr\tw9, [x0, #0x20]\n000000010004f5c0\tldr\tq0, [x10]\n000000010004f5c4\tstr\tq0, [sp, #0x30]\n000000010004f5c8\tstp\twzr, w9, [sp, #0x40]\n000000010004f5cc\tadrp\tx10, 7 ; 0x100056000\n000000010004f5d0\tldr\td0, [x10, #0xd80]\n000000010004f5d4\tstr\td0, [sp, #0x48]\n000000010004f5d8\tadrp\tx10, 8 ; 0x100057000\n000000010004f5dc\tldr\td1, [x10, #0x5d0]\n000000010004f5e0\tstr\td1, [sp, #0x78]\n000000010004f5e4\tadd\tx10, sp, #0x30\n000000010004f5e8\tstp\tx8, xzr, [sp, #0x68]\n000000010004f5ec\tstp\tx10, xzr, [sp, #0x80]\n000000010004f5f0\tstp\txzr, xzr, [sp, #0x58]\n000000010004f5f4\tstp\twzr, w9, [sp, #0x90]\n000000010004f5f8\tadrp\tx10, 7 ; 0x100056000\n000000010004f5fc\tldr\td2, [x10, #0xd88]\n000000010004f600\tstr\td2, [sp, #0x98]\n000000010004f604\tadd\tx10, x8, #0x41\n000000010004f608\tadrp\tx11, 8 ; 0x100057000\n000000010004f60c\tldr\td3, [x11, #0x5d8]\n000000010004f610\tstr\td3, [sp, #0xc0]\n000000010004f614\tadd\tx11, sp, #0x90\n000000010004f618\tstp\tx10, xzr, [sp, #0xb0]\n000000010004f61c\tstp\tx11, xzr, [sp, #0xc8]\n000000010004f620\tstp\txzr, xzr, [sp, #0xa0]\n000000010004f624\tstp\twzr, w9, [sp, #0xd8]\n000000010004f628\tstr\td0, [sp, #0xe0]\n000000010004f62c\tstp\txzr, xzr, [sp, #0x188]\n000000010004f630\tstp\tx8, xzr, [sp, #0x198]\n000000010004f634\tadrp\tx11, 8 ; 0x100057000\n000000010004f638\tldr\td1, [x11, #0x5e0]\n000000010004f63c\tstr\td1, [sp, #0x1a8]\n000000010004f640\tadd\tx11, sp, #0xd8\n000000010004f644\tstp\tx11, xzr, [sp, #0x1b0]\n000000010004f648\tadd\tx11, x8, #0xc\n000000010004f64c\tstp\twzr, w9, [sp, #0xe8]\n000000010004f650\tstr\td0, [sp, #0xf0]\n000000010004f654\tstp\txzr, xzr, [sp, #0x1c0]\n000000010004f658\tstp\tx11, xzr, [sp, #0x1d0]\n000000010004f65c\tstr\td1, [sp, #0x1e0]\n000000010004f660\tadd\tx11, sp, #0xe8\n000000010004f664\tstp\tx11, xzr, [sp, #0x1e8]\n000000010004f668\tadd\tx11, x8, #0x4\n000000010004f66c\tstp\twzr, w9, [sp, #0xf8]\n000000010004f670\tstr\td0, [sp, #0x100]\n000000010004f674\tstp\txzr, xzr, [sp, #0x1f8]\n000000010004f678\tstr\tx11, [sp, #0x208]\n000000010004f67c\tstr\txzr, [sp, #0x210]\n000000010004f680\tstr\td1, [sp, #0x218]\n000000010004f684\tadd\tx11, sp, #0xf8\n000000010004f688\tstr\tx11, [sp, #0x220]\n000000010004f68c\tstr\txzr, [sp, #0x228]\n000000010004f690\tadd\tx11, x8, #0x10\n000000010004f694\tstr\twzr, [sp, #0x108]\n000000010004f698\tstr\tw9, [sp, #0x10c]\n000000010004f69c\tstr\td0, [sp, #0x110]\n000000010004f6a0\tstr\txzr, [sp, #0x238]\n000000010004f6a4\tstr\txzr, [sp, #0x230]\n000000010004f6a8\tstr\tx11, [sp, #0x240]\n000000010004f6ac\tstr\txzr, [sp, #0x248]\n000000010004f6b0\tstr\td1, [sp, #0x250]\n000000010004f6b4\tadd\tx11, sp, #0x108\n000000010004f6b8\tstr\tx11, [sp, #0x258]\n000000010004f6bc\tstr\txzr, [sp, #0x260]\n000000010004f6c0\tadd\tx11, x8, #0x8\n000000010004f6c4\tstr\twzr, [sp, #0x118]\n000000010004f6c8\tstr\tw9, [sp, #0x11c]\n000000010004f6cc\tstr\td0, [sp, #0x120]\n000000010004f6d0\tstr\txzr, [sp, #0x270]\n000000010004f6d4\tstr\txzr, [sp, #0x268]\n000000010004f6d8\tstr\tx11, [sp, #0x278]\n000000010004f6dc\tstr\txzr, [sp, #0x280]\n000000010004f6e0\tstr\td1, [sp, #0x288]\n000000010004f6e4\tadd\tx11, sp, #0x118\n000000010004f6e8\tstr\tx11, [sp, #0x290]\n000000010004f6ec\tstr\txzr, [sp, #0x298]\n000000010004f6f0\tadd\tx11, x8, #0x14\n000000010004f6f4\tstr\twzr, [sp, #0x128]\n000000010004f6f8\tstr\tw9, [sp, #0x12c]\n000000010004f6fc\tstr\td0, [sp, #0x130]\n000000010004f700\tstr\txzr, [sp, #0x2a8]\n000000010004f704\tstr\txzr, [sp, #0x2a0]\n000000010004f708\tstr\tx11, [sp, #0x2b0]\n000000010004f70c\tstr\txzr, [sp, #0x2b8]\n000000010004f710\tstr\td1, [sp, #0x2c0]\n000000010004f714\tadd\tx11, sp, #0x128\n000000010004f718\tstr\tx11, [sp, #0x2c8]\n000000010004f71c\tstr\txzr, [sp, #0x2d0]\n000000010004f720\tadd\tx11, x8, #0x1c\n000000010004f724\tstr\twzr, [sp, #0x138]\n000000010004f728\tstr\tw9, [sp, #0x13c]\n000000010004f72c\tstr\td0, [sp, #0x140]\n000000010004f730\tstr\txzr, [sp, #0x2e0]\n000000010004f734\tstr\txzr, [sp, #0x2d8]\n000000010004f738\tstr\tx11, [sp, #0x2e8]\n000000010004f73c\tstr\txzr, [sp, #0x2f0]\n000000010004f740\tstr\td1, [sp, #0x2f8]\n000000010004f744\tadd\tx11, sp, #0x138\n000000010004f748\tstr\tx11, [sp, #0x300]\n000000010004f74c\tstr\txzr, [sp, #0x308]\n000000010004f750\tstr\twzr, [sp, #0x148]\n000000010004f754\tstr\tw9, [sp, #0x14c]\n000000010004f758\tstr\td2, [sp, #0x150]\n000000010004f75c\tstr\txzr, [sp, #0x318]\n000000010004f760\tstr\txzr, [sp, #0x310]\n000000010004f764\tstr\tx10, [sp, #0x320]\n000000010004f768\tstr\txzr, [sp, #0x328]\n000000010004f76c\tstr\td3, [sp, #0x330]\n000000010004f770\tadd\tx10, sp, #0x148\n000000010004f774\tstr\tx10, [sp, #0x338]\n000000010004f778\tstr\txzr, [sp, #0x340]\n000000010004f77c\tadd\tx10, x8, #0x20\n000000010004f780\tstr\twzr, [sp, #0x158]\n000000010004f784\tstr\tw9, [sp, #0x15c]\n000000010004f788\tstr\td0, [sp, #0x160]\n000000010004f78c\tstp\txzr, xzr, [x29, #-0xe8]\n000000010004f790\tstp\tx10, xzr, [x29, #-0xd8]\n000000010004f794\tstur\td1, [x29, #-0xc8]\n000000010004f798\tadd\tx10, sp, #0x158\n000000010004f79c\tstp\tx10, xzr, [x29, #-0xc0]\n000000010004f7a0\tadd\tx10, x8, #0x24\n000000010004f7a4\tstr\twzr, [sp, #0x168]\n000000010004f7a8\tstr\tw9, [sp, #0x16c]\n000000010004f7ac\tstr\td0, [sp, #0x170]\n000000010004f7b0\tstp\txzr, xzr, [x29, #-0xb0]\n000000010004f7b4\tstp\tx10, xzr, [x29, #-0xa0]\n000000010004f7b8\tstur\td1, [x29, #-0x90]\n000000010004f7bc\tadd\tx10, sp, #0x168\n000000010004f7c0\tstp\tx10, xzr, [x29, #-0x88]\n000000010004f7c4\tadd\tx8, x8, #0x28\n000000010004f7c8\tstr\twzr, [sp, #0x178]\n000000010004f7cc\tstr\tw9, [sp, #0x17c]\n000000010004f7d0\tstr\td0, [sp, #0x180]\n000000010004f7d4\tstp\txzr, xzr, [x29, #-0x78]\n000000010004f7d8\tstp\tx8, xzr, [x29, #-0x68]\n000000010004f7dc\tstur\td1, [x29, #-0x58]\n000000010004f7e0\tadd\tx8, sp, #0x178\n000000010004f7e4\tstp\tx8, xzr, [x29, #-0x50]\n000000010004f7e8\tadrp\tx8, 110 ; 0x1000bd000\n000000010004f7ec\tldr\ts6, [x8, #0xbe0]\n000000010004f7f0\tsub\tx8, x29, #0x78\n000000010004f7f4\tsub\tx9, x29, #0xb0\n000000010004f7f8\tstp\tx9, x8, [sp, #0x20]\n000000010004f7fc\tsub\tx8, x29, #0xe8\n000000010004f800\tadd\tx9, sp, #0x310\n000000010004f804\tstp\tx9, x8, [sp, #0x10]\n000000010004f808\tadd\tx8, sp, #0x2d8\n000000010004f80c\tadd\tx9, sp, #0x2a0\n000000010004f810\tmov\tw10, #0x8889\n000000010004f814\tmovk\tw10, #0x3c88, lsl #16\n000000010004f818\tfmov\ts0, w10\n000000010004f81c\tmov\tw10, #0xd70a\n000000010004f820\tmovk\tw10, #0x3ca3, lsl #16\n000000010004f824\tfmov\ts4, w10\n000000010004f828\tfmov\ts8, #2.00000000\n000000010004f82c\tstp\tx9, x8, [sp]\n000000010004f830\tadd\tx0, sp, #0x58\n000000010004f834\tadd\tx1, sp, #0xa0\n000000010004f838\tmovi.2d\tv1, #0000000000000000\n000000010004f83c\tfmov\ts2, #-1.00000000\n000000010004f840\tmovi.2d\tv3, #0000000000000000\n000000010004f844\tfmov\ts5, #2.00000000\n000000010004f848\tadd\tx3, sp, #0x188\n000000010004f84c\tadd\tx4, sp, #0x1c0\n000000010004f850\tadd\tx5, sp, #0x1f8\n000000010004f854\tadd\tx6, sp, #0x230\n000000010004f858\tadd\tx7, sp, #0x268\n000000010004f85c\tbl\t_halide_b2\n000000010004f860\tldr\tx8, [x20, #0x18]\n000000010004f864\tcbz\tx8, 0x10004fad8\n000000010004f868\tldr\tx9, [x20, #0x10]\n000000010004f86c\tsub\tw10, w21, #0x2\n000000010004f870\tucvtf\ts0, w21\n000000010004f874\tmov\tw11, w21\n000000010004f878\tucvtf\ts1, w19\n000000010004f87c\tadrp\tx12, 14 ; 0x10005d000\n000000010004f880\tadd\tx12, x12, #0x600\n000000010004f884\tfmov\ts2, #0.25000000\n000000010004f888\tmov\tw13, #0xff\n000000010004f88c\tb\t0x10004f8c4\n000000010004f890\tumaddl\tx14, w11, w1, x0\n000000010004f894\tlsl\tx15, x14, #2\n000000010004f898\tldr\td4, [x23, x15]\n000000010004f89c\tuqadd.8b\tv4, v4, v3\n000000010004f8a0\tstr\td4, [x23, x15]\n000000010004f8a4\tadd\tx14, x14, x11\n000000010004f8a8\tlsl\tx14, x14, #2\n000000010004f8ac\tldr\td4, [x23, x14]\n000000010004f8b0\tuqadd.8b\tv3, v4, v3\n000000010004f8b4\tstr\td3, [x23, x14]\n000000010004f8b8\tadd\tx9, x9, #0x44\n000000010004f8bc\tsubs\tx8, x8, #0x1\n000000010004f8c0\tb.eq\t0x10004fad8\n000000010004f8c4\tldrb\tw14, [x9, #0x41]\n000000010004f8c8\tldr\td3, [x12, x14, lsl #3]\n000000010004f8cc\tldp\ts4, s5, [x9]\n000000010004f8d0\tfadd\ts4, s4, s8\n000000010004f8d4\tfmul\ts4, s4, s2\n000000010004f8d8\tfmul\ts4, s4, s0\n000000010004f8dc\tfcvtzs\tw0, s4\n000000010004f8e0\tfsub\ts4, s8, s5\n000000010004f8e4\tfmul\ts4, s4, s2\n000000010004f8e8\tfmul\ts4, s4, s1\n000000010004f8ec\tfcvtzs\tw1, s4\n000000010004f8f0\torr\tw14, w1, w0\n000000010004f8f4\ttbnz\tw14, #0x1f, 0x10004f908\n000000010004f8f8\tadd\tw14, w1, #0x2\n000000010004f8fc\tcmp\tw10, w0\n000000010004f900\tccmp\tw14, w19, #0x0, ge\n000000010004f904\tb.le\t0x10004f890\n000000010004f908\tumov.b\tw16, v3[0]\n000000010004f90c\tumov.b\tw15, v3[1]\n000000010004f910\tsxtw\tx17, w0\n000000010004f914\tumov.b\tw14, v3[2]\n000000010004f918\tcmp\tw1, w19\n000000010004f91c\tb.ge\t0x10004f9a4\n000000010004f920\ttbnz\tw1, #0x1f, 0x10004f9a4\n000000010004f924\tumull\tx2, w11, w1\n000000010004f928\tcmp\tw21, w0\n000000010004f92c\tadd\tx4, x2, x17\n000000010004f930\tmov\tw3, #0x3\n000000010004f934\tbfi\tx3, x4, #2, #61\n000000010004f938\tccmp\tx3, x22, #0x2, hi\n000000010004f93c\tb.hs\t0x10004f988\n000000010004f940\tlsl\tx4, x4, #2\n000000010004f944\tadd\tx4, x23, x4\n000000010004f948\tldrb\tw5, [x4]\n000000010004f94c\tadd\tw5, w5, w16, uxtb\n000000010004f950\tcmp\tw5, #0xff\n000000010004f954\tcsel\tw5, w5, w13, lo\n000000010004f958\tstrb\tw5, [x4]\n000000010004f95c\tldrb\tw5, [x4, #0x1]\n000000010004f960\tadd\tw5, w5, w15, uxtb\n000000010004f964\tcmp\tw5, #0xff\n000000010004f968\tcsel\tw5, w5, w13, lo\n000000010004f96c\tstrb\tw5, [x4, #0x1]\n000000010004f970\tldrb\tw5, [x4, #0x2]\n000000010004f974\tadd\tw5, w5, w14, uxtb\n000000010004f978\tcmp\tw5, #0xff\n000000010004f97c\tcsel\tw5, w5, w13, lo\n000000010004f980\tstrb\tw5, [x4, #0x2]\n000000010004f984\tstrb\tw13, [x23, x3]\n000000010004f988\tadd\tx3, x17, #0x1\n000000010004f98c\tcmp\tw21, w3\n000000010004f990\tadd\tx3, x2, x3\n000000010004f994\tmov\tw2, #0x3\n000000010004f998\tbfi\tx2, x3, #2, #61\n000000010004f99c\tccmp\tx2, x22, #0x2, hi\n000000010004f9a0\tb.lo\t0x10004fa80\n000000010004f9a4\tadd\tw1, w1, #0x1\n000000010004f9a8\tcmp\tw1, w19\n000000010004f9ac\tb.ge\t0x10004f8b8\n000000010004f9b0\ttbnz\tw1, #0x1f, 0x10004f8b8\n000000010004f9b4\tumull\tx1, w11, w1\n000000010004f9b8\tcmp\tw21, w0\n000000010004f9bc\tadd\tx2, x1, x17\n000000010004f9c0\tmov\tw0, #0x3\n000000010004f9c4\tbfi\tx0, x2, #2, #61\n000000010004f9c8\tccmp\tx0, x22, #0x2, hi\n000000010004f9cc\tb.hs\t0x10004fa18\n000000010004f9d0\tlsl\tx2, x2, #2\n000000010004f9d4\tadd\tx2, x23, x2\n000000010004f9d8\tldrb\tw3, [x2]\n000000010004f9dc\tadd\tw3, w3, w16, uxtb\n000000010004f9e0\tcmp\tw3, #0xff\n000000010004f9e4\tcsel\tw3, w3, w13, lo\n000000010004f9e8\tstrb\tw3, [x2]\n000000010004f9ec\tldrb\tw3, [x2, #0x1]\n000000010004f9f0\tadd\tw3, w3, w15, uxtb\n000000010004f9f4\tcmp\tw3, #0xff\n000000010004f9f8\tcsel\tw3, w3, w13, lo\n000000010004f9fc\tstrb\tw3, [x2, #0x1]\n000000010004fa00\tldrb\tw3, [x2, #0x2]\n000000010004fa04\tadd\tw3, w3, w14, uxtb\n000000010004fa08\tcmp\tw3, #0xff\n000000010004fa0c\tcsel\tw3, w3, w13, lo\n000000010004fa10\tstrb\tw3, [x2, #0x2]\n000000010004fa14\tstrb\tw13, [x23, x0]\n000000010004fa18\tadd\tx17, x17, #0x1\n000000010004fa1c\tcmp\tw21, w17\n000000010004fa20\tadd\tx0, x1, x17\n000000010004fa24\tmov\tw17, #0x3\n000000010004fa28\tbfi\tx17, x0, #2, #61\n000000010004fa2c\tccmp\tx17, x22, #0x2, hi\n000000010004fa30\tb.hs\t0x10004f8b8\n000000010004fa34\tlsl\tx0, x0, #2\n000000010004fa38\tadd\tx0, x23, x0\n000000010004fa3c\tldrb\tw1, [x0]\n000000010004fa40\tadd\tw16, w1, w16, uxtb\n000000010004fa44\tcmp\tw16, #0xff\n000000010004fa48\tcsel\tw16, w16, w13, lo\n000000010004fa4c\tstrb\tw16, [x0]\n000000010004fa50\tldrb\tw16, [x0, #0x1]\n000000010004fa54\tadd\tw15, w16, w15, uxtb\n000000010004fa58\tcmp\tw15, #0xff\n000000010004fa5c\tcsel\tw15, w15, w13, lo\n000000010004fa60\tstrb\tw15, [x0, #0x1]\n000000010004fa64\tldrb\tw15, [x0, #0x2]\n000000010004fa68\tadd\tw14, w15, w14, uxtb\n000000010004fa6c\tcmp\tw14, #0xff\n000000010004fa70\tcsel\tw14, w14, w13, lo\n000000010004fa74\tstrb\tw14, [x0, #0x2]\n000000010004fa78\tstrb\tw13, [x23, x17]\n000000010004fa7c\tb\t0x10004f8b8\n000000010004fa80\tlsl\tx3, x3, #2\n000000010004fa84\tadd\tx3, x23, x3\n000000010004fa88\tldrb\tw4, [x3]\n000000010004fa8c\tadd\tw4, w4, w16, uxtb\n000000010004fa90\tcmp\tw4, #0xff\n000000010004fa94\tcsel\tw4, w4, w13, lo\n000000010004fa98\tstrb\tw4, [x3]\n000000010004fa9c\tldrb\tw4, [x3, #0x1]\n000000010004faa0\tadd\tw4, w4, w15, uxtb\n000000010004faa4\tcmp\tw4, #0xff\n000000010004faa8\tcsel\tw4, w4, w13, lo\n000000010004faac\tstrb\tw4, [x3, #0x1]\n000000010004fab0\tldrb\tw4, [x3, #0x2]\n000000010004fab4\tadd\tw4, w4, w14, uxtb\n000000010004fab8\tcmp\tw4, #0xff\n000000010004fabc\tcsel\tw4, w4, w13, lo\n000000010004fac0\tstrb\tw4, [x3, #0x2]\n000000010004fac4\tstrb\tw13, [x23, x2]\n000000010004fac8\tadd\tw1, w1, #0x1\n000000010004facc\tcmp\tw1, w19\n000000010004fad0\tb.lt\t0x10004f9b0\n000000010004fad4\tb\t0x10004f8b8\n000000010004fad8\tldr\tx8, [x20, #0x68]\n000000010004fadc\tadd\tx8, x8, #0x1\n000000010004fae0\tstr\tx8, [x20, #0x68]\n000000010004fae4\tadd\tsp, sp, #0x3f0\n000000010004fae8\tldp\tx29, x30, [sp, #0x40]\n000000010004faec\tldp\tx20, x19, [sp, #0x30]\n000000010004faf0\tldp\tx22, x21, [sp, #0x20]\n000000010004faf4\tldp\tx24, x23, [sp, #0x10]\n000000010004faf8\tldp\td9, d8, [sp], #0x50\n000000010004fafc\tret",
+    "source_attributed": [
+      {
+        "source": "        pub fn step(self: *Self, dt: f32, fb: []u8, w: u32, h: u32) void {",
+        "asm": [
+          "stp\td9, d8, [sp, #-0x50]!",
+          "stp\tx24, x23, [sp, #0x10]",
+          "stp\tx22, x21, [sp, #0x20]",
+          "stp\tx20, x19, [sp, #0x30]",
+          "stp\tx29, x30, [sp, #0x40]",
+          "add\tx29, sp, #0x40",
+          "sub\tsp, sp, #0x3f0",
+          "mov\tx19, x4",
+          "mov\tx21, x3",
+          "mov\tx22, x2",
+          "mov\tx23, x1",
+          "mov\tx20, x0"
+        ]
+      },
+      {
+        "source": "        halide.run(data, dt, sim.frame);",
+        "asm": [
+          "ldr\tx2, [x0, #0x68]",
+          "ldr\tx8, [x0, #0x10]",
+          "adrp\tx10, 14 ; 0x10005d000",
+          "add\tx10, x10, #0x618",
+          "ldr\tw9, [x0, #0x20]",
+          "ldr\tq0, [x10]",
+          "str\tq0, [sp, #0x30]"
+        ]
+      },
+      {
+        "source": "        .{ .min = 0, .extent = @intCast(n), .stride = stride_floats, .flags = 0 },",
+        "asm": [
+          "stp\twzr, w9, [sp, #0x40]",
+          "adrp\tx10, 7 ; 0x100056000",
+          "ldr\td0, [x10, #0xd80]",
+          "str\td0, [sp, #0x48]",
+          "adrp\tx10, 8 ; 0x100057000"
+        ]
+      },
+      {
+        "source": "    var buf_in: halide_buffer_t = .{ .host = base, .type = FLOAT32, .dimensions = 2, .dim = &in_dims };",
+        "asm": [
+          "ldr\td1, [x10, #0x5d0]",
+          "str\td1, [sp, #0x78]",
+          "add\tx10, sp, #0x30",
+          "stp\tx8, xzr, [sp, #0x68]",
+          "stp\tx10, xzr, [sp, #0x80]",
+          "stp\txzr, xzr, [sp, #0x58]"
+        ]
+      },
+      {
+        "source": "        .{ .min = 0, .extent = @intCast(n), .stride = stride_bytes, .flags = 0 },",
+        "asm": [
+          "stp\twzr, w9, [sp, #0x90]",
+          "adrp\tx10, 7 ; 0x100056000",
+          "ldr\td2, [x10, #0xd88]",
+          "str\td2, [sp, #0x98]",
+          "add\tx10, x8, #0x41",
+          "adrp\tx11, 8 ; 0x100057000",
+          "ldr\td3, [x11, #0x5d8]",
+          "str\td3, [sp, #0xc0]",
+          "add\tx11, sp, #0x90"
+        ]
+      },
+      {
+        "source": "    var buf_kind_in: halide_buffer_t = .{ .host = base + @offsetOf(Particle, \"kind\"), .type = UINT8, .dimensions = 1, .dim = &kind_dim };",
+        "asm": [
+          "stp\tx10, xzr, [sp, #0xb0]",
+          "stp\tx11, xzr, [sp, #0xc8]",
+          "stp\txzr, xzr, [sp, #0xa0]"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "stp\twzr, w9, [sp, #0xd8]",
+          "str\td0, [sp, #0xe0]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = t, .dimensions = 1, .dim = d };",
+        "asm": [
+          "stp\txzr, xzr, [sp, #0x188]"
+        ]
+      },
+      {
+        "source": "    var buf_px = out1d(base + pos_off + 0, n, stride_floats, FLOAT32, &dpx);",
+        "asm": [
+          "stp\tx8, xzr, [sp, #0x198]",
+          "adrp\tx11, 8 ; 0x100057000",
+          "ldr\td1, [x11, #0x5e0]",
+          "str\td1, [sp, #0x1a8]",
+          "add\tx11, sp, #0xd8",
+          "stp\tx11, xzr, [sp, #0x1b0]"
+        ]
+      },
+      {
+        "source": "    var buf_vx = out1d(base + vel_off + 0, n, stride_floats, FLOAT32, &dvx);",
+        "asm": [
+          "add\tx11, x8, #0xc"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "stp\twzr, w9, [sp, #0xe8]",
+          "str\td0, [sp, #0xf0]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = t, .dimensions = 1, .dim = d };",
+        "asm": [
+          "stp\txzr, xzr, [sp, #0x1c0]"
+        ]
+      },
+      {
+        "source": "    var buf_vx = out1d(base + vel_off + 0, n, stride_floats, FLOAT32, &dvx);",
+        "asm": [
+          "stp\tx11, xzr, [sp, #0x1d0]",
+          "str\td1, [sp, #0x1e0]",
+          "add\tx11, sp, #0xe8",
+          "stp\tx11, xzr, [sp, #0x1e8]",
+          "add\tx11, x8, #0x4",
+          "stp\twzr, w9, [sp, #0xf8]",
+          "str\td0, [sp, #0x100]",
+          "stp\txzr, xzr, [sp, #0x1f8]"
+        ]
+      },
+      {
+        "source": "    var buf_py = out1d(base + pos_off + 4, n, stride_floats, FLOAT32, &dpy);",
+        "asm": [
+          "str\tx11, [sp, #0x208]",
+          "str\txzr, [sp, #0x210]",
+          "str\td1, [sp, #0x218]",
+          "add\tx11, sp, #0xf8",
+          "str\tx11, [sp, #0x220]",
+          "str\txzr, [sp, #0x228]"
+        ]
+      },
+      {
+        "source": "    var buf_vy = out1d(base + vel_off + 4, n, stride_floats, FLOAT32, &dvy);",
+        "asm": [
+          "add\tx11, x8, #0x10",
+          "str\twzr, [sp, #0x108]",
+          "str\tw9, [sp, #0x10c]",
+          "str\td0, [sp, #0x110]",
+          "str\txzr, [sp, #0x238]",
+          "str\txzr, [sp, #0x230]",
+          "str\tx11, [sp, #0x240]",
+          "str\txzr, [sp, #0x248]",
+          "str\td1, [sp, #0x250]",
+          "add\tx11, sp, #0x108",
+          "str\tx11, [sp, #0x258]",
+          "str\txzr, [sp, #0x260]"
+        ]
+      },
+      {
+        "source": "    var buf_pz = out1d(base + pos_off + 8, n, stride_floats, FLOAT32, &dpz);",
+        "asm": [
+          "add\tx11, x8, #0x8",
+          "str\twzr, [sp, #0x118]",
+          "str\tw9, [sp, #0x11c]",
+          "str\td0, [sp, #0x120]",
+          "str\txzr, [sp, #0x270]",
+          "str\txzr, [sp, #0x268]",
+          "str\tx11, [sp, #0x278]",
+          "str\txzr, [sp, #0x280]",
+          "str\td1, [sp, #0x288]",
+          "add\tx11, sp, #0x118",
+          "str\tx11, [sp, #0x290]",
+          "str\txzr, [sp, #0x298]"
+        ]
+      },
+      {
+        "source": "    var buf_vz = out1d(base + vel_off + 8, n, stride_floats, FLOAT32, &dvz);",
+        "asm": [
+          "add\tx11, x8, #0x14"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "str\twzr, [sp, #0x128]",
+          "str\tw9, [sp, #0x12c]",
+          "str\td0, [sp, #0x130]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = t, .dimensions = 1, .dim = d };",
+        "asm": [
+          "str\txzr, [sp, #0x2a8]",
+          "str\txzr, [sp, #0x2a0]",
+          "str\tx11, [sp, #0x2b0]",
+          "str\txzr, [sp, #0x2b8]",
+          "str\td1, [sp, #0x2c0]",
+          "add\tx11, sp, #0x128"
+        ]
+      },
+      {
+        "source": "    var buf_vz = out1d(base + vel_off + 8, n, stride_floats, FLOAT32, &dvz);",
+        "asm": [
+          "str\tx11, [sp, #0x2c8]",
+          "str\txzr, [sp, #0x2d0]"
+        ]
+      },
+      {
+        "source": "    var buf_age = out1d(base + @offsetOf(Particle, \"age\"), n, stride_floats, FLOAT32, &dag);",
+        "asm": [
+          "add\tx11, x8, #0x1c"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "str\twzr, [sp, #0x138]",
+          "str\tw9, [sp, #0x13c]",
+          "str\td0, [sp, #0x140]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = t, .dimensions = 1, .dim = d };",
+        "asm": [
+          "str\txzr, [sp, #0x2e0]",
+          "str\txzr, [sp, #0x2d8]"
+        ]
+      },
+      {
+        "source": "    var buf_age = out1d(base + @offsetOf(Particle, \"age\"), n, stride_floats, FLOAT32, &dag);",
+        "asm": [
+          "str\tx11, [sp, #0x2e8]",
+          "str\txzr, [sp, #0x2f0]",
+          "str\td1, [sp, #0x2f8]",
+          "add\tx11, sp, #0x138",
+          "str\tx11, [sp, #0x300]",
+          "str\txzr, [sp, #0x308]"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "str\twzr, [sp, #0x148]",
+          "str\tw9, [sp, #0x14c]",
+          "str\td2, [sp, #0x150]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = t, .dimensions = 1, .dim = d };",
+        "asm": [
+          "str\txzr, [sp, #0x318]",
+          "str\txzr, [sp, #0x310]"
+        ]
+      },
+      {
+        "source": "    var buf_kind = out1d(base + @offsetOf(Particle, \"kind\"), n, stride_bytes, UINT8, &dkd);",
+        "asm": [
+          "str\tx10, [sp, #0x320]",
+          "str\txzr, [sp, #0x328]",
+          "str\td3, [sp, #0x330]",
+          "add\tx10, sp, #0x148",
+          "str\tx10, [sp, #0x338]",
+          "str\txzr, [sp, #0x340]"
+        ]
+      },
+      {
+        "source": "    var buf_cr = out1d(base + color_off + 0, n, stride_floats, FLOAT32, &dcr);",
+        "asm": [
+          "add\tx10, x8, #0x20"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "str\twzr, [sp, #0x158]",
+          "str\tw9, [sp, #0x15c]",
+          "str\td0, [sp, #0x160]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = t, .dimensions = 1, .dim = d };",
+        "asm": [
+          "stp\txzr, xzr, [x29, #-0xe8]"
+        ]
+      },
+      {
+        "source": "    var buf_cr = out1d(base + color_off + 0, n, stride_floats, FLOAT32, &dcr);",
+        "asm": [
+          "stp\tx10, xzr, [x29, #-0xd8]",
+          "stur\td1, [x29, #-0xc8]",
+          "add\tx10, sp, #0x158",
+          "stp\tx10, xzr, [x29, #-0xc0]",
+          "add\tx10, x8, #0x24",
+          "str\twzr, [sp, #0x168]"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "str\tw9, [sp, #0x16c]",
+          "str\td0, [sp, #0x170]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = t, .dimensions = 1, .dim = d };",
+        "asm": [
+          "stp\txzr, xzr, [x29, #-0xb0]"
+        ]
+      },
+      {
+        "source": "    var buf_cg = out1d(base + color_off + 4, n, stride_floats, FLOAT32, &dcg);",
+        "asm": [
+          "stp\tx10, xzr, [x29, #-0xa0]",
+          "stur\td1, [x29, #-0x90]",
+          "add\tx10, sp, #0x168",
+          "stp\tx10, xzr, [x29, #-0x88]"
+        ]
+      },
+      {
+        "source": "    var buf_cb = out1d(base + color_off + 8, n, stride_floats, FLOAT32, &dcb);",
+        "asm": [
+          "add\tx8, x8, #0x28"
+        ]
+      },
+      {
+        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
+        "asm": [
+          "str\twzr, [sp, #0x178]",
+          "str\tw9, [sp, #0x17c]",
+          "str\td0, [sp, #0x180]"
+        ]
+      },
+      {
+        "source": "    return .{ .host = host, .type = t, .dimensions = 1, .dim = d };",
+        "asm": [
+          "stp\txzr, xzr, [x29, #-0x78]"
+        ]
+      },
+      {
+        "source": "    var buf_cb = out1d(base + color_off + 8, n, stride_floats, FLOAT32, &dcb);",
+        "asm": [
+          "stp\tx8, xzr, [x29, #-0x68]",
+          "stur\td1, [x29, #-0x58]",
+          "add\tx8, sp, #0x178",
+          "stp\tx8, xzr, [x29, #-0x50]"
+        ]
+      },
+      {
+        "source": "    const rc = halide_b2(&buf_in, &buf_kind_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, config.kill_age, frame, config.q, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_kind, &buf_cr, &buf_cg, &buf_cb);",
+        "asm": [
+          "adrp\tx8, 110 ; 0x1000bd000",
+          "ldr\ts6, [x8, #0xbe0]",
+          "sub\tx8, x29, #0x78",
+          "sub\tx9, x29, #0xb0",
+          "stp\tx9, x8, [sp, #0x20]",
+          "sub\tx8, x29, #0xe8",
+          "add\tx9, sp, #0x310",
+          "stp\tx9, x8, [sp, #0x10]",
+          "add\tx8, sp, #0x2d8",
+          "add\tx9, sp, #0x2a0",
+          "mov\tw10, #0x8889",
+          "movk\tw10, #0x3c88, lsl #16",
+          "fmov\ts0, w10",
+          "mov\tw10, #0xd70a",
+          "movk\tw10, #0x3ca3, lsl #16",
+          "fmov\ts4, w10",
+          "fmov\ts8, #2.00000000",
+          "stp\tx9, x8, [sp]",
+          "add\tx0, sp, #0x58",
+          "add\tx1, sp, #0xa0",
+          "movi.2d\tv1, #0000000000000000",
+          "fmov\ts2, #-1.00000000",
+          "movi.2d\tv3, #0000000000000000",
+          "fmov\ts5, #2.00000000",
+          "add\tx3, sp, #0x188",
+          "add\tx4, sp, #0x1c0",
+          "add\tx5, sp, #0x1f8",
+          "add\tx6, sp, #0x230",
+          "add\tx7, sp, #0x268",
+          "bl\t_halide_b2"
+        ]
+      },
+      {
+        "source": "        for (data.particles) |p| {",
+        "asm": [
+          "ldr\tx8, [x20, #0x18]",
+          "cbz\tx8, 0x10004fad8",
+          "ldr\tx9, [x20, #0x10]",
+          "sub\tw10, w21, #0x2",
+          "ucvtf\ts0, w21",
+          "mov\tw11, w21",
+          "ucvtf\ts1, w19",
+          "adrp\tx12, 14 ; 0x10005d000",
+          "add\tx12, x12, #0x600",
+          "fmov\ts2, #0.25000000",
+          "mov\tw13, #0xff",
+          "b\t0x10004f8c4"
+        ]
+      },
+      {
+        "source": "        const r0 = (y0 * @as(usize, w) + x0) * 4;",
+        "asm": [
+          "umaddl\tx14, w11, w1, x0",
+          "lsl\tx15, x14, #2",
+          "ldr\td4, [x23, x15]",
+          "uqadd.8b\tv4, v4, v3",
+          "str\td4, [x23, x15]",
+          "add\tx14, x14, x11"
+        ]
+      },
+      {
+        "source": "        const d1: *align(1) Row = @ptrCast(fb[r0 + @as(usize, w) * 4 ..][0..8]);",
+        "asm": [
+          "lsl\tx14, x14, #2"
+        ]
+      },
+      {
+        "source": "        d1.* = d1.* +| src;",
+        "asm": [
+          "ldr\td4, [x23, x14]",
+          "uqadd.8b\tv3, v4, v3",
+          "str\td3, [x23, x14]",
+          "add\tx9, x9, #0x44"
+        ]
+      },
+      {
+        "source": "        for (data.particles) |p| {",
+        "asm": [
+          "subs\tx8, x8, #0x1",
+          "b.eq\t0x10004fad8",
+          "ldrb\tw14, [x9, #0x41]",
+          "ldr\td3, [x12, x14, lsl #3]",
+          "ldp\ts4, s5, [x9]",
+          "fadd\ts4, s4, s8",
+          "fmul\ts4, s4, s2"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(norm * half);",
+        "asm": [
+          "fmul\ts4, s4, s0",
+          "fcvtzs\tw0, s4"
+        ]
+      },
+      {
+        "source": "    const norm = (config.view_half - y) / (2.0 * config.view_half); // [0,1)",
+        "asm": [
+          "fsub\ts4, s8, s5",
+          "fmul\ts4, s4, s2"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(norm * half);",
+        "asm": [
+          "fmul\ts4, s4, s1",
+          "fcvtzs\tw1, s4"
+        ]
+      },
+      {
+        "source": "    if (px >= 0 and px + 2 <= wi and py >= 0 and py + 2 <= hi) {",
+        "asm": [
+          "orr\tw14, w1, w0",
+          "tbnz\tw14, #0x1f, 0x10004f908",
+          "add\tw14, w1, #0x2",
+          "cmp\tw10, w0",
+          "ccmp\tw14, w19, #0x0, ge",
+          "b.le\t0x10004f890",
+          "umov.b\tw16, v3[0]",
+          "umov.b\tw15, v3[1]"
+        ]
+      },
+      {
+        "source": "        while (dy < 2) : (dy += 1) {",
+        "asm": [
+          "sxtw\tx17, w0",
+          "umov.b\tw14, v3[2]",
+          "cmp\tw1, w19",
+          "b.ge\t0x10004f9a4",
+          "tbnz\tw1, #0x1f, 0x10004f9a4",
+          "umull\tx2, w11, w1",
+          "cmp\tw21, w0",
+          "add\tx4, x2, x17",
+          "mov\tw3, #0x3",
+          "bfi\tx3, x4, #2, #61"
+        ]
+      },
+      {
+        "source": "                if (idx + 3 >= fb.len) continue;",
+        "asm": [
+          "ccmp\tx3, x22, #0x2, hi",
+          "b.hs\t0x10004f988",
+          "lsl\tx4, x4, #2"
+        ]
+      },
+      {
+        "source": "                fb[idx + 0] = fb[idx + 0] +| src[0];",
+        "asm": [
+          "add\tx4, x23, x4",
+          "ldrb\tw5, [x4]",
+          "add\tw5, w5, w16, uxtb",
+          "cmp\tw5, #0xff",
+          "csel\tw5, w5, w13, lo",
+          "strb\tw5, [x4]",
+          "ldrb\tw5, [x4, #0x1]",
+          "add\tw5, w5, w15, uxtb",
+          "cmp\tw5, #0xff"
+        ]
+      },
+      {
+        "source": "                fb[idx + 1] = fb[idx + 1] +| src[1];",
+        "asm": [
+          "csel\tw5, w5, w13, lo",
+          "strb\tw5, [x4, #0x1]"
+        ]
+      },
+      {
+        "source": "                fb[idx + 2] = fb[idx + 2] +| src[2];",
+        "asm": [
+          "ldrb\tw5, [x4, #0x2]",
+          "add\tw5, w5, w14, uxtb",
+          "cmp\tw5, #0xff",
+          "csel\tw5, w5, w13, lo",
+          "strb\tw5, [x4, #0x2]",
+          "strb\tw13, [x23, x3]",
+          "add\tx3, x17, #0x1",
+          "cmp\tw21, w3",
+          "add\tx3, x2, x3",
+          "mov\tw2, #0x3"
+        ]
+      },
+      {
+        "source": "                if (idx + 3 >= fb.len) continue;",
+        "asm": [
+          "bfi\tx2, x3, #2, #61",
+          "ccmp\tx2, x22, #0x2, hi",
+          "b.lo\t0x10004fa80",
+          "add\tw1, w1, #0x1",
+          "cmp\tw1, w19",
+          "b.ge\t0x10004f8b8",
+          "tbnz\tw1, #0x1f, 0x10004f8b8",
+          "umull\tx1, w11, w1",
+          "cmp\tw21, w0",
+          "add\tx2, x1, x17",
+          "mov\tw0, #0x3",
+          "bfi\tx0, x2, #2, #61",
+          "ccmp\tx0, x22, #0x2, hi",
+          "b.hs\t0x10004fa18",
+          "lsl\tx2, x2, #2"
+        ]
+      },
+      {
+        "source": "                fb[idx + 0] = fb[idx + 0] +| src[0];",
+        "asm": [
+          "add\tx2, x23, x2",
+          "ldrb\tw3, [x2]",
+          "add\tw3, w3, w16, uxtb",
+          "cmp\tw3, #0xff",
+          "csel\tw3, w3, w13, lo",
+          "strb\tw3, [x2]"
+        ]
+      },
+      {
+        "source": "                fb[idx + 1] = fb[idx + 1] +| src[1];",
+        "asm": [
+          "ldrb\tw3, [x2, #0x1]",
+          "add\tw3, w3, w15, uxtb",
+          "cmp\tw3, #0xff",
+          "csel\tw3, w3, w13, lo",
+          "strb\tw3, [x2, #0x1]"
+        ]
+      },
+      {
+        "source": "                fb[idx + 2] = fb[idx + 2] +| src[2];",
+        "asm": [
+          "ldrb\tw3, [x2, #0x2]",
+          "add\tw3, w3, w14, uxtb",
+          "cmp\tw3, #0xff",
+          "csel\tw3, w3, w13, lo",
+          "strb\tw3, [x2, #0x2]",
+          "strb\tw13, [x23, x0]"
+        ]
+      },
+      {
+        "source": "                const fx = px + dx;",
+        "asm": [
+          "add\tx17, x17, #0x1"
+        ]
+      },
+      {
+        "source": "                if (fx < 0 or fx >= wi or fy < 0 or fy >= hi) continue;",
+        "asm": [
+          "cmp\tw21, w17"
+        ]
+      },
+      {
+        "source": "                const idx: usize = (@as(usize, @intCast(fy)) * @as(usize, w) + @as(usize, @intCast(fx))) * 4;",
+        "asm": [
+          "add\tx0, x1, x17"
+        ]
+      },
+      {
+        "source": "                if (idx + 3 >= fb.len) continue;",
+        "asm": [
+          "mov\tw17, #0x3",
+          "bfi\tx17, x0, #2, #61",
+          "ccmp\tx17, x22, #0x2, hi",
+          "b.hs\t0x10004f8b8",
+          "lsl\tx0, x0, #2",
+          "add\tx0, x23, x0",
+          "ldrb\tw1, [x0]",
+          "add\tw16, w1, w16, uxtb",
+          "cmp\tw16, #0xff"
+        ]
+      },
+      {
+        "source": "                fb[idx + 0] = fb[idx + 0] +| src[0];",
+        "asm": [
+          "csel\tw16, w16, w13, lo",
+          "strb\tw16, [x0]"
+        ]
+      },
+      {
+        "source": "                fb[idx + 1] = fb[idx + 1] +| src[1];",
+        "asm": [
+          "ldrb\tw16, [x0, #0x1]",
+          "add\tw15, w16, w15, uxtb",
+          "cmp\tw15, #0xff",
+          "csel\tw15, w15, w13, lo",
+          "strb\tw15, [x0, #0x1]",
+          "ldrb\tw15, [x0, #0x2]",
+          "add\tw14, w15, w14, uxtb",
+          "cmp\tw14, #0xff",
+          "csel\tw14, w14, w13, lo",
+          "strb\tw14, [x0, #0x2]"
+        ]
+      },
+      {
+        "source": "                fb[idx + 3] = 255;",
+        "asm": [
+          "strb\tw13, [x23, x17]"
+        ]
+      },
+      {
+        "source": "    }",
+        "asm": [
+          "b\t0x10004f8b8",
+          "lsl\tx3, x3, #2"
+        ]
+      },
+      {
+        "source": "                fb[idx + 0] = fb[idx + 0] +| src[0];",
+        "asm": [
+          "add\tx3, x23, x3",
+          "ldrb\tw4, [x3]",
+          "add\tw4, w4, w16, uxtb",
+          "cmp\tw4, #0xff",
+          "csel\tw4, w4, w13, lo",
+          "strb\tw4, [x3]",
+          "ldrb\tw4, [x3, #0x1]",
+          "add\tw4, w4, w15, uxtb",
+          "cmp\tw4, #0xff"
+        ]
+      },
+      {
+        "source": "                fb[idx + 1] = fb[idx + 1] +| src[1];",
+        "asm": [
+          "csel\tw4, w4, w13, lo",
+          "strb\tw4, [x3, #0x1]"
+        ]
+      },
+      {
+        "source": "                fb[idx + 2] = fb[idx + 2] +| src[2];",
+        "asm": [
+          "ldrb\tw4, [x3, #0x2]",
+          "add\tw4, w4, w14, uxtb",
+          "cmp\tw4, #0xff",
+          "csel\tw4, w4, w13, lo",
+          "strb\tw4, [x3, #0x2]",
+          "strb\tw13, [x23, x2]",
+          "add\tw1, w1, #0x1",
+          "cmp\tw1, w19",
+          "b.lt\t0x10004f9b0",
+          "b\t0x10004f8b8"
+        ]
+      },
+      {
+        "source": "            self.frame +%= 1; // AF02-blend hash RNG frame counter (free otherwise)",
+        "asm": [
+          "ldr\tx8, [x20, #0x68]",
+          "add\tx8, x8, #0x1",
+          "str\tx8, [x20, #0x68]",
+          "add\tsp, sp, #0x3f0",
+          "ldp\tx29, x30, [sp, #0x40]",
+          "ldp\tx20, x19, [sp, #0x30]",
+          "ldp\tx22, x21, [sp, #0x20]",
+          "ldp\tx24, x23, [sp, #0x10]",
+          "ldp\td9, d8, [sp], #0x50",
+          "ret"
+        ]
+      }
+    ],
+    "algo_source": {
+      "file": "src/layouts/ML01/AF02.LP1-halide.LP2-opt.zig",
+      "lines": [
+        "// Algorithm ML01.AF02.LP1-halide.LP2-opt \u2014 AF02 (math+decide+respawn | render),",
+        "// loop 1 Halide branchless blend, loop 2 optimized r1 splat.",
+        "//",
+        "// Golden: statistical. Halide blend + r1 splat (byte-identical output to",
+        "// LP2-simple's r0 splat, proven by `zig build test`).",
+        "",
+        "const std = @import(\"std\");",
+        "const fw = @import(\"../../framework/sim.zig\");",
+        "const layout = @import(\"data.zig\");",
+        "const halide = @import(\"AF02.LP1-halide_api.zig\");",
+        "const r1 = @import(\"../common/render_opt.zig\");",
+        "",
+        "const Data = layout.Data;",
+        "",
+        "pub const H = struct {",
+        "    pub const algo_meta: fw.AlgorithmMeta = .{",
+        "        .mem_layout = \"ML01\",",
+        "        .algo_fam = .AF02,",
+        "        .ordering = .identity,",
+        "        .intermediates = .none,",
+        "        .loops = &.{",
+        "            .{ .impl = .halide, .schedule = .scalar, .parallel = .none, .variant = .blend },",
+        "            .{ .impl = .zig, .schedule = .r1, .parallel = .none, .variant = .none },",
+        "        },",
+        "        .golden = .statistical,",
+        "        .halide_expressible = \"loop1 yes (branchless blend); loop2 n/a (render)\",",
+        "    };",
+        "",
+        "    pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {",
+        "        const data = &sim.data;",
+        "        // loop 1: Halide branchless blend.",
+        "        halide.run(data, dt, sim.frame);",
+        "        // loop 2: r1 splat pass (no clear \u2014 the driver owns it).",
+        "        for (data.particles) |p| {",
+        "            r1.splatFast(fb, w, h, p.pos.x, p.pos.y, r1.lut[@intFromEnum(p.kind)]);",
+        "        }",
+        "    }",
+        "};",
+        "",
+        "pub const Sim = fw.Strategy(Data, H);"
+      ],
+      "group_lines": [
+        null,
+        32,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        34,
+        null,
+        null,
+        null,
+        34,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        36,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  }
+}

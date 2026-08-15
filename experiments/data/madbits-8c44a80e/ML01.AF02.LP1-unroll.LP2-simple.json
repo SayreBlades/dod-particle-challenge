@@ -1,0 +1,2956 @@
+{
+  "source_hash": "a3481485af9c40d3f721633d4c8c8111b4a7437d0b8aea3542ffe17e62bb2748",
+  "asm": {
+    "source_hash": "a3481485af9c40d3f721633d4c8c8111b4a7437d0b8aea3542ffe17e62bb2748",
+    "symbol": "framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step",
+    "n_instructions": 791,
+    "histogram": {
+      "mov": 193,
+      "vmovss": 43,
+      "cmp": 40,
+      "add": 36,
+      "xor": 36,
+      "movzx": 32,
+      "lea": 27,
+      "vucomiss": 23,
+      "jmp": 17,
+      "and": 16,
+      "jae": 16,
+      "or": 16,
+      "call": 15,
+      "vmulps": 15,
+      "vaddps": 15,
+      "shl": 15,
+      "lzcnt": 15,
+      "vxorps": 13,
+      "cmovae": 12,
+      "vaddss": 11,
+      "jne": 11,
+      "jbe": 11,
+      "vbroadcastss": 10,
+      "vmovups": 10,
+      "vmovsd": 10,
+      "vinsertps": 10,
+      "rorx": 10,
+      "je": 9,
+      "nop": 9,
+      "vmulss": 9,
+      "sub": 7,
+      "jb": 7,
+      "push": 6,
+      "pop": 6,
+      "vshufps": 5,
+      "vmovlps": 5,
+      "jnp": 5,
+      "vmovd": 5,
+      "div": 5,
+      "vcvttss2si": 5,
+      "test": 4,
+      "sets": 4,
+      "setge": 4,
+      "inc": 3,
+      "dec": 2,
+      "data16": 2,
+      "vcvtsi2ss": 2,
+      "imul": 2,
+      "setle": 2,
+      "setl": 2,
+      "vsubss": 1,
+      "movsxd": 1,
+      "ret": 1
+    },
+    "vector_insns": 0,
+    "excerpt": "000000000107f5a0\tpush\trbp\n000000000107f5a1\tmov\trbp,rsp\n000000000107f5a4\tpush\tr15\n000000000107f5a6\tpush\tr14\n000000000107f5a8\tpush\tr13\n000000000107f5aa\tpush\tr12\n000000000107f5ac\tpush\trbx\n000000000107f5ad\tsub\trsp,0x68\n000000000107f5b1\tmov\tr12,rdi\n000000000107f5b4\tadd\trdi,0x10\n000000000107f5b8\tmov\tDWORD PTR [rbp-0x84],r8d\n000000000107f5bf\tmov\tDWORD PTR [rbp-0x4c],ecx\n000000000107f5c2\tmov\tQWORD PTR [rbp-0x80],rdx\n000000000107f5c6\tmov\tQWORD PTR [rbp-0x70],rsi\n000000000107f5ca\tmov\trax,QWORD PTR [r12+0x18]\n000000000107f5cf\tmov\tr14,QWORD PTR [r12+0x10]\n000000000107f5d4\tmov\tQWORD PTR [rbp-0x58],r12\n000000000107f5d8\tmov\tQWORD PTR [rbp-0x38],rdi\n000000000107f5dc\tmov\tQWORD PTR [rbp-0x68],rax\n000000000107f5e0\tand\trax,0xfffffffffffffffc\n000000000107f5e4\tmov\tQWORD PTR [rbp-0x78],rax\n000000000107f5e8\tje\t107fda5 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x805>\n000000000107f5ee\tlea\trax,[r12+0x48]\n000000000107f5f3\tlea\trcx,[r12+0x28]\n000000000107f5f8\txor\tr13d,r13d\n000000000107f5fb\tvxorps\txmm4,xmm4,xmm4\n000000000107f5ff\txor\tr15d,r15d\n000000000107f602\tmov\tQWORD PTR [rbp-0x48],rax\n000000000107f606\tmov\tQWORD PTR [rbp-0x60],rcx\n000000000107f60a\tjmp\t107f636 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x96>\n000000000107f60c\tnop\tDWORD PTR [rax+0x0]\n000000000107f610\tmov\trsi,QWORD PTR [rbp-0x60]\n000000000107f614\tcall\t1080400 <layouts.ML01.data.Data.spawn>\n000000000107f619\tmov\trdi,QWORD PTR [rbp-0x38]\n000000000107f61d\tvxorps\txmm4,xmm4,xmm4\n000000000107f621\tadd\tr13,0x4\n000000000107f625\tadd\tr15,0x110\n000000000107f62c\tcmp\tr13,QWORD PTR [rbp-0x78]\n000000000107f630\tjae\t107fda8 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x808>\n000000000107f636\tmov\trbx,QWORD PTR [rdi]\n000000000107f639\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff82faf]        # 10025f0 <__anon_12856+0xc>\n000000000107f641\tvbroadcastss\txmm5,DWORD PTR [rip+0xfffffffffff82f3a]        # 1002584 <__anon_30540+0x10>\n000000000107f64a\tvmulss\txmm2,xmm2,DWORD PTR [rbx+r15*1+0xc]\n000000000107f651\tvmovups\txmm0,XMMWORD PTR [rbx+r15*1]\n000000000107f657\tvmovsd\txmm1,QWORD PTR [rbx+r15*1+0x10]\n000000000107f65e\tvmovsd\txmm3,xmm0,xmm1\n000000000107f662\tvshufps\txmm3,xmm3,xmm3,0xd3\n000000000107f667\tvaddss\txmm2,xmm2,xmm4\n000000000107f66b\tvinsertps\txmm2,xmm3,xmm2,0x30\n000000000107f671\tvmulps\txmm2,xmm2,xmm5\n000000000107f675\tvaddps\txmm0,xmm0,xmm2\n000000000107f679\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff82eff]        # 1002580 <__anon_30540+0xc>\n000000000107f681\tvmovups\tXMMWORD PTR [rbx+r15*1],xmm0\n000000000107f687\tvinsertps\txmm0,xmm1,DWORD PTR [rbx+r15*1+0x14],0x10\n000000000107f68f\tvbroadcastss\txmm1,DWORD PTR [rip+0xfffffffffff82f58]        # 10025f0 <__anon_12856+0xc>\n000000000107f698\tvmulps\txmm1,xmm0,xmm1\n000000000107f69c\tvaddps\txmm1,xmm1,xmm2\n000000000107f6a0\tvmulps\txmm1,xmm1,xmm5\n000000000107f6a4\tvaddps\txmm0,xmm0,xmm1\n000000000107f6a8\tvmovlps\tQWORD PTR [rbx+r15*1+0x10],xmm0\n000000000107f6af\tvmovss\txmm0,DWORD PTR [rip+0xfffffffffff82ecd]        # 1002584 <__anon_30540+0x10>\n000000000107f6b7\tvaddss\txmm0,xmm0,DWORD PTR [rbx+r15*1+0x1c]\n000000000107f6be\tvucomiss\txmm0,DWORD PTR [rip+0xfffffffffff82ede]        # 10025a4 <__anon_12850+0x10>\n000000000107f6c6\tvmovss\tDWORD PTR [rbx+r15*1+0x1c],xmm0\n000000000107f6cd\tjae\t107f770 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x1d0>\n000000000107f6d3\tvmovss\txmm1,DWORD PTR [rip+0x14ded]        # 10944c8 <framework.config.q>\n000000000107f6db\tvucomiss\txmm1,xmm4\n000000000107f6df\tjne\t107f6e7 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x147>\n000000000107f6e1\tjnp\t107f796 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x1f6>\n000000000107f6e7\tmov\trdx,QWORD PTR [r12+0x50]\n000000000107f6ec\tmov\tr8,r12\n000000000107f6ef\tmov\trax,QWORD PTR [r12+0x60]\n000000000107f6f4\tmov\trcx,QWORD PTR [r12+0x48]\n000000000107f6f9\tmov\tr9,QWORD PTR [r8+0x58]\n000000000107f6fd\tlea\trsi,[rax+rcx*1]\n000000000107f701\tmov\tr10,rdx\n000000000107f704\txor\trax,rdx\n000000000107f707\trorx\tr12,rsi,0x29\n000000000107f70d\txor\tr9,rcx\n000000000107f710\tshl\tr10,0x11\n000000000107f714\txor\trdx,r9\n000000000107f717\tadd\tr12,rcx\n000000000107f71a\txor\trcx,rax\n000000000107f71d\txor\tr9,r10\n000000000107f720\trorx\trax,rax,0x13\n000000000107f726\tmov\tQWORD PTR [r8+0x50],rdx\n000000000107f72a\tmov\tQWORD PTR [r8+0x48],rcx\n000000000107f72e\tmov\tQWORD PTR [r8+0x58],r9\n000000000107f732\tmov\tQWORD PTR [r8+0x60],rax\n000000000107f736\tcmp\tr12,0x7fffff\n000000000107f73d\tjbe\t107fbf1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x651>\n000000000107f743\tlzcnt\trax,r12\n000000000107f748\tand\tr12d,0x7fffff\n000000000107f74f\tshl\teax,0x17\n000000000107f752\tor\tr12d,0x3f000000\n000000000107f759\tsub\tr12d,eax\n000000000107f75c\tvmovd\txmm0,r12d\n000000000107f761\tmov\tr12,QWORD PTR [rbp-0x58]\n000000000107f765\tvucomiss\txmm1,xmm0\n000000000107f769\tjbe\t107f796 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x1f6>\n000000000107f76b\tnop\tDWORD PTR [rax+rax*1+0x0]\n000000000107f770\tmov\tedx,DWORD PTR [rbx+r15*1+0x3c]\n000000000107f775\tmov\trcx,QWORD PTR [r12+0x18]\n000000000107f77a\tcmp\trdx,rcx\n000000000107f77d\tjb\t107f785 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x1e5>\n000000000107f77f\tmov\teax,edx\n000000000107f781\txor\tedx,edx\n000000000107f783\tdiv\tecx\n000000000107f785\tmov\trsi,QWORD PTR [rbp-0x60]\n000000000107f789\tcall\t1080400 <layouts.ML01.data.Data.spawn>\n000000000107f78e\tmov\trdi,QWORD PTR [rbp-0x38]\n000000000107f792\tvxorps\txmm4,xmm4,xmm4\n000000000107f796\tmov\trbx,QWORD PTR [rdi]\n000000000107f799\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff82e4f]        # 10025f0 <__anon_12856+0xc>\n000000000107f7a1\tvbroadcastss\txmm5,DWORD PTR [rip+0xfffffffffff82dda]        # 1002584 <__anon_30540+0x10>\n000000000107f7aa\tvmulss\txmm2,xmm2,DWORD PTR [rbx+r15*1+0x50]\n000000000107f7b1\tvmovups\txmm0,XMMWORD PTR [rbx+r15*1+0x44]\n000000000107f7b8\tvmovsd\txmm1,QWORD PTR [rbx+r15*1+0x54]\n000000000107f7bf\tvmovsd\txmm3,xmm0,xmm1\n000000000107f7c3\tvshufps\txmm3,xmm3,xmm3,0xd3\n000000000107f7c8\tvaddss\txmm2,xmm2,xmm4\n000000000107f7cc\tvinsertps\txmm2,xmm3,xmm2,0x30\n000000000107f7d2\tvmulps\txmm2,xmm2,xmm5\n000000000107f7d6\tvaddps\txmm0,xmm0,xmm2\n000000000107f7da\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff82d9e]        # 1002580 <__anon_30540+0xc>\n000000000107f7e2\tvmovups\tXMMWORD PTR [rbx+r15*1+0x44],xmm0\n000000000107f7e9\tvinsertps\txmm0,xmm1,DWORD PTR [rbx+r15*1+0x58],0x10\n000000000107f7f1\tvbroadcastss\txmm1,DWORD PTR [rip+0xfffffffffff82df6]        # 10025f0 <__anon_12856+0xc>\n000000000107f7fa\tvmulps\txmm1,xmm0,xmm1\n000000000107f7fe\tvaddps\txmm1,xmm1,xmm2\n000000000107f802\tvmulps\txmm1,xmm1,xmm5\n000000000107f806\tvaddps\txmm0,xmm0,xmm1\n000000000107f80a\tvmovlps\tQWORD PTR [rbx+r15*1+0x54],xmm0\n000000000107f811\tvmovss\txmm0,DWORD PTR [rip+0xfffffffffff82d6b]        # 1002584 <__anon_30540+0x10>\n000000000107f819\tvaddss\txmm0,xmm0,DWORD PTR [rbx+r15*1+0x60]\n000000000107f820\tvucomiss\txmm0,DWORD PTR [rip+0xfffffffffff82d7c]        # 10025a4 <__anon_12850+0x10>\n000000000107f828\tvmovss\tDWORD PTR [rbx+r15*1+0x60],xmm0\n000000000107f82f\tjae\t107f8d0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x330>\n000000000107f835\tvmovss\txmm1,DWORD PTR [rip+0x14c8b]        # 10944c8 <framework.config.q>\n000000000107f83d\tvucomiss\txmm1,xmm4\n000000000107f841\tjne\t107f849 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x2a9>\n000000000107f843\tjnp\t107f8f9 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x359>\n000000000107f849\tmov\trdx,QWORD PTR [r12+0x50]\n000000000107f84e\tmov\tr8,r12\n000000000107f851\tmov\trax,QWORD PTR [r12+0x60]\n000000000107f856\tmov\trcx,QWORD PTR [r12+0x48]\n000000000107f85b\tmov\tr9,QWORD PTR [r8+0x58]\n000000000107f85f\tlea\trsi,[rax+rcx*1]\n000000000107f863\tmov\tr10,rdx\n000000000107f866\txor\trax,rdx\n000000000107f869\trorx\tr12,rsi,0x29\n000000000107f86f\txor\tr9,rcx\n000000000107f872\tshl\tr10,0x11\n000000000107f876\txor\trdx,r9\n000000000107f879\tadd\tr12,rcx\n000000000107f87c\txor\trcx,rax\n000000000107f87f\txor\tr9,r10\n000000000107f882\trorx\trax,rax,0x13\n000000000107f888\tmov\tQWORD PTR [r8+0x50],rdx\n000000000107f88c\tmov\tQWORD PTR [r8+0x48],rcx\n000000000107f890\tmov\tQWORD PTR [r8+0x58],r9\n000000000107f894\tmov\tQWORD PTR [r8+0x60],rax\n000000000107f898\tcmp\tr12,0x7fffff\n000000000107f89f\tjbe\t107fc36 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x696>\n000000000107f8a5\tlzcnt\trax,r12\n000000000107f8aa\tand\tr12d,0x7fffff\n000000000107f8b1\tshl\teax,0x17\n000000000107f8b4\tor\tr12d,0x3f000000\n000000000107f8bb\tsub\tr12d,eax\n000000000107f8be\tvmovd\txmm0,r12d\n000000000107f8c3\tmov\tr12,QWORD PTR [rbp-0x58]\n000000000107f8c7\tvucomiss\txmm1,xmm0\n000000000107f8cb\tjbe\t107f8f9 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x359>\n000000000107f8cd\tnop\tDWORD PTR [rax]\n000000000107f8d0\tmov\tedx,DWORD PTR [rbx+r15*1+0x80]\n000000000107f8d8\tmov\trcx,QWORD PTR [r12+0x18]\n000000000107f8dd\tcmp\trdx,rcx\n000000000107f8e0\tjb\t107f8e8 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x348>\n000000000107f8e2\tmov\teax,edx\n000000000107f8e4\txor\tedx,edx\n000000000107f8e6\tdiv\tecx\n000000000107f8e8\tmov\trsi,QWORD PTR [rbp-0x60]\n000000000107f8ec\tcall\t1080400 <layouts.ML01.data.Data.spawn>\n000000000107f8f1\tmov\trdi,QWORD PTR [rbp-0x38]\n000000000107f8f5\tvxorps\txmm4,xmm4,xmm4\n000000000107f8f9\tmov\trbx,QWORD PTR [rdi]\n000000000107f8fc\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff82cec]        # 10025f0 <__anon_12856+0xc>\n000000000107f904\tvbroadcastss\txmm5,DWORD PTR [rip+0xfffffffffff82c77]        # 1002584 <__anon_30540+0x10>\n000000000107f90d\tvmulss\txmm2,xmm2,DWORD PTR [rbx+r15*1+0x94]\n000000000107f917\tvmovups\txmm0,XMMWORD PTR [rbx+r15*1+0x88]\n000000000107f921\tvmovsd\txmm1,QWORD PTR [rbx+r15*1+0x98]\n000000000107f92b\tvmovsd\txmm3,xmm0,xmm1\n000000000107f92f\tvshufps\txmm3,xmm3,xmm3,0xd3\n000000000107f934\tvaddss\txmm2,xmm2,xmm4\n000000000107f938\tvinsertps\txmm2,xmm3,xmm2,0x30\n000000000107f93e\tvmulps\txmm2,xmm2,xmm5\n000000000107f942\tvaddps\txmm0,xmm0,xmm2\n000000000107f946\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff82c32]        # 1002580 <__anon_30540+0xc>\n000000000107f94e\tvmovups\tXMMWORD PTR [rbx+r15*1+0x88],xmm0\n000000000107f958\tvinsertps\txmm0,xmm1,DWORD PTR [rbx+r15*1+0x9c],0x10\n000000000107f963\tvbroadcastss\txmm1,DWORD PTR [rip+0xfffffffffff82c84]        # 10025f0 <__anon_12856+0xc>\n000000000107f96c\tvmulps\txmm1,xmm0,xmm1\n000000000107f970\tvaddps\txmm1,xmm1,xmm2\n000000000107f974\tvmulps\txmm1,xmm1,xmm5\n000000000107f978\tvaddps\txmm0,xmm0,xmm1\n000000000107f97c\tvmovlps\tQWORD PTR [rbx+r15*1+0x98],xmm0\n000000000107f986\tvmovss\txmm0,DWORD PTR [rip+0xfffffffffff82bf6]        # 1002584 <__anon_30540+0x10>\n000000000107f98e\tvaddss\txmm0,xmm0,DWORD PTR [rbx+r15*1+0xa4]\n000000000107f998\tvucomiss\txmm0,DWORD PTR [rip+0xfffffffffff82c04]        # 10025a4 <__anon_12850+0x10>\n000000000107f9a0\tvmovss\tDWORD PTR [rbx+r15*1+0xa4],xmm0\n000000000107f9aa\tjae\t107fa50 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x4b0>\n000000000107f9b0\tvmovss\txmm1,DWORD PTR [rip+0x14b10]        # 10944c8 <framework.config.q>\n000000000107f9b8\tvucomiss\txmm1,xmm4\n000000000107f9bc\tjne\t107f9c4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x424>\n000000000107f9be\tjnp\t107fa79 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x4d9>\n000000000107f9c4\tmov\trdx,QWORD PTR [r12+0x50]\n000000000107f9c9\tmov\tr8,r12\n000000000107f9cc\tmov\trax,QWORD PTR [r12+0x60]\n000000000107f9d1\tmov\trcx,QWORD PTR [r12+0x48]\n000000000107f9d6\tmov\tr9,QWORD PTR [r8+0x58]\n000000000107f9da\tlea\trsi,[rax+rcx*1]\n000000000107f9de\tmov\tr10,rdx\n000000000107f9e1\txor\trax,rdx\n000000000107f9e4\trorx\tr12,rsi,0x29\n000000000107f9ea\txor\tr9,rcx\n000000000107f9ed\tshl\tr10,0x11\n000000000107f9f1\txor\trdx,r9\n000000000107f9f4\tadd\tr12,rcx\n000000000107f9f7\txor\trcx,rax\n000000000107f9fa\txor\tr9,r10\n000000000107f9fd\trorx\trax,rax,0x13\n000000000107fa03\tmov\tQWORD PTR [r8+0x50],rdx\n000000000107fa07\tmov\tQWORD PTR [r8+0x48],rcx\n000000000107fa0b\tmov\tQWORD PTR [r8+0x58],r9\n000000000107fa0f\tmov\tQWORD PTR [r8+0x60],rax\n000000000107fa13\tcmp\tr12,0x7fffff\n000000000107fa1a\tjbe\t107fc7b <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x6db>\n000000000107fa20\tlzcnt\trax,r12\n000000000107fa25\tand\tr12d,0x7fffff\n000000000107fa2c\tshl\teax,0x17\n000000000107fa2f\tor\tr12d,0x3f000000\n000000000107fa36\tsub\tr12d,eax\n000000000107fa39\tvmovd\txmm0,r12d\n000000000107fa3e\tmov\tr12,QWORD PTR [rbp-0x58]\n000000000107fa42\tvucomiss\txmm1,xmm0\n000000000107fa46\tjbe\t107fa79 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x4d9>\n000000000107fa48\tnop\tDWORD PTR [rax+rax*1+0x0]\n000000000107fa50\tmov\tedx,DWORD PTR [rbx+r15*1+0xc4]\n000000000107fa58\tmov\trcx,QWORD PTR [r12+0x18]\n000000000107fa5d\tcmp\trdx,rcx\n000000000107fa60\tjb\t107fa68 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x4c8>\n000000000107fa62\tmov\teax,edx\n000000000107fa64\txor\tedx,edx\n000000000107fa66\tdiv\tecx\n000000000107fa68\tmov\trsi,QWORD PTR [rbp-0x60]\n000000000107fa6c\tcall\t1080400 <layouts.ML01.data.Data.spawn>\n000000000107fa71\tmov\trdi,QWORD PTR [rbp-0x38]\n000000000107fa75\tvxorps\txmm4,xmm4,xmm4\n000000000107fa79\tmov\trbx,QWORD PTR [rdi]\n000000000107fa7c\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff82b6c]        # 10025f0 <__anon_12856+0xc>\n000000000107fa84\tvbroadcastss\txmm5,DWORD PTR [rip+0xfffffffffff82af7]        # 1002584 <__anon_30540+0x10>\n000000000107fa8d\tvmulss\txmm2,xmm2,DWORD PTR [rbx+r15*1+0xd8]\n000000000107fa97\tvmovups\txmm0,XMMWORD PTR [rbx+r15*1+0xcc]\n000000000107faa1\tvmovsd\txmm1,QWORD PTR [rbx+r15*1+0xdc]\n000000000107faab\tvmovsd\txmm3,xmm0,xmm1\n000000000107faaf\tvshufps\txmm3,xmm3,xmm3,0xd3\n000000000107fab4\tvaddss\txmm2,xmm2,xmm4\n000000000107fab8\tvinsertps\txmm2,xmm3,xmm2,0x30\n000000000107fabe\tvmulps\txmm2,xmm2,xmm5\n000000000107fac2\tvaddps\txmm0,xmm0,xmm2\n000000000107fac6\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff82ab2]        # 1002580 <__anon_30540+0xc>\n000000000107face\tvmovups\tXMMWORD PTR [rbx+r15*1+0xcc],xmm0\n000000000107fad8\tvinsertps\txmm0,xmm1,DWORD PTR [rbx+r15*1+0xe0],0x10\n000000000107fae3\tvbroadcastss\txmm1,DWORD PTR [rip+0xfffffffffff82b04]        # 10025f0 <__anon_12856+0xc>\n000000000107faec\tvmulps\txmm1,xmm0,xmm1\n000000000107faf0\tvaddps\txmm1,xmm1,xmm2\n000000000107faf4\tvmulps\txmm1,xmm1,xmm5\n000000000107faf8\tvaddps\txmm0,xmm0,xmm1\n000000000107fafc\tvmovlps\tQWORD PTR [rbx+r15*1+0xdc],xmm0\n000000000107fb06\tvmovss\txmm0,DWORD PTR [rip+0xfffffffffff82a76]        # 1002584 <__anon_30540+0x10>\n000000000107fb0e\tvaddss\txmm0,xmm0,DWORD PTR [rbx+r15*1+0xe8]\n000000000107fb18\tvucomiss\txmm0,DWORD PTR [rip+0xfffffffffff82a84]        # 10025a4 <__anon_12850+0x10>\n000000000107fb20\tvmovss\tDWORD PTR [rbx+r15*1+0xe8],xmm0\n000000000107fb2a\tjae\t107fbd0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x630>\n000000000107fb30\tvmovss\txmm1,DWORD PTR [rip+0x14990]        # 10944c8 <framework.config.q>\n000000000107fb38\tvucomiss\txmm1,xmm4\n000000000107fb3c\tjne\t107fb44 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x5a4>\n000000000107fb3e\tjnp\t107f621 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x81>\n000000000107fb44\tmov\trdx,QWORD PTR [r12+0x50]\n000000000107fb49\tmov\tr8,r12\n000000000107fb4c\tmov\trax,QWORD PTR [r12+0x60]\n000000000107fb51\tmov\trcx,QWORD PTR [r12+0x48]\n000000000107fb56\tmov\tr9,QWORD PTR [r8+0x58]\n000000000107fb5a\tlea\trsi,[rax+rcx*1]\n000000000107fb5e\tmov\tr10,rdx\n000000000107fb61\txor\trax,rdx\n000000000107fb64\trorx\tr12,rsi,0x29\n000000000107fb6a\txor\tr9,rcx\n000000000107fb6d\tshl\tr10,0x11\n000000000107fb71\txor\trdx,r9\n000000000107fb74\tadd\tr12,rcx\n000000000107fb77\txor\trcx,rax\n000000000107fb7a\txor\tr9,r10\n000000000107fb7d\trorx\trax,rax,0x13\n000000000107fb83\tmov\tQWORD PTR [r8+0x50],rdx\n000000000107fb87\tmov\tQWORD PTR [r8+0x48],rcx\n000000000107fb8b\tmov\tQWORD PTR [r8+0x58],r9\n000000000107fb8f\tmov\tQWORD PTR [r8+0x60],rax\n000000000107fb93\tcmp\tr12,0x7fffff\n000000000107fb9a\tjbe\t107fcc0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x720>\n000000000107fba0\tlzcnt\trax,r12\n000000000107fba5\tand\tr12d,0x7fffff\n000000000107fbac\tshl\teax,0x17\n000000000107fbaf\tor\tr12d,0x3f000000\n000000000107fbb6\tsub\tr12d,eax\n000000000107fbb9\tvmovd\txmm0,r12d\n000000000107fbbe\tmov\tr12,QWORD PTR [rbp-0x58]\n000000000107fbc2\tvucomiss\txmm1,xmm0\n000000000107fbc6\tjbe\t107f621 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x81>\n000000000107fbcc\tnop\tDWORD PTR [rax+0x0]\n000000000107fbd0\tmov\tedx,DWORD PTR [rbx+r15*1+0x108]\n000000000107fbd8\tmov\trcx,QWORD PTR [r12+0x18]\n000000000107fbdd\tcmp\trdx,rcx\n000000000107fbe0\tjb\t107f610 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x70>\n000000000107fbe6\tmov\teax,edx\n000000000107fbe8\txor\tedx,edx\n000000000107fbea\tdiv\tecx\n000000000107fbec\tjmp\t107f610 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x70>\n000000000107fbf1\tmov\trdi,QWORD PTR [rbp-0x48]\n000000000107fbf5\tmov\tedx,0x8\n000000000107fbfa\tlea\trsi,[rbp-0x40]\n000000000107fbfe\tvmovss\tDWORD PTR [rbp-0x2c],xmm1\n000000000107fc03\tcall\t1080870 <Random.init__anon_33166.gen.fill>\n000000000107fc08\tlzcnt\trax,QWORD PTR [rbp-0x40]\n000000000107fc0e\tadd\tal,0x29\n000000000107fc10\tmov\tecx,eax\n000000000107fc12\tand\tcl,0x7f\n000000000107fc15\tcmp\tcl,0x69\n000000000107fc18\tje\t107fd05 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x765>\n000000000107fc1e\tmovzx\teax,al\n000000000107fc21\tand\teax,0x7f\n000000000107fc24\tvmovss\txmm1,DWORD PTR [rbp-0x2c]\n000000000107fc29\tmov\trdi,QWORD PTR [rbp-0x38]\n000000000107fc2d\tvxorps\txmm4,xmm4,xmm4\n000000000107fc31\tjmp\t107f748 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x1a8>\n000000000107fc36\tmov\trdi,QWORD PTR [rbp-0x48]\n000000000107fc3a\tmov\tedx,0x8\n000000000107fc3f\tlea\trsi,[rbp-0x40]\n000000000107fc43\tvmovss\tDWORD PTR [rbp-0x2c],xmm1\n000000000107fc48\tcall\t1080870 <Random.init__anon_33166.gen.fill>\n000000000107fc4d\tlzcnt\trax,QWORD PTR [rbp-0x40]\n000000000107fc53\tadd\tal,0x29\n000000000107fc55\tmov\tecx,eax\n000000000107fc57\tand\tcl,0x7f\n000000000107fc5a\tcmp\tcl,0x69\n000000000107fc5d\tje\t107fd2d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x78d>\n000000000107fc63\tmovzx\teax,al\n000000000107fc66\tand\teax,0x7f\n000000000107fc69\tvmovss\txmm1,DWORD PTR [rbp-0x2c]\n000000000107fc6e\tmov\trdi,QWORD PTR [rbp-0x38]\n000000000107fc72\tvxorps\txmm4,xmm4,xmm4\n000000000107fc76\tjmp\t107f8aa <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x30a>\n000000000107fc7b\tmov\trdi,QWORD PTR [rbp-0x48]\n000000000107fc7f\tmov\tedx,0x8\n000000000107fc84\tlea\trsi,[rbp-0x40]\n000000000107fc88\tvmovss\tDWORD PTR [rbp-0x2c],xmm1\n000000000107fc8d\tcall\t1080870 <Random.init__anon_33166.gen.fill>\n000000000107fc92\tlzcnt\trax,QWORD PTR [rbp-0x40]\n000000000107fc98\tadd\tal,0x29\n000000000107fc9a\tmov\tecx,eax\n000000000107fc9c\tand\tcl,0x7f\n000000000107fc9f\tcmp\tcl,0x69\n000000000107fca2\tje\t107fd55 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x7b5>\n000000000107fca8\tmovzx\teax,al\n000000000107fcab\tand\teax,0x7f\n000000000107fcae\tvmovss\txmm1,DWORD PTR [rbp-0x2c]\n000000000107fcb3\tmov\trdi,QWORD PTR [rbp-0x38]\n000000000107fcb7\tvxorps\txmm4,xmm4,xmm4\n000000000107fcbb\tjmp\t107fa25 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x485>\n000000000107fcc0\tmov\trdi,QWORD PTR [rbp-0x48]\n000000000107fcc4\tmov\tedx,0x8\n000000000107fcc9\tlea\trsi,[rbp-0x40]\n000000000107fccd\tvmovss\tDWORD PTR [rbp-0x2c],xmm1\n000000000107fcd2\tcall\t1080870 <Random.init__anon_33166.gen.fill>\n000000000107fcd7\tlzcnt\trax,QWORD PTR [rbp-0x40]\n000000000107fcdd\tadd\tal,0x29\n000000000107fcdf\tmov\tecx,eax\n000000000107fce1\tand\tcl,0x7f\n000000000107fce4\tcmp\tcl,0x69\n000000000107fce7\tje\t107fd7d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x7dd>\n000000000107fced\tmovzx\teax,al\n000000000107fcf0\tand\teax,0x7f\n000000000107fcf3\tvmovss\txmm1,DWORD PTR [rbp-0x2c]\n000000000107fcf8\tmov\trdi,QWORD PTR [rbp-0x38]\n000000000107fcfc\tvxorps\txmm4,xmm4,xmm4\n000000000107fd00\tjmp\t107fba5 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x605>\n000000000107fd05\tmov\trdi,QWORD PTR [rbp-0x48]\n000000000107fd09\tmov\tedx,0x4\n000000000107fd0e\tlea\trsi,[rbp-0x40]\n000000000107fd12\tcall\t1080870 <Random.init__anon_33166.gen.fill>\n000000000107fd17\tmov\teax,DWORD PTR [rbp-0x40]\n000000000107fd1a\tmov\tecx,0x7ff\n000000000107fd1f\tor\teax,ecx\n000000000107fd21\tlzcnt\teax,eax\n000000000107fd25\tadd\teax,0x69\n000000000107fd28\tjmp\t107fc24 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x684>\n000000000107fd2d\tmov\trdi,QWORD PTR [rbp-0x48]\n000000000107fd31\tmov\tedx,0x4\n000000000107fd36\tlea\trsi,[rbp-0x40]\n000000000107fd3a\tcall\t1080870 <Random.init__anon_33166.gen.fill>\n000000000107fd3f\tmov\teax,DWORD PTR [rbp-0x40]\n000000000107fd42\tmov\tecx,0x7ff\n000000000107fd47\tor\teax,ecx\n000000000107fd49\tlzcnt\teax,eax\n000000000107fd4d\tadd\teax,0x69\n000000000107fd50\tjmp\t107fc69 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x6c9>\n000000000107fd55\tmov\trdi,QWORD PTR [rbp-0x48]\n000000000107fd59\tmov\tedx,0x4\n000000000107fd5e\tlea\trsi,[rbp-0x40]\n000000000107fd62\tcall\t1080870 <Random.init__anon_33166.gen.fill>\n000000000107fd67\tmov\teax,DWORD PTR [rbp-0x40]\n000000000107fd6a\tmov\tecx,0x7ff\n000000000107fd6f\tor\teax,ecx\n000000000107fd71\tlzcnt\teax,eax\n000000000107fd75\tadd\teax,0x69\n000000000107fd78\tjmp\t107fcae <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x70e>\n000000000107fd7d\tmov\trdi,QWORD PTR [rbp-0x48]\n000000000107fd81\tmov\tedx,0x4\n000000000107fd86\tlea\trsi,[rbp-0x40]\n000000000107fd8a\tcall\t1080870 <Random.init__anon_33166.gen.fill>\n000000000107fd8f\tmov\teax,DWORD PTR [rbp-0x40]\n000000000107fd92\tmov\tecx,0x7ff\n000000000107fd97\tor\teax,ecx\n000000000107fd99\tlzcnt\teax,eax\n000000000107fd9d\tadd\teax,0x69\n000000000107fda0\tjmp\t107fcf3 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x753>\n000000000107fda5\txor\tr13d,r13d\n000000000107fda8\tmov\tr15,QWORD PTR [rbp-0x68]\n000000000107fdac\tsub\tr15,r13\n000000000107fdaf\tjbe\t107ffc4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa24>\n000000000107fdb5\tmov\trcx,r13\n000000000107fdb8\tlea\trax,[r12+0x48]\n000000000107fdbd\tlea\trdx,[r12+0x28]\n000000000107fdc2\tvxorps\txmm4,xmm4,xmm4\n000000000107fdc6\tshl\trcx,0x6\n000000000107fdca\tmov\tQWORD PTR [rbp-0x78],rax\n000000000107fdce\tmov\tQWORD PTR [rbp-0x60],rdx\n000000000107fdd2\tlea\tr13,[rcx+r13*4]\n000000000107fdd6\tjmp\t107fdfe <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x85e>\n000000000107fdd8\tnop\tDWORD PTR [rax+rax*1+0x0]\n000000000107fde0\tmov\trsi,QWORD PTR [rbp-0x60]\n000000000107fde4\tcall\t1080400 <layouts.ML01.data.Data.spawn>\n000000000107fde9\tmov\trdi,QWORD PTR [rbp-0x38]\n000000000107fded\tvxorps\txmm4,xmm4,xmm4\n000000000107fdf1\tadd\tr13,0x44\n000000000107fdf5\tdec\tr15\n000000000107fdf8\tje\t107ffc4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa24>\n000000000107fdfe\tmov\trbx,QWORD PTR [rdi]\n000000000107fe01\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff827e7]        # 10025f0 <__anon_12856+0xc>\n000000000107fe09\tvbroadcastss\txmm5,DWORD PTR [rip+0xfffffffffff82772]        # 1002584 <__anon_30540+0x10>\n000000000107fe12\tvmulss\txmm2,xmm2,DWORD PTR [rbx+r13*1+0xc]\n000000000107fe19\tvmovups\txmm0,XMMWORD PTR [rbx+r13*1]\n000000000107fe1f\tvmovsd\txmm1,QWORD PTR [rbx+r13*1+0x10]\n000000000107fe26\tvmovsd\txmm3,xmm0,xmm1\n000000000107fe2a\tvshufps\txmm3,xmm3,xmm3,0xd3\n000000000107fe2f\tvaddss\txmm2,xmm2,xmm4\n000000000107fe33\tvinsertps\txmm2,xmm3,xmm2,0x30\n000000000107fe39\tvmulps\txmm2,xmm2,xmm5\n000000000107fe3d\tvaddps\txmm0,xmm0,xmm2\n000000000107fe41\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff82737]        # 1002580 <__anon_30540+0xc>\n000000000107fe49\tvmovups\tXMMWORD PTR [rbx+r13*1],xmm0\n000000000107fe4f\tvinsertps\txmm0,xmm1,DWORD PTR [rbx+r13*1+0x14],0x10\n000000000107fe57\tvbroadcastss\txmm1,DWORD PTR [rip+0xfffffffffff82790]        # 10025f0 <__anon_12856+0xc>\n000000000107fe60\tvmulps\txmm1,xmm0,xmm1\n000000000107fe64\tvaddps\txmm1,xmm1,xmm2\n000000000107fe68\tvmulps\txmm1,xmm1,xmm5\n000000000107fe6c\tvaddps\txmm0,xmm0,xmm1\n000000000107fe70\tvmovlps\tQWORD PTR [rbx+r13*1+0x10],xmm0\n000000000107fe77\tvmovss\txmm0,DWORD PTR [rip+0xfffffffffff82705]        # 1002584 <__anon_30540+0x10>\n000000000107fe7f\tvaddss\txmm0,xmm0,DWORD PTR [rbx+r13*1+0x1c]\n000000000107fe86\tvucomiss\txmm0,DWORD PTR [rip+0xfffffffffff82716]        # 10025a4 <__anon_12850+0x10>\n000000000107fe8e\tvmovss\tDWORD PTR [rbx+r13*1+0x1c],xmm0\n000000000107fe95\tjae\t107ff40 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x9a0>\n000000000107fe9b\tvmovss\txmm1,DWORD PTR [rip+0x14625]        # 10944c8 <framework.config.q>\n000000000107fea3\tvucomiss\txmm1,xmm4\n000000000107fea7\tjne\t107feaf <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x90f>\n000000000107fea9\tjnp\t107fdf1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x851>\n000000000107feaf\tmov\trdx,QWORD PTR [r12+0x50]\n000000000107feb4\tmov\tr8,r12\n000000000107feb7\tmov\trax,QWORD PTR [r12+0x60]\n000000000107febc\tmov\trcx,QWORD PTR [r12+0x48]\n000000000107fec1\tmov\tr9,QWORD PTR [r8+0x58]\n000000000107fec5\tlea\trsi,[rax+rcx*1]\n000000000107fec9\tmov\tr10,rdx\n000000000107fecc\txor\trax,rdx\n000000000107fecf\trorx\tr12,rsi,0x29\n000000000107fed5\txor\tr9,rcx\n000000000107fed8\tshl\tr10,0x11\n000000000107fedc\txor\trdx,r9\n000000000107fedf\tadd\tr12,rcx\n000000000107fee2\txor\trcx,rax\n000000000107fee5\txor\tr9,r10\n000000000107fee8\trorx\trax,rax,0x13\n000000000107feee\tmov\tQWORD PTR [r8+0x50],rdx\n000000000107fef2\tmov\tQWORD PTR [r8+0x48],rcx\n000000000107fef6\tmov\tQWORD PTR [r8+0x58],r9\n000000000107fefa\tmov\tQWORD PTR [r8+0x60],rax\n000000000107fefe\tcmp\tr12,0x7fffff\n000000000107ff05\tjbe\t107ff5e <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x9be>\n000000000107ff07\tlzcnt\trax,r12\n000000000107ff0c\tand\tr12d,0x7fffff\n000000000107ff13\tshl\teax,0x17\n000000000107ff16\tor\tr12d,0x3f000000\n000000000107ff1d\tsub\tr12d,eax\n000000000107ff20\tvmovd\txmm0,r12d\n000000000107ff25\tmov\tr12,QWORD PTR [rbp-0x58]\n000000000107ff29\tvucomiss\txmm1,xmm0\n000000000107ff2d\tjbe\t107fdf1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x851>\n000000000107ff33\tdata16\tdata16 data16 cs nop WORD PTR [rax+rax*1+0x0]\n000000000107ff40\tmov\tedx,DWORD PTR [rbx+r13*1+0x3c]\n000000000107ff45\tmov\trcx,QWORD PTR [r12+0x18]\n000000000107ff4a\tcmp\trdx,rcx\n000000000107ff4d\tjb\t107fde0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x840>\n000000000107ff53\tmov\teax,edx\n000000000107ff55\txor\tedx,edx\n000000000107ff57\tdiv\tecx\n000000000107ff59\tjmp\t107fde0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x840>\n000000000107ff5e\tmov\trdi,QWORD PTR [rbp-0x78]\n000000000107ff62\tmov\tedx,0x8\n000000000107ff67\tlea\trsi,[rbp-0x40]\n000000000107ff6b\tvmovss\tDWORD PTR [rbp-0x48],xmm1\n000000000107ff70\tcall\t1080870 <Random.init__anon_33166.gen.fill>\n000000000107ff75\tlzcnt\trax,QWORD PTR [rbp-0x40]\n000000000107ff7b\tadd\tal,0x29\n000000000107ff7d\tmov\tecx,eax\n000000000107ff7f\tand\tcl,0x7f\n000000000107ff82\tcmp\tcl,0x69\n000000000107ff85\tje\t107ff9f <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x9ff>\n000000000107ff87\tmovzx\teax,al\n000000000107ff8a\tand\teax,0x7f\n000000000107ff8d\tvmovss\txmm1,DWORD PTR [rbp-0x48]\n000000000107ff92\tmov\trdi,QWORD PTR [rbp-0x38]\n000000000107ff96\tvxorps\txmm4,xmm4,xmm4\n000000000107ff9a\tjmp\t107ff0c <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x96c>\n000000000107ff9f\tmov\trdi,QWORD PTR [rbp-0x78]\n000000000107ffa3\tmov\tedx,0x4\n000000000107ffa8\tlea\trsi,[rbp-0x40]\n000000000107ffac\tcall\t1080870 <Random.init__anon_33166.gen.fill>\n000000000107ffb1\tmov\teax,DWORD PTR [rbp-0x40]\n000000000107ffb4\tmov\tecx,0x7ff\n000000000107ffb9\tor\teax,ecx\n000000000107ffbb\tlzcnt\teax,eax\n000000000107ffbf\tadd\teax,0x69\n000000000107ffc2\tjmp\t107ff8d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x9ed>\n000000000107ffc4\tmov\tr15,QWORD PTR [rbp-0x68]\n000000000107ffc8\tmov\tr13d,DWORD PTR [rbp-0x84]\n000000000107ffcf\ttest\tr15,r15\n000000000107ffd2\tje\t108037d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xddd>\n000000000107ffd8\tmov\teax,DWORD PTR [rbp-0x4c]\n000000000107ffdb\tvmovss\txmm3,DWORD PTR [rip+0xfffffffffff825f1]        # 10025d4 <__anon_23520+0x2c>\n000000000107ffe3\tvmovss\txmm4,DWORD PTR [rip+0xfffffffffff825b9]        # 10025a4 <__anon_12850+0x10>\n000000000107ffeb\tvmovss\txmm5,DWORD PTR [rip+0xfffffffffff82595]        # 1002588 <__anon_30540+0x14>\n000000000107fff3\tadd\tr14,0x28\n000000000107fff7\tvxorps\txmm2,xmm2,xmm2\n000000000107fffb\tvcvtsi2ss\txmm0,xmm15,eax\n000000000107ffff\tmov\tecx,eax\n0000000001080001\tmov\tQWORD PTR [rbp-0x38],rcx\n0000000001080005\tvcvtsi2ss\txmm1,xmm15,r13d\n000000000108000a\tjmp\t108001d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa7d>\n000000000108000c\tnop\tDWORD PTR [rax+0x0]\n0000000001080010\tadd\tr14,0x44\n0000000001080014\tdec\tr15\n0000000001080017\tje\t108037d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xddd>\n000000000108001d\tvmovss\txmm6,DWORD PTR [r14-0x8]\n0000000001080023\tvucomiss\txmm2,xmm6\n0000000001080027\tjae\t1080080 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xae0>\n0000000001080029\tvucomiss\txmm6,xmm3\n000000000108002d\tmov\tdx,0xff\n0000000001080031\tjae\t108003a <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa9a>\n0000000001080033\tvcvttss2si\tedx,xmm6\n0000000001080037\tmovzx\tedx,dl\n000000000108003a\tvmovss\txmm6,DWORD PTR [r14-0x4]\n0000000001080040\tvucomiss\txmm2,xmm6\n0000000001080044\tjae\t108008e <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xaee>\n0000000001080046\tvucomiss\txmm6,xmm3\n000000000108004a\tmov\tsi,0xff\n000000000108004e\tjae\t1080058 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xab8>\n0000000001080050\tvcvttss2si\tesi,xmm6\n0000000001080054\tmovzx\tesi,sil\n0000000001080058\tvmovss\txmm6,DWORD PTR [r14]\n000000000108005d\tvucomiss\txmm2,xmm6\n0000000001080061\tjae\t108009b <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xafb>\n0000000001080063\tvucomiss\txmm6,xmm3\n0000000001080067\tmov\tdi,0xff\n000000000108006b\tjae\t108009d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xafd>\n000000000108006d\tvcvttss2si\tedi,xmm6\n0000000001080071\tmovzx\tedi,dil\n0000000001080075\tjmp\t108009d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xafd>\n0000000001080077\tnop\tWORD PTR [rax+rax*1+0x0]\n0000000001080080\txor\tedx,edx\n0000000001080082\tvmovss\txmm6,DWORD PTR [r14-0x4]\n0000000001080088\tvucomiss\txmm2,xmm6\n000000000108008c\tjb\t1080046 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xaa6>\n000000000108008e\txor\tesi,esi\n0000000001080090\tvmovss\txmm6,DWORD PTR [r14]\n0000000001080095\tvucomiss\txmm2,xmm6\n0000000001080099\tjb\t1080063 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xac3>\n000000000108009b\txor\tedi,edi\n000000000108009d\tvaddss\txmm6,xmm4,DWORD PTR [r14-0x28]\n00000000010800a3\tvmulss\txmm6,xmm6,xmm5\n00000000010800a7\tvmulss\txmm6,xmm6,xmm0\n00000000010800ab\tvcvttss2si\tr8d,xmm6\n00000000010800af\tvsubss\txmm6,xmm4,DWORD PTR [r14-0x24]\n00000000010800b5\tmovsxd\tr8,r8d\n00000000010800b8\tvmulss\txmm6,xmm6,xmm5\n00000000010800bc\tvmulss\txmm6,xmm6,xmm1\n00000000010800c0\tvcvttss2si\tr9d,xmm6\n00000000010800c4\ttest\tr9d,r9d\n00000000010800c7\tsets\tr10b\n00000000010800cb\tcmp\tr9d,r13d\n00000000010800ce\tsetge\tr11b\n00000000010800d2\tor\tr11b,r10b\n00000000010800d5\tjne\t1080230 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xc90>\n00000000010800db\tmov\tebx,DWORD PTR [rbp-0x4c]\n00000000010800de\tmov\tr10d,r9d\n00000000010800e1\tmov\trax,r15\n00000000010800e4\timul\tr10d,ebx\n00000000010800e8\ttest\tr8d,r8d\n00000000010800eb\tsets\tr11b\n00000000010800ef\tcmp\tebx,r8d\n00000000010800f2\tsetle\tbl\n00000000010800f5\tor\tbl,r11b\n00000000010800f8\tjne\t1080188 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xbe8>\n00000000010800fe\tlea\tr11,[r10+r8*1]\n0000000001080102\tlea\trbx,[r11*4+0x3]\n000000000108010a\tcmp\trbx,QWORD PTR [rbp-0x80]\n000000000108010e\tjae\t1080188 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xbe8>\n0000000001080110\tmov\trcx,QWORD PTR [rbp-0x70]\n0000000001080114\tshl\tr11,0x2\n0000000001080118\tmovzx\tr12d,dx\n000000000108011c\tmovzx\tr15d,BYTE PTR [rcx+r11*1]\n0000000001080121\tadd\tr12d,r15d\n0000000001080124\tmov\tr15d,0xff\n000000000108012a\tcmp\tr12w,0xff\n0000000001080130\tcmovae\tr12d,r15d\n0000000001080134\tmov\tBYTE PTR [rcx+r11*1],r12b\n0000000001080138\tmovzx\tr12d,si\n000000000108013c\tmovzx\tr15d,BYTE PTR [rcx+r11*1+0x1]\n0000000001080142\tadd\tr12d,r15d\n0000000001080145\tmov\tr15d,0xff\n000000000108014b\tcmp\tr12w,0xff\n0000000001080151\tcmovae\tr12d,r15d\n0000000001080155\tmov\tBYTE PTR [rcx+r11*1+0x1],r12b\n000000000108015a\tmovzx\tr12d,di\n000000000108015e\tmovzx\tr15d,BYTE PTR [rcx+r11*1+0x2]\n0000000001080164\tadd\tr12d,r15d\n0000000001080167\tmov\tr15d,0xff\n000000000108016d\tcmp\tr12w,0xff\n0000000001080173\tcmovae\tr12d,r15d\n0000000001080177\tmov\tBYTE PTR [rcx+r11*1+0x2],r12b\n000000000108017c\tmov\tBYTE PTR [rcx+rbx*1],0xff\n0000000001080180\tmov\tr12,QWORD PTR [rbp-0x58]\n0000000001080184\tmov\trcx,QWORD PTR [rbp-0x38]\n0000000001080188\tcmp\tr8d,0xffffffff\n000000000108018c\tlea\tr11,[r8+0x1]\n0000000001080190\tsetl\tbl\n0000000001080193\tcmp\tr11,rcx\n0000000001080196\tsetge\tr15b\n000000000108019a\tor\tr15b,bl\n000000000108019d\tmov\tr15,rax\n00000000010801a0\tjne\t1080230 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xc90>\n00000000010801a6\tadd\tr11,r10\n00000000010801a9\tlea\tr10,[r11*4+0x3]\n00000000010801b1\tcmp\tr10,QWORD PTR [rbp-0x80]\n00000000010801b5\tjae\t1080230 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xc90>\n00000000010801b7\tmov\trcx,QWORD PTR [rbp-0x70]\n00000000010801bb\tshl\tr11,0x2\n00000000010801bf\tmovzx\tr15d,dx\n00000000010801c3\tmovzx\tebx,BYTE PTR [rcx+r11*1]\n00000000010801c8\tadd\tr15d,ebx\n00000000010801cb\tmov\tebx,0xff\n00000000010801d0\tcmp\tr15w,0xff\n00000000010801d6\tcmovae\tr15d,ebx\n00000000010801da\tmov\tBYTE PTR [rcx+r11*1],r15b\n00000000010801de\tmovzx\tr15d,si\n00000000010801e2\tmovzx\tebx,BYTE PTR [rcx+r11*1+0x1]\n00000000010801e8\tadd\tr15d,ebx\n00000000010801eb\tmov\tebx,0xff\n00000000010801f0\tcmp\tr15w,0xff\n00000000010801f6\tcmovae\tr15d,ebx\n00000000010801fa\tmov\tBYTE PTR [rcx+r11*1+0x1],r15b\n00000000010801ff\tmovzx\tr15d,di\n0000000001080203\tmovzx\tebx,BYTE PTR [rcx+r11*1+0x2]\n0000000001080209\tadd\tr15d,ebx\n000000000108020c\tmov\tebx,0xff\n0000000001080211\tcmp\tr15w,0xff\n0000000001080217\tcmovae\tr15d,ebx\n000000000108021b\tmov\tBYTE PTR [rcx+r11*1+0x2],r15b\n0000000001080220\tmov\tBYTE PTR [rcx+r10*1],0xff\n0000000001080225\tmov\trcx,QWORD PTR [rbp-0x38]\n0000000001080229\tmov\tr15,rax\n000000000108022c\tnop\tDWORD PTR [rax+0x0]\n0000000001080230\tinc\tr9d\n0000000001080233\tsets\tr10b\n0000000001080237\tcmp\tr9d,r13d\n000000000108023a\tsetge\tr11b\n000000000108023e\tor\tr11b,r10b\n0000000001080241\tjne\t1080010 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa70>\n0000000001080247\tmov\tr11d,DWORD PTR [rbp-0x4c]\n000000000108024b\timul\tr9d,r11d\n000000000108024f\ttest\tr8d,r8d\n0000000001080252\tsets\tr10b\n0000000001080256\tcmp\tr11d,r8d\n0000000001080259\tsetle\tr11b\n000000000108025d\tor\tr11b,r10b\n0000000001080260\tjne\t10802e8 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xd48>\n0000000001080266\tlea\tr10,[r9+r8*1]\n000000000108026a\tlea\tr11,[r10*4+0x3]\n0000000001080272\tcmp\tr11,QWORD PTR [rbp-0x80]\n0000000001080276\tjae\t10802e8 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xd48>\n0000000001080278\tmov\trcx,QWORD PTR [rbp-0x70]\n000000000108027c\tshl\tr10,0x2\n0000000001080280\tmov\tQWORD PTR [rbp-0x68],r15\n0000000001080284\tmovzx\tr15d,dx\n0000000001080288\tmov\teax,0xff\n000000000108028d\tmovzx\tebx,BYTE PTR [rcx+r10*1]\n0000000001080292\tadd\tr15d,ebx\n0000000001080295\tcmp\tr15w,0xff\n000000000108029b\tcmovae\tr15d,eax\n000000000108029f\tmov\tBYTE PTR [rcx+r10*1],r15b\n00000000010802a3\tmovzx\tr15d,si\n00000000010802a7\tmovzx\tebx,BYTE PTR [rcx+r10*1+0x1]\n00000000010802ad\tadd\tr15d,ebx\n00000000010802b0\tcmp\tr15w,0xff\n00000000010802b6\tcmovae\tr15d,eax\n00000000010802ba\tmov\tBYTE PTR [rcx+r10*1+0x1],r15b\n00000000010802bf\tmovzx\tr15d,di\n00000000010802c3\tmovzx\tebx,BYTE PTR [rcx+r10*1+0x2]\n00000000010802c9\tadd\tr15d,ebx\n00000000010802cc\tcmp\tr15w,0xff\n00000000010802d2\tcmovae\tr15d,eax\n00000000010802d6\tmov\tBYTE PTR [rcx+r10*1+0x2],r15b\n00000000010802db\tmov\tBYTE PTR [rcx+r11*1],0xff\n00000000010802e0\tmov\tr15,QWORD PTR [rbp-0x68]\n00000000010802e4\tmov\trcx,QWORD PTR [rbp-0x38]\n00000000010802e8\tmov\tr10d,r8d\n00000000010802eb\tinc\tr8\n00000000010802ee\tcmp\tr10d,0xffffffff\n00000000010802f2\tsetl\tr10b\n00000000010802f6\tcmp\tr8,rcx\n00000000010802f9\tsetge\tr11b\n00000000010802fd\tor\tr11b,r10b\n0000000001080300\tjne\t1080010 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa70>\n0000000001080306\tadd\tr8,r9\n0000000001080309\tlea\tr9,[r8*4+0x3]\n0000000001080311\tcmp\tr9,QWORD PTR [rbp-0x80]\n0000000001080315\tjae\t1080010 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa70>\n000000000108031b\tmov\trcx,QWORD PTR [rbp-0x70]\n000000000108031f\tshl\tr8,0x2\n0000000001080323\tmovzx\tedx,dx\n0000000001080326\tmov\teax,0xff\n000000000108032b\tmovzx\tesi,si\n000000000108032e\tmovzx\tr10d,BYTE PTR [rcx+r8*1]\n0000000001080333\tadd\tedx,r10d\n0000000001080336\tcmp\tdx,0xff\n000000000108033b\tcmovae\tedx,eax\n000000000108033e\tmov\tBYTE PTR [rcx+r8*1],dl\n0000000001080342\tmovzx\tedx,BYTE PTR [rcx+r8*1+0x1]\n0000000001080348\tadd\tesi,edx\n000000000108034a\tcmp\tsi,0xff\n000000000108034f\tcmovae\tesi,eax\n0000000001080352\tmov\tBYTE PTR [rcx+r8*1+0x1],sil\n0000000001080357\tmovzx\tesi,di\n000000000108035a\tmovzx\tedx,BYTE PTR [rcx+r8*1+0x2]\n0000000001080360\tadd\tesi,edx\n0000000001080362\tcmp\tsi,0xff\n0000000001080367\tcmovae\tesi,eax\n000000000108036a\tmov\tBYTE PTR [rcx+r8*1+0x2],sil\n000000000108036f\tmov\tBYTE PTR [rcx+r9*1],0xff\n0000000001080374\tmov\trcx,QWORD PTR [rbp-0x38]\n0000000001080378\tjmp\t1080010 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa70>\n000000000108037d\tinc\tQWORD PTR [r12+0x68]\n0000000001080382\tadd\trsp,0x68\n0000000001080386\tpop\trbx\n0000000001080387\tpop\tr12\n0000000001080389\tpop\tr13\n000000000108038b\tpop\tr14\n000000000108038d\tpop\tr15\n000000000108038f\tpop\trbp\n0000000001080390\tret\t\n0000000001080391\tdata16\tdata16 data16 data16 data16 cs nop WORD PTR [rax+rax*1+0x0]",
+    "source_attributed": [
+      {
+        "source": "        pub fn step(self: *Self, dt: f32, fb: []u8, w: u32, h: u32) void {",
+        "asm": [
+          "push\trbp",
+          "mov\trbp,rsp",
+          "push\tr15",
+          "push\tr14",
+          "push\tr13",
+          "push\tr12",
+          "push\trbx",
+          "sub\trsp,0x68",
+          "mov\tr12,rdi"
+        ]
+      },
+      {
+        "source": "        const data = &sim.data;",
+        "asm": [
+          "add\trdi,0x10"
+        ]
+      },
+      {
+        "source": "framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step():",
+        "asm": [
+          "mov\tDWORD PTR [rbp-0x84],r8d"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "mov\tDWORD PTR [rbp-0x4c],ecx",
+          "mov\tQWORD PTR [rbp-0x80],rdx",
+          "mov\tQWORD PTR [rbp-0x70],rsi"
+        ]
+      },
+      {
+        "source": "        const ps = data.particles;",
+        "asm": [
+          "mov\trax,QWORD PTR [r12+0x18]",
+          "mov\tr14,QWORD PTR [r12+0x10]",
+          "mov\tQWORD PTR [rbp-0x58],r12",
+          "mov\tQWORD PTR [rbp-0x38],rdi",
+          "mov\tQWORD PTR [rbp-0x68],rax"
+        ]
+      },
+      {
+        "source": "        while (i < main) : (i += UNROLL) {",
+        "asm": [
+          "and\trax,0xfffffffffffffffc",
+          "mov\tQWORD PTR [rbp-0x78],rax",
+          "je\t107fda5 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x805>",
+          "lea\trax,[r12+0x48]",
+          "lea\trcx,[r12+0x28]",
+          "xor\tr13d,r13d",
+          "vxorps\txmm4,xmm4,xmm4",
+          "xor\tr15d,r15d",
+          "mov\tQWORD PTR [rbp-0x48],rax",
+          "mov\tQWORD PTR [rbp-0x60],rcx",
+          "jmp\t107f636 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x96>",
+          "nop\tDWORD PTR [rax+0x0]",
+          "mov\trsi,QWORD PTR [rbp-0x60]"
+        ]
+      },
+      {
+        "source": "            data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));",
+        "asm": [
+          "call\t1080400 <layouts.ML01.data.Data.spawn>",
+          "mov\trdi,QWORD PTR [rbp-0x38]",
+          "vxorps\txmm4,xmm4,xmm4"
+        ]
+      },
+      {
+        "source": "        while (i < main) : (i += UNROLL) {",
+        "asm": [
+          "add\tr13,0x4",
+          "add\tr15,0x110",
+          "cmp\tr13,QWORD PTR [rbp-0x78]",
+          "jae\t107fda8 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x808>"
+        ]
+      },
+      {
+        "source": "        const p = &data.particles[i];",
+        "asm": [
+          "mov\trbx,QWORD PTR [rdi]"
+        ]
+      },
+      {
+        "source": "            .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "asm": [
+          "vmovss\txmm2,DWORD PTR [rip+0xfffffffffff82faf]        # 10025f0 <__anon_12856+0xc>",
+          "vbroadcastss\txmm5,DWORD PTR [rip+0xfffffffffff82f3a]        # 1002584 <__anon_30540+0x10>",
+          "vmulss\txmm2,xmm2,DWORD PTR [rbx+r15*1+0xc]"
+        ]
+      },
+      {
+        "source": "        p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "vmovups\txmm0,XMMWORD PTR [rbx+r15*1]",
+          "vmovsd\txmm1,QWORD PTR [rbx+r15*1+0x10]"
+        ]
+      },
+      {
+        "source": "        return .{ .x = a.x * s, .y = a.y * s, .z = a.z * s };",
+        "asm": [
+          "vmovsd\txmm3,xmm0,xmm1",
+          "vshufps\txmm3,xmm3,xmm3,0xd3"
+        ]
+      },
+      {
+        "source": "            .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "asm": [
+          "vaddss\txmm2,xmm2,xmm4"
+        ]
+      },
+      {
+        "source": "framework.vec.Vec3.scale():",
+        "asm": [
+          "vinsertps\txmm2,xmm3,xmm2,0x30",
+          "vmulps\txmm2,xmm2,xmm5"
+        ]
+      },
+      {
+        "source": "        return .{ .x = a.x + b.x, .y = a.y + b.y, .z = a.z + b.z };",
+        "asm": [
+          "vaddps\txmm0,xmm0,xmm2"
+        ]
+      },
+      {
+        "source": "            .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "asm": [
+          "vmovss\txmm2,DWORD PTR [rip+0xfffffffffff82eff]        # 1002580 <__anon_30540+0xc>"
+        ]
+      },
+      {
+        "source": "        p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "vmovups\tXMMWORD PTR [rbx+r15*1],xmm0"
+        ]
+      },
+      {
+        "source": "            .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "asm": [
+          "vinsertps\txmm0,xmm1,DWORD PTR [rbx+r15*1+0x14],0x10",
+          "vbroadcastss\txmm1,DWORD PTR [rip+0xfffffffffff82f58]        # 10025f0 <__anon_12856+0xc>",
+          "vmulps\txmm1,xmm0,xmm1",
+          "vaddps\txmm1,xmm1,xmm2",
+          "vmulps\txmm1,xmm1,xmm5",
+          "vaddps\txmm0,xmm0,xmm1",
+          "vmovlps\tQWORD PTR [rbx+r15*1+0x10],xmm0"
+        ]
+      },
+      {
+        "source": "        p.age += dt;",
+        "asm": [
+          "vmovss\txmm0,DWORD PTR [rip+0xfffffffffff82ecd]        # 1002584 <__anon_30540+0x10>",
+          "vaddss\txmm0,xmm0,DWORD PTR [rbx+r15*1+0x1c]"
+        ]
+      },
+      {
+        "source": "    if (age >= kill_age) return true;",
+        "asm": [
+          "vucomiss\txmm0,DWORD PTR [rip+0xfffffffffff82ede]        # 10025a4 <__anon_12850+0x10>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.advanceOne():",
+        "asm": [
+          "vmovss\tDWORD PTR [rbx+r15*1+0x1c],xmm0"
+        ]
+      },
+      {
+        "source": "framework.config.isDead():",
+        "asm": [
+          "jae\t107f770 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x1d0>"
+        ]
+      },
+      {
+        "source": "    if (q == 0) return false; // runtime short-circuit; no kill-RNG draw at q=0",
+        "asm": [
+          "vmovss\txmm1,DWORD PTR [rip+0x14ded]        # 10944c8 <framework.config.q>",
+          "vucomiss\txmm1,xmm4",
+          "jne\t107f6e7 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x147>",
+          "jnp\t107f796 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x1f6>"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "mov\trdx,QWORD PTR [r12+0x50]",
+          "mov\tr8,r12"
+        ]
+      },
+      {
+        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
+        "asm": [
+          "mov\trax,QWORD PTR [r12+0x60]",
+          "mov\trcx,QWORD PTR [r12+0x48]",
+          "mov\tr9,QWORD PTR [r8+0x58]",
+          "lea\trsi,[rax+rcx*1]"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "mov\tr10,rdx"
+        ]
+      },
+      {
+        "source": "self.s[3] ^= self.s[1];",
+        "asm": [
+          "xor\trax,rdx"
+        ]
+      },
+      {
+        "source": "return x << ar | x >> 1 +% ~ar;",
+        "asm": [
+          "rorx\tr12,rsi,0x29"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= self.s[0];",
+        "asm": [
+          "xor\tr9,rcx"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "shl\tr10,0x11"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "xor\trdx,r9"
+        ]
+      },
+      {
+        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
+        "asm": [
+          "add\tr12,rcx"
+        ]
+      },
+      {
+        "source": "self.s[0] ^= self.s[3];",
+        "asm": [
+          "xor\trcx,rax"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "xor\tr9,r10"
+        ]
+      },
+      {
+        "source": "math.rotl__anon_33216():",
+        "asm": [
+          "rorx\trax,rax,0x13"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x50],rdx"
+        ]
+      },
+      {
+        "source": "self.s[0] ^= self.s[3];",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x48],rcx"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x58],r9"
+        ]
+      },
+      {
+        "source": "self.s[3] = math.rotl(u64, self.s[3], 45);",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x60],rax"
+        ]
+      },
+      {
+        "source": "if (rand_lz >= 41) {",
+        "asm": [
+          "cmp\tr12,0x7fffff",
+          "jbe\t107fbf1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x651>",
+          "lzcnt\trax,r12"
+        ]
+      },
+      {
+        "source": "return @bitCast(exponent | mantissa);",
+        "asm": [
+          "and\tr12d,0x7fffff",
+          "shl\teax,0x17",
+          "or\tr12d,0x3f000000",
+          "sub\tr12d,eax",
+          "vmovd\txmm0,r12d",
+          "mov\tr12,QWORD PTR [rbp-0x58]"
+        ]
+      },
+      {
+        "source": "    return kill_rng.random().float(f32) < q;",
+        "asm": [
+          "vucomiss\txmm1,xmm0"
+        ]
+      },
+      {
+        "source": "        if (config.isDead(p.age, &sim.kill_rng)) {",
+        "asm": [
+          "jbe\t107f796 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x1f6>",
+          "nop\tDWORD PTR [rax+rax*1+0x0]"
+        ]
+      },
+      {
+        "source": "            data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));",
+        "asm": [
+          "mov\tedx,DWORD PTR [rbx+r15*1+0x3c]",
+          "mov\trcx,QWORD PTR [r12+0x18]",
+          "cmp\trdx,rcx",
+          "jb\t107f785 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x1e5>",
+          "mov\teax,edx",
+          "xor\tedx,edx",
+          "div\tecx",
+          "mov\trsi,QWORD PTR [rbp-0x60]",
+          "call\t1080400 <layouts.ML01.data.Data.spawn>",
+          "mov\trdi,QWORD PTR [rbp-0x38]",
+          "vxorps\txmm4,xmm4,xmm4"
+        ]
+      },
+      {
+        "source": "        const p = &data.particles[i];",
+        "asm": [
+          "mov\trbx,QWORD PTR [rdi]"
+        ]
+      },
+      {
+        "source": "            .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "asm": [
+          "vmovss\txmm2,DWORD PTR [rip+0xfffffffffff82e4f]        # 10025f0 <__anon_12856+0xc>",
+          "vbroadcastss\txmm5,DWORD PTR [rip+0xfffffffffff82dda]        # 1002584 <__anon_30540+0x10>",
+          "vmulss\txmm2,xmm2,DWORD PTR [rbx+r15*1+0x50]"
+        ]
+      },
+      {
+        "source": "        p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "vmovups\txmm0,XMMWORD PTR [rbx+r15*1+0x44]",
+          "vmovsd\txmm1,QWORD PTR [rbx+r15*1+0x54]"
+        ]
+      },
+      {
+        "source": "        return .{ .x = a.x * s, .y = a.y * s, .z = a.z * s };",
+        "asm": [
+          "vmovsd\txmm3,xmm0,xmm1",
+          "vshufps\txmm3,xmm3,xmm3,0xd3"
+        ]
+      },
+      {
+        "source": "            .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "asm": [
+          "vaddss\txmm2,xmm2,xmm4"
+        ]
+      },
+      {
+        "source": "framework.vec.Vec3.scale():",
+        "asm": [
+          "vinsertps\txmm2,xmm3,xmm2,0x30",
+          "vmulps\txmm2,xmm2,xmm5"
+        ]
+      },
+      {
+        "source": "        return .{ .x = a.x + b.x, .y = a.y + b.y, .z = a.z + b.z };",
+        "asm": [
+          "vaddps\txmm0,xmm0,xmm2"
+        ]
+      },
+      {
+        "source": "            .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "asm": [
+          "vmovss\txmm2,DWORD PTR [rip+0xfffffffffff82d9e]        # 1002580 <__anon_30540+0xc>"
+        ]
+      },
+      {
+        "source": "        p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "vmovups\tXMMWORD PTR [rbx+r15*1+0x44],xmm0"
+        ]
+      },
+      {
+        "source": "            .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "asm": [
+          "vinsertps\txmm0,xmm1,DWORD PTR [rbx+r15*1+0x58],0x10",
+          "vbroadcastss\txmm1,DWORD PTR [rip+0xfffffffffff82df6]        # 10025f0 <__anon_12856+0xc>",
+          "vmulps\txmm1,xmm0,xmm1",
+          "vaddps\txmm1,xmm1,xmm2",
+          "vmulps\txmm1,xmm1,xmm5",
+          "vaddps\txmm0,xmm0,xmm1",
+          "vmovlps\tQWORD PTR [rbx+r15*1+0x54],xmm0"
+        ]
+      },
+      {
+        "source": "        p.age += dt;",
+        "asm": [
+          "vmovss\txmm0,DWORD PTR [rip+0xfffffffffff82d6b]        # 1002584 <__anon_30540+0x10>",
+          "vaddss\txmm0,xmm0,DWORD PTR [rbx+r15*1+0x60]"
+        ]
+      },
+      {
+        "source": "    if (age >= kill_age) return true;",
+        "asm": [
+          "vucomiss\txmm0,DWORD PTR [rip+0xfffffffffff82d7c]        # 10025a4 <__anon_12850+0x10>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.advanceOne():",
+        "asm": [
+          "vmovss\tDWORD PTR [rbx+r15*1+0x60],xmm0"
+        ]
+      },
+      {
+        "source": "framework.config.isDead():",
+        "asm": [
+          "jae\t107f8d0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x330>"
+        ]
+      },
+      {
+        "source": "    if (q == 0) return false; // runtime short-circuit; no kill-RNG draw at q=0",
+        "asm": [
+          "vmovss\txmm1,DWORD PTR [rip+0x14c8b]        # 10944c8 <framework.config.q>",
+          "vucomiss\txmm1,xmm4",
+          "jne\t107f849 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x2a9>",
+          "jnp\t107f8f9 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x359>"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "mov\trdx,QWORD PTR [r12+0x50]",
+          "mov\tr8,r12"
+        ]
+      },
+      {
+        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
+        "asm": [
+          "mov\trax,QWORD PTR [r12+0x60]",
+          "mov\trcx,QWORD PTR [r12+0x48]",
+          "mov\tr9,QWORD PTR [r8+0x58]",
+          "lea\trsi,[rax+rcx*1]"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "mov\tr10,rdx"
+        ]
+      },
+      {
+        "source": "self.s[3] ^= self.s[1];",
+        "asm": [
+          "xor\trax,rdx"
+        ]
+      },
+      {
+        "source": "math.rotl__anon_33215():",
+        "asm": [
+          "rorx\tr12,rsi,0x29"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= self.s[0];",
+        "asm": [
+          "xor\tr9,rcx"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "shl\tr10,0x11"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "xor\trdx,r9"
+        ]
+      },
+      {
+        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
+        "asm": [
+          "add\tr12,rcx"
+        ]
+      },
+      {
+        "source": "self.s[0] ^= self.s[3];",
+        "asm": [
+          "xor\trcx,rax"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "xor\tr9,r10"
+        ]
+      },
+      {
+        "source": "math.rotl__anon_33216():",
+        "asm": [
+          "rorx\trax,rax,0x13"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x50],rdx"
+        ]
+      },
+      {
+        "source": "self.s[0] ^= self.s[3];",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x48],rcx"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x58],r9"
+        ]
+      },
+      {
+        "source": "self.s[3] = math.rotl(u64, self.s[3], 45);",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x60],rax"
+        ]
+      },
+      {
+        "source": "if (rand_lz >= 41) {",
+        "asm": [
+          "cmp\tr12,0x7fffff",
+          "jbe\t107fc36 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x696>",
+          "lzcnt\trax,r12"
+        ]
+      },
+      {
+        "source": "return @bitCast(exponent | mantissa);",
+        "asm": [
+          "and\tr12d,0x7fffff",
+          "shl\teax,0x17",
+          "or\tr12d,0x3f000000",
+          "sub\tr12d,eax",
+          "vmovd\txmm0,r12d",
+          "mov\tr12,QWORD PTR [rbp-0x58]"
+        ]
+      },
+      {
+        "source": "    return kill_rng.random().float(f32) < q;",
+        "asm": [
+          "vucomiss\txmm1,xmm0"
+        ]
+      },
+      {
+        "source": "        if (config.isDead(p.age, &sim.kill_rng)) {",
+        "asm": [
+          "jbe\t107f8f9 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x359>",
+          "nop\tDWORD PTR [rax]"
+        ]
+      },
+      {
+        "source": "            data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));",
+        "asm": [
+          "mov\tedx,DWORD PTR [rbx+r15*1+0x80]",
+          "mov\trcx,QWORD PTR [r12+0x18]",
+          "cmp\trdx,rcx",
+          "jb\t107f8e8 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x348>",
+          "mov\teax,edx",
+          "xor\tedx,edx",
+          "div\tecx",
+          "mov\trsi,QWORD PTR [rbp-0x60]",
+          "call\t1080400 <layouts.ML01.data.Data.spawn>",
+          "mov\trdi,QWORD PTR [rbp-0x38]",
+          "vxorps\txmm4,xmm4,xmm4"
+        ]
+      },
+      {
+        "source": "        const p = &data.particles[i];",
+        "asm": [
+          "mov\trbx,QWORD PTR [rdi]"
+        ]
+      },
+      {
+        "source": "            .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "asm": [
+          "vmovss\txmm2,DWORD PTR [rip+0xfffffffffff82cec]        # 10025f0 <__anon_12856+0xc>",
+          "vbroadcastss\txmm5,DWORD PTR [rip+0xfffffffffff82c77]        # 1002584 <__anon_30540+0x10>",
+          "vmulss\txmm2,xmm2,DWORD PTR [rbx+r15*1+0x94]"
+        ]
+      },
+      {
+        "source": "        p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "vmovups\txmm0,XMMWORD PTR [rbx+r15*1+0x88]",
+          "vmovsd\txmm1,QWORD PTR [rbx+r15*1+0x98]"
+        ]
+      },
+      {
+        "source": "        return .{ .x = a.x * s, .y = a.y * s, .z = a.z * s };",
+        "asm": [
+          "vmovsd\txmm3,xmm0,xmm1",
+          "vshufps\txmm3,xmm3,xmm3,0xd3"
+        ]
+      },
+      {
+        "source": "            .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "asm": [
+          "vaddss\txmm2,xmm2,xmm4"
+        ]
+      },
+      {
+        "source": "framework.vec.Vec3.scale():",
+        "asm": [
+          "vinsertps\txmm2,xmm3,xmm2,0x30",
+          "vmulps\txmm2,xmm2,xmm5"
+        ]
+      },
+      {
+        "source": "        return .{ .x = a.x + b.x, .y = a.y + b.y, .z = a.z + b.z };",
+        "asm": [
+          "vaddps\txmm0,xmm0,xmm2"
+        ]
+      },
+      {
+        "source": "            .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "asm": [
+          "vmovss\txmm2,DWORD PTR [rip+0xfffffffffff82c32]        # 1002580 <__anon_30540+0xc>"
+        ]
+      },
+      {
+        "source": "        p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "vmovups\tXMMWORD PTR [rbx+r15*1+0x88],xmm0"
+        ]
+      },
+      {
+        "source": "            .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "asm": [
+          "vinsertps\txmm0,xmm1,DWORD PTR [rbx+r15*1+0x9c],0x10",
+          "vbroadcastss\txmm1,DWORD PTR [rip+0xfffffffffff82c84]        # 10025f0 <__anon_12856+0xc>",
+          "vmulps\txmm1,xmm0,xmm1",
+          "vaddps\txmm1,xmm1,xmm2",
+          "vmulps\txmm1,xmm1,xmm5",
+          "vaddps\txmm0,xmm0,xmm1",
+          "vmovlps\tQWORD PTR [rbx+r15*1+0x98],xmm0"
+        ]
+      },
+      {
+        "source": "        p.age += dt;",
+        "asm": [
+          "vmovss\txmm0,DWORD PTR [rip+0xfffffffffff82bf6]        # 1002584 <__anon_30540+0x10>",
+          "vaddss\txmm0,xmm0,DWORD PTR [rbx+r15*1+0xa4]"
+        ]
+      },
+      {
+        "source": "    if (age >= kill_age) return true;",
+        "asm": [
+          "vucomiss\txmm0,DWORD PTR [rip+0xfffffffffff82c04]        # 10025a4 <__anon_12850+0x10>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.advanceOne():",
+        "asm": [
+          "vmovss\tDWORD PTR [rbx+r15*1+0xa4],xmm0"
+        ]
+      },
+      {
+        "source": "framework.config.isDead():",
+        "asm": [
+          "jae\t107fa50 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x4b0>"
+        ]
+      },
+      {
+        "source": "    if (q == 0) return false; // runtime short-circuit; no kill-RNG draw at q=0",
+        "asm": [
+          "vmovss\txmm1,DWORD PTR [rip+0x14b10]        # 10944c8 <framework.config.q>",
+          "vucomiss\txmm1,xmm4",
+          "jne\t107f9c4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x424>",
+          "jnp\t107fa79 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x4d9>"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "mov\trdx,QWORD PTR [r12+0x50]",
+          "mov\tr8,r12"
+        ]
+      },
+      {
+        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
+        "asm": [
+          "mov\trax,QWORD PTR [r12+0x60]",
+          "mov\trcx,QWORD PTR [r12+0x48]",
+          "mov\tr9,QWORD PTR [r8+0x58]",
+          "lea\trsi,[rax+rcx*1]"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "mov\tr10,rdx"
+        ]
+      },
+      {
+        "source": "self.s[3] ^= self.s[1];",
+        "asm": [
+          "xor\trax,rdx"
+        ]
+      },
+      {
+        "source": "math.rotl__anon_33215():",
+        "asm": [
+          "rorx\tr12,rsi,0x29"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= self.s[0];",
+        "asm": [
+          "xor\tr9,rcx"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "shl\tr10,0x11"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "xor\trdx,r9"
+        ]
+      },
+      {
+        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
+        "asm": [
+          "add\tr12,rcx"
+        ]
+      },
+      {
+        "source": "self.s[0] ^= self.s[3];",
+        "asm": [
+          "xor\trcx,rax"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "xor\tr9,r10"
+        ]
+      },
+      {
+        "source": "math.rotl__anon_33216():",
+        "asm": [
+          "rorx\trax,rax,0x13"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x50],rdx"
+        ]
+      },
+      {
+        "source": "self.s[0] ^= self.s[3];",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x48],rcx"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x58],r9"
+        ]
+      },
+      {
+        "source": "self.s[3] = math.rotl(u64, self.s[3], 45);",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x60],rax"
+        ]
+      },
+      {
+        "source": "if (rand_lz >= 41) {",
+        "asm": [
+          "cmp\tr12,0x7fffff",
+          "jbe\t107fc7b <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x6db>",
+          "lzcnt\trax,r12"
+        ]
+      },
+      {
+        "source": "return @bitCast(exponent | mantissa);",
+        "asm": [
+          "and\tr12d,0x7fffff",
+          "shl\teax,0x17",
+          "or\tr12d,0x3f000000",
+          "sub\tr12d,eax",
+          "vmovd\txmm0,r12d",
+          "mov\tr12,QWORD PTR [rbp-0x58]"
+        ]
+      },
+      {
+        "source": "    return kill_rng.random().float(f32) < q;",
+        "asm": [
+          "vucomiss\txmm1,xmm0"
+        ]
+      },
+      {
+        "source": "        if (config.isDead(p.age, &sim.kill_rng)) {",
+        "asm": [
+          "jbe\t107fa79 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x4d9>",
+          "nop\tDWORD PTR [rax+rax*1+0x0]"
+        ]
+      },
+      {
+        "source": "            data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));",
+        "asm": [
+          "mov\tedx,DWORD PTR [rbx+r15*1+0xc4]",
+          "mov\trcx,QWORD PTR [r12+0x18]",
+          "cmp\trdx,rcx",
+          "jb\t107fa68 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x4c8>",
+          "mov\teax,edx",
+          "xor\tedx,edx",
+          "div\tecx",
+          "mov\trsi,QWORD PTR [rbp-0x60]",
+          "call\t1080400 <layouts.ML01.data.Data.spawn>",
+          "mov\trdi,QWORD PTR [rbp-0x38]",
+          "vxorps\txmm4,xmm4,xmm4"
+        ]
+      },
+      {
+        "source": "        const p = &data.particles[i];",
+        "asm": [
+          "mov\trbx,QWORD PTR [rdi]"
+        ]
+      },
+      {
+        "source": "            .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "asm": [
+          "vmovss\txmm2,DWORD PTR [rip+0xfffffffffff82b6c]        # 10025f0 <__anon_12856+0xc>",
+          "vbroadcastss\txmm5,DWORD PTR [rip+0xfffffffffff82af7]        # 1002584 <__anon_30540+0x10>",
+          "vmulss\txmm2,xmm2,DWORD PTR [rbx+r15*1+0xd8]"
+        ]
+      },
+      {
+        "source": "        p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "vmovups\txmm0,XMMWORD PTR [rbx+r15*1+0xcc]",
+          "vmovsd\txmm1,QWORD PTR [rbx+r15*1+0xdc]"
+        ]
+      },
+      {
+        "source": "        return .{ .x = a.x * s, .y = a.y * s, .z = a.z * s };",
+        "asm": [
+          "vmovsd\txmm3,xmm0,xmm1",
+          "vshufps\txmm3,xmm3,xmm3,0xd3"
+        ]
+      },
+      {
+        "source": "            .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "asm": [
+          "vaddss\txmm2,xmm2,xmm4"
+        ]
+      },
+      {
+        "source": "framework.vec.Vec3.scale():",
+        "asm": [
+          "vinsertps\txmm2,xmm3,xmm2,0x30",
+          "vmulps\txmm2,xmm2,xmm5"
+        ]
+      },
+      {
+        "source": "        return .{ .x = a.x + b.x, .y = a.y + b.y, .z = a.z + b.z };",
+        "asm": [
+          "vaddps\txmm0,xmm0,xmm2"
+        ]
+      },
+      {
+        "source": "            .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "asm": [
+          "vmovss\txmm2,DWORD PTR [rip+0xfffffffffff82ab2]        # 1002580 <__anon_30540+0xc>"
+        ]
+      },
+      {
+        "source": "        p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "vmovups\tXMMWORD PTR [rbx+r15*1+0xcc],xmm0"
+        ]
+      },
+      {
+        "source": "            .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "asm": [
+          "vinsertps\txmm0,xmm1,DWORD PTR [rbx+r15*1+0xe0],0x10",
+          "vbroadcastss\txmm1,DWORD PTR [rip+0xfffffffffff82b04]        # 10025f0 <__anon_12856+0xc>",
+          "vmulps\txmm1,xmm0,xmm1",
+          "vaddps\txmm1,xmm1,xmm2",
+          "vmulps\txmm1,xmm1,xmm5",
+          "vaddps\txmm0,xmm0,xmm1",
+          "vmovlps\tQWORD PTR [rbx+r15*1+0xdc],xmm0"
+        ]
+      },
+      {
+        "source": "        p.age += dt;",
+        "asm": [
+          "vmovss\txmm0,DWORD PTR [rip+0xfffffffffff82a76]        # 1002584 <__anon_30540+0x10>",
+          "vaddss\txmm0,xmm0,DWORD PTR [rbx+r15*1+0xe8]"
+        ]
+      },
+      {
+        "source": "    if (age >= kill_age) return true;",
+        "asm": [
+          "vucomiss\txmm0,DWORD PTR [rip+0xfffffffffff82a84]        # 10025a4 <__anon_12850+0x10>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.advanceOne():",
+        "asm": [
+          "vmovss\tDWORD PTR [rbx+r15*1+0xe8],xmm0"
+        ]
+      },
+      {
+        "source": "framework.config.isDead():",
+        "asm": [
+          "jae\t107fbd0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x630>"
+        ]
+      },
+      {
+        "source": "    if (q == 0) return false; // runtime short-circuit; no kill-RNG draw at q=0",
+        "asm": [
+          "vmovss\txmm1,DWORD PTR [rip+0x14990]        # 10944c8 <framework.config.q>",
+          "vucomiss\txmm1,xmm4",
+          "jne\t107fb44 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x5a4>",
+          "jnp\t107f621 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x81>"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "mov\trdx,QWORD PTR [r12+0x50]",
+          "mov\tr8,r12"
+        ]
+      },
+      {
+        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
+        "asm": [
+          "mov\trax,QWORD PTR [r12+0x60]",
+          "mov\trcx,QWORD PTR [r12+0x48]",
+          "mov\tr9,QWORD PTR [r8+0x58]",
+          "lea\trsi,[rax+rcx*1]"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "mov\tr10,rdx"
+        ]
+      },
+      {
+        "source": "self.s[3] ^= self.s[1];",
+        "asm": [
+          "xor\trax,rdx"
+        ]
+      },
+      {
+        "source": "math.rotl__anon_33215():",
+        "asm": [
+          "rorx\tr12,rsi,0x29"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= self.s[0];",
+        "asm": [
+          "xor\tr9,rcx"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "shl\tr10,0x11"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "xor\trdx,r9"
+        ]
+      },
+      {
+        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
+        "asm": [
+          "add\tr12,rcx"
+        ]
+      },
+      {
+        "source": "self.s[0] ^= self.s[3];",
+        "asm": [
+          "xor\trcx,rax"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "xor\tr9,r10"
+        ]
+      },
+      {
+        "source": "math.rotl__anon_33216():",
+        "asm": [
+          "rorx\trax,rax,0x13"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x50],rdx"
+        ]
+      },
+      {
+        "source": "self.s[0] ^= self.s[3];",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x48],rcx"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x58],r9"
+        ]
+      },
+      {
+        "source": "self.s[3] = math.rotl(u64, self.s[3], 45);",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x60],rax"
+        ]
+      },
+      {
+        "source": "if (rand_lz >= 41) {",
+        "asm": [
+          "cmp\tr12,0x7fffff",
+          "jbe\t107fcc0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x720>",
+          "lzcnt\trax,r12"
+        ]
+      },
+      {
+        "source": "return @bitCast(exponent | mantissa);",
+        "asm": [
+          "and\tr12d,0x7fffff",
+          "shl\teax,0x17",
+          "or\tr12d,0x3f000000",
+          "sub\tr12d,eax",
+          "vmovd\txmm0,r12d",
+          "mov\tr12,QWORD PTR [rbp-0x58]"
+        ]
+      },
+      {
+        "source": "    return kill_rng.random().float(f32) < q;",
+        "asm": [
+          "vucomiss\txmm1,xmm0"
+        ]
+      },
+      {
+        "source": "        if (config.isDead(p.age, &sim.kill_rng)) {",
+        "asm": [
+          "jbe\t107f621 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x81>",
+          "nop\tDWORD PTR [rax+0x0]"
+        ]
+      },
+      {
+        "source": "            data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));",
+        "asm": [
+          "mov\tedx,DWORD PTR [rbx+r15*1+0x108]",
+          "mov\trcx,QWORD PTR [r12+0x18]",
+          "cmp\trdx,rcx",
+          "jb\t107f610 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x70>",
+          "mov\teax,edx",
+          "xor\tedx,edx",
+          "div\tecx",
+          "jmp\t107f610 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x70>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "mov\trdi,QWORD PTR [rbp-0x48]"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "mov\tedx,0x8",
+          "lea\trsi,[rbp-0x40]",
+          "vmovss\tDWORD PTR [rbp-0x2c],xmm1",
+          "call\t1080870 <Random.init__anon_33166.gen.fill>"
+        ]
+      },
+      {
+        "source": "rand_lz = 41 + @clz(r.int(u64));",
+        "asm": [
+          "lzcnt\trax,QWORD PTR [rbp-0x40]",
+          "add\tal,0x29",
+          "mov\tecx,eax",
+          "and\tcl,0x7f"
+        ]
+      },
+      {
+        "source": "if (rand_lz == 41 + 64) {",
+        "asm": [
+          "cmp\tcl,0x69",
+          "je\t107fd05 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x765>",
+          "movzx\teax,al",
+          "and\teax,0x7f"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "vmovss\txmm1,DWORD PTR [rbp-0x2c]",
+          "mov\trdi,QWORD PTR [rbp-0x38]",
+          "vxorps\txmm4,xmm4,xmm4",
+          "jmp\t107f748 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x1a8>",
+          "mov\trdi,QWORD PTR [rbp-0x48]"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "mov\tedx,0x8",
+          "lea\trsi,[rbp-0x40]",
+          "vmovss\tDWORD PTR [rbp-0x2c],xmm1",
+          "call\t1080870 <Random.init__anon_33166.gen.fill>"
+        ]
+      },
+      {
+        "source": "rand_lz = 41 + @clz(r.int(u64));",
+        "asm": [
+          "lzcnt\trax,QWORD PTR [rbp-0x40]",
+          "add\tal,0x29",
+          "mov\tecx,eax",
+          "and\tcl,0x7f"
+        ]
+      },
+      {
+        "source": "if (rand_lz == 41 + 64) {",
+        "asm": [
+          "cmp\tcl,0x69",
+          "je\t107fd2d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x78d>",
+          "movzx\teax,al",
+          "and\teax,0x7f"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "vmovss\txmm1,DWORD PTR [rbp-0x2c]",
+          "mov\trdi,QWORD PTR [rbp-0x38]",
+          "vxorps\txmm4,xmm4,xmm4",
+          "jmp\t107f8aa <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x30a>",
+          "mov\trdi,QWORD PTR [rbp-0x48]"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "mov\tedx,0x8",
+          "lea\trsi,[rbp-0x40]",
+          "vmovss\tDWORD PTR [rbp-0x2c],xmm1",
+          "call\t1080870 <Random.init__anon_33166.gen.fill>"
+        ]
+      },
+      {
+        "source": "rand_lz = 41 + @clz(r.int(u64));",
+        "asm": [
+          "lzcnt\trax,QWORD PTR [rbp-0x40]",
+          "add\tal,0x29",
+          "mov\tecx,eax",
+          "and\tcl,0x7f"
+        ]
+      },
+      {
+        "source": "if (rand_lz == 41 + 64) {",
+        "asm": [
+          "cmp\tcl,0x69",
+          "je\t107fd55 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x7b5>",
+          "movzx\teax,al",
+          "and\teax,0x7f"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "vmovss\txmm1,DWORD PTR [rbp-0x2c]",
+          "mov\trdi,QWORD PTR [rbp-0x38]",
+          "vxorps\txmm4,xmm4,xmm4",
+          "jmp\t107fa25 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x485>",
+          "mov\trdi,QWORD PTR [rbp-0x48]"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "mov\tedx,0x8",
+          "lea\trsi,[rbp-0x40]",
+          "vmovss\tDWORD PTR [rbp-0x2c],xmm1",
+          "call\t1080870 <Random.init__anon_33166.gen.fill>"
+        ]
+      },
+      {
+        "source": "rand_lz = 41 + @clz(r.int(u64));",
+        "asm": [
+          "lzcnt\trax,QWORD PTR [rbp-0x40]",
+          "add\tal,0x29",
+          "mov\tecx,eax",
+          "and\tcl,0x7f"
+        ]
+      },
+      {
+        "source": "if (rand_lz == 41 + 64) {",
+        "asm": [
+          "cmp\tcl,0x69",
+          "je\t107fd7d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x7dd>",
+          "movzx\teax,al",
+          "and\teax,0x7f"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "vmovss\txmm1,DWORD PTR [rbp-0x2c]",
+          "mov\trdi,QWORD PTR [rbp-0x38]",
+          "vxorps\txmm4,xmm4,xmm4",
+          "jmp\t107fba5 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x605>",
+          "mov\trdi,QWORD PTR [rbp-0x48]"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "mov\tedx,0x4",
+          "lea\trsi,[rbp-0x40]",
+          "call\t1080870 <Random.init__anon_33166.gen.fill>",
+          "mov\teax,DWORD PTR [rbp-0x40]"
+        ]
+      },
+      {
+        "source": "rand_lz += @clz(r.int(u32) | 0x7FF);",
+        "asm": [
+          "mov\tecx,0x7ff",
+          "or\teax,ecx",
+          "lzcnt\teax,eax",
+          "add\teax,0x69",
+          "jmp\t107fc24 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x684>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "mov\trdi,QWORD PTR [rbp-0x48]"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "mov\tedx,0x4",
+          "lea\trsi,[rbp-0x40]",
+          "call\t1080870 <Random.init__anon_33166.gen.fill>",
+          "mov\teax,DWORD PTR [rbp-0x40]"
+        ]
+      },
+      {
+        "source": "rand_lz += @clz(r.int(u32) | 0x7FF);",
+        "asm": [
+          "mov\tecx,0x7ff",
+          "or\teax,ecx",
+          "lzcnt\teax,eax",
+          "add\teax,0x69",
+          "jmp\t107fc69 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x6c9>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "mov\trdi,QWORD PTR [rbp-0x48]"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "mov\tedx,0x4",
+          "lea\trsi,[rbp-0x40]",
+          "call\t1080870 <Random.init__anon_33166.gen.fill>",
+          "mov\teax,DWORD PTR [rbp-0x40]"
+        ]
+      },
+      {
+        "source": "rand_lz += @clz(r.int(u32) | 0x7FF);",
+        "asm": [
+          "mov\tecx,0x7ff",
+          "or\teax,ecx",
+          "lzcnt\teax,eax",
+          "add\teax,0x69",
+          "jmp\t107fcae <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x70e>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "mov\trdi,QWORD PTR [rbp-0x48]"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "mov\tedx,0x4",
+          "lea\trsi,[rbp-0x40]",
+          "call\t1080870 <Random.init__anon_33166.gen.fill>",
+          "mov\teax,DWORD PTR [rbp-0x40]"
+        ]
+      },
+      {
+        "source": "rand_lz += @clz(r.int(u32) | 0x7FF);",
+        "asm": [
+          "mov\tecx,0x7ff",
+          "or\teax,ecx",
+          "lzcnt\teax,eax",
+          "add\teax,0x69",
+          "jmp\t107fcf3 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x753>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "xor\tr13d,r13d",
+          "mov\tr15,QWORD PTR [rbp-0x68]"
+        ]
+      },
+      {
+        "source": "        while (i < n) : (i += 1) {",
+        "asm": [
+          "sub\tr15,r13",
+          "jbe\t107ffc4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa24>",
+          "mov\trcx,r13",
+          "lea\trax,[r12+0x48]",
+          "lea\trdx,[r12+0x28]",
+          "vxorps\txmm4,xmm4,xmm4",
+          "shl\trcx,0x6",
+          "mov\tQWORD PTR [rbp-0x78],rax",
+          "mov\tQWORD PTR [rbp-0x60],rdx",
+          "lea\tr13,[rcx+r13*4]",
+          "jmp\t107fdfe <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x85e>",
+          "nop\tDWORD PTR [rax+rax*1+0x0]",
+          "mov\trsi,QWORD PTR [rbp-0x60]"
+        ]
+      },
+      {
+        "source": "            data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));",
+        "asm": [
+          "call\t1080400 <layouts.ML01.data.Data.spawn>",
+          "mov\trdi,QWORD PTR [rbp-0x38]",
+          "vxorps\txmm4,xmm4,xmm4"
+        ]
+      },
+      {
+        "source": "        while (i < n) : (i += 1) {",
+        "asm": [
+          "add\tr13,0x44",
+          "dec\tr15",
+          "je\t107ffc4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa24>"
+        ]
+      },
+      {
+        "source": "        const p = &data.particles[i];",
+        "asm": [
+          "mov\trbx,QWORD PTR [rdi]"
+        ]
+      },
+      {
+        "source": "            .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "asm": [
+          "vmovss\txmm2,DWORD PTR [rip+0xfffffffffff827e7]        # 10025f0 <__anon_12856+0xc>",
+          "vbroadcastss\txmm5,DWORD PTR [rip+0xfffffffffff82772]        # 1002584 <__anon_30540+0x10>",
+          "vmulss\txmm2,xmm2,DWORD PTR [rbx+r13*1+0xc]"
+        ]
+      },
+      {
+        "source": "        p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "vmovups\txmm0,XMMWORD PTR [rbx+r13*1]",
+          "vmovsd\txmm1,QWORD PTR [rbx+r13*1+0x10]"
+        ]
+      },
+      {
+        "source": "        return .{ .x = a.x * s, .y = a.y * s, .z = a.z * s };",
+        "asm": [
+          "vmovsd\txmm3,xmm0,xmm1",
+          "vshufps\txmm3,xmm3,xmm3,0xd3"
+        ]
+      },
+      {
+        "source": "            .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "asm": [
+          "vaddss\txmm2,xmm2,xmm4"
+        ]
+      },
+      {
+        "source": "framework.vec.Vec3.scale():",
+        "asm": [
+          "vinsertps\txmm2,xmm3,xmm2,0x30",
+          "vmulps\txmm2,xmm2,xmm5"
+        ]
+      },
+      {
+        "source": "        return .{ .x = a.x + b.x, .y = a.y + b.y, .z = a.z + b.z };",
+        "asm": [
+          "vaddps\txmm0,xmm0,xmm2"
+        ]
+      },
+      {
+        "source": "            .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "asm": [
+          "vmovss\txmm2,DWORD PTR [rip+0xfffffffffff82737]        # 1002580 <__anon_30540+0xc>"
+        ]
+      },
+      {
+        "source": "        p.pos = p.pos.add(p.vel.scale(dt));",
+        "asm": [
+          "vmovups\tXMMWORD PTR [rbx+r13*1],xmm0"
+        ]
+      },
+      {
+        "source": "            .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "asm": [
+          "vinsertps\txmm0,xmm1,DWORD PTR [rbx+r13*1+0x14],0x10",
+          "vbroadcastss\txmm1,DWORD PTR [rip+0xfffffffffff82790]        # 10025f0 <__anon_12856+0xc>",
+          "vmulps\txmm1,xmm0,xmm1",
+          "vaddps\txmm1,xmm1,xmm2",
+          "vmulps\txmm1,xmm1,xmm5",
+          "vaddps\txmm0,xmm0,xmm1",
+          "vmovlps\tQWORD PTR [rbx+r13*1+0x10],xmm0"
+        ]
+      },
+      {
+        "source": "        p.age += dt;",
+        "asm": [
+          "vmovss\txmm0,DWORD PTR [rip+0xfffffffffff82705]        # 1002584 <__anon_30540+0x10>",
+          "vaddss\txmm0,xmm0,DWORD PTR [rbx+r13*1+0x1c]"
+        ]
+      },
+      {
+        "source": "    if (age >= kill_age) return true;",
+        "asm": [
+          "vucomiss\txmm0,DWORD PTR [rip+0xfffffffffff82716]        # 10025a4 <__anon_12850+0x10>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.advanceOne():",
+        "asm": [
+          "vmovss\tDWORD PTR [rbx+r13*1+0x1c],xmm0"
+        ]
+      },
+      {
+        "source": "framework.config.isDead():",
+        "asm": [
+          "jae\t107ff40 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x9a0>"
+        ]
+      },
+      {
+        "source": "    if (q == 0) return false; // runtime short-circuit; no kill-RNG draw at q=0",
+        "asm": [
+          "vmovss\txmm1,DWORD PTR [rip+0x14625]        # 10944c8 <framework.config.q>",
+          "vucomiss\txmm1,xmm4",
+          "jne\t107feaf <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x90f>",
+          "jnp\t107fdf1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x851>"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "mov\trdx,QWORD PTR [r12+0x50]",
+          "mov\tr8,r12"
+        ]
+      },
+      {
+        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
+        "asm": [
+          "mov\trax,QWORD PTR [r12+0x60]",
+          "mov\trcx,QWORD PTR [r12+0x48]",
+          "mov\tr9,QWORD PTR [r8+0x58]",
+          "lea\trsi,[rax+rcx*1]"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "mov\tr10,rdx"
+        ]
+      },
+      {
+        "source": "self.s[3] ^= self.s[1];",
+        "asm": [
+          "xor\trax,rdx"
+        ]
+      },
+      {
+        "source": "math.rotl__anon_33215():",
+        "asm": [
+          "rorx\tr12,rsi,0x29"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= self.s[0];",
+        "asm": [
+          "xor\tr9,rcx"
+        ]
+      },
+      {
+        "source": "const t = self.s[1] << 17;",
+        "asm": [
+          "shl\tr10,0x11"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "xor\trdx,r9"
+        ]
+      },
+      {
+        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
+        "asm": [
+          "add\tr12,rcx"
+        ]
+      },
+      {
+        "source": "self.s[0] ^= self.s[3];",
+        "asm": [
+          "xor\trcx,rax"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "xor\tr9,r10"
+        ]
+      },
+      {
+        "source": "math.rotl__anon_33216():",
+        "asm": [
+          "rorx\trax,rax,0x13"
+        ]
+      },
+      {
+        "source": "self.s[1] ^= self.s[2];",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x50],rdx"
+        ]
+      },
+      {
+        "source": "self.s[0] ^= self.s[3];",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x48],rcx"
+        ]
+      },
+      {
+        "source": "self.s[2] ^= t;",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x58],r9"
+        ]
+      },
+      {
+        "source": "self.s[3] = math.rotl(u64, self.s[3], 45);",
+        "asm": [
+          "mov\tQWORD PTR [r8+0x60],rax"
+        ]
+      },
+      {
+        "source": "if (rand_lz >= 41) {",
+        "asm": [
+          "cmp\tr12,0x7fffff",
+          "jbe\t107ff5e <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x9be>",
+          "lzcnt\trax,r12"
+        ]
+      },
+      {
+        "source": "return @bitCast(exponent | mantissa);",
+        "asm": [
+          "and\tr12d,0x7fffff",
+          "shl\teax,0x17",
+          "or\tr12d,0x3f000000",
+          "sub\tr12d,eax",
+          "vmovd\txmm0,r12d",
+          "mov\tr12,QWORD PTR [rbp-0x58]"
+        ]
+      },
+      {
+        "source": "    return kill_rng.random().float(f32) < q;",
+        "asm": [
+          "vucomiss\txmm1,xmm0"
+        ]
+      },
+      {
+        "source": "        if (config.isDead(p.age, &sim.kill_rng)) {",
+        "asm": [
+          "jbe\t107fdf1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x851>",
+          "data16\tdata16 data16 cs nop WORD PTR [rax+rax*1+0x0]"
+        ]
+      },
+      {
+        "source": "            data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));",
+        "asm": [
+          "mov\tedx,DWORD PTR [rbx+r13*1+0x3c]",
+          "mov\trcx,QWORD PTR [r12+0x18]",
+          "cmp\trdx,rcx",
+          "jb\t107fde0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x840>",
+          "mov\teax,edx",
+          "xor\tedx,edx",
+          "div\tecx",
+          "jmp\t107fde0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x840>",
+          "mov\trdi,QWORD PTR [rbp-0x78]"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "mov\tedx,0x8",
+          "lea\trsi,[rbp-0x40]",
+          "vmovss\tDWORD PTR [rbp-0x48],xmm1",
+          "call\t1080870 <Random.init__anon_33166.gen.fill>"
+        ]
+      },
+      {
+        "source": "rand_lz = 41 + @clz(r.int(u64));",
+        "asm": [
+          "lzcnt\trax,QWORD PTR [rbp-0x40]",
+          "add\tal,0x29",
+          "mov\tecx,eax",
+          "and\tcl,0x7f"
+        ]
+      },
+      {
+        "source": "if (rand_lz == 41 + 64) {",
+        "asm": [
+          "cmp\tcl,0x69",
+          "je\t107ff9f <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x9ff>",
+          "movzx\teax,al",
+          "and\teax,0x7f",
+          "vmovss\txmm1,DWORD PTR [rbp-0x48]",
+          "mov\trdi,QWORD PTR [rbp-0x38]",
+          "vxorps\txmm4,xmm4,xmm4",
+          "jmp\t107ff0c <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x96c>",
+          "mov\trdi,QWORD PTR [rbp-0x78]"
+        ]
+      },
+      {
+        "source": "r.fillFn(r.ptr, buf);",
+        "asm": [
+          "mov\tedx,0x4",
+          "lea\trsi,[rbp-0x40]",
+          "call\t1080870 <Random.init__anon_33166.gen.fill>",
+          "mov\teax,DWORD PTR [rbp-0x40]"
+        ]
+      },
+      {
+        "source": "rand_lz += @clz(r.int(u32) | 0x7FF);",
+        "asm": [
+          "mov\tecx,0x7ff",
+          "or\teax,ecx",
+          "lzcnt\teax,eax",
+          "add\teax,0x69",
+          "jmp\t107ff8d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0x9ed>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "mov\tr15,QWORD PTR [rbp-0x68]",
+          "mov\tr13d,DWORD PTR [rbp-0x84]"
+        ]
+      },
+      {
+        "source": "        for (ps) |p| {",
+        "asm": [
+          "test\tr15,r15",
+          "je\t108037d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xddd>",
+          "mov\teax,DWORD PTR [rbp-0x4c]",
+          "vmovss\txmm3,DWORD PTR [rip+0xfffffffffff825f1]        # 10025d4 <__anon_23520+0x2c>",
+          "vmovss\txmm4,DWORD PTR [rip+0xfffffffffff825b9]        # 10025a4 <__anon_12850+0x10>",
+          "vmovss\txmm5,DWORD PTR [rip+0xfffffffffff82595]        # 1002588 <__anon_30540+0x14>",
+          "add\tr14,0x28",
+          "vxorps\txmm2,xmm2,xmm2",
+          "vcvtsi2ss\txmm0,xmm15,eax",
+          "mov\tecx,eax",
+          "mov\tQWORD PTR [rbp-0x38],rcx",
+          "vcvtsi2ss\txmm1,xmm15,r13d",
+          "jmp\t108001d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa7d>",
+          "nop\tDWORD PTR [rax+0x0]",
+          "add\tr14,0x44",
+          "dec\tr15",
+          "je\t108037d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xddd>",
+          "vmovss\txmm6,DWORD PTR [r14-0x8]"
+        ]
+      },
+      {
+        "source": "    if (v <= 0) return 0;",
+        "asm": [
+          "vucomiss\txmm2,xmm6",
+          "jae\t1080080 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xae0>"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "vucomiss\txmm6,xmm3",
+          "mov\tdx,0xff",
+          "jae\t108003a <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa9a>"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(v);",
+        "asm": [
+          "vcvttss2si\tedx,xmm6"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tedx,dl"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "vmovss\txmm6,DWORD PTR [r14-0x4]"
+        ]
+      },
+      {
+        "source": "    if (v <= 0) return 0;",
+        "asm": [
+          "vucomiss\txmm2,xmm6",
+          "jae\t108008e <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xaee>"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "vucomiss\txmm6,xmm3",
+          "mov\tsi,0xff",
+          "jae\t1080058 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xab8>"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(v);",
+        "asm": [
+          "vcvttss2si\tesi,xmm6"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tesi,sil"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "vmovss\txmm6,DWORD PTR [r14]"
+        ]
+      },
+      {
+        "source": "    if (v <= 0) return 0;",
+        "asm": [
+          "vucomiss\txmm2,xmm6",
+          "jae\t108009b <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xafb>"
+        ]
+      },
+      {
+        "source": "    if (v >= 255) return 255;",
+        "asm": [
+          "vucomiss\txmm6,xmm3",
+          "mov\tdi,0xff",
+          "jae\t108009d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xafd>"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(v);",
+        "asm": [
+          "vcvttss2si\tedi,xmm6"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tedi,dil",
+          "jmp\t108009d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xafd>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "nop\tWORD PTR [rax+rax*1+0x0]",
+          "xor\tedx,edx",
+          "vmovss\txmm6,DWORD PTR [r14-0x4]"
+        ]
+      },
+      {
+        "source": "    if (v <= 0) return 0;",
+        "asm": [
+          "vucomiss\txmm2,xmm6",
+          "jb\t1080046 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xaa6>"
+        ]
+      },
+      {
+        "source": "layouts.ML01.AF02.LP1-unroll.LP2-simple.H.step__anon_33008():",
+        "asm": [
+          "xor\tesi,esi",
+          "vmovss\txmm6,DWORD PTR [r14]"
+        ]
+      },
+      {
+        "source": "layouts.common.render_simple.clamp255():",
+        "asm": [
+          "vucomiss\txmm2,xmm6",
+          "jb\t1080063 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xac3>"
+        ]
+      },
+      {
+        "source": "layouts.common.render_simple.splat():",
+        "asm": [
+          "xor\tedi,edi"
+        ]
+      },
+      {
+        "source": "    const norm = (x + config.view_half) / (2.0 * config.view_half); // [0,1)",
+        "asm": [
+          "vaddss\txmm6,xmm4,DWORD PTR [r14-0x28]",
+          "vmulss\txmm6,xmm6,xmm5"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(norm * half);",
+        "asm": [
+          "vmulss\txmm6,xmm6,xmm0",
+          "vcvttss2si\tr8d,xmm6"
+        ]
+      },
+      {
+        "source": "    const norm = (config.view_half - y) / (2.0 * config.view_half); // [0,1)",
+        "asm": [
+          "vsubss\txmm6,xmm4,DWORD PTR [r14-0x24]"
+        ]
+      },
+      {
+        "source": "    while (dy < 2) : (dy += 1) {",
+        "asm": [
+          "movsxd\tr8,r8d"
+        ]
+      },
+      {
+        "source": "    const norm = (config.view_half - y) / (2.0 * config.view_half); // [0,1)",
+        "asm": [
+          "vmulss\txmm6,xmm6,xmm5"
+        ]
+      },
+      {
+        "source": "    return @intFromFloat(norm * half);",
+        "asm": [
+          "vmulss\txmm6,xmm6,xmm1",
+          "vcvttss2si\tr9d,xmm6",
+          "test\tr9d,r9d",
+          "sets\tr10b",
+          "cmp\tr9d,r13d",
+          "setge\tr11b",
+          "or\tr11b,r10b",
+          "jne\t1080230 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xc90>"
+        ]
+      },
+      {
+        "source": "layouts.common.render_simple.splat():",
+        "asm": [
+          "mov\tebx,DWORD PTR [rbp-0x4c]",
+          "mov\tr10d,r9d",
+          "mov\trax,r15",
+          "imul\tr10d,ebx"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "test\tr8d,r8d",
+          "sets\tr11b",
+          "cmp\tebx,r8d",
+          "setle\tbl",
+          "or\tbl,r11b",
+          "jne\t1080188 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xbe8>"
+        ]
+      },
+      {
+        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
+        "asm": [
+          "lea\tr11,[r10+r8*1]"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "lea\trbx,[r11*4+0x3]",
+          "cmp\trbx,QWORD PTR [rbp-0x80]",
+          "jae\t1080188 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xbe8>",
+          "mov\trcx,QWORD PTR [rbp-0x70]",
+          "shl\tr11,0x2"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tr12d,dx"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "movzx\tr15d,BYTE PTR [rcx+r11*1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tr12d,r15d",
+          "mov\tr15d,0xff"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tr12w,0xff",
+          "cmovae\tr12d,r15d"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r11*1],r12b"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tr12d,si"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "movzx\tr15d,BYTE PTR [rcx+r11*1+0x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tr12d,r15d"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "mov\tr15d,0xff",
+          "cmp\tr12w,0xff",
+          "cmovae\tr12d,r15d"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r11*1+0x1],r12b"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tr12d,di"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "movzx\tr15d,BYTE PTR [rcx+r11*1+0x2]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tr12d,r15d"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "mov\tr15d,0xff",
+          "cmp\tr12w,0xff",
+          "cmovae\tr12d,r15d"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r11*1+0x2],r12b"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "mov\tBYTE PTR [rcx+rbx*1],0xff",
+          "mov\tr12,QWORD PTR [rbp-0x58]",
+          "mov\trcx,QWORD PTR [rbp-0x38]"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "cmp\tr8d,0xffffffff"
+        ]
+      },
+      {
+        "source": "            const fx = px + dx;",
+        "asm": [
+          "lea\tr11,[r8+0x1]"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "setl\tbl",
+          "cmp\tr11,rcx",
+          "setge\tr15b",
+          "or\tr15b,bl",
+          "mov\tr15,rax",
+          "jne\t1080230 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xc90>"
+        ]
+      },
+      {
+        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
+        "asm": [
+          "add\tr11,r10"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "lea\tr10,[r11*4+0x3]",
+          "cmp\tr10,QWORD PTR [rbp-0x80]",
+          "jae\t1080230 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xc90>",
+          "mov\trcx,QWORD PTR [rbp-0x70]",
+          "shl\tr11,0x2"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tr15d,dx"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "movzx\tebx,BYTE PTR [rcx+r11*1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tr15d,ebx",
+          "mov\tebx,0xff"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tr15w,0xff",
+          "cmovae\tr15d,ebx"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r11*1],r15b"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tr15d,si"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "movzx\tebx,BYTE PTR [rcx+r11*1+0x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tr15d,ebx"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "mov\tebx,0xff",
+          "cmp\tr15w,0xff",
+          "cmovae\tr15d,ebx"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r11*1+0x1],r15b"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tr15d,di"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "movzx\tebx,BYTE PTR [rcx+r11*1+0x2]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tr15d,ebx"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "mov\tebx,0xff",
+          "cmp\tr15w,0xff",
+          "cmovae\tr15d,ebx"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r11*1+0x2],r15b"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r10*1],0xff",
+          "mov\trcx,QWORD PTR [rbp-0x38]",
+          "mov\tr15,rax",
+          "nop\tDWORD PTR [rax+0x0]",
+          "inc\tr9d",
+          "sets\tr10b",
+          "cmp\tr9d,r13d",
+          "setge\tr11b",
+          "or\tr11b,r10b",
+          "jne\t1080010 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa70>",
+          "mov\tr11d,DWORD PTR [rbp-0x4c]",
+          "imul\tr9d,r11d"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "test\tr8d,r8d",
+          "sets\tr10b",
+          "cmp\tr11d,r8d",
+          "setle\tr11b",
+          "or\tr11b,r10b",
+          "jne\t10802e8 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xd48>"
+        ]
+      },
+      {
+        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
+        "asm": [
+          "lea\tr10,[r9+r8*1]"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "lea\tr11,[r10*4+0x3]",
+          "cmp\tr11,QWORD PTR [rbp-0x80]",
+          "jae\t10802e8 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xd48>",
+          "mov\trcx,QWORD PTR [rbp-0x70]",
+          "shl\tr10,0x2",
+          "mov\tQWORD PTR [rbp-0x68],r15"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tr15d,dx",
+          "mov\teax,0xff"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "movzx\tebx,BYTE PTR [rcx+r10*1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tr15d,ebx"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tr15w,0xff",
+          "cmovae\tr15d,eax"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r10*1],r15b"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tr15d,si"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "movzx\tebx,BYTE PTR [rcx+r10*1+0x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tr15d,ebx"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tr15w,0xff",
+          "cmovae\tr15d,eax"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r10*1+0x1],r15b"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tr15d,di"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "movzx\tebx,BYTE PTR [rcx+r10*1+0x2]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tr15d,ebx"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tr15w,0xff",
+          "cmovae\tr15d,eax"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r10*1+0x2],r15b"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r11*1],0xff",
+          "mov\tr15,QWORD PTR [rbp-0x68]",
+          "mov\trcx,QWORD PTR [rbp-0x38]",
+          "mov\tr10d,r8d"
+        ]
+      },
+      {
+        "source": "            const fx = px + dx;",
+        "asm": [
+          "inc\tr8"
+        ]
+      },
+      {
+        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
+        "asm": [
+          "cmp\tr10d,0xffffffff",
+          "setl\tr10b",
+          "cmp\tr8,rcx",
+          "setge\tr11b",
+          "or\tr11b,r10b",
+          "jne\t1080010 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa70>"
+        ]
+      },
+      {
+        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
+        "asm": [
+          "add\tr8,r9"
+        ]
+      },
+      {
+        "source": "            if (i + 3 >= fb.len) continue;",
+        "asm": [
+          "lea\tr9,[r8*4+0x3]",
+          "cmp\tr9,QWORD PTR [rbp-0x80]",
+          "jae\t1080010 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa70>",
+          "mov\trcx,QWORD PTR [rbp-0x70]",
+          "shl\tr8,0x2"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tedx,dx",
+          "mov\teax,0xff",
+          "movzx\tesi,si"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "movzx\tr10d,BYTE PTR [rcx+r8*1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tedx,r10d"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tdx,0xff",
+          "cmovae\tedx,eax"
+        ]
+      },
+      {
+        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r8*1],dl"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "movzx\tedx,BYTE PTR [rcx+r8*1+0x1]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tesi,edx"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tsi,0xff",
+          "cmovae\tesi,eax"
+        ]
+      },
+      {
+        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r8*1+0x1],sil"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "movzx\tesi,di"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "movzx\tedx,BYTE PTR [rcx+r8*1+0x2]"
+        ]
+      },
+      {
+        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
+        "asm": [
+          "add\tesi,edx"
+        ]
+      },
+      {
+        "source": "    return if (sum > 255) 255 else @intCast(sum);",
+        "asm": [
+          "cmp\tsi,0xff",
+          "cmovae\tesi,eax"
+        ]
+      },
+      {
+        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r8*1+0x2],sil"
+        ]
+      },
+      {
+        "source": "            fb[i + 3] = 255;",
+        "asm": [
+          "mov\tBYTE PTR [rcx+r9*1],0xff",
+          "mov\trcx,QWORD PTR [rbp-0x38]",
+          "jmp\t1080010 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-unroll.LP2-simple.H).step+0xa70>"
+        ]
+      },
+      {
+        "source": "            self.frame +%= 1; // AF02-blend hash RNG frame counter (free otherwise)",
+        "asm": [
+          "inc\tQWORD PTR [r12+0x68]",
+          "add\trsp,0x68",
+          "pop\trbx",
+          "pop\tr12",
+          "pop\tr13",
+          "pop\tr14",
+          "pop\tr15",
+          "pop\trbp",
+          "ret",
+          "data16\tdata16 data16 data16 data16 cs nop WORD PTR [rax+rax*1+0x0]"
+        ]
+      }
+    ],
+    "algo_source": {
+      "file": "src/layouts/ML01/AF02.LP1-unroll.LP2-simple.zig",
+      "lines": [
+        "// Algorithm ML01.AF02.LP1-unroll.LP2-simple \u2014 AF02 (math+decide+respawn | render),",
+        "// loop 1 unroll-by-4 branchy, loop 2 r0 splat.",
+        "//",
+        "// Fills the `unroll` schedule knob (declared in LoopSchedule but, until this",
+        "// cell, instantiated nowhere in ML01). Manual loop unrolling: the physics body",
+        "// is replicated 4\u00d7 via `inline for`, so four particles are advanced per loop",
+        "// iteration. That amortizes branch/loop overhead and exposes four independent",
+        "// particle bodies to the out-of-order core (ILP) \u2014 the classic unrolling win.",
+        "//",
+        "// What it isolates. The per-particle math is byte-identical to the autovec",
+        "// cell (same ops, same FP order \u2192 bit-exact golden). The ONLY change from",
+        "// autovec is the loop structure: autovec lets LLVM pick the unroll factor",
+        "// (and vectorize); this cell commits to a source-level unroll of 4. So:",
+        "//   auto   \u2192 unroll   = does FORCING the unroll beat LLVM's chosen one?",
+        "//   scalar \u2192 unroll   = boxed-no-unroll-scalar vs forced-unroll (+ autovec).",
+        "// (Vectorization is left to the compiler here, exactly as in `auto` \u2014 the",
+        "//  orthogonal, boxed \"unroll with the vectorizer pinned off\" comparison is a",
+        "//  separate cell if we ever want that axis split; see the README note.)",
+        "//",
+        "// Golden: bit-exact. The respawn branch is per-particle and the loop preserves",
+        "// index order (i, i+1, i+2, i+3), so the shared spawn/kill RNG stream is",
+        "// consumed identically to autovec.",
+        "",
+        "const std = @import(\"std\");",
+        "const fw = @import(\"../../framework/sim.zig\");",
+        "const config = @import(\"../../framework/config.zig\");",
+        "const layout = @import(\"data.zig\");",
+        "const r0 = @import(\"../common/render_simple.zig\");",
+        "",
+        "const Data = layout.Data;",
+        "",
+        "pub const H = struct {",
+        "    pub const algo_meta: fw.AlgorithmMeta = .{",
+        "        .mem_layout = \"ML01\",",
+        "        .algo_fam = .AF02,",
+        "        .ordering = .identity,",
+        "        .intermediates = .none,",
+        "        .loops = &.{",
+        "            .{ .impl = .zig, .schedule = .unroll, .parallel = .none, .variant = .branchy },",
+        "            .{ .impl = .zig, .schedule = .r0, .parallel = .none, .variant = .none },",
+        "        },",
+        "        .golden = .bit_exact,",
+        "        .halide_expressible = \"loop1 no (branchy respawn); loop2 n/a (render)\",",
+        "    };",
+        "",
+        "    /// Unroll factor. 4 mirrors the vw4 vector-width neighbor \u2014 \"four-wide,",
+        "    /// either by scalar ILP (this cell) or by NEON lanes (vw4).\"",
+        "    pub const UNROLL: usize = 4;",
+        "",
+        "    /// One particle's math+decide+respawn (identical to the autovec body).",
+        "    /// Hoisted so the unrolled copy and the tail stay provably in sync.",
+        "    inline fn advanceOne(data: *Data, sim: anytype, i: usize, dt: f32) void {",
+        "        const p = &data.particles[i];",
+        "        // 1. Integrate: pos += vel * dt",
+        "        p.pos = p.pos.add(p.vel.scale(dt));",
+        "        // 2. Forces: vel += (gravity + drag*vel) * dt",
+        "        const v = p.vel;",
+        "        p.vel = .{",
+        "            .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
+        "            .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
+        "            .z = v.z + (config.gravity.z + config.drag * v.z) * dt,",
+        "        };",
+        "        // 3. Age",
+        "        p.age += dt;",
+        "        // 4. Kill \u2192 respawn (in place; seed % len == i by construction)",
+        "        if (config.isDead(p.age, &sim.kill_rng)) {",
+        "            data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));",
+        "        }",
+        "    }",
+        "",
+        "    pub fn step(sim: anytype, dt: f32, fb: []u8, w: u32, h: u32) void {",
+        "        const data = &sim.data;",
+        "        const ps = data.particles;",
+        "        const n = ps.len;",
+        "",
+        "        // loop 1: math + decide + respawn (branchy), unrolled by UNROLL.",
+        "        // `inline for` is the comptime unroll: the body is replicated UNROLL",
+        "        // times, advancing i, i+1, \u2026, i+UNROLL-1 per iteration. Index order is",
+        "        // preserved, so the RNG stream matches autovec exactly.",
+        "        var i: usize = 0;",
+        "        const main = n - (n % UNROLL);",
+        "        while (i < main) : (i += UNROLL) {",
+        "            inline for (0..UNROLL) |k| {",
+        "                advanceOne(data, sim, i + k, dt);",
+        "            }",
+        "        }",
+        "        // tail: the final (n % UNROLL) particles, one at a time.",
+        "        while (i < n) : (i += 1) {",
+        "            advanceOne(data, sim, i, dt);",
+        "        }",
+        "",
+        "        // loop 2: r0 splat pass (no clear \u2014 the driver owns it).",
+        "        for (ps) |p| {",
+        "            r0.splat(fb, w, h, p.pos.x, p.pos.y, p.color.x, p.color.y, p.color.z);",
+        "        }",
+        "    }",
+        "};",
+        "",
+        "pub const Sim = fw.Strategy(Data, H);"
+      ],
+      "group_lines": [
+        null,
+        72,
+        null,
+        null,
+        73,
+        82,
+        67,
+        82,
+        53,
+        59,
+        55,
+        null,
+        59,
+        null,
+        null,
+        60,
+        55,
+        60,
+        64,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        66,
+        67,
+        53,
+        59,
+        55,
+        null,
+        59,
+        null,
+        null,
+        60,
+        55,
+        60,
+        64,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        66,
+        67,
+        53,
+        59,
+        55,
+        null,
+        59,
+        null,
+        null,
+        60,
+        55,
+        60,
+        64,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        66,
+        67,
+        53,
+        59,
+        55,
+        null,
+        59,
+        null,
+        null,
+        60,
+        55,
+        60,
+        64,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        66,
+        67,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        88,
+        67,
+        88,
+        53,
+        59,
+        55,
+        null,
+        59,
+        null,
+        null,
+        60,
+        55,
+        60,
+        64,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        66,
+        67,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        93,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  }
+}
