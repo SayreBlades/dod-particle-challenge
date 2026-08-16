@@ -17,9 +17,9 @@ measurements written by a few **atomic** scripts. `experiments/analysis/` is
 
 | script | role |
 |-------|------|
-| [`collect.py`](#collectpy) | **orchestrator** — drives the atomics over the grid (algo × q × threads × N × trials) |
+| [`collect.py`](#collectpy) | **orchestrator** — drives the atomics over the regime grid (algo × q × N × trials; T=1) |
 | [`algo.py`](#algopy) | **atomic** — rebuild + disassemble `step` → `<algo>.json` (the asm bundle) |
-| [`bench.py`](#benchpy) | **atomic** — time one `(algo, q, threads)` column → `<algo>.runs.jsonl` (timing + check) |
+| [`bench.py`](#benchpy) | **atomic** — time one `(algo, q)` column → `<algo>.runs.jsonl` (timing + check) |
 | [`profile.py`](#profilepy) | **atomic** — cycle-attribution for one point → `<algo>.profile.jsonl` (dispatcher; `profile_xctrace.py` backend) |
 | [`hardware_json.py`](#hardware_jsonpy) | **atomic** — machine profile → `hardware.json` (`machine_id` + measured bandwidth) |
 | [`build_report.py`](#build_reportpy) | `data/` → the `experiments/analysis/` tree + the `--verify` gate |
@@ -44,15 +44,14 @@ error (no silent default run).
 
 ```sh
 ./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --help                       # algo_meta + options
-./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --n 100000 --q 0.1 --threads 1 --iters 100 --trial 1 --json  # one timing row
-./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --check --q 0.1 --threads 1  # invariant suite (PASS/FAIL)
+./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --n 100000 --q 0.1 --iters 100 --trial 1 --json  # one timing row (--threads optional, default 1)
+./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --check --q 0.1              # invariant suite (PASS/FAIL)
 ./out/bin/ML01.AF02.LP1-autovec.LP2-simple.bench --bandwidth                  # streaming-BW microbench
-./out/bin/ML01.AF02.LP1-autovec-par.LP2-simple.bench --n 100000 --q 0.1 --threads 4 --iters 100 --trial 1 --json
 ```
 
-- **Timing (default)** requires `--n`, `--q`, `--threads`, `--iters`, `--trial`;
-  `--warmup` (default 5) and `--json` (emit the row) are optional.
-- `--check` requires `--q`, `--threads` (runs the invariant suite, prints `checked=PASS|FAIL`).
+- **Timing (default)** requires `--n`, `--q`, `--iters`, `--trial`;
+  `--threads` (default 1), `--warmup` (default 5) and `--json` (emit the row) are optional.
+- `--check` requires `--q` (runs the invariant suite, prints `checked=PASS|FAIL`).
 - `--bandwidth` is a standalone mode (streaming-BW microbench).
 - `q` is **runtime** (one binary sweeps the whole death axis; `-Ddeath` is just the build default).
 
@@ -67,12 +66,10 @@ ensure data/<id>/ ; hardware (once)
 for algo in algos:
   algo  → <algo>.json              # when source_hash changes
   for q in DEATH_RATES:
-    for T in threads_for(algo):    # {1} serial; {1,4,8} -par
-      bench → timing + check rows  # unless SKIP_DONE
-    if --with-profile:             # where a profiler backend exists
-      for T in threads_for(algo):
-        for N in N_GRID:
-          profile → cycle row
+    bench → timing + check rows    # unless SKIP_DONE
+  if --with-profile:               # where a profiler backend exists
+    for N in N_GRID:
+      profile → cycle row          # T=1
 ```
 
 Default run = timing + check + algo + hardware, **no profiling**. `--with-profile`
@@ -87,7 +84,6 @@ failure.
 | `NS` | `sweep_config.N_GRID` | comma-list of N, e.g. `10000,1000000` |
 | `TRIALS` | `3` | trials per point (the report keeps the min) |
 | `DEATH_RATES` | `sweep_config.DEATH_RATES` (`0.01 0.1 0.25 0.5`) | space-list of accident rates q |
-| `THREADS` | `1 4 8` | space-list; **parallel algorithms only** (serial algorithms run T=1) |
 | `SKIP_DONE` | `1` | skip points already present at the current `source_hash` (resume) |
 | `REFRESH_HW` | `0` | rewrite `hardware.json` (re-measure `streaming_bw_gbs`) |
 | `VERBOSE` | `0` | `1` = per-step chatter instead of the live progress bar |
@@ -123,15 +119,15 @@ uv run python scripts/algo.py ML01.AF02.LP1-autovec.LP2-simple --force
 
 ## bench.py
 
-The timing atomic. Times ONE `(algo, q, threads)` column — every `(N × trial)`
+The timing atomic. Times ONE `(algo, q)` column — every `(N × trial)`
 point via the single-point binary, then one `--check` — appending rows into
 `<algo>.runs.jsonl`. Timing rows are `kind:"timing"`; the check row is
 `kind:"check"` (one file, kind-discriminated). Owns the N→iters/warmup schedule
-(from `sweep_config`). `collect.py` loops algos × q × threads and calls this.
+(from `sweep_config`). `collect.py` loops algos × q and calls this.
 
 ```sh
-uv run python scripts/bench.py ML01.AF02.LP1-autovec.LP2-simple --q 0.1 --threads 1
-uv run python scripts/bench.py ML01.AF02.LP1-autovec-par.LP2-simple --q 0.25 --threads 4 --trials 3 --skip-done
+uv run python scripts/bench.py ML01.AF02.LP1-autovec.LP2-simple --q 0.1
+uv run python scripts/bench.py ML01.AF02.LP1-blend.LP2-simple --q 0.25 --trials 3 --skip-done
 ```
 
 ## profile.py
@@ -233,8 +229,8 @@ were consolidated here; subset sweeps are a CLI concern: pass targets to
 ## The full sweep workflow
 
 ```sh
-# 1. Collect — algorithms × {0.01,0.1,0.25,0.5} × {10K,100K,1M,10M} × {1,4,8}
-#    (parallel only) → per-algo files under experiments/data/<machine_id>/:
+# 1. Collect — algorithms × {0.01,0.1,0.25,0.5} × {10K,100K,1M,10M} (T=1)
+#    → per-algo files under experiments/data/<machine_id>/:
 uv run python scripts/collect.py ML01
 #    resume without duplicating (default on): SKIP_DONE=1 is the default.
 

@@ -35,9 +35,8 @@ stores **no data** — every route fetches from `analysis/`:
 - Two persistent selectors at the top: **machine** (from
   `analysis/machines.json` — a slim discovery index: machine_id + cpu label;
   hardware facts live in each machine's `overview.json`, projected verbatim
-  from `data/<machine_id>/hardware.json`) and **thread group** {1, 4, 8}. Champions are
-  partitioned by thread group (a parallel algorithm's T=8 and a serial algorithm's T=1
-  never share a podium).
+  from `data/<machine_id>/hardware.json`). All current algorithms are T=1
+  (T>1 was removed 2026-08); the picker stays vestigial for its return.
 - **`#/`** — global top-3 per (regime × death_q) on the selected
   (machine, threads).
 - **`#/memory layout/<L>`** — one memory layout's champion grid + performance landscape +

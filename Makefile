@@ -73,8 +73,8 @@ check:
 
 # --- full sweep: bench + check + profile per unit. Builds first. ---
 # profile is Mac-gated (xctrace); on Linux it degrades gracefully (no profile
-# rows, timing+check still run). Narrow via env: NS, TRIALS, THREADS,
-# DEATH_RATES, PROFILE_NS, PROFILE_THREADS, PROFILE_DEATH_RATES, PROFILE=0.
+# rows, timing+check still run). Narrow via env: NS, TRIALS,
+# DEATH_RATES, PROFILE_NS, PROFILE_DEATH_RATES, PROFILE=0.
 collect: build
 	uv run python scripts/collect.py $(TARGET) --with-profile
 

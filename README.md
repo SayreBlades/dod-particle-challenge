@@ -190,11 +190,13 @@ then links it. For the full `dod-particles` bench-binary flag reference
 One loop powers the whole lab: **collect → report → (optional) profile**.
 
 - **Collect** — [`scripts/collect.py`](scripts/collect.py) orchestrates the atomic
-  measurement scripts across the **regime grid** (N × death-rate q × threads):
+  measurement scripts across the **regime grid** (N × death-rate q; T=1 — the
+  T>1 cells were removed 2026-08; the framework's threads axis survives for
+  their eventual return):
   `hardware` (machine facts), `algo` (the asm bundle), `bench` (timing + invariant
   check), `profile` (cycle attribution, where a profiler backend exists). Each
   writes per-algorithm files under `experiments/data/<machine_id>/`. Knobs:
-  `SKIP_DONE=1` (resume), `NS=`, `THREADS=`, `TRIALS=`.
+  `SKIP_DONE=1` (resume), `NS=`, `TRIALS=`.
 - **Report** — [`scripts/build_report.py`](scripts/build_report.py) is pure derivation:
   it reads `data/` (no toolchain — zig/otool/xctrace not needed) and builds the
   analysis tree under [`experiments/analysis/`](experiments/analysis/) (per-algorithm
