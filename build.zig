@@ -143,27 +143,20 @@ const algo_labels = [_]AlgoEntry{
     .{ .mem_layout = "ML01", .algo = "AF02.LP1-autovec.LP2-opt", .label = "ML01.AF02.LP1-autovec.LP2-opt (AF02: autovec branchy step + optimized r1 render)" },
     .{ .mem_layout = "ML01", .algo = "AF02.LP1-scalar.LP2-simple", .label = "ML01.AF02.LP1-scalar.LP2-simple (AF02: scalar-forced step + r0 render; de-vec control)" },
     .{ .mem_layout = "ML01", .algo = "AF02.LP1-unroll.LP2-simple", .label = "ML01.AF02.LP1-unroll.LP2-simple (AF02: unroll-by-4 branchy step + r0 render; isolates the unroll knob)" },
-    .{ .mem_layout = "ML01", .algo = "AF02.LP1-autovec-par.LP2-simple", .label = "ML01.AF02.LP1-autovec-par.LP2-simple (AF02: parallel branchy math+decide | serial respawn | r0 render)" },
     .{ .mem_layout = "ML01", .algo = "AF02.LP1-blend.LP2-simple", .label = "ML01.AF02.LP1-blend.LP2-simple (AF02: Zig branchless blend + r0 render; STATISTICAL)" },
-    .{ .mem_layout = "ML01", .algo = "AF02.LP1-blend-par.LP2-simple", .label = "ML01.AF02.LP1-blend-par.LP2-simple (AF02: parallel Zig blend + r0 render; STATISTICAL)" },
     .{ .mem_layout = "ML01", .algo = "AF02.LP1-halide.LP2-simple", .label = "ML01.AF02.LP1-halide.LP2-simple (AF02: Halide branchless blend + r0 render; STATISTICAL)" },
     .{ .mem_layout = "ML01", .algo = "AF02.LP1-halide.LP2-opt", .label = "ML01.AF02.LP1-halide.LP2-opt (AF02: Halide branchless blend + optimized r1 render; STATISTICAL)" },
-    .{ .mem_layout = "ML01", .algo = "AF02.LP1-halide-par.LP2-simple", .label = "ML01.AF02.LP1-halide-par.LP2-simple (AF02: parallel Halide blend + r0 render; STATISTICAL; PREDICTED DRAM CHAMPION)" },
     // --- AF03 (Integrate+Decide | Respawn+Render) ---
     .{ .mem_layout = "ML01", .algo = "AF03.LP1-autovec.LP2-fused", .label = "ML01.AF03.LP1-autovec.LP2-fused (AF03: math+decide→mask | fused scan+respawn+render; FRAMEBUFFER-ONLY)" },
     // --- AF04 (Integrate | Decide+Respawn+Render) ---
     .{ .mem_layout = "ML01", .algo = "AF04.LP1-autovec.LP2-fused", .label = "ML01.AF04.LP1-autovec.LP2-fused (AF04: math | fused decide+respawn+render; FRAMEBUFFER-ONLY)" },
     // --- AF05 (Integrate | Decide+Respawn | Render — the natural seam) ---
     .{ .mem_layout = "ML01", .algo = "AF05.LP1-autovec.LP2-simple", .label = "ML01.AF05.LP1-autovec.LP2-simple (AF05: math | decide+respawn | r0 render)" },
-    .{ .mem_layout = "ML01", .algo = "AF05.LP1-autovec-par.LP2-simple", .label = "ML01.AF05.LP1-autovec-par.LP2-simple (AF05: parallel math | decide+respawn | r0 render)" },
     .{ .mem_layout = "ML01", .algo = "AF05.LP1-halide.LP2-simple", .label = "ML01.AF05.LP1-halide.LP2-simple (AF05: Halide math | decide+respawn | r0 render)" },
-    .{ .mem_layout = "ML01", .algo = "AF05.LP1-halide-par.LP2-simple", .label = "ML01.AF05.LP1-halide-par.LP2-simple (AF05: parallel Halide math | decide+respawn | r0 render)" },
     // --- AF06 (Integrate+Decide | Respawn | Render — mask/list/partition impl choice) ---
     .{ .mem_layout = "ML01", .algo = "AF06.LP1-autovec.LP2-mask", .label = "ML01.AF06.LP1-autovec.LP2-mask (AF06: math+decide→mask | scan+respawn | r0 render)" },
-    .{ .mem_layout = "ML01", .algo = "AF06.LP1-autovec-par.LP2-mask-rmerge", .label = "ML01.AF06.LP1-autovec-par.LP2-mask-rmerge (AF06: parallel math+decide→mask | serial respawn | r0 render; DE-RISK)" },
     .{ .mem_layout = "ML01", .algo = "AF06.LP1-halide.LP2-mask", .label = "ML01.AF06.LP1-halide.LP2-mask (AF06: Halide math+decide→mask | scan+respawn | r0 render)" },
     .{ .mem_layout = "ML01", .algo = "AF06.LP1-autovec.LP2-list", .label = "ML01.AF06.LP1-autovec.LP2-list (AF06: math+decide→list | respawn-dead | r0 render)" },
-    .{ .mem_layout = "ML01", .algo = "AF06.LP1-autovec-par.LP2-list-rmerge", .label = "ML01.AF06.LP1-autovec-par.LP2-list-rmerge (AF06: parallel math+decide→list | ranked-merge respawn | r0 render)" },
     .{ .mem_layout = "ML01", .algo = "AF06.LP1-autovec.LP2-list-fused", .label = "ML01.AF06.LP1-autovec.LP2-list-fused (AF06: math+decide→list | fused respawn+render(dead) | render(live); FRAMEBUFFER-ONLY)" },
 };
 

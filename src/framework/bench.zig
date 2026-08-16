@@ -128,18 +128,14 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         return;
     }
 
-    // --- invariant suite (--check): early-out (requires q + threads) ---
+    // --- invariant suite (--check): early-out (requires q) ---
     if (check_mode) {
         const qv = q_opt orelse {
             printUsage(SimImpl);
             std.debug.print("\nerror: --check requires --q\n", .{});
             return error.MissingArgument;
         };
-        const threads = threads_opt orelse {
-            printUsage(SimImpl);
-            std.debug.print("\nerror: --check requires --threads\n", .{});
-            return error.MissingArgument;
-        };
+        const threads = threads_opt orelse 1;
         try applyDeath(qv);
         const death_q = config.q;
         std.debug.print("=== Invariant suite (--check, q={d:.2}) ===\n\n", .{death_q});
@@ -160,17 +156,13 @@ pub fn run(comptime SimImpl: type, init: std.process.Init) !void {
         return;
     }
 
-    // --- timing path: needs q + threads ---
+    // --- timing path: needs q (threads defaults to 1; T>1 returns later) ---
     const qv = q_opt orelse {
         printUsage(SimImpl);
         std.debug.print("\nerror: --q is required\n", .{});
         return error.MissingArgument;
     };
-    const threads = threads_opt orelse {
-        printUsage(SimImpl);
-        std.debug.print("\nerror: --threads is required\n", .{});
-        return error.MissingArgument;
-    };
+    const threads = threads_opt orelse 1;
     try applyDeath(qv);
     const death_q = config.q;
 
@@ -328,14 +320,14 @@ fn applyDeath(qv: f64) !void {
 
 fn printUsage(comptime SimImpl: type) void {
     const manifest = @import("manifest.zig");
-    std.debug.print("Usage: {s} <mode> --q <q> --threads <T> [timing args]\n\n", .{@import("options").name});
+    std.debug.print("Usage: {s} <mode> --q <q> [--threads <T>] [timing args]\n\n", .{@import("options").name});
     if (SimImpl.algo_meta) |cd|
         manifest.printAlgoHeader(@import("options").name, cd);
     std.debug.print(
         \\Measures ONE point — there is no default sweep; the caller owns the grid.
         \\
-        \\Required for timing: --n, --q, --threads, --iters, --trial.
-        \\Required for --check: --q, --threads. (--bandwidth: none.)
+        \\Required for timing: --n, --q, --iters, --trial.
+        \\Required for --check: --q. (--bandwidth: none.)
         \\
         \\Options:
         \\  -q, --death <q>     per-frame accident rate (0 = natural/golden)
@@ -343,7 +335,7 @@ fn printUsage(comptime SimImpl: type) void {
         \\      --iters <K>     timed frames (timing)
         \\      --trial <T>     trial index — labels the JSONL row (timing)
         \\      --warmup <K>    warmup frames (default 5; timing)
-        \\      --threads <T>   worker count
+        \\      --threads <T>   worker count (default 1; no T>1 algos currently)
         \\      --json          emit one JSONL timing row (prefix `json,`)
         \\      --check         invariant suite only (PASS/FAIL), then exit
         \\      --bandwidth     streaming-BW microbench, then exit

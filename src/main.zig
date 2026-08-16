@@ -16,27 +16,20 @@ const sim_map = std.StaticStringMap(type).initComptime(.{
     .{ "ML01.AF02.LP1-autovec.LP2-opt", @import("layouts/ML01/AF02.LP1-autovec.LP2-opt.zig").Sim },
     .{ "ML01.AF02.LP1-scalar.LP2-simple", @import("layouts/ML01/AF02.LP1-scalar.LP2-simple.zig").Sim },
     .{ "ML01.AF02.LP1-unroll.LP2-simple", @import("layouts/ML01/AF02.LP1-unroll.LP2-simple.zig").Sim },
-    .{ "ML01.AF02.LP1-autovec-par.LP2-simple", @import("layouts/ML01/AF02.LP1-autovec-par.LP2-simple.zig").Sim },
     .{ "ML01.AF02.LP1-blend.LP2-simple", @import("layouts/ML01/AF02.LP1-blend.LP2-simple.zig").Sim },
-    .{ "ML01.AF02.LP1-blend-par.LP2-simple", @import("layouts/ML01/AF02.LP1-blend-par.LP2-simple.zig").Sim },
     .{ "ML01.AF02.LP1-halide.LP2-simple", @import("layouts/ML01/AF02.LP1-halide.LP2-simple.zig").Sim },
     .{ "ML01.AF02.LP1-halide.LP2-opt", @import("layouts/ML01/AF02.LP1-halide.LP2-opt.zig").Sim },
-    .{ "ML01.AF02.LP1-halide-par.LP2-simple", @import("layouts/ML01/AF02.LP1-halide-par.LP2-simple.zig").Sim },
     // --- AF03 (Integrate+Decide | Respawn+Render) ---
     .{ "ML01.AF03.LP1-autovec.LP2-fused", @import("layouts/ML01/AF03.LP1-autovec.LP2-fused.zig").Sim },
     // --- AF04 (Integrate | Decide+Respawn+Render) ---
     .{ "ML01.AF04.LP1-autovec.LP2-fused", @import("layouts/ML01/AF04.LP1-autovec.LP2-fused.zig").Sim },
     // --- AF05 (Integrate | Decide+Respawn | Render) ---
     .{ "ML01.AF05.LP1-autovec.LP2-simple", @import("layouts/ML01/AF05.LP1-autovec.LP2-simple.zig").Sim },
-    .{ "ML01.AF05.LP1-autovec-par.LP2-simple", @import("layouts/ML01/AF05.LP1-autovec-par.LP2-simple.zig").Sim },
     .{ "ML01.AF05.LP1-halide.LP2-simple", @import("layouts/ML01/AF05.LP1-halide.LP2-simple.zig").Sim },
-    .{ "ML01.AF05.LP1-halide-par.LP2-simple", @import("layouts/ML01/AF05.LP1-halide-par.LP2-simple.zig").Sim },
     // --- AF06 (Integrate+Decide | Respawn | Render — mask/list variants) ---
     .{ "ML01.AF06.LP1-autovec.LP2-mask", @import("layouts/ML01/AF06.LP1-autovec.LP2-mask.zig").Sim },
-    .{ "ML01.AF06.LP1-autovec-par.LP2-mask-rmerge", @import("layouts/ML01/AF06.LP1-autovec-par.LP2-mask-rmerge.zig").Sim },
     .{ "ML01.AF06.LP1-halide.LP2-mask", @import("layouts/ML01/AF06.LP1-halide.LP2-mask.zig").Sim },
     .{ "ML01.AF06.LP1-autovec.LP2-list", @import("layouts/ML01/AF06.LP1-autovec.LP2-list.zig").Sim },
-    .{ "ML01.AF06.LP1-autovec-par.LP2-list-rmerge", @import("layouts/ML01/AF06.LP1-autovec-par.LP2-list-rmerge.zig").Sim },
     .{ "ML01.AF06.LP1-autovec.LP2-list-fused", @import("layouts/ML01/AF06.LP1-autovec.LP2-list-fused.zig").Sim },
 });
 
