@@ -4,7 +4,7 @@
 Owns ALL sweep policy + resume. Calls the atomic scripts:
   hardware_json → hardware.json                    (once)
   algo          → <algo>.json                      (when source changes)
-  bench         → <algo>.runs.jsonl                (timing + check, per q × threads)
+  bench         → <algo>.runs.jsonl                (timing + check, per q)
   profile       → <algo>.profile.jsonl             (cycle attribution, per N × q, T=1,
                                                    where a profiler backend exists)
 
@@ -24,7 +24,6 @@ Usage:
     scripts/collect.py ML01 --with-profile           # + cycle attribution
     scripts/collect.py ML01 --only profile           # just the profile loop
     NS=10000,1000000 TRIALS=5 scripts/collect.py ML01
-    THREADS="1 4 8" scripts/collect.py ML01
 """
 from __future__ import annotations
 import argparse, datetime, json, os, re, subprocess, sys, threading, time
@@ -68,16 +67,6 @@ def resolve(target):
             sys.exit(f"error: '{tok}' is not a memory layout or full algorithm name "
                      f"(expected ML<mem_layout>.<algo>, e.g. ML01.AF05.LP1-autovec.LP2-simple)")
     return out
-
-
-def is_parallel(algo):
-    """Parallel algorithms (algo carries -par / rmerge) sweep the thread set;
-    serial algorithms run T=1 only."""
-    return "-par" in algo or "rmerge" in algo
-
-
-def threads_for(algo, thread_set):
-    return thread_set if is_parallel(algo) else [1]
 
 
 def _fmt_dur(s):
@@ -136,8 +125,6 @@ def main():
     ap.add_argument("target", nargs="?", default="all",
                     help="memory layout (ML01), full algorithm, or all (default: all)")
     ap.add_argument("--trials", type=int, default=int(env("TRIALS", "3")))
-    ap.add_argument("--threads", default=env("THREADS", sweep_config.THREADS_DEFAULT),
-                    help="space-list of worker counts (parallel algorithms only)")
     ap.add_argument("--ns", default=env("NS", ""),
                     help="comma-list of N (default: sweep_config.N_GRID)")
     ap.add_argument("--skip-done", action=argparse.BooleanOptionalAction,
@@ -151,7 +138,6 @@ def main():
     ap.add_argument("--verbose", action="store_true", default=env("VERBOSE", "0") == "1",
                     help="per-step chatter instead of the progress bar (default: bar)")
     a = ap.parse_args()
-    a.threads = [int(t) for t in a.threads.split() if t.strip()]
     a.n_list = [int(x) for x in a.ns.split(",") if x.strip()] if a.ns else None
 
     algos = resolve(a.target)
@@ -172,8 +158,7 @@ def main():
     print(f"=== collect: target={a.target} run={run_id} ===", file=sys.stderr)
     print(f"  algos:   {' '.join(algos)}", file=sys.stderr)
     print(f"  machine: {machine_id} ({host})", file=sys.stderr)
-    print(f"  ns:      {a.n_list or sweep_config.N_GRID}  trials={a.trials}  "
-          f"threads={a.threads} (parallel only)", file=sys.stderr)
+    print(f"  ns:      {a.n_list or sweep_config.N_GRID}  trials={a.trials}  (T=1 only)", file=sys.stderr)
     print(f"  profile: {'--with-profile' if a.with_profile else ('--only profile' if a.only == 'profile' else 'off')}  "
           f"backends={profilers or 'none'}", file=sys.stderr)
     print(f"  skip_done={int(a.skip_done)}", file=sys.stderr)
@@ -194,9 +179,9 @@ def main():
     def _units(al):
         u = 0
         if do_bench:
-            u += len(rates) * len(threads_for(al, a.threads))
+            u += len(rates)
         if do_profile:
-            u += len(n_list) * len(rates) * len(threads_for(al, a.threads))
+            u += len(n_list) * len(rates)
         return u
 
     total = sum(_units(al) for al in algos)
@@ -229,28 +214,26 @@ def main():
                 continue
         if do_bench:
             for q in rates:
-                for T in threads_for(al, a.threads):
-                    try:
-                        rows = bench.bench_column(al, q, T, n_list=a.n_list, trials=a.trials,
-                                                  machine_id=machine_id, run_id=run_id,
-                                                  ts_utc=ts_utc, skip_done=a.skip_done,
-                                                  verbose=a.verbose)
-                        counts["columns" if rows else "skip"] += 1
-                    except SystemExit as e:
-                        print(f"\n    BENCH FAIL {al} q={q} T={T}: {e}", file=sys.stderr)
-                        counts["fail"] += 1
-                    bar.update(f"{tag} {al} q={q} T={T}")
+                try:
+                    rows = bench.bench_column(al, q, n_list=a.n_list, trials=a.trials,
+                                              machine_id=machine_id, run_id=run_id,
+                                              ts_utc=ts_utc, skip_done=a.skip_done,
+                                              verbose=a.verbose)
+                    counts["columns" if rows else "skip"] += 1
+                except SystemExit as e:
+                    print(f"\n    BENCH FAIL {al} q={q}: {e}", file=sys.stderr)
+                    counts["fail"] += 1
+                bar.update(f"{tag} {al} q={q}")
         if do_profile:
             for q in rates:
-                for T in threads_for(al, a.threads):
-                    for n in n_list:
-                        try:
-                            profile.profile_point(al, n, q, T, machine_id=machine_id,
-                                                  run_id=run_id, ts_utc=ts_utc,
-                                                  skip_done=a.skip_done, verbose=a.verbose)
-                        except (SystemExit, RuntimeError) as e:
-                            print(f"\n    PROFILE FAIL {al} N={n} q={q} T={T}: {e}", file=sys.stderr)
-                        bar.update(f"{tag} {al} N={n} q={q} T={T}")
+                for n in n_list:
+                    try:
+                        profile.profile_point(al, n, q, machine_id=machine_id,
+                                              run_id=run_id, ts_utc=ts_utc,
+                                              skip_done=a.skip_done, verbose=a.verbose)
+                    except (SystemExit, RuntimeError) as e:
+                        print(f"\n    PROFILE FAIL {al} N={n} q={q}: {e}", file=sys.stderr)
+                    bar.update(f"{tag} {al} N={n} q={q}")
     bar.finish()
     print(f"=== done: {counts}", file=sys.stderr)
     print("  report: scripts/build_report.py  (then serve experiments/)", file=sys.stderr)

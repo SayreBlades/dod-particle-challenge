@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """bench.py — the timing atomic.
 
-Times ONE (algo, q, threads) column: every (N × trial) point via the single-point
+Times ONE (algo, q) column: every (N × trial) point via the single-point
 bench binary, then one --check, appending rows into
 experiments/data/<machine_id>/<algo>.runs.jsonl. Owns the N→iters/warmup
 schedule (moved out of the bench binary — sweep_config). collect.py loops
-algos × q × threads and calls bench_column().
+algos × q and calls bench_column().
 
 Each timing row is kind:"timing"; the check row is kind:"check" — one file,
 kind-discriminated (no separate checks file). Rows are append-only; --skip-done
 skips a point already present at the current source_hash (resume without dupes).
 
 Usage:
-    scripts/bench.py ML01.AF02.LP1-autovec.LP2-simple --q 0.1 --threads 1
-    scripts/bench.py ML01.AF02.LP1-autovec-par.LP2-simple --q 0.25 --threads 4 --trials 3 --skip-done
+    scripts/bench.py ML01.AF02.LP1-autovec.LP2-simple --q 0.1
+    scripts/bench.py ML01.AF02.LP1-blend.LP2-simple --q 0.25 --trials 3 --skip-done
 """
 from __future__ import annotations
 import argparse, datetime, json, os, platform, subprocess, sys
@@ -145,9 +145,9 @@ def append_rows(path, rows):
             f.write(json.dumps(row) + "\n")
 
 
-def bench_column(algo, q, threads, n_list=None, trials=None, machine_id=None,
+def bench_column(algo, q, threads=1, n_list=None, trials=None, machine_id=None,
                  run_id=None, ts_utc=None, skip_done=False, verbose=True):
-    """Time one (algo, q, threads) column: all (N × trial) timing rows + one
+    """Time one (algo, q, threads=1) column: all (N × trial) timing rows + one
     check row, appended to <algo>.runs.jsonl. Returns the rows written."""
     machine_id = machine_id_arg(machine_id)
     host = host_of(machine_id)
@@ -192,7 +192,7 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("algo")
     ap.add_argument("--q", type=float, required=True, help="death rate (required)")
-    ap.add_argument("--threads", type=int, required=True, help="worker count (required)")
+    ap.add_argument("--threads", type=int, default=1, help="worker count (default 1; no T>1 algos currently)")
     ap.add_argument("--ns", default=None, help="comma-list of N (default: N_GRID)")
     ap.add_argument("--trials", type=int, default=3)
     ap.add_argument("--machine-id", default=None)

@@ -131,7 +131,7 @@ def main():
     ap.add_argument("algo")
     ap.add_argument("--n", type=int, required=True)
     ap.add_argument("--q", type=float, required=True)
-    ap.add_argument("--threads", type=int, required=True)
+    ap.add_argument("--threads", type=int, default=1, help="worker count (default 1; no T>1 algos currently)")
     ap.add_argument("--trial", type=int, default=1)
     ap.add_argument("--iters", type=int, default=None)
     ap.add_argument("--machine-id", default=None)

@@ -4,7 +4,7 @@
 The N/q/T axes + per-N iters/warmup schedules live here as constants, and the
 algorithm roster is parsed from build.zig's `algo_labels` registry (what can
 build = what gets swept). collect.py, bench.py and analyze_algo.py all import
-this. Env-overridable where it matters (NS, TRIALS, THREADS, DEATH_RATES).
+this. Env-overridable where it matters (NS, TRIALS, DEATH_RATES).
 
 (The legacy experiments/sweeps/ config files were retired: `death_rates.txt`
 and the per-layout `<ML>.algos` rosters duplicated this module / build.zig.
@@ -31,12 +31,6 @@ ITERS_DEFAULT = 50
 # Warmup frames per N (prime caches/predictors/DVFS before the timed region).
 WARMUP = {10000: 20, 100000: 10, 1000000: 3, 10000000: 2}
 WARMUP_DEFAULT = 5
-
-# Thread set — shared by bench AND profile. Parallel algorithms sweep it; serial
-# algorithms run T=1 only. {1,4,8} = baseline / mid / saturation (T=2 dropped:
-# 1→2 is near-linear/predictable, and the radar stays fully populated at every T
-# only if bench and profile share one set).
-THREADS_DEFAULT = "1 4 8"
 
 # The death-rate (q) axis. Drops 0.05 from the legacy set — the best-interpolated
 # value (linear interp 0.01↔0.10 is within ≤0.5pp on branch_flush); keeps both
