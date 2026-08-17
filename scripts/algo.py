@@ -391,7 +391,16 @@ def inline_chains(algo, shash, addrs):
     for frames in chains:
         cs = next((ln for f, ln in frames if os.path.basename(f) == algo_base and ln > 0), None)
         call_site.append(cs)
-    return {"files": files, "chains": compact, "call_site": call_site}
+    # which chain files are repo sources (the algo's import closure) vs zig std /
+    # runtime — the SPA tints repo inlines differently and black-boxes std.
+    repo_files = []
+    try:
+        import algo_hash
+        repo_files = sorted({os.path.basename(p) for p in algo_hash.walk_closure(algo_hash.algo_file_path(algo))})
+    except Exception:
+        pass
+    return {"files": files, "chains": compact, "call_site": call_site,
+            "repo_files": repo_files}
 
 
 # ---- loop digest (deterministic; every number labeled ≈ in the UI) ----------

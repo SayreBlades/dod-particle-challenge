@@ -19,7 +19,7 @@ const AX = { axisLine: { lineStyle: { color: "#666" } }, axisLabel: { color: "#a
 
 let MACHINES, machine, threads = 1;
 const ovCache = {}, layCache = {}, algoCache = {};
-const REPORT_V = "v2";   // cache-bust key for SPA fetches — bump when bundle schemas change
+const REPORT_V = "v4";   // cache-bust key for SPA fetches — bump when bundle schemas change
 const fetchJSON = (u) => fetch(`${u}?${REPORT_V}`).then((r) => r.ok ? r.json() : null);
 const fetchText = (u) => fetch(`${u}?${REPORT_V}`).then((r) => r.ok ? r.text() : "");
 
