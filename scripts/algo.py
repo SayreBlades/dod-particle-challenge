@@ -114,13 +114,18 @@ def classify_insn(mnem: str, ops: str, arch: str) -> str:
 
 
 def is_vector_insn(mnem: str, ops: str, arch: str) -> bool:
-    """SIMD-width check, per arch (drives `vector_insns` + the digest)."""
+    """SIMD-width check, per arch (drives `vector_insns` + the digest).
+    x86: packed ops end in ps/pd; scalar FP (*ss/*sd) uses xmm too and is NOT
+    vector — the register name alone can't decide (a scalar vmulss is xmm)."""
     if arch == "arm64":
         return "." in mnem and bool(re.match(r"(2|3|4|8|16)[sdh]", mnem.split(".", 1)[1]))
     m = mnem.lower()
     if m.endswith(("ps", "pd")):
         return True
-    return bool(re.search(r"\b[xy]mm\d", ops, re.I))
+    # packed mem moves carry no ps/pd suffix — width via the vector register
+    if re.fullmatch(r"v?(movups|movaps|movdqa|movdqu|movhps|movlps|pmovmskb|pmovzxbw|pmovsxbw)", m):
+        return bool(re.search(r"\b[xyz]mm\d", ops, re.I))
+    return False
 
 
 def branch_target(mnem: str, ops: str, arch: str):
@@ -300,17 +305,24 @@ def _parse_atos(out: str):
     return chains
 
 
-def _parse_symbolizer(out: str, n: int):
-    """llvm-symbolizer output (blank-line-separated per address, alternating
-    function / file:line lines, innermost first) → n chains."""
+def _parse_symbolizer_json(out: str, n: int):
+    """llvm-symbolizer --output-style=JSON: one JSON object per line per input
+    address, `Symbol` = inline stack (innermost first). Unambiguous in batch
+    mode (the GNU style has NO separator between addresses on some LLVMs)."""
     chains = []
-    for block in out.split("\n\n"):
+    for line in out.splitlines():
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            obj = json.loads(line)
+        except ValueError:
+            continue
         frames = []
-        lines = [l for l in block.strip().splitlines() if l.strip()]
-        for i in range(0, len(lines) - 1, 2):
-            m = re.match(r"^(.+?):(\d+)", lines[i + 1].strip())
-            if m and not lines[i + 1].startswith("??"):
-                frames.append((m.group(1), int(m.group(2))))
+        for fr in obj.get("Symbol") or []:
+            f, ln = fr.get("File"), fr.get("Line") or 0
+            if f and ln and not str(f).startswith("??"):
+                frames.append((f, int(ln)))
         chains.append(frames)
     chains = (chains + [[]] * n)[:n]
     return chains
@@ -351,17 +363,19 @@ def inline_chains(algo, shash, addrs):
     hexaddrs = [f"0x{a:x}" for a in addrs]
     if IS_LINUX:
         chains = None
-        # llvm-symbolizer: blank-line-separated inline stacks, one batch call.
+        # llvm-symbolizer JSON style: one object per address — the only batch
+        # mode whose framing is unambiguous across LLVM versions.
         try:
             r = subprocess.run(["llvm-symbolizer", "--obj", binp, "-f", "--inlines",
-                                "--output-style=GNU"],
+                                "--output-style=JSON"],
                                input="\n".join(hexaddrs) + "\n",
                                capture_output=True, text=True, timeout=180)
         except (OSError, subprocess.TimeoutExpired):
             r = None
         if r is not None and r.returncode == 0 and r.stdout.strip():
-            chains = _parse_symbolizer(r.stdout, len(addrs))
-        if chains is None:
+            chains = _parse_symbolizer_json(r.stdout, len(addrs))
+        # sanity: most instructions should resolve; else fall back per-address
+        if chains is None or sum(1 for c in chains if c) < max(1, len(addrs) // 4):
             chains = _addr2line_per_addr(binp, hexaddrs)
         if chains is None:
             return None
@@ -531,8 +545,9 @@ def detect_loops(insns, attr, arch):
         adds = Counter()
         for i in span:
             m, o = insns[i]["m"], insns[i]["o"]
+            # arm64: `add xN, xN, #imm` · x86 intel: two-operand `add rN, imm`
             mm = (re.match(r"^add\s+(\w+),\s*\1,\s*#(0x[0-9a-f]+|\d+)$", f"{m}\t{o}") if arch == "arm64"
-                  else re.match(r"^add\s+(\w+),\1,(0x[0-9a-f]+|\d+)$", f"{m}\t{o}"))
+                  else re.match(r"^add\s+(\w+),(0x[0-9a-f]+|\d+)$", f"{m}\t{o}"))
             if mm and mm.group(1) in bases:
                 v = int(mm.group(2), 0)
                 if v >= 8:
