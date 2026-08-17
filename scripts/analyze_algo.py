@@ -21,16 +21,21 @@ Usage:
 LLM key: read from env ZAI_API_KEY, else file .scratch/zai_api_key (gitignored).
 """
 from __future__ import annotations
-import json, os, re, subprocess, sys
+import glob, json, os, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sweep_config
+import layout_facts
 
 DATA = os.path.join(ROOT, "experiments", "data")
 ASM_CACHE = os.path.join(ROOT, ".scratch", "asm_cache")
 DEFAULT_MODEL = "glm-5.2"
 ADDR = re.compile(r"^[0-9a-f]{16}$")
+
+# The canonical naive reference every algorithm's story is told against
+# (report-v2.md §0.5): AF02, loop1 scalar (de-vectorized), loop2 simple splat.
+BASELINE = "ML01.AF02.LP1-scalar.LP2-simple"
 
 # Death-rate points EXCLUDED from per-algo bundles (legacy sweep values not in
 # sweep_config.DEATH_RATES). Raw data retains them. Keep in sync with
@@ -118,10 +123,124 @@ def series(runs, bpp):
     return grouped
 
 
+# ---- references: the naive baseline + the per-(q,N,T) winner (report-v2 §3) ----
+_WINNERS: dict[str, dict] = {}
+
+
+def grid_minima(m):
+    """{(q, N, threads): (min ns_particle, algo)} across ALL algos on machine m,
+    latest source_hash per algo, EXCLUDE filters applied — the winner map."""
+    if m in _WINNERS:
+        return _WINNERS[m]
+    latest: dict[str, str] = {}
+    for p in sorted(glob.glob(os.path.join(DATA, m, "*.runs.jsonl"))):
+        algo = os.path.basename(p)[: -len(".runs.jsonl")]
+        for line in open(p):
+            try:
+                r = json.loads(line)
+            except Exception:
+                continue
+            if r.get("kind") != "timing" or not r.get("source_hash"):
+                continue
+            if algo in latest and (r.get("ts_utc") or "") <= latest[algo][0]:
+                continue
+            latest[algo] = (r.get("ts_utc") or "", r["source_hash"])
+    best: dict[tuple, tuple] = {}
+    for p in sorted(glob.glob(os.path.join(DATA, m, "*.runs.jsonl"))):
+        algo = os.path.basename(p)[: -len(".runs.jsonl")]
+        shash = latest.get(algo, (None, None))[1]
+        for line in open(p):
+            try:
+                r = json.loads(line)
+            except Exception:
+                continue
+            if (r.get("kind") != "timing" or r.get("algo") != algo
+                    or r.get("source_hash") != shash
+                    or r.get("death_q") in EXCLUDE_DEATH_Q or r.get("N") in EXCLUDE_N):
+                continue
+            key = (r["death_q"], r["N"], r["threads"])
+            if key not in best or r["ns_particle"] < best[key][0]:
+                best[key] = (r["ns_particle"], algo)
+    _WINNERS[m] = best
+    return best
+
+
+def baseline_minima(m):
+    """{(q, N, threads): min ns_particle} for the naive baseline algo."""
+    p = os.path.join(DATA, m, f"{BASELINE}.runs.jsonl")
+    out = {}
+    if not os.path.exists(p):
+        return out
+    shash = source_hash(BASELINE)
+    for line in open(p):
+        try:
+            r = json.loads(line)
+        except Exception:
+            continue
+        if (r.get("kind") != "timing" or r.get("source_hash") != shash
+                or r.get("death_q") in EXCLUDE_DEATH_Q or r.get("N") in EXCLUDE_N):
+            continue
+        key = (r["death_q"], r["N"], r["threads"])
+        if key not in out or r["ns_particle"] < out[key]:
+            out[key] = r["ns_particle"]
+    return out
+
+
+def regimes(cache_transitions):
+    """Band label per N given the spill transitions (report-v2 §3.1)."""
+    def label(n):
+        cur = "DRAM"
+        for name, cut in cache_transitions:
+            if n < cut:
+                return f"{name}-resident"
+        return cur
+    return label
+
+
+def asm_digest(asm):
+    """Compact deterministic digest of the loop structure for the prompt."""
+    if not asm or asm.get("schema") != 2:
+        return None
+    parts = []
+    for L in asm.get("loops") or []:
+        ln = f"L{L['lines'][0]}-L{L['lines'][1]}" if L.get("lines") else "?"
+        s = (f"loop {L['loop']} @{ln}: ~{L['insns']} insns/iter, "
+             f"cond-branches {L['cond_branches']}")
+        if L.get("stride_bytes"):
+            s += f", stride {L['stride_bytes']}B"
+        if L.get("notes"):
+            s += "; " + "; ".join(L["notes"])
+        parts.append(s)
+    for c in asm.get("calls") or []:
+        if not c.get("std"):
+            parts.append(f"call-delegated loop @L{c.get('line')}: {c['sym']} (external/AOT)")
+    vec = asm.get("vector_insns", 0)
+    tot = max(1, asm.get("n_instructions", 1))
+    parts.append(f"vector-insns {vec}/{tot} across the whole step")
+    return "\n  ".join(parts)
+
+
 def build_evidence(algo, m, hw, runs, prof, asm):
     bpp = runs[0]["bytes_per_particle"]
     decl = {k: runs[0][k] for k in
             ("algo_fam", "ordering", "intermediates", "golden_class", "halide_expressible")}
+    ct = cache_transitions(bpp, hw)
+    ser = series(runs, bpp)
+    # references: baseline + winner per (q,N,T), ratios folded into each row
+    winners = grid_minima(m)
+    baseline = baseline_minima(m)
+    for q, rows in ser.items():
+        for r in rows:
+            key = (float(q), r["N"], r["threads"])
+            bns = baseline.get(key)
+            wns, walgo = winners.get(key, (None, None))
+            r["baseline_ns"] = round(bns, 3) if bns is not None else None
+            r["ratio_baseline"] = round(r["ns_particle"] / bns, 3) if bns else None
+            r["winner"] = walgo.split(".", 1)[1] if walgo else None
+            r["winner_ns"] = round(wns, 3) if wns is not None else None
+            r["ratio_winner"] = round(r["ns_particle"] / wns, 3) if wns else None
+    regime_of = regimes(ct)
+    all_ns = sorted({r["N"] for rows in ser.values() for r in rows})
     return {
         "algo": algo, "machine_id": m,
         "source_hash": asm["source_hash"], "git_sha": runs[0].get("git_sha"),
@@ -130,13 +249,22 @@ def build_evidence(algo, m, hw, runs, prof, asm):
         "hardware": {k: hw[k] for k in
                      ("cpu", "l1dcachesize", "l2cachesize", "l3cachesize",
                       "cachelinesize", "streaming_bw_gbs", "logicalcpu")},
-        "cache_transitions": cache_transitions(bpp, hw),
-        "series": series(runs, bpp),
+        "cache_transitions": ct,
+        "regimes": {str(n): regime_of(n) for n in all_ns},
+        "memory_floor_ns": round(bpp / hw["streaming_bw_gbs"], 3),
+        "layout_facts": {
+            "struct": layout_facts.LAYOUTS.get(runs[0]["mem_layout"], {}).get("struct"),
+            "loops": layout_facts.loop_hot_bytes(runs[0]["mem_layout"], decl["algo_fam"]),
+            "intermediate_bpp": layout_facts.INTERMEDIATE_BPP.get(decl["intermediates"], 0),
+        },
+        "baseline": BASELINE,
+        "series": ser,
         "profile": [{k: p.get(k) for k in ("N", "death_q", "threads", "trial", "profiler",
                  "cycles", "compute_pct", "backend_stall_pct",
                  "frontend_stall_pct", "branch_flush_pct")}
                 for p in prof],
         "asm": asm,
+        "asm_digest": asm_digest(asm),
     }
 
 
@@ -145,60 +273,78 @@ def build_evidence(algo, m, hw, runs, prof, asm):
 SYSTEM = """You are a performance engineer writing the analysis for ONE algo of a \
 particle-simulation benchmark, measured on ONE machine. You are given a structured \
 evidence bundle: the algo's declaration, its hypothesis, the measured ns/particle \
-and achieved bandwidth across N and death-rate, the machine's cache hierarchy and \
-streaming-bandwidth ceiling, cycle attribution (compute/backend/frontend/branch buckets), and the disassembly of the \
-algo's `step` function with an instruction histogram.
+and achieved bandwidth across N and death-rate WITH per-point references (the naive \
+baseline and the best-in-grid winner at that point), the machine's cache hierarchy \
+and streaming-bandwidth ceiling, the per-N cache regime labels, the memory floor \
+(ns/particle at the streaming ceiling), per-loop hot-byte facts about the memory \
+layout, cycle attribution (compute/backend/frontend/branch buckets), and the \
+disassembly of the algo's `step` function with an instruction histogram and a \
+loop digest.
 
-The narrative's JOB is to evaluate the algo's hypothesis against the measurements. \
-Do NOT restate the declaration (algo_fam / ordering / intermediates / golden / \
-loop-axes) — the reader already has it. Write markdown with EXACTLY these five \
-sections, in order, each one a tight paragraph:
+The narrative's JOB is to explain WHY the algo performed the way it did on this \
+hardware, anchored to the references — better/worse than naive and than the \
+winner, at each N×q point, in terms of mechanisms (vectorization, branchiness, \
+hot/cold byte fractions, cache spillover, the memory floor). Do NOT restate the declaration (algo_fam / ordering / intermediates / golden / loop-axes) — the \
+reader already has it. Write markdown with EXACTLY these six sections, in order, \
+each one a tight paragraph:
 
 ## Intent
 ONE sentence: the hypothesis this algo exists to test. Start with "Hypothesis:". \
 Nothing else. Example: "Hypothesis: compiler auto-vectorization over per-particle \
 components can approach the streaming ceiling on death-free workloads."
 
+## Layout & approach
+What this memory layout OFFERS the algorithm (bytes/particle, which fraction of \
+them this algo's loops actually touch — the hot-byte facts — useful vs dead \
+bandwidth) and what the APPROACH does about it (intermediate storage or its \
+absence — verdict kept hot in registers; branchy vs blend; fusion structure), \
+plus the expected interaction with the cache hierarchy (where the working set \
+spills, what that means for this loop structure). This frames everything below. \
+Cite the hot-byte numbers and the intermediate bytes from LAYOUT FACTS.
+
 ## Cache saturation
-Read the ns/particle-vs-N curve across death rates. The bundle gives the L1d and \
-L2 spill points as N values — locate them on the curve and state whether cost \
-RISES, FALLS, or stays FLAT at each spill. Explain the SHAPE in those terms: \
-overhead amortization at small N? a knee at the L2→DRAM spill? death-rate raising \
-the floor without changing the N-shape? Cite the specific N values and ns/p \
-numbers. If the hypothesis concerns cache behavior, address it here.
+The ns/particle-vs-N shape, told by REGIME (each measured N carries its band \
+label — L1d-resident, L2-resident, DRAM): where does cost rise at a spill, \
+where is it flat, and WHY (hot fraction, prefetch friendliness, overhead \
+amortization). Locate the knee relative to the transitions and say whether the \
+dense grid resolves it. Do NOT walk cell by cell — speak in regimes and the \
+steepest changes. Address the hypothesis here if it concerns cache behavior.
 
 ## Bandwidth
-Peak achieved GB/s, what % of the streaming ceiling, at which N and death rate. \
-State the verdict — bandwidth-bound, compute-bound, or overhead-bound — and WHERE \
-it transitions (by N or by death rate). If the hypothesis predicts approaching the \
-streaming ceiling, say how close it got and at which regime; if it falls away, say \
-when and why (e.g. branchy-respawn cost rising with churn). Cite the numbers.
+Achieved GB/s relative to the ceiling AND to the memory floor (ns/p at \
+ceiling): the floor frames how much of the algo's time is irreducible memory \
+time. Then the verdict — bandwidth-bound, compute-bound, branch-bound, or \
+overhead-bound — and WHERE it transitions (by regime or by death rate). Ratios \
+vs the baseline and the winner at the extremes and at the transition anchor \
+the story: "2.3x naive at q=0.01 but only 1.1x at q=0.5 — the branchy respawn \
+is the equalizer." Cite the numbers.
 
 ## Assembly
-Did the compiler vectorize? Across the components of one particle, or across \
-particles? Is there a gather (an indexed NEON load like `ld1.s {vN}[i]`)? Cite \
-specific instructions (e.g. `ldr q`, `fmul.4s`, `ext.16b`, `uqadd.8b`) and connect \
-the codegen to the cache/bandwidth findings — e.g. "component-wise vec on stride-17 \
-explains the high bandwidth; the scatter's byte stores cap it at 46% of ceiling."
+What the codegen actually did, from the loop digest + histogram + excerpt: \
+vectorized or not (and across what), gather present or not, branchy respawn \
+or select-based, byte-granular scatter, stride. Connect codegen to the \
+bandwidth/cache findings — e.g. "component-wise vec on stride-68 explains the \
+high achieved bandwidth; the scatter's byte stores cap it at 46% of ceiling." \
+Cite specific instructions (e.g. `ldr q`, `fmul.4s`, `ext.16b`, `strb`).
 
 ## Verdict
-Explicitly: did the hypothesis hold? Cite the two or three numbers that decide it. \
-Example forms:
-  - "Holds — at q=0 the algo sustains 22.7 GB/s = 90% of ceiling with no \
-cache-spill knee, confirming autovec approaches the streaming ceiling on \
-death-free workloads."
-  - "Partially — bandwidth-bound and near-ceiling at q≤0.05, but the branchy \
-respawn collapses it to 35% of ceiling by q=0.25, so the hypothesis only holds \
-in the low-churn regime."
-  - "Refuted — achieved never exceeds 46% of ceiling because the fused scatter's \
-byte-granular writes cannot stream, regardless of death rate."
+Explicitly: did the hypothesis hold? Cite the two or three ratios that decide \
+it (vs baseline and vs winner, at the deciding N×q points) plus the mechanism \
+that explains them. Example forms:
+  - "Holds — 0.9x of the winner and 3.1x faster than naive at q=0.01, \
+sustaining 90% of ceiling with no cache-spill knee."
+  - "Partially — beats naive everywhere (1.4-1.8x) but never beats the winner \
+at q>=0.25: branch_flush rises to 36% and the select chain cannot stream."
+  - "Refuted — 1.0-1.1x of naive at every point: the fused scatter's byte-granular \
+writes cannot stream regardless of death rate."
 One tight paragraph.
 
 HARD RULES:
 - Cite ONLY numbers and instructions present in the evidence. Never invent.
+- Use the ratio/baseline/winner values given per point; do not recompute.
 - If the evidence is silent on something, say so explicitly.
-- No marketing voice, no "in conclusion". ~300–350 words total.
-- Output ONLY the five ## sections. No preamble, no code fence."""
+- No marketing voice, no "in conclusion". ~350-420 words total.
+- Output ONLY the six ## sections. No preamble, no code fence."""
 
 
 def evidence_to_prompt(e):
@@ -218,13 +364,31 @@ def evidence_to_prompt(e):
         f"  halide_expressible: {e['algo_meta']['halide_expressible']}",
         f"CACHE TRANSITIONS (working set = {e['bytes_per_particle']}·N):",
         "  " + "  ".join(f"{n} spill at N≈{v}" for n, v in ct) or "  (none)",
-        "SERIES (min ns/particle across trials; achieved_bw = bytes/p·N / ns_frame):",
+        f"MEMORY FLOOR: {e['memory_floor_ns']} ns/particle = bytes_per_particle / streaming_bw_gbs "
+        f"— no {e['bytes_per_particle']} B/p algo can beat this on this machine.",
+        f"REGIMES (band label per measured N):",
     ]
+    lines += [f"  N={n} → {r}" for n, r in e["regimes"].items()]
+    lf = e["layout_facts"]
+    if lf.get("loops"):
+        lines += ["LAYOUT FACTS:", f"  struct: {lf['struct']} ({e['bytes_per_particle']} B/particle)"]
+        for i, L in enumerate(lf["loops"], 1):
+            lines.append(f"  loop {i} ({'+'.join(s.capitalize() for s in L['stages'])}): "
+                         f"touches {'+'.join(L['fields'])} = {L['hot_bytes']} of {L['stride_bytes']} B/p "
+                         f"({int(L['hot_frac']*100)}% hot — the rest is dead weight dragged through the line filler)")
+        if lf.get("intermediate_bpp"):
+            lines.append(f"  intermediate storage adds {lf['intermediate_bpp']} B/particle")
+        else:
+            lines.append("  no intermediate storage — the death verdict stays in registers")
+    lines.append(f"SERIES (min ns/particle across trials; achieved_bw = bytes/p·N / ns_frame;")
+    lines.append(f"  ratios vs BASELINE={e.get('baseline')} (naive scalar) and vs WINNER (best algo on this machine at that point)):")
     for q, rows in e["series"].items():
         lines.append(f"  death_q={q}:")
         for r in rows:
             bw = f"{r['achieved_bw_gbs']} GB/s" if r["achieved_bw_gbs"] is not None else "?"
-            lines.append(f"    N={r['N']:<9} ns/p={r['ns_particle']:<7} achieved={bw}")
+            rb = f"{r['ratio_baseline']}x baseline" if r.get("ratio_baseline") else "?"
+            rw = f"{r['ratio_winner']}x winner ({r['winner']})" if r.get("ratio_winner") else "?"
+            lines.append(f"    N={r['N']:<9} ns/p={r['ns_particle']:<7} achieved={bw:<12} {rb:<22} {rw}")
     if e["profile"]:
         for p in e["profile"]:
             lines.append(
@@ -235,9 +399,12 @@ def evidence_to_prompt(e):
     else:
         lines.append("PROFILE: (none)")
     a = e["asm"]
-    lines.append(f"DISASSEMBLY of `step` ({a['n_instructions']} insns), histogram:")
+    lines.append(f"DISASSEMBLY of `step` ({a['n_instructions']} insns, arch {a.get('arch', '?')}), histogram:")
     lines.append("  " + "  ".join(f"{k}={v}" for k, v in a["histogram"].items()))
     lines.append(f"  vector-suffixed instructions: {a['vector_insns']}")
+    if e.get("asm_digest"):
+        lines.append("LOOP DIGEST (deterministic, ≈):")
+        lines.append("  " + e["asm_digest"])
     lines.append("EXCERPT (full step body):")
     lines.append(a["excerpt"])
     return "\n".join(lines)
@@ -361,10 +528,10 @@ def process_algo(algo, m, hw, model, json_only, prompt_only, force=False):
 
 # ---- --verify: integrity check (narrative cites only bundle evidence) ----
 
-SECTIONS = ["## Intent", "## Cache saturation", "## Bandwidth", "## Assembly", "## Verdict"]
+SECTIONS = ["## Intent", "## Layout & approach", "## Cache saturation", "## Bandwidth", "## Assembly", "## Verdict"]
 
-# AArch64 mnemonic allowlist. A backticked token is only treated as a cited
-# instruction if its base is in here — so `spawn` (a function symbol) or
+# AArch64 + x86-64 mnemonic allowlist. A backticked token is only treated as a
+# cited instruction if its base is in here — so `spawn` (a function symbol) or
 # English words aren't mistaken for instructions. Keep loose; missing one just
 # means a citation isn't checked, never a false flag.
 MNEMONICS = frozenset("""
@@ -380,6 +547,13 @@ sbfx ubfx bfi bfxil sxth sxtw uxth uxtw sxtb uxtb adrp adr
 b bl br ret cbz cbnz tbz tbnz
 csel cset cinc csinc ccmp ccmn
 rev clz cls rbit mov movz movk
+movzx movsx lea nop call jmp endbr64 vmovss vmovsd vmovups vmovaps vmovdqa vmovdqu vmovd vmovq
+vmulss vmulps vmulsd vmulpd vaddss vaddps vaddsd vaddpd vsubss vsubps vsubsd vsubpd
+vdivss vdivps vdivsd vdivpd vminss vminps vmaxss vmaxps vsqrtss vsqrtps
+vfmadd231ps vfmadd231ss vfmadd213ps vfmadd132ps vfmadd231sd vfmadd231pd vfmsub231ps
+vucomiss ucomiss comiss vbroadcastss vbroadcastps vpshufd vpshufb vpunpckldq vpunpckhdq
+vinsertf128 vextractf128 vpermilps vpxor vpor vpand vcvtsi2ss vcvtsi2sd vcvtss2si vcvttss2si
+vroundps vroundss cmovae cmovbe cmovne cmove cmovg cmovl cmovge cmovle sete setne
 """.split())
 
 # Preceding-context words that mean the narrative cites an instruction's
@@ -426,6 +600,26 @@ def attested_numbers(e):
                 add(r["achieved_bw_gbs"] / ceil * 100)   # % of ceiling
             add(r["N"] * bpp / 1e6)          # footprint MB
             add(r["N"] * bpp / 1024)         # footprint KB
+            for k in ("baseline_ns", "winner_ns", "ratio_baseline", "ratio_winner"):
+                add(r.get(k))
+            if r.get("ratio_baseline"):
+                add(1 / r["ratio_baseline"])   # "baseline is Nx slower" phrasing
+                add(100 * (1 - 1 / r["ratio_baseline"]))  # %-faster-than-baseline
+    add(e.get("memory_floor_ns"))
+    lf = e.get("layout_facts") or {}
+    for L in (lf.get("loops") or []):
+        add(L["hot_bytes"])
+        add(L["hot_frac"])
+        add(int(L["hot_frac"] * 100))
+        add(L["stride_bytes"])
+    add(lf.get("intermediate_bpp"))
+    a2 = e["asm"]
+    for L in (a2.get("loops") or []):
+        add(L["insns"])
+        add(L["cond_branches"])
+        add(L["vector_fp"])
+        add(L["scalar_fp"])
+        add(L.get("stride_bytes"))
     for p in e["profile"]:
         for k in ("cycles", "compute_pct", "backend_stall_pct",
                  "frontend_stall_pct", "branch_flush_pct"):
