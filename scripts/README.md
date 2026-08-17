@@ -25,7 +25,8 @@ measurements written by a few **atomic** scripts. `experiments/analysis/` is
 | [`build_report.py`](#build_reportpy) | `data/` → the `experiments/analysis/` tree + the `--verify` gate |
 | [`analyze_algo.py`](#analyze_algopy) | per-algorithm: evidence `<algo>.json` + LLM narrative `<algo>.md` (reads asm from `data/`) |
 | [`algo_hash.py`](#algo_hashpy) | an algorithm's `@import`-closure SHA-256 → `source_hash` |
-| [`sweep_config.py`](#sweep_configpy) | the regime grid (N list, iters/warmup schedule, death rates) — single source |
+| [`sweep_config.py`](#sweep_configpy) | the regime grid (machine-aware N list, iters/warmup schedule, death rates) — single source |
+| [`layout_facts.py`](#layout_factspy) | static per-layout facts: field sizes, stage→fields, per-AF loop structure → hot bytes |
 Removed: `run.py` (resolution → `build.zig -Dselect`; verbs → the Makefile),
 `hardware_profile.py` (trivial printer over `hardware_json.py`),
 `pmc_collect.py`/`pmc_sweep.py` (→ `profile.py`/`profile_xctrace.py`),
@@ -81,7 +82,7 @@ failure.
 
 | knob | default | meaning |
 |------|---------|---------|
-| `NS` | `sweep_config.N_GRID` | comma-list of N, e.g. `10000,1000000` |
+| `NS` | machine-aware `sweep_config.n_grid(hw)` | comma-list of N, e.g. `10000,1000000` — default brackets this machine's cache transitions (13 pts on M4; the fallback decades when no `hardware.json` yet) |
 | `TRIALS` | `3` | trials per point (the report keeps the min) |
 | `DEATH_RATES` | `sweep_config.DEATH_RATES` (`0.01 0.1 0.25 0.5`) | space-list of accident rates q |
 | `SKIP_DONE` | `1` | skip points already present at the current `source_hash` (resume) |
@@ -94,6 +95,8 @@ uv run python scripts/collect.py ML01                               # one memory
 uv run python scripts/collect.py ML01.AF02.LP1-autovec.LP2-simple    # one algorithm
 uv run python scripts/collect.py ML01 --with-profile                 # + cycle attribution
 uv run python scripts/collect.py ML01 --only profile                 # just the profile loop
+uv run python scripts/collect.py ML01 --only asm                   # just the asm bundles (schema v2)
+uv run python scripts/collect.py ML01 --refresh-asm                # force-rewrite asm bundles
 NS=10000,1000000 TRIALS=5 uv run python scripts/collect.py ML01          # quick subset
 ```
 
@@ -106,11 +109,21 @@ runs contend for cores and skew `ns_frame`).
 ## algo.py
 
 The disassembly atomic. Rebuilds the algorithm's ReleaseFast binary and captures
-the `step` disassembly (`otool` + `llvm-objdump --source` attribution) into
-`experiments/data/<id>/<algo>.json` — the asm source of truth, keyed by
-`source_hash` (skipped if current; `--force` rebuilds). This is the canonical
-home of the disassembly functions; `analyze_algo.py` reads the bundle instead of
-rebuilding.
+the `step` disassembly into `experiments/data/<id>/<algo>.json` — the asm source
+of truth, keyed by `source_hash` + `asm.schema` (schema bumps self-invalidate;
+`--force` rebuilds). This is the canonical home of the disassembly functions;
+`analyze_algo.py` reads the bundle instead of rebuilding.
+
+**Schema v2** (report-v2): `excerpt` + `histogram` as before, plus `insns[]`
+(per-instruction address/mnemonic/operands/class/branch-target, classified
+per-arch for arm64 + x86-64), `attribution` (DWARF **inline chains** per
+instruction via `atos -i` on the dSYM / `llvm-symbolizer`-or-`addr2line` on the
+ELF, same codegen debug build; `call_site` = the algo-file frame; `repo_files`
+distinguishes repo inlines from zig std), `loops[]` (deterministic loop digest:
+insns/iter, vector/scalar FP mix, branchy-respawn note with target line,
+byte-scatter, gather, stride, external delegation), `calls[]` (external callees
+with source lines), `fconst[]` (arm64 decoded float immediates). Legacy v1
+bundles still render (flat asm fallback) until that machine re-runs collect.
 
 ```sh
 uv run python scripts/algo.py ML01.AF02.LP1-autovec.LP2-simple           # write <algo>.json
@@ -185,11 +198,14 @@ uv run python scripts/build_report.py --force    # force-regenerate all narrativ
 ## analyze_algo.py
 
 The per-algorithm generator. Reads the asm bundle + timing + profile from `data/`,
-assembles the evidence `<algo>.json` (algo_meta + cache hierarchy + measured series
-+ cycle attribution + the asm histogram/excerpt), then calls the z.ai GLM-5.2 LLM
-(`zai-sdk`) to write the 5-section narrative `<algo>.md` (Intent / Cache
-saturation / Bandwidth / Assembly / Verdict). `--verify` checks cited
-instructions + section presence (the gate `build_report.py` runs).
+assembles the evidence `<algo>.json` (algo_meta + cache hierarchy + regimes +
+memory floor + layout hot-byte facts + measured series **with per-point
+references** — the naive baseline `ML01.AF02.LP1-scalar.LP2-simple` and the
+best-in-grid winner, with ×baseline/×winner ratios — + cycle attribution + the
+asm histogram/excerpt/digest), then calls the z.ai GLM-5.2 LLM (`zai-sdk`) to
+write the 6-section narrative `<algo>.md` (Intent / **Layout & approach** /
+Cache saturation / Bandwidth / Assembly / Verdict). `--verify` checks cited
+instructions + numbers + section presence (the gate `build_report.py` runs).
 
 ```sh
 uv run python scripts/analyze_algo.py ML01.AF02.LP1-autovec.LP2-opt        # full: json + md
@@ -200,6 +216,16 @@ uv run python scripts/analyze_algo.py ML01 --verify                   # integrit
 LLM key: `ZAI_API_KEY` env or `.scratch/zai_api_key`; optional `ZAI_BASE_URL` /
 `.scratch/zai_base_url`. `MAX_TOKENS` (default 16000) overrides the
 reasoning-token budget.
+
+## layout_facts.py
+
+Static per-memory-layout facts for evidence + the SPA layout strip: field
+sizes (exact `@sizeOf` per field — Zig structs have no field-order guarantee,
+so facts are name+size only), the stage→fields map, the per-AF loop structure,
+and `loop_hot_bytes(mem_layout, algo_fam)` → per-loop hot bytes (fields a loop
+touches) vs the struct stride — the "useful vs dead bandwidth" framing. Consumed
+by `analyze_algo.py` (prompt + attested numbers) and `build_report.py` (ships
+`layout_facts` into `<L>.mem_layout.json`).
 
 ## algo_hash.py
 
@@ -214,12 +240,15 @@ uv run python scripts/algo_hash.py ML01.AF02.LP1-autovec.LP2-simple --files  # a
 
 ## sweep_config.py
 
-The single source of truth for the collection grid (replaces the bench binary's
-old hardcoded `SWEEP`/`ITERS_PER_N`/`WARMUP_PER_N` consts): `N_GRID`, the per-N
-`ITERS`/`WARMUP` schedules, `THREADS_DEFAULT`, `DEATH_RATES`, and the algorithm
+The single source of truth for the collection grid: the **machine-aware N grid**
+(`n_grid(hw)` — decades + 5 points bracketing each cache transition
+`size/bytes_per_particle`, ≥1.15× log-spacing dedupe, clamp [300, 1e7]; M4 gets
+13 points bracketing the 963 / 61680 spills), computed `iters_for(n)`/`warmup_for(n)`
+(≥~18ms timed region at a conservative 8 ns/p floor), the **frozen
+`PROFILE_N_GRID`** (dense-N is bench-only), `DEATH_RATES`, and the algorithm
 roster (`algo_roster()`/`mem_layout_algos()` — parsed from build.zig's
-`algo_labels` registry, so what can build is exactly what gets swept). Imported
-by `collect.py`, `bench.py`, and `analyze_algo.py`. (The legacy
+`algo_labels` registry). Imported by `collect.py`, `bench.py`, and
+`analyze_algo.py`. (The legacy
 `experiments/sweeps/` config files — `death_rates.txt` + `<ML>.algos` rosters —
 were consolidated here; subset sweeps are a CLI concern: pass targets to
 `collect.py`.)
@@ -229,7 +258,8 @@ were consolidated here; subset sweeps are a CLI concern: pass targets to
 ## The full sweep workflow
 
 ```sh
-# 1. Collect — algorithms × {0.01,0.1,0.25,0.5} × {10K,100K,1M,10M} (T=1)
+# 1. Collect — algorithms × {0.01,0.1,0.25,0.5} × the machine-aware N grid (T=1)
+#    (dense bench grid; SKIP_DONE appends new N points incrementally)
 #    → per-algo files under experiments/data/<machine_id>/:
 uv run python scripts/collect.py ML01
 #    resume without duplicating (default on): SKIP_DONE=1 is the default.
