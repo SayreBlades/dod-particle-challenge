@@ -305,27 +305,35 @@ def _parse_atos(out: str):
     return chains
 
 
-def _parse_symbolizer_json(out: str, n: int):
-    """llvm-symbolizer --output-style=JSON: one JSON object per line per input
-    address, `Symbol` = inline stack (innermost first). Unambiguous in batch
-    mode (the GNU style has NO separator between addresses on some LLVMs)."""
-    chains = []
-    for line in out.splitlines():
-        line = line.strip()
-        if not line.startswith("{"):
+def _addr2line_batch(binp, hexaddrs):
+    """GNU addr2line -a batch: address-prefixed blocks make framing unambiguous
+    (plain GNU output has NO separator between addresses; llvm-symbolizer's GNU
+    style doesn't either, and its JSON style hangs on some LLVM builds). One
+    process for all addresses. Returns chains or None."""
+    try:
+        r = subprocess.run(["addr2line", "-e", binp, "-a", "-f", "-i", "-C", *hexaddrs],
+                           capture_output=True, text=True, timeout=180)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if r.returncode != 0 or not r.stdout.strip():
+        return None
+    chains, cur = [], None
+    lines = [l for l in r.stdout.splitlines() if l.strip()]
+    i = 0
+    while i < len(lines):
+        if lines[i].lower().startswith("0x"):
+            cur = []
+            chains.append(cur)
+            i += 1
             continue
-        try:
-            obj = json.loads(line)
-        except ValueError:
+        if i + 1 < len(lines) and cur is not None:
+            m = re.match(r"^(.+?):(\d+)$", lines[i + 1].strip())
+            if m and not lines[i + 1].startswith("??"):
+                cur.append((m.group(1), int(m.group(2))))
+            i += 2
             continue
-        frames = []
-        for fr in obj.get("Symbol") or []:
-            f, ln = fr.get("File"), fr.get("Line") or 0
-            if f and ln and not str(f).startswith("??"):
-                frames.append((f, int(ln)))
-        chains.append(frames)
-    chains = (chains + [[]] * n)[:n]
-    return chains
+        i += 1
+    return (chains + [[]] * len(hexaddrs))[:len(hexaddrs)]
 
 
 def _addr2line_per_addr(binp, hexaddrs):
@@ -362,21 +370,9 @@ def inline_chains(algo, shash, addrs):
         return None
     hexaddrs = [f"0x{a:x}" for a in addrs]
     if IS_LINUX:
-        chains = None
-        # llvm-symbolizer JSON style: one object per address — the only batch
-        # mode whose framing is unambiguous across LLVM versions.
-        try:
-            r = subprocess.run(["llvm-symbolizer", "--obj", binp, "-f", "--inlines",
-                                "--output-style=JSON"],
-                               input="\n".join(hexaddrs) + "\n",
-                               capture_output=True, text=True, timeout=180)
-        except (OSError, subprocess.TimeoutExpired):
-            r = None
-        if r is not None and r.returncode == 0 and r.stdout.strip():
-            chains = _parse_symbolizer_json(r.stdout, len(addrs))
-        # sanity: most instructions should resolve; else fall back per-address
+        chains = _addr2line_batch(binp, hexaddrs)
         if chains is None or sum(1 for c in chains if c) < max(1, len(addrs) // 4):
-            chains = _addr2line_per_addr(binp, hexaddrs)
+            chains = _addr2line_per_addr(binp, hexaddrs)   # per-address fallback
         if chains is None:
             return None
     else:
