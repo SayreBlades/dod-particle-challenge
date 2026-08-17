@@ -35,6 +35,8 @@ import glob, json, os, subprocess, sys, tempfile
 import duckdb
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "scripts"))
+import layout_facts
 DATA = os.path.join(ROOT, "experiments", "data")
 OUT = os.path.join(ROOT, "experiments", "analysis")
 PY = os.path.join(ROOT, ".venv", "bin", "python")
@@ -280,7 +282,7 @@ def build_machines_index(con):
 
     # analysis/README.md — the machine index (the only honest cross-machine view)
     def kb(v): return f"{v // 1024} KB" if v else "—"
-    def mb(v): return f"{v / 1048576:.0f} MB" if v else "—"
+    def cache_sz(v): return f"{v / 1048576:.1f} MB" if v >= 1048576 else (f"{v // 1024} KB" if v else "—")
     lines = ["# Analysis — machine index", ""]
     lines.append("The derived analysis layer, rebuilt by `scripts/build_report.py`. "
                  "Raw data lives in `experiments/data/<machine_id>/`; this tree is the "
@@ -298,7 +300,7 @@ def build_machines_index(con):
     for hw, layouts in entries:
         lines.append(f"| [`{hw['machine_id']}`]({hw['machine_id']}/) | {hw['cpu']} | "
                      f"{hw['streaming_bw_gbs']} GB/s | {kb(hw['l1dcachesize'])} | "
-                     f"{mb(hw['l2cachesize'])} | {hw['l3cachesize'] or '—'} | "
+                     f"{cache_sz(hw['l2cachesize'])} | {cache_sz(hw['l3cachesize'])} | "
                      f"{', '.join(layouts)} |")
     lines.append("")
     lines.append("Per machine: `<machine_id>/README.md` (overview) → "
@@ -358,7 +360,12 @@ def build_mem_layout_bundle(con, mid, L):
                                  "teaser": teaser(os.path.join(OUT, mid, f"{c}.md"))})
     lb = {"machine_id": mid, "mem_layout": L, "death_rates": deaths, "n_values": nvals,
           "thread_groups": threads, "streaming_bw_gbs": hw["streaming_bw_gbs"],
-          "memory_layout": MEM_LAYOUT_MEMORY.get(L, ""), "champions": champs,
+          "memory_layout": MEM_LAYOUT_MEMORY.get(L, ""),
+          "layout_facts": {"struct": layout_facts.LAYOUTS.get(L, {}).get("struct"),
+                           "fields": layout_facts.LAYOUTS.get(L, {}).get("fields"),
+                           "loops_by_fam": {fam: layout_facts.loop_hot_bytes(L, fam)
+                                            for fam in layout_facts.AF_LOOPS}},
+          "champions": champs,
           "algos": algos_all, "featured": featured}
     os.makedirs(os.path.join(OUT, mid), exist_ok=True)
     json.dump(lb, open(os.path.join(OUT, mid, f"{L}.mem_layout.json"), "w"), indent=2)
