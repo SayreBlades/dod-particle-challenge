@@ -1,6 +1,8 @@
 {
   "source_hash": "6d114902396510160edcfc4af14e6026d98efb689d25d854a28da438ae6f0f6b",
   "asm": {
+    "schema": 2,
+    "arch": "x86_64",
     "source_hash": "6d114902396510160edcfc4af14e6026d98efb689d25d854a28da438ae6f0f6b",
     "symbol": "framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step",
     "n_instructions": 379,
@@ -51,989 +53,7468 @@
       "movsxd": 1,
       "ret": 1
     },
-    "vector_insns": 0,
-    "excerpt": "000000000107a290\tpush\trbp\n000000000107a291\tmov\trbp,rsp\n000000000107a294\tpush\tr15\n000000000107a296\tpush\tr14\n000000000107a298\tpush\tr13\n000000000107a29a\tpush\tr12\n000000000107a29c\tpush\trbx\n000000000107a29d\tsub\trsp,0x448\n000000000107a2a4\tvmovups\txmm0,XMMWORD PTR [rip+0xfffffffffff887a4]        # 1002a50 <__anon_32712>\n000000000107a2ac\tmov\trax,QWORD PTR [rdi+0x10]\n000000000107a2b0\tmov\tr13,rsi\n000000000107a2b3\tmovabs\trsi,0x200012002\n000000000107a2bd\tmov\tQWORD PTR [rbp-0x38],rcx\n000000000107a2c1\tmov\tQWORD PTR [rbp-0x40],rdx\n000000000107a2c5\tmov\trdx,QWORD PTR [rdi+0x68]\n000000000107a2c9\tmov\tecx,DWORD PTR [rdi+0x20]\n000000000107a2cc\tmov\tebx,r8d\n000000000107a2cf\tmov\tr14,rdi\n000000000107a2d2\tmovabs\tr8,0x100010801\n000000000107a2dc\tvmovss\txmm5,DWORD PTR [rip+0xfffffffffff88910]        # 1002bf4 <__anon_12715+0x10>\n000000000107a2e4\tvmovss\txmm6,DWORD PTR [rip+0x1f3b4]        # 10996a0 <framework.config.q>\n000000000107a2ec\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff888d8]        # 1002bcc <__anon_30408+0xc>\n000000000107a2f4\tvmovss\txmm4,DWORD PTR [rip+0xfffffffffff88954]        # 1002c50 <__anon_12721+0xc>\n000000000107a2fc\tlea\tr10,[rbp-0x80]\n000000000107a300\tlea\tr9,[rbp-0x70]\n000000000107a304\tmov\tDWORD PTR [rbp-0x60],0x0\n000000000107a30b\tmov\tDWORD PTR [rbp-0x70],0x0\n000000000107a312\tmov\tDWORD PTR [rbp-0x80],0x0\n000000000107a319\tmov\tDWORD PTR [rbp-0x90],0x0\n000000000107a323\tmov\tDWORD PTR [rbp-0xa0],0x0\n000000000107a32d\tmov\tDWORD PTR [rbp-0xb0],0x0\n000000000107a337\tmov\tDWORD PTR [rbp-0xc0],0x0\n000000000107a341\tmov\tDWORD PTR [rbp-0xd0],0x0\n000000000107a34b\tmov\tDWORD PTR [rbp-0xe0],0x0\n000000000107a355\tmov\tDWORD PTR [rbp-0xf0],0x0\n000000000107a35f\tmov\tDWORD PTR [rbp-0x100],0x0\n000000000107a369\tmov\tDWORD PTR [rbp-0x110],0x0\n000000000107a373\tlea\tr15,[rbp-0x3b0]\n000000000107a37a\tlea\tr12,[rbp-0x370]\n000000000107a381\tvxorps\txmm1,xmm1,xmm1\n000000000107a385\tvpxor\txmm3,xmm3,xmm3\n000000000107a389\tmov\tQWORD PTR [rbp-0x160],rax\n000000000107a390\tmov\tQWORD PTR [rbp-0x150],rsi\n000000000107a397\tlea\trsi,[rbp-0x130]\n000000000107a39e\tlea\trdi,[rax+0x41]\n000000000107a3a2\tlea\tr11,[rax+0xc]\n000000000107a3a6\tmov\tDWORD PTR [rbp-0x5c],ecx\n000000000107a3a9\tmov\tDWORD PTR [rbp-0x6c],ecx\n000000000107a3ac\tmov\tDWORD PTR [rbp-0x7c],ecx\n000000000107a3af\tmov\tDWORD PTR [rbp-0x8c],ecx\n000000000107a3b5\tmov\tDWORD PTR [rbp-0x9c],ecx\n000000000107a3bb\tmov\tDWORD PTR [rbp-0xac],ecx\n000000000107a3c1\tmov\tDWORD PTR [rbp-0xbc],ecx\n000000000107a3c7\tmov\tDWORD PTR [rbp-0xcc],ecx\n000000000107a3cd\tmov\tDWORD PTR [rbp-0xdc],ecx\n000000000107a3d3\tmov\tDWORD PTR [rbp-0xec],ecx\n000000000107a3d9\tmov\tDWORD PTR [rbp-0xfc],ecx\n000000000107a3df\tmov\tDWORD PTR [rbp-0x10c],ecx\n000000000107a3e5\tmov\tQWORD PTR [rbp-0x58],0x44\n000000000107a3ed\tmov\tQWORD PTR [rbp-0x68],0x11\n000000000107a3f5\tmov\tQWORD PTR [rbp-0x78],0x11\n000000000107a3fd\tmov\tQWORD PTR [rbp-0x88],0x11\n000000000107a408\tmov\tQWORD PTR [rbp-0x98],0x11\n000000000107a413\tmov\tQWORD PTR [rbp-0xa8],0x11\n000000000107a41e\tmov\tQWORD PTR [rbp-0xb8],0x11\n000000000107a429\tmov\tQWORD PTR [rbp-0xc8],0x11\n000000000107a434\tmov\tQWORD PTR [rbp-0xd8],0x44\n000000000107a43f\tmov\tQWORD PTR [rbp-0xe8],0x11\n000000000107a44a\tmov\tQWORD PTR [rbp-0xf8],0x11\n000000000107a455\tmov\tQWORD PTR [rbp-0x108],0x11\n000000000107a460\tmov\tQWORD PTR [rbp-0x148],rsi\n000000000107a467\tlea\trsi,[rbp-0x60]\n000000000107a46b\tmov\tQWORD PTR [rbp-0x158],0x0\n000000000107a476\tmov\tQWORD PTR [rbp-0x1a0],rdi\n000000000107a47d\tmov\tQWORD PTR [rbp-0x190],r8\n000000000107a484\tmov\tQWORD PTR [rbp-0x140],0x0\n000000000107a48f\tmov\tQWORD PTR [rbp-0x188],rsi\n000000000107a496\tmov\tQWORD PTR [rbp-0x198],0x0\n000000000107a4a1\tmov\tQWORD PTR [rbp-0x180],0x0\n000000000107a4ac\tmovabs\trsi,0x100012002\n000000000107a4b6\tvmovaps\tXMMWORD PTR [rbp-0x130],xmm0\n000000000107a4be\tvxorps\txmm0,xmm0,xmm0\n000000000107a4c2\tmov\tDWORD PTR [rbp-0x120],0x0\n000000000107a4cc\tmov\tDWORD PTR [rbp-0x11c],ecx\n000000000107a4d2\tmov\tQWORD PTR [rbp-0x118],0x11\n000000000107a4dd\tlea\trcx,[rbp-0x1f0]\n000000000107a4e4\tvmovaps\tXMMWORD PTR [rbp-0x1f0],xmm0\n000000000107a4ec\tvmovaps\tXMMWORD PTR [rbp-0x230],xmm0\n000000000107a4f4\tmov\tQWORD PTR [rbp-0x220],r11\n000000000107a4fb\tvmovaps\tXMMWORD PTR [rbp-0x3b0],xmm0\n000000000107a503\tvmovaps\tXMMWORD PTR [rbp-0x170],xmm0\n000000000107a50b\tvmovaps\tXMMWORD PTR [rbp-0x1b0],xmm0\n000000000107a513\tlea\tr11,[rax+0x4]\n000000000107a517\tvmovaps\tXMMWORD PTR [rbp-0x270],xmm0\n000000000107a51f\tvmovaps\tXMMWORD PTR [rbp-0x2b0],xmm0\n000000000107a527\tvmovaps\tXMMWORD PTR [rbp-0x2f0],xmm0\n000000000107a52f\tvmovaps\tXMMWORD PTR [rbp-0x330],xmm0\n000000000107a537\tvmovaps\tXMMWORD PTR [rbp-0x370],xmm0\n000000000107a53f\tvmovaps\tXMMWORD PTR [rbp-0x3f0],xmm0\n000000000107a547\tvmovaps\tXMMWORD PTR [rbp-0x430],xmm0\n000000000107a54f\tvmovaps\tXMMWORD PTR [rbp-0x470],xmm0\n000000000107a557\tvmovss\txmm0,DWORD PTR [rip+0xfffffffffff88671]        # 1002bd0 <__anon_30408+0x10>\n000000000107a55f\tmov\tQWORD PTR [rbp-0x3a0],rdi\n000000000107a566\tlea\trdi,[rbp-0xe0]\n000000000107a56d\tmov\tQWORD PTR [rbp-0x218],0x0\n000000000107a578\tmov\tQWORD PTR [rbp-0x210],rsi\n000000000107a57f\tmov\tQWORD PTR [rbp-0x208],r10\n000000000107a586\tmov\tQWORD PTR [rbp-0x398],0x0\n000000000107a591\tmov\tQWORD PTR [rbp-0x390],r8\n000000000107a598\tlea\tr10,[rbp-0x90]\n000000000107a59f\tmov\tQWORD PTR [rbp-0x1e0],rax\n000000000107a5a6\tmov\tQWORD PTR [rbp-0x1d8],0x0\n000000000107a5b1\tmov\tQWORD PTR [rbp-0x1d0],rsi\n000000000107a5b8\tmov\tQWORD PTR [rbp-0x1c8],r9\n000000000107a5bf\tmov\tQWORD PTR [rbp-0x1c0],0x0\n000000000107a5ca\tmov\tQWORD PTR [rbp-0x200],0x0\n000000000107a5d5\tlea\tr8,[rbp-0x230]\n000000000107a5dc\tlea\tr9,[rbp-0x270]\n000000000107a5e3\tmov\tQWORD PTR [rbp-0x260],r11\n000000000107a5ea\tlea\tr11,[rax+0x10]\n000000000107a5ee\tmov\tQWORD PTR [rbp-0x388],rdi\n000000000107a5f5\tlea\trdi,[rax+0x20]\n000000000107a5f9\tmov\tQWORD PTR [rbp-0x258],0x0\n000000000107a604\tmov\tQWORD PTR [rbp-0x250],rsi\n000000000107a60b\tmov\tQWORD PTR [rbp-0x248],r10\n000000000107a612\tlea\tr10,[rbp-0xa0]\n000000000107a619\tmov\tQWORD PTR [rbp-0x240],0x0\n000000000107a624\tmov\tQWORD PTR [rbp-0x380],0x0\n000000000107a62f\tmov\tQWORD PTR [rbp-0x2a0],r11\n000000000107a636\tlea\tr11,[rax+0x8]\n000000000107a63a\tmov\tQWORD PTR [rbp-0x3e0],rdi\n000000000107a641\tlea\trdi,[rbp-0xf0]\n000000000107a648\tmov\tQWORD PTR [rbp-0x298],0x0\n000000000107a653\tmov\tQWORD PTR [rbp-0x290],rsi\n000000000107a65a\tmov\tQWORD PTR [rbp-0x288],r10\n000000000107a661\tmov\tQWORD PTR [rbp-0x3d8],0x0\n000000000107a66c\tmov\tQWORD PTR [rbp-0x3d0],rsi\n000000000107a673\tlea\tr10,[rbp-0xb0]\n000000000107a67a\tmov\tQWORD PTR [rbp-0x280],0x0\n000000000107a685\tmov\tQWORD PTR [rbp-0x2e0],r11\n000000000107a68c\tlea\tr11,[rax+0x14]\n000000000107a690\tmov\tQWORD PTR [rbp-0x3c8],rdi\n000000000107a697\tlea\trdi,[rax+0x24]\n000000000107a69b\tmov\tQWORD PTR [rbp-0x2d8],0x0\n000000000107a6a6\tmov\tQWORD PTR [rbp-0x2d0],rsi\n000000000107a6ad\tmov\tQWORD PTR [rbp-0x2c8],r10\n000000000107a6b4\tlea\tr10,[rbp-0xc0]\n000000000107a6bb\tmov\tQWORD PTR [rbp-0x2c0],0x0\n000000000107a6c6\tmov\tQWORD PTR [rbp-0x3c0],0x0\n000000000107a6d1\tmov\tQWORD PTR [rbp-0x320],r11\n000000000107a6d8\tlea\tr11,[rax+0x1c]\n000000000107a6dc\tadd\trax,0x28\n000000000107a6e0\tmov\tQWORD PTR [rbp-0x420],rdi\n000000000107a6e7\tmov\tQWORD PTR [rbp-0x318],0x0\n000000000107a6f2\tmov\tQWORD PTR [rbp-0x310],rsi\n000000000107a6f9\tmov\tQWORD PTR [rbp-0x308],r10\n000000000107a700\tlea\tr10,[rbp-0xd0]\n000000000107a707\tlea\trdi,[rbp-0x100]\n000000000107a70e\tmov\tQWORD PTR [rbp-0x418],0x0\n000000000107a719\tmov\tQWORD PTR [rbp-0x410],rsi\n000000000107a720\tmov\tQWORD PTR [rbp-0x300],0x0\n000000000107a72b\tmov\tQWORD PTR [rbp-0x460],rax\n000000000107a732\tlea\trax,[rbp-0x110]\n000000000107a739\tmov\tQWORD PTR [rbp-0x458],0x0\n000000000107a744\tmov\tQWORD PTR [rbp-0x450],rsi\n000000000107a74b\tmov\tQWORD PTR [rbp-0x360],r11\n000000000107a752\tmov\tQWORD PTR [rbp-0x408],rdi\n000000000107a759\tmov\tQWORD PTR [rbp-0x358],0x0\n000000000107a764\tmov\tQWORD PTR [rbp-0x350],rsi\n000000000107a76b\tmov\tQWORD PTR [rbp-0x348],r10\n000000000107a772\tmov\tQWORD PTR [rbp-0x340],0x0\n000000000107a77d\tmov\tQWORD PTR [rbp-0x400],0x0\n000000000107a788\tlea\tr10,[rbp-0x430]\n000000000107a78f\tlea\tr11,[rbp-0x3f0]\n000000000107a796\tlea\trdi,[rbp-0x170]\n000000000107a79d\tlea\trsi,[rbp-0x1b0]\n000000000107a7a4\tmov\tQWORD PTR [rbp-0x448],rax\n000000000107a7ab\tlea\trax,[rbp-0x470]\n000000000107a7b2\tmov\tQWORD PTR [rbp-0x440],0x0\n000000000107a7bd\tpush\trax\n000000000107a7be\tpush\tr10\n000000000107a7c0\tpush\tr11\n000000000107a7c2\tpush\tr15\n000000000107a7c4\tpush\tr12\n000000000107a7c6\tlea\trax,[rbp-0x330]\n000000000107a7cd\tpush\trax\n000000000107a7ce\tlea\trax,[rbp-0x2f0]\n000000000107a7d5\tpush\trax\n000000000107a7d6\tlea\trax,[rbp-0x2b0]\n000000000107a7dd\tpush\trax\n000000000107a7de\tcall\t108a550 <halide_b2>\n000000000107a7e3\tvmovss\txmm5,DWORD PTR [rip+0xfffffffffff88409]        # 1002bf4 <__anon_12715+0x10>\n000000000107a7eb\tadd\trsp,0x40\n000000000107a7ef\tmov\trax,QWORD PTR [r14+0x18]\n000000000107a7f3\tmov\tQWORD PTR [rbp-0x50],r14\n000000000107a7f7\ttest\trax,rax\n000000000107a7fa\tje\t107aad4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x844>\n000000000107a800\tmov\trdx,QWORD PTR [rbp-0x38]\n000000000107a804\tmov\trcx,QWORD PTR [rbp-0x50]\n000000000107a808\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff883c4]        # 1002bd4 <__anon_30408+0x14>\n000000000107a810\tmov\tDWORD PTR [rbp-0x44],ebx\n000000000107a813\tvcvtsi2ss\txmm0,xmm15,edx\n000000000107a817\tmov\trcx,QWORD PTR [rcx+0x10]\n000000000107a81b\tlea\tr14d,[rdx-0x2]\n000000000107a81f\tmov\tesi,edx\n000000000107a821\tvcvtsi2ss\txmm1,xmm15,ebx\n000000000107a825\tjmp\t107a86e <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5de>\n000000000107a827\tnop\tWORD PTR [rax+rax*1+0x0]\n000000000107a830\timul\trdi,rsi\n000000000107a834\tmov\tedx,r8d\n000000000107a837\tadd\trdi,rdx\n000000000107a83a\tvmovq\txmm4,QWORD PTR [r13+rdi*4+0x0]\n000000000107a841\tvpaddusb\txmm4,xmm4,xmm3\n000000000107a845\tvmovq\tQWORD PTR [r13+rdi*4+0x0],xmm4\n000000000107a84c\tadd\trdi,rsi\n000000000107a84f\tvmovq\txmm4,QWORD PTR [r13+rdi*4+0x0]\n000000000107a856\tvpaddusb\txmm3,xmm4,xmm3\n000000000107a85a\tvmovq\tQWORD PTR [r13+rdi*4+0x0],xmm3\n000000000107a861\tadd\trcx,0x44\n000000000107a865\tdec\trax\n000000000107a868\tje\t107aad4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x844>\n000000000107a86e\tvaddss\txmm4,xmm5,DWORD PTR [rcx]\n000000000107a872\tmovzx\tedx,BYTE PTR [rcx+0x41]\n000000000107a876\tlea\trdi,[rip+0xfffffffffff95dc3]        # 1010640 <__anon_32685>\n000000000107a87d\tvmovq\txmm3,QWORD PTR [rdi+rdx*8]\n000000000107a882\tvmulss\txmm4,xmm4,xmm2\n000000000107a886\tvmulss\txmm4,xmm4,xmm0\n000000000107a88a\tvcvttss2si\tr8d,xmm4\n000000000107a88e\tvsubss\txmm4,xmm5,DWORD PTR [rcx+0x4]\n000000000107a893\tcmp\tr14d,r8d\n000000000107a896\tsetge\tdl\n000000000107a899\tvmulss\txmm4,xmm4,xmm2\n000000000107a89d\tvmulss\txmm4,xmm4,xmm1\n000000000107a8a1\tvcvttss2si\tr9d,xmm4\n000000000107a8a5\tmov\tedi,r9d\n000000000107a8a8\tor\tedi,r8d\n000000000107a8ab\tmov\tedi,r9d\n000000000107a8ae\tsetns\tr10b\n000000000107a8b2\tand\tr10b,dl\n000000000107a8b5\tlea\tedx,[r9+0x2]\n000000000107a8b9\tcmp\tedx,ebx\n000000000107a8bb\tsetle\tdl\n000000000107a8be\ttest\tr10b,dl\n000000000107a8c1\tjne\t107a830 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5a0>\n000000000107a8c7\tvpextrb\tedx,xmm3,0x2\n000000000107a8cd\ttest\tr9d,r9d\n000000000107a8d0\tmov\tr10d,r14d\n000000000107a8d3\tvmovd\tr12d,xmm3\n000000000107a8d8\tvpextrb\tr11d,xmm3,0x1\n000000000107a8de\tmovsxd\tr15,r8d\n000000000107a8e1\tmov\tDWORD PTR [rbp-0x30],edx\n000000000107a8e4\tsets\tdl\n000000000107a8e7\tcmp\tr9d,ebx\n000000000107a8ea\tsetge\tr14b\n000000000107a8ee\tor\tr14b,dl\n000000000107a8f1\tjne\t107a9e0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x750>\n000000000107a8f7\timul\trdi,rsi\n000000000107a8fb\tcmp\tDWORD PTR [rbp-0x38],r8d\n000000000107a8ff\tjbe\t107a96d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x6dd>\n000000000107a901\tlea\tr14,[rdi+r15*1]\n000000000107a905\tlea\trdx,[r14*4+0x3]\n000000000107a90d\tcmp\trdx,QWORD PTR [rbp-0x40]\n000000000107a911\tjae\t107a96d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x6dd>\n000000000107a913\tshl\tr14,0x2\n000000000107a917\tmov\tDWORD PTR [rbp-0x2c],r12d\n000000000107a91b\tmovzx\tebx,BYTE PTR [r13+r14*1+0x0]\n000000000107a921\tadd\tbl,r12b\n000000000107a924\tmov\tr12d,0xff\n000000000107a92a\tmovzx\tebx,bl\n000000000107a92d\tcmovb\tebx,r12d\n000000000107a931\tmov\tBYTE PTR [r13+r14*1+0x0],bl\n000000000107a936\tmovzx\tebx,BYTE PTR [r13+r14*1+0x1]\n000000000107a93c\tadd\tbl,r11b\n000000000107a93f\tmovzx\tebx,bl\n000000000107a942\tcmovb\tebx,r12d\n000000000107a946\tmov\tBYTE PTR [r13+r14*1+0x1],bl\n000000000107a94b\tmovzx\tebx,BYTE PTR [r13+r14*1+0x2]\n000000000107a951\tadd\tbl,BYTE PTR [rbp-0x30]\n000000000107a954\tmovzx\tebx,bl\n000000000107a957\tcmovb\tebx,r12d\n000000000107a95b\tmov\tr12d,DWORD PTR [rbp-0x2c]\n000000000107a95f\tmov\tBYTE PTR [r13+r14*1+0x2],bl\n000000000107a964\tmov\tebx,DWORD PTR [rbp-0x44]\n000000000107a967\tmov\tBYTE PTR [r13+rdx*1+0x0],0xff\n000000000107a96d\tlea\trdx,[r15+0x1]\n000000000107a971\tcmp\tDWORD PTR [rbp-0x38],edx\n000000000107a974\tjbe\t107a9e0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x750>\n000000000107a976\tadd\trdi,rdx\n000000000107a979\tlea\tr14,[rdi*4+0x3]\n000000000107a981\tcmp\tr14,QWORD PTR [rbp-0x40]\n000000000107a985\tjae\t107a9e0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x750>\n000000000107a987\tshl\trdi,0x2\n000000000107a98b\tmov\tDWORD PTR [rbp-0x2c],r11d\n000000000107a98f\tmov\tr11d,0xff\n000000000107a995\tmovzx\tedx,BYTE PTR [r13+rdi*1+0x0]\n000000000107a99b\tadd\tdl,r12b\n000000000107a99e\tmovzx\tedx,dl\n000000000107a9a1\tcmovb\tedx,r11d\n000000000107a9a5\tmov\tBYTE PTR [r13+rdi*1+0x0],dl\n000000000107a9aa\tmovzx\tedx,BYTE PTR [r13+rdi*1+0x1]\n000000000107a9b0\tadd\tdl,BYTE PTR [rbp-0x2c]\n000000000107a9b3\tmovzx\tedx,dl\n000000000107a9b6\tcmovb\tedx,r11d\n000000000107a9ba\tmov\tBYTE PTR [r13+rdi*1+0x1],dl\n000000000107a9bf\tmovzx\tedx,BYTE PTR [r13+rdi*1+0x2]\n000000000107a9c5\tadd\tdl,BYTE PTR [rbp-0x30]\n000000000107a9c8\tmovzx\tedx,dl\n000000000107a9cb\tcmovb\tedx,r11d\n000000000107a9cf\tmov\tr11d,DWORD PTR [rbp-0x2c]\n000000000107a9d3\tmov\tBYTE PTR [r13+rdi*1+0x2],dl\n000000000107a9d8\tmov\tBYTE PTR [r13+r14*1+0x0],0xff\n000000000107a9de\txchg\tax,ax\n000000000107a9e0\tinc\tr9d\n000000000107a9e3\tmov\tr14d,r10d\n000000000107a9e6\tsets\tdl\n000000000107a9e9\tcmp\tr9d,ebx\n000000000107a9ec\tsetge\tdil\n000000000107a9f0\tor\tdil,dl\n000000000107a9f3\tjne\t107a861 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>\n000000000107a9f9\timul\tr9,rsi\n000000000107a9fd\tcmp\tDWORD PTR [rbp-0x38],r8d\n000000000107aa01\tjbe\t107aa64 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x7d4>\n000000000107aa03\tlea\trdi,[r9+r15*1]\n000000000107aa07\tlea\tr8,[rdi*4+0x3]\n000000000107aa0f\tcmp\tr8,QWORD PTR [rbp-0x40]\n000000000107aa13\tjae\t107aa64 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x7d4>\n000000000107aa15\tshl\trdi,0x2\n000000000107aa19\tmov\tr10d,0xff\n000000000107aa1f\tmovzx\tedx,BYTE PTR [r13+rdi*1+0x0]\n000000000107aa25\tadd\tdl,r12b\n000000000107aa28\tmovzx\tedx,dl\n000000000107aa2b\tcmovb\tedx,r10d\n000000000107aa2f\tmov\tBYTE PTR [r13+rdi*1+0x0],dl\n000000000107aa34\tmovzx\tedx,BYTE PTR [r13+rdi*1+0x1]\n000000000107aa3a\tadd\tdl,r11b\n000000000107aa3d\tmovzx\tedx,dl\n000000000107aa40\tcmovb\tedx,r10d\n000000000107aa44\tmov\tBYTE PTR [r13+rdi*1+0x1],dl\n000000000107aa49\tmovzx\tedx,BYTE PTR [r13+rdi*1+0x2]\n000000000107aa4f\tadd\tdl,BYTE PTR [rbp-0x30]\n000000000107aa52\tmovzx\tedx,dl\n000000000107aa55\tcmovb\tedx,r10d\n000000000107aa59\tmov\tBYTE PTR [r13+rdi*1+0x2],dl\n000000000107aa5e\tmov\tBYTE PTR [r13+r8*1+0x0],0xff\n000000000107aa64\tinc\tr15\n000000000107aa67\tcmp\tDWORD PTR [rbp-0x38],r15d\n000000000107aa6b\tjbe\t107a861 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>\n000000000107aa71\tadd\tr9,r15\n000000000107aa74\tlea\trdx,[r9*4+0x3]\n000000000107aa7c\tcmp\trdx,QWORD PTR [rbp-0x40]\n000000000107aa80\tjae\t107a861 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>\n000000000107aa86\tshl\tr9,0x2\n000000000107aa8a\tmov\tr8d,0xff\n000000000107aa90\tadd\tr12b,BYTE PTR [r13+r9*1+0x0]\n000000000107aa95\tmovzx\tedi,r12b\n000000000107aa99\tcmovb\tedi,r8d\n000000000107aa9d\tmov\tBYTE PTR [r13+r9*1+0x0],dil\n000000000107aaa2\tadd\tr11b,BYTE PTR [r13+r9*1+0x1]\n000000000107aaa7\tmovzx\tedi,r11b\n000000000107aaab\tcmovb\tedi,r8d\n000000000107aaaf\tmov\tBYTE PTR [r13+r9*1+0x1],dil\n000000000107aab4\tmov\tedi,DWORD PTR [rbp-0x30]\n000000000107aab7\tadd\tdil,BYTE PTR [r13+r9*1+0x2]\n000000000107aabc\tmovzx\tedi,dil\n000000000107aac0\tcmovb\tedi,r8d\n000000000107aac4\tmov\tBYTE PTR [r13+r9*1+0x2],dil\n000000000107aac9\tmov\tBYTE PTR [r13+rdx*1+0x0],0xff\n000000000107aacf\tjmp\t107a861 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>\n000000000107aad4\tmov\trax,QWORD PTR [rbp-0x50]\n000000000107aad8\tinc\tQWORD PTR [rax+0x68]\n000000000107aadc\tadd\trsp,0x448\n000000000107aae3\tpop\trbx\n000000000107aae4\tpop\tr12\n000000000107aae6\tpop\tr13\n000000000107aae8\tpop\tr14\n000000000107aaea\tpop\tr15\n000000000107aaec\tpop\trbp\n000000000107aaed\tret\t\n000000000107aaee\txchg\tax,ax",
-    "source_attributed": [
-      {
-        "source": "        pub fn step(self: *Self, dt: f32, fb: []u8, w: u32, h: u32) void {",
-        "asm": [
-          "push\trbp",
-          "mov\trbp,rsp",
-          "push\tr15",
-          "push\tr14",
-          "push\tr13",
-          "push\tr12",
-          "push\trbx",
-          "sub\trsp,0x448"
-        ]
+    "vector_insns": 17,
+    "excerpt": "0000000001079be0\tpush\trbp\n0000000001079be1\tmov\trbp,rsp\n0000000001079be4\tpush\tr15\n0000000001079be6\tpush\tr14\n0000000001079be8\tpush\tr13\n0000000001079bea\tpush\tr12\n0000000001079bec\tpush\trbx\n0000000001079bed\tsub\trsp,0x448\n0000000001079bf4\tvmovups\txmm0,XMMWORD PTR [rip+0xfffffffffff88e54]        # 1002a50 <__anon_32491>\n0000000001079bfc\tmov\trax,QWORD PTR [rdi+0x10]\n0000000001079c00\tmov\tr13,rsi\n0000000001079c03\tmovabs\trsi,0x200012002\n0000000001079c0d\tmov\tQWORD PTR [rbp-0x38],rcx\n0000000001079c11\tmov\tQWORD PTR [rbp-0x40],rdx\n0000000001079c15\tmov\trdx,QWORD PTR [rdi+0x68]\n0000000001079c19\tmov\tecx,DWORD PTR [rdi+0x20]\n0000000001079c1c\tmov\tebx,r8d\n0000000001079c1f\tmov\tr14,rdi\n0000000001079c22\tmovabs\tr8,0x100010801\n0000000001079c2c\tvmovss\txmm5,DWORD PTR [rip+0xfffffffffff88fc0]        # 1002bf4 <__anon_12526+0x10>\n0000000001079c34\tvmovss\txmm6,DWORD PTR [rip+0x1f3b4]        # 1098ff0 <framework.config.q>\n0000000001079c3c\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff88f88]        # 1002bcc <__anon_30228+0xc>\n0000000001079c44\tvmovss\txmm4,DWORD PTR [rip+0xfffffffffff89004]        # 1002c50 <__anon_12532+0xc>\n0000000001079c4c\tlea\tr10,[rbp-0x80]\n0000000001079c50\tlea\tr9,[rbp-0x70]\n0000000001079c54\tmov\tDWORD PTR [rbp-0x60],0x0\n0000000001079c5b\tmov\tDWORD PTR [rbp-0x70],0x0\n0000000001079c62\tmov\tDWORD PTR [rbp-0x80],0x0\n0000000001079c69\tmov\tDWORD PTR [rbp-0x90],0x0\n0000000001079c73\tmov\tDWORD PTR [rbp-0xa0],0x0\n0000000001079c7d\tmov\tDWORD PTR [rbp-0xb0],0x0\n0000000001079c87\tmov\tDWORD PTR [rbp-0xc0],0x0\n0000000001079c91\tmov\tDWORD PTR [rbp-0xd0],0x0\n0000000001079c9b\tmov\tDWORD PTR [rbp-0xe0],0x0\n0000000001079ca5\tmov\tDWORD PTR [rbp-0xf0],0x0\n0000000001079caf\tmov\tDWORD PTR [rbp-0x100],0x0\n0000000001079cb9\tmov\tDWORD PTR [rbp-0x110],0x0\n0000000001079cc3\tlea\tr15,[rbp-0x3b0]\n0000000001079cca\tlea\tr12,[rbp-0x370]\n0000000001079cd1\tvxorps\txmm1,xmm1,xmm1\n0000000001079cd5\tvpxor\txmm3,xmm3,xmm3\n0000000001079cd9\tmov\tQWORD PTR [rbp-0x160],rax\n0000000001079ce0\tmov\tQWORD PTR [rbp-0x150],rsi\n0000000001079ce7\tlea\trsi,[rbp-0x130]\n0000000001079cee\tlea\trdi,[rax+0x41]\n0000000001079cf2\tlea\tr11,[rax+0xc]\n0000000001079cf6\tmov\tDWORD PTR [rbp-0x5c],ecx\n0000000001079cf9\tmov\tDWORD PTR [rbp-0x6c],ecx\n0000000001079cfc\tmov\tDWORD PTR [rbp-0x7c],ecx\n0000000001079cff\tmov\tDWORD PTR [rbp-0x8c],ecx\n0000000001079d05\tmov\tDWORD PTR [rbp-0x9c],ecx\n0000000001079d0b\tmov\tDWORD PTR [rbp-0xac],ecx\n0000000001079d11\tmov\tDWORD PTR [rbp-0xbc],ecx\n0000000001079d17\tmov\tDWORD PTR [rbp-0xcc],ecx\n0000000001079d1d\tmov\tDWORD PTR [rbp-0xdc],ecx\n0000000001079d23\tmov\tDWORD PTR [rbp-0xec],ecx\n0000000001079d29\tmov\tDWORD PTR [rbp-0xfc],ecx\n0000000001079d2f\tmov\tDWORD PTR [rbp-0x10c],ecx\n0000000001079d35\tmov\tQWORD PTR [rbp-0x58],0x44\n0000000001079d3d\tmov\tQWORD PTR [rbp-0x68],0x11\n0000000001079d45\tmov\tQWORD PTR [rbp-0x78],0x11\n0000000001079d4d\tmov\tQWORD PTR [rbp-0x88],0x11\n0000000001079d58\tmov\tQWORD PTR [rbp-0x98],0x11\n0000000001079d63\tmov\tQWORD PTR [rbp-0xa8],0x11\n0000000001079d6e\tmov\tQWORD PTR [rbp-0xb8],0x11\n0000000001079d79\tmov\tQWORD PTR [rbp-0xc8],0x11\n0000000001079d84\tmov\tQWORD PTR [rbp-0xd8],0x44\n0000000001079d8f\tmov\tQWORD PTR [rbp-0xe8],0x11\n0000000001079d9a\tmov\tQWORD PTR [rbp-0xf8],0x11\n0000000001079da5\tmov\tQWORD PTR [rbp-0x108],0x11\n0000000001079db0\tmov\tQWORD PTR [rbp-0x148],rsi\n0000000001079db7\tlea\trsi,[rbp-0x60]\n0000000001079dbb\tmov\tQWORD PTR [rbp-0x158],0x0\n0000000001079dc6\tmov\tQWORD PTR [rbp-0x1a0],rdi\n0000000001079dcd\tmov\tQWORD PTR [rbp-0x190],r8\n0000000001079dd4\tmov\tQWORD PTR [rbp-0x140],0x0\n0000000001079ddf\tmov\tQWORD PTR [rbp-0x188],rsi\n0000000001079de6\tmov\tQWORD PTR [rbp-0x198],0x0\n0000000001079df1\tmov\tQWORD PTR [rbp-0x180],0x0\n0000000001079dfc\tmovabs\trsi,0x100012002\n0000000001079e06\tvmovaps\tXMMWORD PTR [rbp-0x130],xmm0\n0000000001079e0e\tvxorps\txmm0,xmm0,xmm0\n0000000001079e12\tmov\tDWORD PTR [rbp-0x120],0x0\n0000000001079e1c\tmov\tDWORD PTR [rbp-0x11c],ecx\n0000000001079e22\tmov\tQWORD PTR [rbp-0x118],0x11\n0000000001079e2d\tlea\trcx,[rbp-0x1f0]\n0000000001079e34\tvmovaps\tXMMWORD PTR [rbp-0x1f0],xmm0\n0000000001079e3c\tvmovaps\tXMMWORD PTR [rbp-0x230],xmm0\n0000000001079e44\tmov\tQWORD PTR [rbp-0x220],r11\n0000000001079e4b\tvmovaps\tXMMWORD PTR [rbp-0x3b0],xmm0\n0000000001079e53\tvmovaps\tXMMWORD PTR [rbp-0x170],xmm0\n0000000001079e5b\tvmovaps\tXMMWORD PTR [rbp-0x1b0],xmm0\n0000000001079e63\tlea\tr11,[rax+0x4]\n0000000001079e67\tvmovaps\tXMMWORD PTR [rbp-0x270],xmm0\n0000000001079e6f\tvmovaps\tXMMWORD PTR [rbp-0x2b0],xmm0\n0000000001079e77\tvmovaps\tXMMWORD PTR [rbp-0x2f0],xmm0\n0000000001079e7f\tvmovaps\tXMMWORD PTR [rbp-0x330],xmm0\n0000000001079e87\tvmovaps\tXMMWORD PTR [rbp-0x370],xmm0\n0000000001079e8f\tvmovaps\tXMMWORD PTR [rbp-0x3f0],xmm0\n0000000001079e97\tvmovaps\tXMMWORD PTR [rbp-0x430],xmm0\n0000000001079e9f\tvmovaps\tXMMWORD PTR [rbp-0x470],xmm0\n0000000001079ea7\tvmovss\txmm0,DWORD PTR [rip+0xfffffffffff88d21]        # 1002bd0 <__anon_30228+0x10>\n0000000001079eaf\tmov\tQWORD PTR [rbp-0x3a0],rdi\n0000000001079eb6\tlea\trdi,[rbp-0xe0]\n0000000001079ebd\tmov\tQWORD PTR [rbp-0x218],0x0\n0000000001079ec8\tmov\tQWORD PTR [rbp-0x210],rsi\n0000000001079ecf\tmov\tQWORD PTR [rbp-0x208],r10\n0000000001079ed6\tmov\tQWORD PTR [rbp-0x398],0x0\n0000000001079ee1\tmov\tQWORD PTR [rbp-0x390],r8\n0000000001079ee8\tlea\tr10,[rbp-0x90]\n0000000001079eef\tmov\tQWORD PTR [rbp-0x1e0],rax\n0000000001079ef6\tmov\tQWORD PTR [rbp-0x1d8],0x0\n0000000001079f01\tmov\tQWORD PTR [rbp-0x1d0],rsi\n0000000001079f08\tmov\tQWORD PTR [rbp-0x1c8],r9\n0000000001079f0f\tmov\tQWORD PTR [rbp-0x1c0],0x0\n0000000001079f1a\tmov\tQWORD PTR [rbp-0x200],0x0\n0000000001079f25\tlea\tr8,[rbp-0x230]\n0000000001079f2c\tlea\tr9,[rbp-0x270]\n0000000001079f33\tmov\tQWORD PTR [rbp-0x260],r11\n0000000001079f3a\tlea\tr11,[rax+0x10]\n0000000001079f3e\tmov\tQWORD PTR [rbp-0x388],rdi\n0000000001079f45\tlea\trdi,[rax+0x20]\n0000000001079f49\tmov\tQWORD PTR [rbp-0x258],0x0\n0000000001079f54\tmov\tQWORD PTR [rbp-0x250],rsi\n0000000001079f5b\tmov\tQWORD PTR [rbp-0x248],r10\n0000000001079f62\tlea\tr10,[rbp-0xa0]\n0000000001079f69\tmov\tQWORD PTR [rbp-0x240],0x0\n0000000001079f74\tmov\tQWORD PTR [rbp-0x380],0x0\n0000000001079f7f\tmov\tQWORD PTR [rbp-0x2a0],r11\n0000000001079f86\tlea\tr11,[rax+0x8]\n0000000001079f8a\tmov\tQWORD PTR [rbp-0x3e0],rdi\n0000000001079f91\tlea\trdi,[rbp-0xf0]\n0000000001079f98\tmov\tQWORD PTR [rbp-0x298],0x0\n0000000001079fa3\tmov\tQWORD PTR [rbp-0x290],rsi\n0000000001079faa\tmov\tQWORD PTR [rbp-0x288],r10\n0000000001079fb1\tmov\tQWORD PTR [rbp-0x3d8],0x0\n0000000001079fbc\tmov\tQWORD PTR [rbp-0x3d0],rsi\n0000000001079fc3\tlea\tr10,[rbp-0xb0]\n0000000001079fca\tmov\tQWORD PTR [rbp-0x280],0x0\n0000000001079fd5\tmov\tQWORD PTR [rbp-0x2e0],r11\n0000000001079fdc\tlea\tr11,[rax+0x14]\n0000000001079fe0\tmov\tQWORD PTR [rbp-0x3c8],rdi\n0000000001079fe7\tlea\trdi,[rax+0x24]\n0000000001079feb\tmov\tQWORD PTR [rbp-0x2d8],0x0\n0000000001079ff6\tmov\tQWORD PTR [rbp-0x2d0],rsi\n0000000001079ffd\tmov\tQWORD PTR [rbp-0x2c8],r10\n000000000107a004\tlea\tr10,[rbp-0xc0]\n000000000107a00b\tmov\tQWORD PTR [rbp-0x2c0],0x0\n000000000107a016\tmov\tQWORD PTR [rbp-0x3c0],0x0\n000000000107a021\tmov\tQWORD PTR [rbp-0x320],r11\n000000000107a028\tlea\tr11,[rax+0x1c]\n000000000107a02c\tadd\trax,0x28\n000000000107a030\tmov\tQWORD PTR [rbp-0x420],rdi\n000000000107a037\tmov\tQWORD PTR [rbp-0x318],0x0\n000000000107a042\tmov\tQWORD PTR [rbp-0x310],rsi\n000000000107a049\tmov\tQWORD PTR [rbp-0x308],r10\n000000000107a050\tlea\tr10,[rbp-0xd0]\n000000000107a057\tlea\trdi,[rbp-0x100]\n000000000107a05e\tmov\tQWORD PTR [rbp-0x418],0x0\n000000000107a069\tmov\tQWORD PTR [rbp-0x410],rsi\n000000000107a070\tmov\tQWORD PTR [rbp-0x300],0x0\n000000000107a07b\tmov\tQWORD PTR [rbp-0x460],rax\n000000000107a082\tlea\trax,[rbp-0x110]\n000000000107a089\tmov\tQWORD PTR [rbp-0x458],0x0\n000000000107a094\tmov\tQWORD PTR [rbp-0x450],rsi\n000000000107a09b\tmov\tQWORD PTR [rbp-0x360],r11\n000000000107a0a2\tmov\tQWORD PTR [rbp-0x408],rdi\n000000000107a0a9\tmov\tQWORD PTR [rbp-0x358],0x0\n000000000107a0b4\tmov\tQWORD PTR [rbp-0x350],rsi\n000000000107a0bb\tmov\tQWORD PTR [rbp-0x348],r10\n000000000107a0c2\tmov\tQWORD PTR [rbp-0x340],0x0\n000000000107a0cd\tmov\tQWORD PTR [rbp-0x400],0x0\n000000000107a0d8\tlea\tr10,[rbp-0x430]\n000000000107a0df\tlea\tr11,[rbp-0x3f0]\n000000000107a0e6\tlea\trdi,[rbp-0x170]\n000000000107a0ed\tlea\trsi,[rbp-0x1b0]\n000000000107a0f4\tmov\tQWORD PTR [rbp-0x448],rax\n000000000107a0fb\tlea\trax,[rbp-0x470]\n000000000107a102\tmov\tQWORD PTR [rbp-0x440],0x0\n000000000107a10d\tpush\trax\n000000000107a10e\tpush\tr10\n000000000107a110\tpush\tr11\n000000000107a112\tpush\tr15\n000000000107a114\tpush\tr12\n000000000107a116\tlea\trax,[rbp-0x330]\n000000000107a11d\tpush\trax\n000000000107a11e\tlea\trax,[rbp-0x2f0]\n000000000107a125\tpush\trax\n000000000107a126\tlea\trax,[rbp-0x2b0]\n000000000107a12d\tpush\trax\n000000000107a12e\tcall\t1089ea0 <halide_b2>\n000000000107a133\tvmovss\txmm5,DWORD PTR [rip+0xfffffffffff88ab9]        # 1002bf4 <__anon_12526+0x10>\n000000000107a13b\tadd\trsp,0x40\n000000000107a13f\tmov\trax,QWORD PTR [r14+0x18]\n000000000107a143\tmov\tQWORD PTR [rbp-0x50],r14\n000000000107a147\ttest\trax,rax\n000000000107a14a\tje\t107a424 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x844>\n000000000107a150\tmov\trdx,QWORD PTR [rbp-0x38]\n000000000107a154\tmov\trcx,QWORD PTR [rbp-0x50]\n000000000107a158\tvmovss\txmm2,DWORD PTR [rip+0xfffffffffff88a74]        # 1002bd4 <__anon_30228+0x14>\n000000000107a160\tmov\tDWORD PTR [rbp-0x44],ebx\n000000000107a163\tvcvtsi2ss\txmm0,xmm15,edx\n000000000107a167\tmov\trcx,QWORD PTR [rcx+0x10]\n000000000107a16b\tlea\tr14d,[rdx-0x2]\n000000000107a16f\tmov\tesi,edx\n000000000107a171\tvcvtsi2ss\txmm1,xmm15,ebx\n000000000107a175\tjmp\t107a1be <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5de>\n000000000107a177\tnop\tWORD PTR [rax+rax*1+0x0]\n000000000107a180\timul\trdi,rsi\n000000000107a184\tmov\tedx,r8d\n000000000107a187\tadd\trdi,rdx\n000000000107a18a\tvmovq\txmm4,QWORD PTR [r13+rdi*4+0x0]\n000000000107a191\tvpaddusb\txmm4,xmm4,xmm3\n000000000107a195\tvmovq\tQWORD PTR [r13+rdi*4+0x0],xmm4\n000000000107a19c\tadd\trdi,rsi\n000000000107a19f\tvmovq\txmm4,QWORD PTR [r13+rdi*4+0x0]\n000000000107a1a6\tvpaddusb\txmm3,xmm4,xmm3\n000000000107a1aa\tvmovq\tQWORD PTR [r13+rdi*4+0x0],xmm3\n000000000107a1b1\tadd\trcx,0x44\n000000000107a1b5\tdec\trax\n000000000107a1b8\tje\t107a424 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x844>\n000000000107a1be\tvaddss\txmm4,xmm5,DWORD PTR [rcx]\n000000000107a1c2\tmovzx\tedx,BYTE PTR [rcx+0x41]\n000000000107a1c6\tlea\trdi,[rip+0xfffffffffff96453]        # 1010620 <__anon_32464>\n000000000107a1cd\tvmovq\txmm3,QWORD PTR [rdi+rdx*8]\n000000000107a1d2\tvmulss\txmm4,xmm4,xmm2\n000000000107a1d6\tvmulss\txmm4,xmm4,xmm0\n000000000107a1da\tvcvttss2si\tr8d,xmm4\n000000000107a1de\tvsubss\txmm4,xmm5,DWORD PTR [rcx+0x4]\n000000000107a1e3\tcmp\tr14d,r8d\n000000000107a1e6\tsetge\tdl\n000000000107a1e9\tvmulss\txmm4,xmm4,xmm2\n000000000107a1ed\tvmulss\txmm4,xmm4,xmm1\n000000000107a1f1\tvcvttss2si\tr9d,xmm4\n000000000107a1f5\tmov\tedi,r9d\n000000000107a1f8\tor\tedi,r8d\n000000000107a1fb\tmov\tedi,r9d\n000000000107a1fe\tsetns\tr10b\n000000000107a202\tand\tr10b,dl\n000000000107a205\tlea\tedx,[r9+0x2]\n000000000107a209\tcmp\tedx,ebx\n000000000107a20b\tsetle\tdl\n000000000107a20e\ttest\tr10b,dl\n000000000107a211\tjne\t107a180 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5a0>\n000000000107a217\tvpextrb\tedx,xmm3,0x2\n000000000107a21d\ttest\tr9d,r9d\n000000000107a220\tmov\tr10d,r14d\n000000000107a223\tvmovd\tr12d,xmm3\n000000000107a228\tvpextrb\tr11d,xmm3,0x1\n000000000107a22e\tmovsxd\tr15,r8d\n000000000107a231\tmov\tDWORD PTR [rbp-0x30],edx\n000000000107a234\tsets\tdl\n000000000107a237\tcmp\tr9d,ebx\n000000000107a23a\tsetge\tr14b\n000000000107a23e\tor\tr14b,dl\n000000000107a241\tjne\t107a330 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x750>\n000000000107a247\timul\trdi,rsi\n000000000107a24b\tcmp\tDWORD PTR [rbp-0x38],r8d\n000000000107a24f\tjbe\t107a2bd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x6dd>\n000000000107a251\tlea\tr14,[rdi+r15*1]\n000000000107a255\tlea\trdx,[r14*4+0x3]\n000000000107a25d\tcmp\trdx,QWORD PTR [rbp-0x40]\n000000000107a261\tjae\t107a2bd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x6dd>\n000000000107a263\tshl\tr14,0x2\n000000000107a267\tmov\tDWORD PTR [rbp-0x2c],r12d\n000000000107a26b\tmovzx\tebx,BYTE PTR [r13+r14*1+0x0]\n000000000107a271\tadd\tbl,r12b\n000000000107a274\tmov\tr12d,0xff\n000000000107a27a\tmovzx\tebx,bl\n000000000107a27d\tcmovb\tebx,r12d\n000000000107a281\tmov\tBYTE PTR [r13+r14*1+0x0],bl\n000000000107a286\tmovzx\tebx,BYTE PTR [r13+r14*1+0x1]\n000000000107a28c\tadd\tbl,r11b\n000000000107a28f\tmovzx\tebx,bl\n000000000107a292\tcmovb\tebx,r12d\n000000000107a296\tmov\tBYTE PTR [r13+r14*1+0x1],bl\n000000000107a29b\tmovzx\tebx,BYTE PTR [r13+r14*1+0x2]\n000000000107a2a1\tadd\tbl,BYTE PTR [rbp-0x30]\n000000000107a2a4\tmovzx\tebx,bl\n000000000107a2a7\tcmovb\tebx,r12d\n000000000107a2ab\tmov\tr12d,DWORD PTR [rbp-0x2c]\n000000000107a2af\tmov\tBYTE PTR [r13+r14*1+0x2],bl\n000000000107a2b4\tmov\tebx,DWORD PTR [rbp-0x44]\n000000000107a2b7\tmov\tBYTE PTR [r13+rdx*1+0x0],0xff\n000000000107a2bd\tlea\trdx,[r15+0x1]\n000000000107a2c1\tcmp\tDWORD PTR [rbp-0x38],edx\n000000000107a2c4\tjbe\t107a330 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x750>\n000000000107a2c6\tadd\trdi,rdx\n000000000107a2c9\tlea\tr14,[rdi*4+0x3]\n000000000107a2d1\tcmp\tr14,QWORD PTR [rbp-0x40]\n000000000107a2d5\tjae\t107a330 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x750>\n000000000107a2d7\tshl\trdi,0x2\n000000000107a2db\tmov\tDWORD PTR [rbp-0x2c],r11d\n000000000107a2df\tmov\tr11d,0xff\n000000000107a2e5\tmovzx\tedx,BYTE PTR [r13+rdi*1+0x0]\n000000000107a2eb\tadd\tdl,r12b\n000000000107a2ee\tmovzx\tedx,dl\n000000000107a2f1\tcmovb\tedx,r11d\n000000000107a2f5\tmov\tBYTE PTR [r13+rdi*1+0x0],dl\n000000000107a2fa\tmovzx\tedx,BYTE PTR [r13+rdi*1+0x1]\n000000000107a300\tadd\tdl,BYTE PTR [rbp-0x2c]\n000000000107a303\tmovzx\tedx,dl\n000000000107a306\tcmovb\tedx,r11d\n000000000107a30a\tmov\tBYTE PTR [r13+rdi*1+0x1],dl\n000000000107a30f\tmovzx\tedx,BYTE PTR [r13+rdi*1+0x2]\n000000000107a315\tadd\tdl,BYTE PTR [rbp-0x30]\n000000000107a318\tmovzx\tedx,dl\n000000000107a31b\tcmovb\tedx,r11d\n000000000107a31f\tmov\tr11d,DWORD PTR [rbp-0x2c]\n000000000107a323\tmov\tBYTE PTR [r13+rdi*1+0x2],dl\n000000000107a328\tmov\tBYTE PTR [r13+r14*1+0x0],0xff\n000000000107a32e\txchg\tax,ax\n000000000107a330\tinc\tr9d\n000000000107a333\tmov\tr14d,r10d\n000000000107a336\tsets\tdl\n000000000107a339\tcmp\tr9d,ebx\n000000000107a33c\tsetge\tdil\n000000000107a340\tor\tdil,dl\n000000000107a343\tjne\t107a1b1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>\n000000000107a349\timul\tr9,rsi\n000000000107a34d\tcmp\tDWORD PTR [rbp-0x38],r8d\n000000000107a351\tjbe\t107a3b4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x7d4>\n000000000107a353\tlea\trdi,[r9+r15*1]\n000000000107a357\tlea\tr8,[rdi*4+0x3]\n000000000107a35f\tcmp\tr8,QWORD PTR [rbp-0x40]\n000000000107a363\tjae\t107a3b4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x7d4>\n000000000107a365\tshl\trdi,0x2\n000000000107a369\tmov\tr10d,0xff\n000000000107a36f\tmovzx\tedx,BYTE PTR [r13+rdi*1+0x0]\n000000000107a375\tadd\tdl,r12b\n000000000107a378\tmovzx\tedx,dl\n000000000107a37b\tcmovb\tedx,r10d\n000000000107a37f\tmov\tBYTE PTR [r13+rdi*1+0x0],dl\n000000000107a384\tmovzx\tedx,BYTE PTR [r13+rdi*1+0x1]\n000000000107a38a\tadd\tdl,r11b\n000000000107a38d\tmovzx\tedx,dl\n000000000107a390\tcmovb\tedx,r10d\n000000000107a394\tmov\tBYTE PTR [r13+rdi*1+0x1],dl\n000000000107a399\tmovzx\tedx,BYTE PTR [r13+rdi*1+0x2]\n000000000107a39f\tadd\tdl,BYTE PTR [rbp-0x30]\n000000000107a3a2\tmovzx\tedx,dl\n000000000107a3a5\tcmovb\tedx,r10d\n000000000107a3a9\tmov\tBYTE PTR [r13+rdi*1+0x2],dl\n000000000107a3ae\tmov\tBYTE PTR [r13+r8*1+0x0],0xff\n000000000107a3b4\tinc\tr15\n000000000107a3b7\tcmp\tDWORD PTR [rbp-0x38],r15d\n000000000107a3bb\tjbe\t107a1b1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>\n000000000107a3c1\tadd\tr9,r15\n000000000107a3c4\tlea\trdx,[r9*4+0x3]\n000000000107a3cc\tcmp\trdx,QWORD PTR [rbp-0x40]\n000000000107a3d0\tjae\t107a1b1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>\n000000000107a3d6\tshl\tr9,0x2\n000000000107a3da\tmov\tr8d,0xff\n000000000107a3e0\tadd\tr12b,BYTE PTR [r13+r9*1+0x0]\n000000000107a3e5\tmovzx\tedi,r12b\n000000000107a3e9\tcmovb\tedi,r8d\n000000000107a3ed\tmov\tBYTE PTR [r13+r9*1+0x0],dil\n000000000107a3f2\tadd\tr11b,BYTE PTR [r13+r9*1+0x1]\n000000000107a3f7\tmovzx\tedi,r11b\n000000000107a3fb\tcmovb\tedi,r8d\n000000000107a3ff\tmov\tBYTE PTR [r13+r9*1+0x1],dil\n000000000107a404\tmov\tedi,DWORD PTR [rbp-0x30]\n000000000107a407\tadd\tdil,BYTE PTR [r13+r9*1+0x2]\n000000000107a40c\tmovzx\tedi,dil\n000000000107a410\tcmovb\tedi,r8d\n000000000107a414\tmov\tBYTE PTR [r13+r9*1+0x2],dil\n000000000107a419\tmov\tBYTE PTR [r13+rdx*1+0x0],0xff\n000000000107a41f\tjmp\t107a1b1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>\n000000000107a424\tmov\trax,QWORD PTR [rbp-0x50]\n000000000107a428\tinc\tQWORD PTR [rax+0x68]\n000000000107a42c\tadd\trsp,0x448\n000000000107a433\tpop\trbx\n000000000107a434\tpop\tr12\n000000000107a436\tpop\tr13\n000000000107a438\tpop\tr14\n000000000107a43a\tpop\tr15\n000000000107a43c\tpop\trbp\n000000000107a43d\tret\t\n000000000107a43e\txchg\tax,ax",
+    "insns": [
+      {
+        "a": 17275872,
+        "m": "push",
+        "o": "rbp",
+        "cls": "other"
+      },
+      {
+        "a": 17275873,
+        "m": "mov",
+        "o": "rbp,rsp",
+        "cls": "other"
+      },
+      {
+        "a": 17275876,
+        "m": "push",
+        "o": "r15",
+        "cls": "other"
+      },
+      {
+        "a": 17275878,
+        "m": "push",
+        "o": "r14",
+        "cls": "other"
+      },
+      {
+        "a": 17275880,
+        "m": "push",
+        "o": "r13",
+        "cls": "other"
+      },
+      {
+        "a": 17275882,
+        "m": "push",
+        "o": "r12",
+        "cls": "other"
+      },
+      {
+        "a": 17275884,
+        "m": "push",
+        "o": "rbx",
+        "cls": "other"
+      },
+      {
+        "a": 17275885,
+        "m": "sub",
+        "o": "rsp,0x448",
+        "cls": "other"
+      },
+      {
+        "a": 17275892,
+        "m": "vmovups",
+        "o": "xmm0,XMMWORD PTR [rip+0xfffffffffff88e54]        # 1002a50 <__anon_32491>",
+        "cls": "vload"
+      },
+      {
+        "a": 17275900,
+        "m": "mov",
+        "o": "rax,QWORD PTR [rdi+0x10]",
+        "cls": "load"
+      },
+      {
+        "a": 17275904,
+        "m": "mov",
+        "o": "r13,rsi",
+        "cls": "other"
+      },
+      {
+        "a": 17275907,
+        "m": "movabs",
+        "o": "rsi,0x200012002",
+        "cls": "other"
+      },
+      {
+        "a": 17275917,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x38],rcx",
+        "cls": "store"
+      },
+      {
+        "a": 17275921,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x40],rdx",
+        "cls": "store"
+      },
+      {
+        "a": 17275925,
+        "m": "mov",
+        "o": "rdx,QWORD PTR [rdi+0x68]",
+        "cls": "load"
+      },
+      {
+        "a": 17275929,
+        "m": "mov",
+        "o": "ecx,DWORD PTR [rdi+0x20]",
+        "cls": "load"
+      },
+      {
+        "a": 17275932,
+        "m": "mov",
+        "o": "ebx,r8d",
+        "cls": "other"
+      },
+      {
+        "a": 17275935,
+        "m": "mov",
+        "o": "r14,rdi",
+        "cls": "other"
+      },
+      {
+        "a": 17275938,
+        "m": "movabs",
+        "o": "r8,0x100010801",
+        "cls": "other"
+      },
+      {
+        "a": 17275948,
+        "m": "vmovss",
+        "o": "xmm5,DWORD PTR [rip+0xfffffffffff88fc0]        # 1002bf4 <__anon_12526+0x10>",
+        "cls": "load"
+      },
+      {
+        "a": 17275956,
+        "m": "vmovss",
+        "o": "xmm6,DWORD PTR [rip+0x1f3b4]        # 1098ff0 <framework.config.q>",
+        "cls": "load"
+      },
+      {
+        "a": 17275964,
+        "m": "vmovss",
+        "o": "xmm2,DWORD PTR [rip+0xfffffffffff88f88]        # 1002bcc <__anon_30228+0xc>",
+        "cls": "load"
+      },
+      {
+        "a": 17275972,
+        "m": "vmovss",
+        "o": "xmm4,DWORD PTR [rip+0xfffffffffff89004]        # 1002c50 <__anon_12532+0xc>",
+        "cls": "load"
+      },
+      {
+        "a": 17275980,
+        "m": "lea",
+        "o": "r10,[rbp-0x80]",
+        "cls": "other"
+      },
+      {
+        "a": 17275984,
+        "m": "lea",
+        "o": "r9,[rbp-0x70]",
+        "cls": "other"
+      },
+      {
+        "a": 17275988,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x60],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17275995,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x70],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276002,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x80],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276009,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x90],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276019,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0xa0],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276029,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0xb0],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276039,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0xc0],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276049,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0xd0],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276059,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0xe0],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276069,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0xf0],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276079,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x100],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276089,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x110],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276099,
+        "m": "lea",
+        "o": "r15,[rbp-0x3b0]",
+        "cls": "other"
+      },
+      {
+        "a": 17276106,
+        "m": "lea",
+        "o": "r12,[rbp-0x370]",
+        "cls": "other"
+      },
+      {
+        "a": 17276113,
+        "m": "vxorps",
+        "o": "xmm1,xmm1,xmm1",
+        "cls": "other"
+      },
+      {
+        "a": 17276117,
+        "m": "vpxor",
+        "o": "xmm3,xmm3,xmm3",
+        "cls": "vec"
+      },
+      {
+        "a": 17276121,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x160],rax",
+        "cls": "store"
+      },
+      {
+        "a": 17276128,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x150],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17276135,
+        "m": "lea",
+        "o": "rsi,[rbp-0x130]",
+        "cls": "other"
+      },
+      {
+        "a": 17276142,
+        "m": "lea",
+        "o": "rdi,[rax+0x41]",
+        "cls": "other"
+      },
+      {
+        "a": 17276146,
+        "m": "lea",
+        "o": "r11,[rax+0xc]",
+        "cls": "other"
+      },
+      {
+        "a": 17276150,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x5c],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276153,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x6c],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276156,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x7c],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276159,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x8c],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276165,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x9c],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276171,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0xac],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276177,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0xbc],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276183,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0xcc],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276189,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0xdc],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276195,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0xec],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276201,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0xfc],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276207,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x10c],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276213,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x58],0x44",
+        "cls": "store"
+      },
+      {
+        "a": 17276221,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x68],0x11",
+        "cls": "store"
+      },
+      {
+        "a": 17276229,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x78],0x11",
+        "cls": "store"
+      },
+      {
+        "a": 17276237,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x88],0x11",
+        "cls": "store"
+      },
+      {
+        "a": 17276248,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x98],0x11",
+        "cls": "store"
+      },
+      {
+        "a": 17276259,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0xa8],0x11",
+        "cls": "store"
+      },
+      {
+        "a": 17276270,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0xb8],0x11",
+        "cls": "store"
+      },
+      {
+        "a": 17276281,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0xc8],0x11",
+        "cls": "store"
+      },
+      {
+        "a": 17276292,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0xd8],0x44",
+        "cls": "store"
+      },
+      {
+        "a": 17276303,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0xe8],0x11",
+        "cls": "store"
+      },
+      {
+        "a": 17276314,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0xf8],0x11",
+        "cls": "store"
+      },
+      {
+        "a": 17276325,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x108],0x11",
+        "cls": "store"
+      },
+      {
+        "a": 17276336,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x148],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17276343,
+        "m": "lea",
+        "o": "rsi,[rbp-0x60]",
+        "cls": "other"
+      },
+      {
+        "a": 17276347,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x158],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276358,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x1a0],rdi",
+        "cls": "store"
+      },
+      {
+        "a": 17276365,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x190],r8",
+        "cls": "store"
+      },
+      {
+        "a": 17276372,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x140],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276383,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x188],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17276390,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x198],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276401,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x180],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276412,
+        "m": "movabs",
+        "o": "rsi,0x100012002",
+        "cls": "other"
+      },
+      {
+        "a": 17276422,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x130],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276430,
+        "m": "vxorps",
+        "o": "xmm0,xmm0,xmm0",
+        "cls": "other"
+      },
+      {
+        "a": 17276434,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x120],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276444,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x11c],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17276450,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x118],0x11",
+        "cls": "store"
+      },
+      {
+        "a": 17276461,
+        "m": "lea",
+        "o": "rcx,[rbp-0x1f0]",
+        "cls": "other"
+      },
+      {
+        "a": 17276468,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x1f0],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276476,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x230],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276484,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x220],r11",
+        "cls": "store"
+      },
+      {
+        "a": 17276491,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x3b0],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276499,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x170],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276507,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x1b0],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276515,
+        "m": "lea",
+        "o": "r11,[rax+0x4]",
+        "cls": "other"
+      },
+      {
+        "a": 17276519,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x270],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276527,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x2b0],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276535,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x2f0],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276543,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x330],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276551,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x370],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276559,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x3f0],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276567,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x430],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276575,
+        "m": "vmovaps",
+        "o": "XMMWORD PTR [rbp-0x470],xmm0",
+        "cls": "vstore"
+      },
+      {
+        "a": 17276583,
+        "m": "vmovss",
+        "o": "xmm0,DWORD PTR [rip+0xfffffffffff88d21]        # 1002bd0 <__anon_30228+0x10>",
+        "cls": "load"
+      },
+      {
+        "a": 17276591,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x3a0],rdi",
+        "cls": "store"
+      },
+      {
+        "a": 17276598,
+        "m": "lea",
+        "o": "rdi,[rbp-0xe0]",
+        "cls": "other"
+      },
+      {
+        "a": 17276605,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x218],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276616,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x210],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17276623,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x208],r10",
+        "cls": "store"
+      },
+      {
+        "a": 17276630,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x398],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276641,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x390],r8",
+        "cls": "store"
+      },
+      {
+        "a": 17276648,
+        "m": "lea",
+        "o": "r10,[rbp-0x90]",
+        "cls": "other"
+      },
+      {
+        "a": 17276655,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x1e0],rax",
+        "cls": "store"
+      },
+      {
+        "a": 17276662,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x1d8],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276673,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x1d0],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17276680,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x1c8],r9",
+        "cls": "store"
+      },
+      {
+        "a": 17276687,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x1c0],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276698,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x200],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276709,
+        "m": "lea",
+        "o": "r8,[rbp-0x230]",
+        "cls": "other"
+      },
+      {
+        "a": 17276716,
+        "m": "lea",
+        "o": "r9,[rbp-0x270]",
+        "cls": "other"
+      },
+      {
+        "a": 17276723,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x260],r11",
+        "cls": "store"
+      },
+      {
+        "a": 17276730,
+        "m": "lea",
+        "o": "r11,[rax+0x10]",
+        "cls": "other"
+      },
+      {
+        "a": 17276734,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x388],rdi",
+        "cls": "store"
+      },
+      {
+        "a": 17276741,
+        "m": "lea",
+        "o": "rdi,[rax+0x20]",
+        "cls": "other"
+      },
+      {
+        "a": 17276745,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x258],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276756,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x250],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17276763,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x248],r10",
+        "cls": "store"
+      },
+      {
+        "a": 17276770,
+        "m": "lea",
+        "o": "r10,[rbp-0xa0]",
+        "cls": "other"
+      },
+      {
+        "a": 17276777,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x240],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276788,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x380],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276799,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x2a0],r11",
+        "cls": "store"
+      },
+      {
+        "a": 17276806,
+        "m": "lea",
+        "o": "r11,[rax+0x8]",
+        "cls": "other"
+      },
+      {
+        "a": 17276810,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x3e0],rdi",
+        "cls": "store"
+      },
+      {
+        "a": 17276817,
+        "m": "lea",
+        "o": "rdi,[rbp-0xf0]",
+        "cls": "other"
+      },
+      {
+        "a": 17276824,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x298],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276835,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x290],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17276842,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x288],r10",
+        "cls": "store"
+      },
+      {
+        "a": 17276849,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x3d8],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276860,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x3d0],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17276867,
+        "m": "lea",
+        "o": "r10,[rbp-0xb0]",
+        "cls": "other"
+      },
+      {
+        "a": 17276874,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x280],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276885,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x2e0],r11",
+        "cls": "store"
+      },
+      {
+        "a": 17276892,
+        "m": "lea",
+        "o": "r11,[rax+0x14]",
+        "cls": "other"
+      },
+      {
+        "a": 17276896,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x3c8],rdi",
+        "cls": "store"
+      },
+      {
+        "a": 17276903,
+        "m": "lea",
+        "o": "rdi,[rax+0x24]",
+        "cls": "other"
+      },
+      {
+        "a": 17276907,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x2d8],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276918,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x2d0],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17276925,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x2c8],r10",
+        "cls": "store"
+      },
+      {
+        "a": 17276932,
+        "m": "lea",
+        "o": "r10,[rbp-0xc0]",
+        "cls": "other"
+      },
+      {
+        "a": 17276939,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x2c0],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276950,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x3c0],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276961,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x320],r11",
+        "cls": "store"
+      },
+      {
+        "a": 17276968,
+        "m": "lea",
+        "o": "r11,[rax+0x1c]",
+        "cls": "other"
+      },
+      {
+        "a": 17276972,
+        "m": "add",
+        "o": "rax,0x28",
+        "cls": "other"
+      },
+      {
+        "a": 17276976,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x420],rdi",
+        "cls": "store"
+      },
+      {
+        "a": 17276983,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x318],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17276994,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x310],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17277001,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x308],r10",
+        "cls": "store"
+      },
+      {
+        "a": 17277008,
+        "m": "lea",
+        "o": "r10,[rbp-0xd0]",
+        "cls": "other"
+      },
+      {
+        "a": 17277015,
+        "m": "lea",
+        "o": "rdi,[rbp-0x100]",
+        "cls": "other"
+      },
+      {
+        "a": 17277022,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x418],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17277033,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x410],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17277040,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x300],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17277051,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x460],rax",
+        "cls": "store"
+      },
+      {
+        "a": 17277058,
+        "m": "lea",
+        "o": "rax,[rbp-0x110]",
+        "cls": "other"
+      },
+      {
+        "a": 17277065,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x458],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17277076,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x450],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17277083,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x360],r11",
+        "cls": "store"
+      },
+      {
+        "a": 17277090,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x408],rdi",
+        "cls": "store"
+      },
+      {
+        "a": 17277097,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x358],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17277108,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x350],rsi",
+        "cls": "store"
+      },
+      {
+        "a": 17277115,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x348],r10",
+        "cls": "store"
+      },
+      {
+        "a": 17277122,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x340],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17277133,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x400],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17277144,
+        "m": "lea",
+        "o": "r10,[rbp-0x430]",
+        "cls": "other"
+      },
+      {
+        "a": 17277151,
+        "m": "lea",
+        "o": "r11,[rbp-0x3f0]",
+        "cls": "other"
+      },
+      {
+        "a": 17277158,
+        "m": "lea",
+        "o": "rdi,[rbp-0x170]",
+        "cls": "other"
+      },
+      {
+        "a": 17277165,
+        "m": "lea",
+        "o": "rsi,[rbp-0x1b0]",
+        "cls": "other"
+      },
+      {
+        "a": 17277172,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x448],rax",
+        "cls": "store"
+      },
+      {
+        "a": 17277179,
+        "m": "lea",
+        "o": "rax,[rbp-0x470]",
+        "cls": "other"
+      },
+      {
+        "a": 17277186,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x440],0x0",
+        "cls": "store"
+      },
+      {
+        "a": 17277197,
+        "m": "push",
+        "o": "rax",
+        "cls": "other"
+      },
+      {
+        "a": 17277198,
+        "m": "push",
+        "o": "r10",
+        "cls": "other"
+      },
+      {
+        "a": 17277200,
+        "m": "push",
+        "o": "r11",
+        "cls": "other"
+      },
+      {
+        "a": 17277202,
+        "m": "push",
+        "o": "r15",
+        "cls": "other"
+      },
+      {
+        "a": 17277204,
+        "m": "push",
+        "o": "r12",
+        "cls": "other"
+      },
+      {
+        "a": 17277206,
+        "m": "lea",
+        "o": "rax,[rbp-0x330]",
+        "cls": "other"
+      },
+      {
+        "a": 17277213,
+        "m": "push",
+        "o": "rax",
+        "cls": "other"
+      },
+      {
+        "a": 17277214,
+        "m": "lea",
+        "o": "rax,[rbp-0x2f0]",
+        "cls": "other"
+      },
+      {
+        "a": 17277221,
+        "m": "push",
+        "o": "rax",
+        "cls": "other"
+      },
+      {
+        "a": 17277222,
+        "m": "lea",
+        "o": "rax,[rbp-0x2b0]",
+        "cls": "other"
+      },
+      {
+        "a": 17277229,
+        "m": "push",
+        "o": "rax",
+        "cls": "other"
+      },
+      {
+        "a": 17277230,
+        "m": "call",
+        "o": "1089ea0 <halide_b2>",
+        "cls": "branch",
+        "t": "halide_b2"
       },
       {
-        "source": "        .{ .min = 0, .extent = @intCast(n), .stride = stride_floats, .flags = 0 },",
-        "asm": [
-          "vmovups\txmm0,XMMWORD PTR [rip+0xfffffffffff887a4]        # 1002a50 <__anon_32712>"
-        ]
+        "a": 17277235,
+        "m": "vmovss",
+        "o": "xmm5,DWORD PTR [rip+0xfffffffffff88ab9]        # 1002bf4 <__anon_12526+0x10>",
+        "cls": "load"
       },
       {
-        "source": "        halide.run(data, dt, sim.frame);",
-        "asm": [
-          "mov\trax,QWORD PTR [rdi+0x10]"
-        ]
+        "a": 17277243,
+        "m": "add",
+        "o": "rsp,0x40",
+        "cls": "other"
       },
       {
-        "source": "framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step():",
-        "asm": [
-          "mov\tr13,rsi"
-        ]
+        "a": 17277247,
+        "m": "mov",
+        "o": "rax,QWORD PTR [r14+0x18]",
+        "cls": "load"
       },
       {
-        "source": "layouts.ML01.AF02.LP1-halide.LP2-opt.H.step__anon_32555():",
-        "asm": [
-          "movabs\trsi,0x200012002",
-          "mov\tQWORD PTR [rbp-0x38],rcx",
-          "mov\tQWORD PTR [rbp-0x40],rdx",
-          "mov\trdx,QWORD PTR [rdi+0x68]",
-          "mov\tecx,DWORD PTR [rdi+0x20]",
-          "mov\tebx,r8d",
-          "mov\tr14,rdi",
-          "movabs\tr8,0x100010801",
-          "vmovss\txmm5,DWORD PTR [rip+0xfffffffffff88910]        # 1002bf4 <__anon_12715+0x10>"
-        ]
+        "a": 17277251,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x50],r14",
+        "cls": "store"
       },
       {
-        "source": "    const rc = halide_b2(&buf_in, &buf_kind_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, config.kill_age, frame, config.q, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_kind, &buf_cr, &buf_cg, &buf_cb);",
-        "asm": [
-          "vmovss\txmm6,DWORD PTR [rip+0x1f3b4]        # 10996a0 <framework.config.q>",
-          "vmovss\txmm2,DWORD PTR [rip+0xfffffffffff888d8]        # 1002bcc <__anon_30408+0xc>",
-          "vmovss\txmm4,DWORD PTR [rip+0xfffffffffff88954]        # 1002c50 <__anon_12721+0xc>",
-          "lea\tr10,[rbp-0x80]",
-          "lea\tr9,[rbp-0x70]"
-        ]
+        "a": 17277255,
+        "m": "test",
+        "o": "rax,rax",
+        "cls": "cmp"
       },
       {
-        "source": "        .{ .min = 0, .extent = @intCast(n), .stride = stride_bytes, .flags = 0 },",
-        "asm": [
-          "mov\tDWORD PTR [rbp-0x60],0x0"
-        ]
+        "a": 17277258,
+        "m": "je",
+        "o": "107a424 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x844>",
+        "cls": "branch",
+        "bt": 368
       },
       {
-        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
-        "asm": [
-          "mov\tDWORD PTR [rbp-0x70],0x0",
-          "mov\tDWORD PTR [rbp-0x80],0x0",
-          "mov\tDWORD PTR [rbp-0x90],0x0",
-          "mov\tDWORD PTR [rbp-0xa0],0x0",
-          "mov\tDWORD PTR [rbp-0xb0],0x0",
-          "mov\tDWORD PTR [rbp-0xc0],0x0",
-          "mov\tDWORD PTR [rbp-0xd0],0x0",
-          "mov\tDWORD PTR [rbp-0xe0],0x0",
-          "mov\tDWORD PTR [rbp-0xf0],0x0",
-          "mov\tDWORD PTR [rbp-0x100],0x0",
-          "mov\tDWORD PTR [rbp-0x110],0x0",
-          "lea\tr15,[rbp-0x3b0]",
-          "lea\tr12,[rbp-0x370]"
-        ]
+        "a": 17277264,
+        "m": "mov",
+        "o": "rdx,QWORD PTR [rbp-0x38]",
+        "cls": "load"
       },
       {
-        "source": "    const rc = halide_b2(&buf_in, &buf_kind_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, config.kill_age, frame, config.q, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_kind, &buf_cr, &buf_cg, &buf_cb);",
-        "asm": [
-          "vxorps\txmm1,xmm1,xmm1",
-          "vpxor\txmm3,xmm3,xmm3"
-        ]
+        "a": 17277268,
+        "m": "mov",
+        "o": "rcx,QWORD PTR [rbp-0x50]",
+        "cls": "load"
       },
       {
-        "source": "    var buf_in: halide_buffer_t = .{ .host = base, .type = FLOAT32, .dimensions = 2, .dim = &in_dims };",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x160],rax",
-          "mov\tQWORD PTR [rbp-0x150],rsi",
-          "lea\trsi,[rbp-0x130]"
-        ]
+        "a": 17277272,
+        "m": "vmovss",
+        "o": "xmm2,DWORD PTR [rip+0xfffffffffff88a74]        # 1002bd4 <__anon_30228+0x14>",
+        "cls": "load"
       },
       {
-        "source": "    var buf_kind_in: halide_buffer_t = .{ .host = base + @offsetOf(Particle, \"kind\"), .type = UINT8, .dimensions = 1, .dim = &kind_dim };",
-        "asm": [
-          "lea\trdi,[rax+0x41]"
-        ]
+        "a": 17277280,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x44],ebx",
+        "cls": "store"
       },
       {
-        "source": "    var buf_vx = out1d(base + vel_off + 0, n, stride_floats, FLOAT32, &dvx);",
-        "asm": [
-          "lea\tr11,[rax+0xc]"
-        ]
+        "a": 17277283,
+        "m": "vcvtsi2ss",
+        "o": "xmm0,xmm15,edx",
+        "cls": "vec"
       },
       {
-        "source": "        .{ .min = 0, .extent = @intCast(n), .stride = stride_bytes, .flags = 0 },",
-        "asm": [
-          "mov\tDWORD PTR [rbp-0x5c],ecx"
-        ]
+        "a": 17277287,
+        "m": "mov",
+        "o": "rcx,QWORD PTR [rcx+0x10]",
+        "cls": "load"
       },
       {
-        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
-        "asm": [
-          "mov\tDWORD PTR [rbp-0x6c],ecx",
-          "mov\tDWORD PTR [rbp-0x7c],ecx",
-          "mov\tDWORD PTR [rbp-0x8c],ecx",
-          "mov\tDWORD PTR [rbp-0x9c],ecx",
-          "mov\tDWORD PTR [rbp-0xac],ecx",
-          "mov\tDWORD PTR [rbp-0xbc],ecx",
-          "mov\tDWORD PTR [rbp-0xcc],ecx",
-          "mov\tDWORD PTR [rbp-0xdc],ecx",
-          "mov\tDWORD PTR [rbp-0xec],ecx",
-          "mov\tDWORD PTR [rbp-0xfc],ecx",
-          "mov\tDWORD PTR [rbp-0x10c],ecx"
-        ]
+        "a": 17277291,
+        "m": "lea",
+        "o": "r14d,[rdx-0x2]",
+        "cls": "other"
       },
       {
-        "source": "        .{ .min = 0, .extent = @intCast(n), .stride = stride_bytes, .flags = 0 },",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x58],0x44"
-        ]
+        "a": 17277295,
+        "m": "mov",
+        "o": "esi,edx",
+        "cls": "other"
       },
       {
-        "source": "    d[0] = .{ .min = 0, .extent = @intCast(n), .stride = stride, .flags = 0 };",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x68],0x11",
-          "mov\tQWORD PTR [rbp-0x78],0x11",
-          "mov\tQWORD PTR [rbp-0x88],0x11",
-          "mov\tQWORD PTR [rbp-0x98],0x11",
-          "mov\tQWORD PTR [rbp-0xa8],0x11",
-          "mov\tQWORD PTR [rbp-0xb8],0x11",
-          "mov\tQWORD PTR [rbp-0xc8],0x11",
-          "mov\tQWORD PTR [rbp-0xd8],0x44",
-          "mov\tQWORD PTR [rbp-0xe8],0x11",
-          "mov\tQWORD PTR [rbp-0xf8],0x11",
-          "mov\tQWORD PTR [rbp-0x108],0x11"
-        ]
+        "a": 17277297,
+        "m": "vcvtsi2ss",
+        "o": "xmm1,xmm15,ebx",
+        "cls": "vec"
       },
       {
-        "source": "    var buf_in: halide_buffer_t = .{ .host = base, .type = FLOAT32, .dimensions = 2, .dim = &in_dims };",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x148],rsi",
-          "lea\trsi,[rbp-0x60]",
-          "mov\tQWORD PTR [rbp-0x158],0x0"
-        ]
+        "a": 17277301,
+        "m": "jmp",
+        "o": "107a1be <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5de>",
+        "cls": "branch",
+        "bt": 221
       },
       {
-        "source": "    var buf_kind_in: halide_buffer_t = .{ .host = base + @offsetOf(Particle, \"kind\"), .type = UINT8, .dimensions = 1, .dim = &kind_dim };",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x1a0],rdi",
-          "mov\tQWORD PTR [rbp-0x190],r8"
-        ]
+        "a": 17277303,
+        "m": "nop",
+        "o": "WORD PTR [rax+rax*1+0x0]",
+        "cls": "other"
       },
       {
-        "source": "    var buf_in: halide_buffer_t = .{ .host = base, .type = FLOAT32, .dimensions = 2, .dim = &in_dims };",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x140],0x0"
-        ]
+        "a": 17277312,
+        "m": "imul",
+        "o": "rdi,rsi",
+        "cls": "other"
       },
       {
-        "source": "    var buf_kind_in: halide_buffer_t = .{ .host = base + @offsetOf(Particle, \"kind\"), .type = UINT8, .dimensions = 1, .dim = &kind_dim };",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x188],rsi",
-          "mov\tQWORD PTR [rbp-0x198],0x0",
-          "mov\tQWORD PTR [rbp-0x180],0x0",
-          "movabs\trsi,0x100012002"
-        ]
+        "a": 17277316,
+        "m": "mov",
+        "o": "edx,r8d",
+        "cls": "other"
       },
       {
-        "source": "        .{ .min = 0, .extent = @intCast(n), .stride = stride_floats, .flags = 0 },",
-        "asm": [
-          "vmovaps\tXMMWORD PTR [rbp-0x130],xmm0"
-        ]
+        "a": 17277319,
+        "m": "add",
+        "o": "rdi,rdx",
+        "cls": "other"
       },
       {
-        "source": "    var buf_in: halide_buffer_t = .{ .host = base, .type = FLOAT32, .dimensions = 2, .dim = &in_dims };",
-        "asm": [
-          "vxorps\txmm0,xmm0,xmm0"
-        ]
+        "a": 17277322,
+        "m": "vmovq",
+        "o": "xmm4,QWORD PTR [r13+rdi*4+0x0]",
+        "cls": "vec"
       },
       {
-        "source": "        .{ .min = 0, .extent = @intCast(n), .stride = stride_floats, .flags = 0 },",
-        "asm": [
-          "mov\tDWORD PTR [rbp-0x120],0x0",
-          "mov\tDWORD PTR [rbp-0x11c],ecx",
-          "mov\tQWORD PTR [rbp-0x118],0x11",
-          "lea\trcx,[rbp-0x1f0]"
-        ]
+        "a": 17277329,
+        "m": "vpaddusb",
+        "o": "xmm4,xmm4,xmm3",
+        "cls": "other"
       },
       {
-        "source": "    return .{ .host = host, .type = t, .dimensions = 1, .dim = d };",
-        "asm": [
-          "vmovaps\tXMMWORD PTR [rbp-0x1f0],xmm0",
-          "vmovaps\tXMMWORD PTR [rbp-0x230],xmm0"
-        ]
+        "a": 17277333,
+        "m": "vmovq",
+        "o": "QWORD PTR [r13+rdi*4+0x0],xmm4",
+        "cls": "vec"
       },
       {
-        "source": "    var buf_vx = out1d(base + vel_off + 0, n, stride_floats, FLOAT32, &dvx);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x220],r11"
-        ]
+        "a": 17277340,
+        "m": "add",
+        "o": "rdi,rsi",
+        "cls": "other"
       },
       {
-        "source": "    return .{ .host = host, .type = t, .dimensions = 1, .dim = d };",
-        "asm": [
-          "vmovaps\tXMMWORD PTR [rbp-0x3b0],xmm0"
-        ]
+        "a": 17277343,
+        "m": "vmovq",
+        "o": "xmm4,QWORD PTR [r13+rdi*4+0x0]",
+        "cls": "vec"
       },
       {
-        "source": "    var buf_in: halide_buffer_t = .{ .host = base, .type = FLOAT32, .dimensions = 2, .dim = &in_dims };",
-        "asm": [
-          "vmovaps\tXMMWORD PTR [rbp-0x170],xmm0"
-        ]
+        "a": 17277350,
+        "m": "vpaddusb",
+        "o": "xmm3,xmm4,xmm3",
+        "cls": "other"
       },
       {
-        "source": "    var buf_kind_in: halide_buffer_t = .{ .host = base + @offsetOf(Particle, \"kind\"), .type = UINT8, .dimensions = 1, .dim = &kind_dim };",
-        "asm": [
-          "vmovaps\tXMMWORD PTR [rbp-0x1b0],xmm0"
-        ]
+        "a": 17277354,
+        "m": "vmovq",
+        "o": "QWORD PTR [r13+rdi*4+0x0],xmm3",
+        "cls": "vec"
       },
       {
-        "source": "    var buf_py = out1d(base + pos_off + 4, n, stride_floats, FLOAT32, &dpy);",
-        "asm": [
-          "lea\tr11,[rax+0x4]"
-        ]
+        "a": 17277361,
+        "m": "add",
+        "o": "rcx,0x44",
+        "cls": "other"
       },
       {
-        "source": "    return .{ .host = host, .type = t, .dimensions = 1, .dim = d };",
-        "asm": [
-          "vmovaps\tXMMWORD PTR [rbp-0x270],xmm0",
-          "vmovaps\tXMMWORD PTR [rbp-0x2b0],xmm0",
-          "vmovaps\tXMMWORD PTR [rbp-0x2f0],xmm0",
-          "vmovaps\tXMMWORD PTR [rbp-0x330],xmm0",
-          "vmovaps\tXMMWORD PTR [rbp-0x370],xmm0",
-          "vmovaps\tXMMWORD PTR [rbp-0x3f0],xmm0",
-          "vmovaps\tXMMWORD PTR [rbp-0x430],xmm0",
-          "vmovaps\tXMMWORD PTR [rbp-0x470],xmm0",
-          "vmovss\txmm0,DWORD PTR [rip+0xfffffffffff88671]        # 1002bd0 <__anon_30408+0x10>"
-        ]
+        "a": 17277365,
+        "m": "dec",
+        "o": "rax",
+        "cls": "other"
       },
       {
-        "source": "    var buf_kind = out1d(base + @offsetOf(Particle, \"kind\"), n, stride_bytes, UINT8, &dkd);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x3a0],rdi",
-          "lea\trdi,[rbp-0xe0]"
-        ]
+        "a": 17277368,
+        "m": "je",
+        "o": "107a424 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x844>",
+        "cls": "branch",
+        "bt": 368
       },
       {
-        "source": "    var buf_vx = out1d(base + vel_off + 0, n, stride_floats, FLOAT32, &dvx);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x218],0x0",
-          "mov\tQWORD PTR [rbp-0x210],rsi",
-          "mov\tQWORD PTR [rbp-0x208],r10"
-        ]
+        "a": 17277374,
+        "m": "vaddss",
+        "o": "xmm4,xmm5,DWORD PTR [rcx]",
+        "cls": "fp"
       },
       {
-        "source": "    var buf_kind = out1d(base + @offsetOf(Particle, \"kind\"), n, stride_bytes, UINT8, &dkd);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x398],0x0",
-          "mov\tQWORD PTR [rbp-0x390],r8",
-          "lea\tr10,[rbp-0x90]"
-        ]
+        "a": 17277378,
+        "m": "movzx",
+        "o": "edx,BYTE PTR [rcx+0x41]",
+        "cls": "load"
       },
       {
-        "source": "    var buf_px = out1d(base + pos_off + 0, n, stride_floats, FLOAT32, &dpx);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x1e0],rax",
-          "mov\tQWORD PTR [rbp-0x1d8],0x0",
-          "mov\tQWORD PTR [rbp-0x1d0],rsi",
-          "mov\tQWORD PTR [rbp-0x1c8],r9",
-          "mov\tQWORD PTR [rbp-0x1c0],0x0"
-        ]
+        "a": 17277382,
+        "m": "lea",
+        "o": "rdi,[rip+0xfffffffffff96453]        # 1010620 <__anon_32464>",
+        "cls": "other"
       },
       {
-        "source": "    var buf_vx = out1d(base + vel_off + 0, n, stride_floats, FLOAT32, &dvx);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x200],0x0",
-          "lea\tr8,[rbp-0x230]",
-          "lea\tr9,[rbp-0x270]"
-        ]
+        "a": 17277389,
+        "m": "vmovq",
+        "o": "xmm3,QWORD PTR [rdi+rdx*8]",
+        "cls": "vec"
       },
       {
-        "source": "    var buf_py = out1d(base + pos_off + 4, n, stride_floats, FLOAT32, &dpy);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x260],r11"
-        ]
+        "a": 17277394,
+        "m": "vmulss",
+        "o": "xmm4,xmm4,xmm2",
+        "cls": "fp"
       },
       {
-        "source": "    var buf_vy = out1d(base + vel_off + 4, n, stride_floats, FLOAT32, &dvy);",
-        "asm": [
-          "lea\tr11,[rax+0x10]"
-        ]
+        "a": 17277398,
+        "m": "vmulss",
+        "o": "xmm4,xmm4,xmm0",
+        "cls": "fp"
       },
       {
-        "source": "    var buf_kind = out1d(base + @offsetOf(Particle, \"kind\"), n, stride_bytes, UINT8, &dkd);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x388],rdi"
-        ]
+        "a": 17277402,
+        "m": "vcvttss2si",
+        "o": "r8d,xmm4",
+        "cls": "vec"
       },
       {
-        "source": "    var buf_cr = out1d(base + color_off + 0, n, stride_floats, FLOAT32, &dcr);",
-        "asm": [
-          "lea\trdi,[rax+0x20]"
-        ]
+        "a": 17277406,
+        "m": "vsubss",
+        "o": "xmm4,xmm5,DWORD PTR [rcx+0x4]",
+        "cls": "fp"
       },
       {
-        "source": "    var buf_py = out1d(base + pos_off + 4, n, stride_floats, FLOAT32, &dpy);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x258],0x0",
-          "mov\tQWORD PTR [rbp-0x250],rsi",
-          "mov\tQWORD PTR [rbp-0x248],r10",
-          "lea\tr10,[rbp-0xa0]",
-          "mov\tQWORD PTR [rbp-0x240],0x0"
-        ]
+        "a": 17277411,
+        "m": "cmp",
+        "o": "r14d,r8d",
+        "cls": "cmp"
       },
       {
-        "source": "    var buf_kind = out1d(base + @offsetOf(Particle, \"kind\"), n, stride_bytes, UINT8, &dkd);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x380],0x0"
-        ]
+        "a": 17277414,
+        "m": "setge",
+        "o": "dl",
+        "cls": "cmp"
       },
       {
-        "source": "    var buf_vy = out1d(base + vel_off + 4, n, stride_floats, FLOAT32, &dvy);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x2a0],r11"
-        ]
+        "a": 17277417,
+        "m": "vmulss",
+        "o": "xmm4,xmm4,xmm2",
+        "cls": "fp"
       },
       {
-        "source": "    var buf_pz = out1d(base + pos_off + 8, n, stride_floats, FLOAT32, &dpz);",
-        "asm": [
-          "lea\tr11,[rax+0x8]"
-        ]
+        "a": 17277421,
+        "m": "vmulss",
+        "o": "xmm4,xmm4,xmm1",
+        "cls": "fp"
       },
       {
-        "source": "    var buf_cr = out1d(base + color_off + 0, n, stride_floats, FLOAT32, &dcr);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x3e0],rdi",
-          "lea\trdi,[rbp-0xf0]"
-        ]
+        "a": 17277425,
+        "m": "vcvttss2si",
+        "o": "r9d,xmm4",
+        "cls": "vec"
       },
       {
-        "source": "    var buf_vy = out1d(base + vel_off + 4, n, stride_floats, FLOAT32, &dvy);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x298],0x0",
-          "mov\tQWORD PTR [rbp-0x290],rsi",
-          "mov\tQWORD PTR [rbp-0x288],r10"
-        ]
+        "a": 17277429,
+        "m": "mov",
+        "o": "edi,r9d",
+        "cls": "other"
       },
       {
-        "source": "    var buf_cr = out1d(base + color_off + 0, n, stride_floats, FLOAT32, &dcr);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x3d8],0x0",
-          "mov\tQWORD PTR [rbp-0x3d0],rsi",
-          "lea\tr10,[rbp-0xb0]"
-        ]
+        "a": 17277432,
+        "m": "or",
+        "o": "edi,r8d",
+        "cls": "other"
       },
       {
-        "source": "    var buf_vy = out1d(base + vel_off + 4, n, stride_floats, FLOAT32, &dvy);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x280],0x0"
-        ]
+        "a": 17277435,
+        "m": "mov",
+        "o": "edi,r9d",
+        "cls": "other"
       },
       {
-        "source": "    var buf_pz = out1d(base + pos_off + 8, n, stride_floats, FLOAT32, &dpz);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x2e0],r11"
-        ]
+        "a": 17277438,
+        "m": "setns",
+        "o": "r10b",
+        "cls": "cmp"
       },
       {
-        "source": "    var buf_vz = out1d(base + vel_off + 8, n, stride_floats, FLOAT32, &dvz);",
-        "asm": [
-          "lea\tr11,[rax+0x14]"
-        ]
+        "a": 17277442,
+        "m": "and",
+        "o": "r10b,dl",
+        "cls": "other"
       },
       {
-        "source": "    var buf_cr = out1d(base + color_off + 0, n, stride_floats, FLOAT32, &dcr);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x3c8],rdi"
-        ]
+        "a": 17277445,
+        "m": "lea",
+        "o": "edx,[r9+0x2]",
+        "cls": "other"
       },
       {
-        "source": "    var buf_cg = out1d(base + color_off + 4, n, stride_floats, FLOAT32, &dcg);",
-        "asm": [
-          "lea\trdi,[rax+0x24]"
-        ]
+        "a": 17277449,
+        "m": "cmp",
+        "o": "edx,ebx",
+        "cls": "cmp"
       },
       {
-        "source": "    var buf_pz = out1d(base + pos_off + 8, n, stride_floats, FLOAT32, &dpz);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x2d8],0x0",
-          "mov\tQWORD PTR [rbp-0x2d0],rsi",
-          "mov\tQWORD PTR [rbp-0x2c8],r10",
-          "lea\tr10,[rbp-0xc0]",
-          "mov\tQWORD PTR [rbp-0x2c0],0x0"
-        ]
+        "a": 17277451,
+        "m": "setle",
+        "o": "dl",
+        "cls": "cmp"
       },
       {
-        "source": "    var buf_cr = out1d(base + color_off + 0, n, stride_floats, FLOAT32, &dcr);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x3c0],0x0"
-        ]
+        "a": 17277454,
+        "m": "test",
+        "o": "r10b,dl",
+        "cls": "cmp"
       },
       {
-        "source": "    var buf_vz = out1d(base + vel_off + 8, n, stride_floats, FLOAT32, &dvz);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x320],r11"
-        ]
+        "a": 17277457,
+        "m": "jne",
+        "o": "107a180 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5a0>",
+        "cls": "branch",
+        "bt": 208
       },
       {
-        "source": "    var buf_age = out1d(base + @offsetOf(Particle, \"age\"), n, stride_floats, FLOAT32, &dag);",
-        "asm": [
-          "lea\tr11,[rax+0x1c]"
-        ]
+        "a": 17277463,
+        "m": "vpextrb",
+        "o": "edx,xmm3,0x2",
+        "cls": "other"
       },
       {
-        "source": "    var buf_cb = out1d(base + color_off + 8, n, stride_floats, FLOAT32, &dcb);",
-        "asm": [
-          "add\trax,0x28"
-        ]
+        "a": 17277469,
+        "m": "test",
+        "o": "r9d,r9d",
+        "cls": "cmp"
       },
       {
-        "source": "    var buf_cg = out1d(base + color_off + 4, n, stride_floats, FLOAT32, &dcg);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x420],rdi"
-        ]
+        "a": 17277472,
+        "m": "mov",
+        "o": "r10d,r14d",
+        "cls": "other"
       },
       {
-        "source": "    var buf_vz = out1d(base + vel_off + 8, n, stride_floats, FLOAT32, &dvz);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x318],0x0",
-          "mov\tQWORD PTR [rbp-0x310],rsi",
-          "mov\tQWORD PTR [rbp-0x308],r10",
-          "lea\tr10,[rbp-0xd0]",
-          "lea\trdi,[rbp-0x100]"
-        ]
+        "a": 17277475,
+        "m": "vmovd",
+        "o": "r12d,xmm3",
+        "cls": "vec"
       },
       {
-        "source": "    var buf_cg = out1d(base + color_off + 4, n, stride_floats, FLOAT32, &dcg);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x418],0x0",
-          "mov\tQWORD PTR [rbp-0x410],rsi"
-        ]
+        "a": 17277480,
+        "m": "vpextrb",
+        "o": "r11d,xmm3,0x1",
+        "cls": "other"
       },
       {
-        "source": "    var buf_vz = out1d(base + vel_off + 8, n, stride_floats, FLOAT32, &dvz);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x300],0x0"
-        ]
+        "a": 17277486,
+        "m": "movsxd",
+        "o": "r15,r8d",
+        "cls": "other"
       },
       {
-        "source": "    var buf_cb = out1d(base + color_off + 8, n, stride_floats, FLOAT32, &dcb);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x460],rax",
-          "lea\trax,[rbp-0x110]",
-          "mov\tQWORD PTR [rbp-0x458],0x0",
-          "mov\tQWORD PTR [rbp-0x450],rsi"
-        ]
+        "a": 17277489,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x30],edx",
+        "cls": "store"
       },
       {
-        "source": "    var buf_age = out1d(base + @offsetOf(Particle, \"age\"), n, stride_floats, FLOAT32, &dag);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x360],r11"
-        ]
+        "a": 17277492,
+        "m": "sets",
+        "o": "dl",
+        "cls": "cmp"
       },
       {
-        "source": "    var buf_cg = out1d(base + color_off + 4, n, stride_floats, FLOAT32, &dcg);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x408],rdi"
-        ]
+        "a": 17277495,
+        "m": "cmp",
+        "o": "r9d,ebx",
+        "cls": "cmp"
       },
       {
-        "source": "    var buf_age = out1d(base + @offsetOf(Particle, \"age\"), n, stride_floats, FLOAT32, &dag);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x358],0x0",
-          "mov\tQWORD PTR [rbp-0x350],rsi",
-          "mov\tQWORD PTR [rbp-0x348],r10",
-          "mov\tQWORD PTR [rbp-0x340],0x0"
-        ]
+        "a": 17277498,
+        "m": "setge",
+        "o": "r14b",
+        "cls": "cmp"
       },
       {
-        "source": "    var buf_cg = out1d(base + color_off + 4, n, stride_floats, FLOAT32, &dcg);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x400],0x0",
-          "lea\tr10,[rbp-0x430]",
-          "lea\tr11,[rbp-0x3f0]",
-          "lea\trdi,[rbp-0x170]",
-          "lea\trsi,[rbp-0x1b0]"
-        ]
+        "a": 17277502,
+        "m": "or",
+        "o": "r14b,dl",
+        "cls": "other"
       },
       {
-        "source": "    var buf_cb = out1d(base + color_off + 8, n, stride_floats, FLOAT32, &dcb);",
-        "asm": [
-          "mov\tQWORD PTR [rbp-0x448],rax",
-          "lea\trax,[rbp-0x470]",
-          "mov\tQWORD PTR [rbp-0x440],0x0"
-        ]
+        "a": 17277505,
+        "m": "jne",
+        "o": "107a330 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x750>",
+        "cls": "branch",
+        "bt": 312
       },
       {
-        "source": "    const rc = halide_b2(&buf_in, &buf_kind_in, dt, config.gravity.x, config.gravity.y, config.gravity.z, config.drag, config.kill_age, frame, config.q, &buf_px, &buf_vx, &buf_py, &buf_vy, &buf_pz, &buf_vz, &buf_age, &buf_kind, &buf_cr, &buf_cg, &buf_cb);",
-        "asm": [
-          "push\trax",
-          "push\tr10",
-          "push\tr11",
-          "push\tr15",
-          "push\tr12",
-          "lea\trax,[rbp-0x330]",
-          "push\trax",
-          "lea\trax,[rbp-0x2f0]",
-          "push\trax",
-          "lea\trax,[rbp-0x2b0]",
-          "push\trax",
-          "call\t108a550 <halide_b2>",
-          "vmovss\txmm5,DWORD PTR [rip+0xfffffffffff88409]        # 1002bf4 <__anon_12715+0x10>",
-          "add\trsp,0x40"
-        ]
+        "a": 17277511,
+        "m": "imul",
+        "o": "rdi,rsi",
+        "cls": "other"
       },
       {
-        "source": "        for (data.particles) |p| {",
-        "asm": [
-          "mov\trax,QWORD PTR [r14+0x18]",
-          "mov\tQWORD PTR [rbp-0x50],r14",
-          "test\trax,rax",
-          "je\t107aad4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x844>",
-          "mov\trdx,QWORD PTR [rbp-0x38]",
-          "mov\trcx,QWORD PTR [rbp-0x50]",
-          "vmovss\txmm2,DWORD PTR [rip+0xfffffffffff883c4]        # 1002bd4 <__anon_30408+0x14>",
-          "mov\tDWORD PTR [rbp-0x44],ebx",
-          "vcvtsi2ss\txmm0,xmm15,edx",
-          "mov\trcx,QWORD PTR [rcx+0x10]",
-          "lea\tr14d,[rdx-0x2]",
-          "mov\tesi,edx",
-          "vcvtsi2ss\txmm1,xmm15,ebx",
-          "jmp\t107a86e <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5de>"
-        ]
+        "a": 17277515,
+        "m": "cmp",
+        "o": "DWORD PTR [rbp-0x38],r8d",
+        "cls": "cmp"
       },
       {
-        "source": "layouts.common.render_opt.splatFast():",
-        "asm": [
-          "nop\tWORD PTR [rax+rax*1+0x0]"
-        ]
+        "a": 17277519,
+        "m": "jbe",
+        "o": "107a2bd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x6dd>",
+        "cls": "branch",
+        "bt": 284
       },
       {
-        "source": "        const r0 = (y0 * @as(usize, w) + x0) * 4;",
-        "asm": [
-          "imul\trdi,rsi"
-        ]
+        "a": 17277521,
+        "m": "lea",
+        "o": "r14,[rdi+r15*1]",
+        "cls": "other"
       },
       {
-        "source": "        const x0: usize = @intCast(px);",
-        "asm": [
-          "mov\tedx,r8d"
-        ]
+        "a": 17277525,
+        "m": "lea",
+        "o": "rdx,[r14*4+0x3]",
+        "cls": "other"
       },
       {
-        "source": "        const r0 = (y0 * @as(usize, w) + x0) * 4;",
-        "asm": [
-          "add\trdi,rdx"
-        ]
+        "a": 17277533,
+        "m": "cmp",
+        "o": "rdx,QWORD PTR [rbp-0x40]",
+        "cls": "cmp"
       },
       {
-        "source": "        d0.* = d0.* +| src;",
-        "asm": [
-          "vmovq\txmm4,QWORD PTR [r13+rdi*4+0x0]",
-          "vpaddusb\txmm4,xmm4,xmm3",
-          "vmovq\tQWORD PTR [r13+rdi*4+0x0],xmm4"
-        ]
+        "a": 17277537,
+        "m": "jae",
+        "o": "107a2bd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x6dd>",
+        "cls": "branch",
+        "bt": 284
       },
       {
-        "source": "        const d1: *align(1) Row = @ptrCast(fb[r0 + @as(usize, w) * 4 ..][0..8]);",
-        "asm": [
-          "add\trdi,rsi"
-        ]
+        "a": 17277539,
+        "m": "shl",
+        "o": "r14,0x2",
+        "cls": "other"
       },
       {
-        "source": "        d1.* = d1.* +| src;",
-        "asm": [
-          "vmovq\txmm4,QWORD PTR [r13+rdi*4+0x0]",
-          "vpaddusb\txmm3,xmm4,xmm3",
-          "vmovq\tQWORD PTR [r13+rdi*4+0x0],xmm3"
-        ]
+        "a": 17277543,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x2c],r12d",
+        "cls": "store"
       },
       {
-        "source": "layouts.ML01.AF02.LP1-halide.LP2-opt.H.step__anon_32555():",
-        "asm": [
-          "add\trcx,0x44",
-          "dec\trax",
-          "je\t107aad4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x844>"
-        ]
+        "a": 17277547,
+        "m": "movzx",
+        "o": "ebx,BYTE PTR [r13+r14*1+0x0]",
+        "cls": "load"
       },
       {
-        "source": "    const norm = (x + config.view_half) / (2.0 * config.view_half); // [0,1)",
-        "asm": [
-          "vaddss\txmm4,xmm5,DWORD PTR [rcx]"
-        ]
+        "a": 17277553,
+        "m": "add",
+        "o": "bl,r12b",
+        "cls": "other"
       },
       {
-        "source": "layouts.ML01.AF02.LP1-halide.LP2-opt.H.step__anon_32555():",
-        "asm": [
-          "movzx\tedx,BYTE PTR [rcx+0x41]"
-        ]
+        "a": 17277556,
+        "m": "mov",
+        "o": "r12d,0xff",
+        "cls": "other"
       },
       {
-        "source": "            r1.splatFast(fb, w, h, p.pos.x, p.pos.y, r1.lut[@intFromEnum(p.kind)]);",
-        "asm": [
-          "lea\trdi,[rip+0xfffffffffff95dc3]        # 1010640 <__anon_32685>",
-          "vmovq\txmm3,QWORD PTR [rdi+rdx*8]"
-        ]
+        "a": 17277562,
+        "m": "movzx",
+        "o": "ebx,bl",
+        "cls": "other"
       },
       {
-        "source": "layouts.common.render_simple.worldToPxX():",
-        "asm": [
-          "vmulss\txmm4,xmm4,xmm2"
-        ]
+        "a": 17277565,
+        "m": "cmovb",
+        "o": "ebx,r12d",
+        "cls": "cmp"
       },
       {
-        "source": "    return @intFromFloat(norm * half);",
-        "asm": [
-          "vmulss\txmm4,xmm4,xmm0",
-          "vcvttss2si\tr8d,xmm4"
-        ]
+        "a": 17277569,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r14*1+0x0],bl",
+        "cls": "store"
       },
       {
-        "source": "    const norm = (config.view_half - y) / (2.0 * config.view_half); // [0,1)",
-        "asm": [
-          "vsubss\txmm4,xmm5,DWORD PTR [rcx+0x4]"
-        ]
+        "a": 17277574,
+        "m": "movzx",
+        "o": "ebx,BYTE PTR [r13+r14*1+0x1]",
+        "cls": "load"
       },
       {
-        "source": "    if (px >= 0 and px + 2 <= wi and py >= 0 and py + 2 <= hi) {",
-        "asm": [
-          "cmp\tr14d,r8d",
-          "setge\tdl"
-        ]
+        "a": 17277580,
+        "m": "add",
+        "o": "bl,r11b",
+        "cls": "other"
       },
       {
-        "source": "layouts.common.render_simple.worldToPxY():",
-        "asm": [
-          "vmulss\txmm4,xmm4,xmm2"
-        ]
+        "a": 17277583,
+        "m": "movzx",
+        "o": "ebx,bl",
+        "cls": "other"
       },
       {
-        "source": "    return @intFromFloat(norm * half);",
-        "asm": [
-          "vmulss\txmm4,xmm4,xmm1",
-          "vcvttss2si\tr9d,xmm4"
-        ]
+        "a": 17277586,
+        "m": "cmovb",
+        "o": "ebx,r12d",
+        "cls": "cmp"
       },
       {
-        "source": "layouts.common.render_opt.splatFast():",
-        "asm": [
-          "mov\tedi,r9d",
-          "or\tedi,r8d",
-          "mov\tedi,r9d",
-          "setns\tr10b",
-          "and\tr10b,dl",
-          "lea\tedx,[r9+0x2]",
-          "cmp\tedx,ebx",
-          "setle\tdl",
-          "test\tr10b,dl",
-          "jne\t107a830 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5a0>",
-          "vpextrb\tedx,xmm3,0x2",
-          "test\tr9d,r9d",
-          "mov\tr10d,r14d",
-          "vmovd\tr12d,xmm3",
-          "vpextrb\tr11d,xmm3,0x1"
-        ]
+        "a": 17277590,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r14*1+0x1],bl",
+        "cls": "store"
       },
       {
-        "source": "    while (dy < 2) : (dy += 1) {",
-        "asm": [
-          "movsxd\tr15,r8d",
-          "mov\tDWORD PTR [rbp-0x30],edx",
-          "sets\tdl",
-          "cmp\tr9d,ebx",
-          "setge\tr14b",
-          "or\tr14b,dl",
-          "jne\t107a9e0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x750>",
-          "imul\trdi,rsi"
-        ]
+        "a": 17277595,
+        "m": "movzx",
+        "o": "ebx,BYTE PTR [r13+r14*1+0x2]",
+        "cls": "load"
       },
       {
-        "source": "                if (fx < 0 or fx >= wi or fy < 0 or fy >= hi) continue;",
-        "asm": [
-          "cmp\tDWORD PTR [rbp-0x38],r8d",
-          "jbe\t107a96d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x6dd>"
-        ]
+        "a": 17277601,
+        "m": "add",
+        "o": "bl,BYTE PTR [rbp-0x30]",
+        "cls": "other"
       },
       {
-        "source": "                const idx: usize = (@as(usize, @intCast(fy)) * @as(usize, w) + @as(usize, @intCast(fx))) * 4;",
-        "asm": [
-          "lea\tr14,[rdi+r15*1]"
-        ]
+        "a": 17277604,
+        "m": "movzx",
+        "o": "ebx,bl",
+        "cls": "other"
       },
       {
-        "source": "                if (idx + 3 >= fb.len) continue;",
-        "asm": [
-          "lea\trdx,[r14*4+0x3]",
-          "cmp\trdx,QWORD PTR [rbp-0x40]",
-          "jae\t107a96d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x6dd>",
-          "shl\tr14,0x2",
-          "mov\tDWORD PTR [rbp-0x2c],r12d",
-          "movzx\tebx,BYTE PTR [r13+r14*1+0x0]"
-        ]
+        "a": 17277607,
+        "m": "cmovb",
+        "o": "ebx,r12d",
+        "cls": "cmp"
       },
       {
-        "source": "                fb[idx + 0] = fb[idx + 0] +| src[0];",
-        "asm": [
-          "add\tbl,r12b",
-          "mov\tr12d,0xff",
-          "movzx\tebx,bl",
-          "cmovb\tebx,r12d",
-          "mov\tBYTE PTR [r13+r14*1+0x0],bl",
-          "movzx\tebx,BYTE PTR [r13+r14*1+0x1]"
-        ]
+        "a": 17277611,
+        "m": "mov",
+        "o": "r12d,DWORD PTR [rbp-0x2c]",
+        "cls": "load"
       },
       {
-        "source": "                fb[idx + 1] = fb[idx + 1] +| src[1];",
-        "asm": [
-          "add\tbl,r11b",
-          "movzx\tebx,bl",
-          "cmovb\tebx,r12d",
-          "mov\tBYTE PTR [r13+r14*1+0x1],bl",
-          "movzx\tebx,BYTE PTR [r13+r14*1+0x2]"
-        ]
+        "a": 17277615,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r14*1+0x2],bl",
+        "cls": "store"
       },
       {
-        "source": "                fb[idx + 2] = fb[idx + 2] +| src[2];",
-        "asm": [
-          "add\tbl,BYTE PTR [rbp-0x30]",
-          "movzx\tebx,bl",
-          "cmovb\tebx,r12d",
-          "mov\tr12d,DWORD PTR [rbp-0x2c]",
-          "mov\tBYTE PTR [r13+r14*1+0x2],bl",
-          "mov\tebx,DWORD PTR [rbp-0x44]"
-        ]
+        "a": 17277620,
+        "m": "mov",
+        "o": "ebx,DWORD PTR [rbp-0x44]",
+        "cls": "load"
       },
       {
-        "source": "                fb[idx + 3] = 255;",
-        "asm": [
-          "mov\tBYTE PTR [r13+rdx*1+0x0],0xff"
-        ]
+        "a": 17277623,
+        "m": "mov",
+        "o": "BYTE PTR [r13+rdx*1+0x0],0xff",
+        "cls": "store"
       },
       {
-        "source": "            const fx = px + dx;",
-        "asm": [
-          "lea\trdx,[r15+0x1]"
-        ]
+        "a": 17277629,
+        "m": "lea",
+        "o": "rdx,[r15+0x1]",
+        "cls": "other"
       },
       {
-        "source": "                if (fx < 0 or fx >= wi or fy < 0 or fy >= hi) continue;",
-        "asm": [
-          "cmp\tDWORD PTR [rbp-0x38],edx",
-          "jbe\t107a9e0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x750>"
-        ]
+        "a": 17277633,
+        "m": "cmp",
+        "o": "DWORD PTR [rbp-0x38],edx",
+        "cls": "cmp"
       },
       {
-        "source": "                const idx: usize = (@as(usize, @intCast(fy)) * @as(usize, w) + @as(usize, @intCast(fx))) * 4;",
-        "asm": [
-          "add\trdi,rdx"
-        ]
+        "a": 17277636,
+        "m": "jbe",
+        "o": "107a330 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x750>",
+        "cls": "branch",
+        "bt": 312
       },
       {
-        "source": "                if (idx + 3 >= fb.len) continue;",
-        "asm": [
-          "lea\tr14,[rdi*4+0x3]",
-          "cmp\tr14,QWORD PTR [rbp-0x40]",
-          "jae\t107a9e0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x750>",
-          "shl\trdi,0x2",
-          "mov\tDWORD PTR [rbp-0x2c],r11d"
-        ]
+        "a": 17277638,
+        "m": "add",
+        "o": "rdi,rdx",
+        "cls": "other"
       },
       {
-        "source": "                fb[idx + 0] = fb[idx + 0] +| src[0];",
-        "asm": [
-          "mov\tr11d,0xff",
-          "movzx\tedx,BYTE PTR [r13+rdi*1+0x0]",
-          "add\tdl,r12b",
-          "movzx\tedx,dl",
-          "cmovb\tedx,r11d",
-          "mov\tBYTE PTR [r13+rdi*1+0x0],dl",
-          "movzx\tedx,BYTE PTR [r13+rdi*1+0x1]"
-        ]
+        "a": 17277641,
+        "m": "lea",
+        "o": "r14,[rdi*4+0x3]",
+        "cls": "other"
       },
       {
-        "source": "                fb[idx + 1] = fb[idx + 1] +| src[1];",
-        "asm": [
-          "add\tdl,BYTE PTR [rbp-0x2c]",
-          "movzx\tedx,dl",
-          "cmovb\tedx,r11d",
-          "mov\tBYTE PTR [r13+rdi*1+0x1],dl",
-          "movzx\tedx,BYTE PTR [r13+rdi*1+0x2]"
-        ]
+        "a": 17277649,
+        "m": "cmp",
+        "o": "r14,QWORD PTR [rbp-0x40]",
+        "cls": "cmp"
       },
       {
-        "source": "                fb[idx + 2] = fb[idx + 2] +| src[2];",
-        "asm": [
-          "add\tdl,BYTE PTR [rbp-0x30]",
-          "movzx\tedx,dl",
-          "cmovb\tedx,r11d",
-          "mov\tr11d,DWORD PTR [rbp-0x2c]",
-          "mov\tBYTE PTR [r13+rdi*1+0x2],dl"
-        ]
+        "a": 17277653,
+        "m": "jae",
+        "o": "107a330 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x750>",
+        "cls": "branch",
+        "bt": 312
       },
       {
-        "source": "                fb[idx + 3] = 255;",
-        "asm": [
-          "mov\tBYTE PTR [r13+r14*1+0x0],0xff",
-          "xchg\tax,ax",
-          "inc\tr9d",
-          "mov\tr14d,r10d",
-          "sets\tdl",
-          "cmp\tr9d,ebx",
-          "setge\tdil",
-          "or\tdil,dl",
-          "jne\t107a861 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>",
-          "imul\tr9,rsi"
-        ]
+        "a": 17277655,
+        "m": "shl",
+        "o": "rdi,0x2",
+        "cls": "other"
       },
       {
-        "source": "                if (fx < 0 or fx >= wi or fy < 0 or fy >= hi) continue;",
-        "asm": [
-          "cmp\tDWORD PTR [rbp-0x38],r8d",
-          "jbe\t107aa64 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x7d4>"
-        ]
+        "a": 17277659,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x2c],r11d",
+        "cls": "store"
       },
       {
-        "source": "                const idx: usize = (@as(usize, @intCast(fy)) * @as(usize, w) + @as(usize, @intCast(fx))) * 4;",
-        "asm": [
-          "lea\trdi,[r9+r15*1]"
-        ]
+        "a": 17277663,
+        "m": "mov",
+        "o": "r11d,0xff",
+        "cls": "other"
       },
       {
-        "source": "                if (idx + 3 >= fb.len) continue;",
-        "asm": [
-          "lea\tr8,[rdi*4+0x3]",
-          "cmp\tr8,QWORD PTR [rbp-0x40]",
-          "jae\t107aa64 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x7d4>",
-          "shl\trdi,0x2",
-          "mov\tr10d,0xff",
-          "movzx\tedx,BYTE PTR [r13+rdi*1+0x0]"
-        ]
+        "a": 17277669,
+        "m": "movzx",
+        "o": "edx,BYTE PTR [r13+rdi*1+0x0]",
+        "cls": "load"
       },
       {
-        "source": "                fb[idx + 0] = fb[idx + 0] +| src[0];",
-        "asm": [
-          "add\tdl,r12b",
-          "movzx\tedx,dl",
-          "cmovb\tedx,r10d",
-          "mov\tBYTE PTR [r13+rdi*1+0x0],dl",
-          "movzx\tedx,BYTE PTR [r13+rdi*1+0x1]"
-        ]
+        "a": 17277675,
+        "m": "add",
+        "o": "dl,r12b",
+        "cls": "other"
       },
       {
-        "source": "                fb[idx + 1] = fb[idx + 1] +| src[1];",
-        "asm": [
-          "add\tdl,r11b",
-          "movzx\tedx,dl",
-          "cmovb\tedx,r10d",
-          "mov\tBYTE PTR [r13+rdi*1+0x1],dl",
-          "movzx\tedx,BYTE PTR [r13+rdi*1+0x2]"
-        ]
+        "a": 17277678,
+        "m": "movzx",
+        "o": "edx,dl",
+        "cls": "other"
       },
       {
-        "source": "                fb[idx + 2] = fb[idx + 2] +| src[2];",
-        "asm": [
-          "add\tdl,BYTE PTR [rbp-0x30]",
-          "movzx\tedx,dl",
-          "cmovb\tedx,r10d",
-          "mov\tBYTE PTR [r13+rdi*1+0x2],dl"
-        ]
+        "a": 17277681,
+        "m": "cmovb",
+        "o": "edx,r11d",
+        "cls": "cmp"
       },
       {
-        "source": "                fb[idx + 3] = 255;",
-        "asm": [
-          "mov\tBYTE PTR [r13+r8*1+0x0],0xff"
-        ]
+        "a": 17277685,
+        "m": "mov",
+        "o": "BYTE PTR [r13+rdi*1+0x0],dl",
+        "cls": "store"
       },
       {
-        "source": "            const fx = px + dx;",
-        "asm": [
-          "inc\tr15"
-        ]
+        "a": 17277690,
+        "m": "movzx",
+        "o": "edx,BYTE PTR [r13+rdi*1+0x1]",
+        "cls": "load"
       },
       {
-        "source": "                if (fx < 0 or fx >= wi or fy < 0 or fy >= hi) continue;",
-        "asm": [
-          "cmp\tDWORD PTR [rbp-0x38],r15d",
-          "jbe\t107a861 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>"
-        ]
+        "a": 17277696,
+        "m": "add",
+        "o": "dl,BYTE PTR [rbp-0x2c]",
+        "cls": "other"
       },
       {
-        "source": "                const idx: usize = (@as(usize, @intCast(fy)) * @as(usize, w) + @as(usize, @intCast(fx))) * 4;",
-        "asm": [
-          "add\tr9,r15"
-        ]
+        "a": 17277699,
+        "m": "movzx",
+        "o": "edx,dl",
+        "cls": "other"
       },
       {
-        "source": "                if (idx + 3 >= fb.len) continue;",
-        "asm": [
-          "lea\trdx,[r9*4+0x3]",
-          "cmp\trdx,QWORD PTR [rbp-0x40]",
-          "jae\t107a861 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>",
-          "shl\tr9,0x2",
-          "mov\tr8d,0xff"
-        ]
+        "a": 17277702,
+        "m": "cmovb",
+        "o": "edx,r11d",
+        "cls": "cmp"
       },
       {
-        "source": "                fb[idx + 0] = fb[idx + 0] +| src[0];",
-        "asm": [
-          "add\tr12b,BYTE PTR [r13+r9*1+0x0]",
-          "movzx\tedi,r12b",
-          "cmovb\tedi,r8d",
-          "mov\tBYTE PTR [r13+r9*1+0x0],dil"
-        ]
+        "a": 17277706,
+        "m": "mov",
+        "o": "BYTE PTR [r13+rdi*1+0x1],dl",
+        "cls": "store"
       },
       {
-        "source": "                fb[idx + 1] = fb[idx + 1] +| src[1];",
-        "asm": [
-          "add\tr11b,BYTE PTR [r13+r9*1+0x1]",
-          "movzx\tedi,r11b",
-          "cmovb\tedi,r8d",
-          "mov\tBYTE PTR [r13+r9*1+0x1],dil",
-          "mov\tedi,DWORD PTR [rbp-0x30]"
-        ]
+        "a": 17277711,
+        "m": "movzx",
+        "o": "edx,BYTE PTR [r13+rdi*1+0x2]",
+        "cls": "load"
       },
       {
-        "source": "                fb[idx + 2] = fb[idx + 2] +| src[2];",
-        "asm": [
-          "add\tdil,BYTE PTR [r13+r9*1+0x2]",
-          "movzx\tedi,dil",
-          "cmovb\tedi,r8d",
-          "mov\tBYTE PTR [r13+r9*1+0x2],dil"
-        ]
+        "a": 17277717,
+        "m": "add",
+        "o": "dl,BYTE PTR [rbp-0x30]",
+        "cls": "other"
       },
       {
-        "source": "                fb[idx + 3] = 255;",
-        "asm": [
-          "mov\tBYTE PTR [r13+rdx*1+0x0],0xff"
-        ]
+        "a": 17277720,
+        "m": "movzx",
+        "o": "edx,dl",
+        "cls": "other"
       },
       {
-        "source": "    }",
-        "asm": [
-          "jmp\t107a861 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>"
-        ]
+        "a": 17277723,
+        "m": "cmovb",
+        "o": "edx,r11d",
+        "cls": "cmp"
       },
       {
-        "source": "framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step():",
-        "asm": [
-          "mov\trax,QWORD PTR [rbp-0x50]"
-        ]
+        "a": 17277727,
+        "m": "mov",
+        "o": "r11d,DWORD PTR [rbp-0x2c]",
+        "cls": "load"
+      },
+      {
+        "a": 17277731,
+        "m": "mov",
+        "o": "BYTE PTR [r13+rdi*1+0x2],dl",
+        "cls": "store"
+      },
+      {
+        "a": 17277736,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r14*1+0x0],0xff",
+        "cls": "store"
+      },
+      {
+        "a": 17277742,
+        "m": "xchg",
+        "o": "ax,ax",
+        "cls": "other"
+      },
+      {
+        "a": 17277744,
+        "m": "inc",
+        "o": "r9d",
+        "cls": "other"
+      },
+      {
+        "a": 17277747,
+        "m": "mov",
+        "o": "r14d,r10d",
+        "cls": "other"
+      },
+      {
+        "a": 17277750,
+        "m": "sets",
+        "o": "dl",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277753,
+        "m": "cmp",
+        "o": "r9d,ebx",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277756,
+        "m": "setge",
+        "o": "dil",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277760,
+        "m": "or",
+        "o": "dil,dl",
+        "cls": "other"
+      },
+      {
+        "a": 17277763,
+        "m": "jne",
+        "o": "107a1b1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>",
+        "cls": "branch",
+        "bt": 218
+      },
+      {
+        "a": 17277769,
+        "m": "imul",
+        "o": "r9,rsi",
+        "cls": "other"
+      },
+      {
+        "a": 17277773,
+        "m": "cmp",
+        "o": "DWORD PTR [rbp-0x38],r8d",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277777,
+        "m": "jbe",
+        "o": "107a3b4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x7d4>",
+        "cls": "branch",
+        "bt": 344
+      },
+      {
+        "a": 17277779,
+        "m": "lea",
+        "o": "rdi,[r9+r15*1]",
+        "cls": "other"
+      },
+      {
+        "a": 17277783,
+        "m": "lea",
+        "o": "r8,[rdi*4+0x3]",
+        "cls": "other"
+      },
+      {
+        "a": 17277791,
+        "m": "cmp",
+        "o": "r8,QWORD PTR [rbp-0x40]",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277795,
+        "m": "jae",
+        "o": "107a3b4 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x7d4>",
+        "cls": "branch",
+        "bt": 344
+      },
+      {
+        "a": 17277797,
+        "m": "shl",
+        "o": "rdi,0x2",
+        "cls": "other"
+      },
+      {
+        "a": 17277801,
+        "m": "mov",
+        "o": "r10d,0xff",
+        "cls": "other"
+      },
+      {
+        "a": 17277807,
+        "m": "movzx",
+        "o": "edx,BYTE PTR [r13+rdi*1+0x0]",
+        "cls": "load"
+      },
+      {
+        "a": 17277813,
+        "m": "add",
+        "o": "dl,r12b",
+        "cls": "other"
+      },
+      {
+        "a": 17277816,
+        "m": "movzx",
+        "o": "edx,dl",
+        "cls": "other"
+      },
+      {
+        "a": 17277819,
+        "m": "cmovb",
+        "o": "edx,r10d",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277823,
+        "m": "mov",
+        "o": "BYTE PTR [r13+rdi*1+0x0],dl",
+        "cls": "store"
+      },
+      {
+        "a": 17277828,
+        "m": "movzx",
+        "o": "edx,BYTE PTR [r13+rdi*1+0x1]",
+        "cls": "load"
+      },
+      {
+        "a": 17277834,
+        "m": "add",
+        "o": "dl,r11b",
+        "cls": "other"
+      },
+      {
+        "a": 17277837,
+        "m": "movzx",
+        "o": "edx,dl",
+        "cls": "other"
+      },
+      {
+        "a": 17277840,
+        "m": "cmovb",
+        "o": "edx,r10d",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277844,
+        "m": "mov",
+        "o": "BYTE PTR [r13+rdi*1+0x1],dl",
+        "cls": "store"
+      },
+      {
+        "a": 17277849,
+        "m": "movzx",
+        "o": "edx,BYTE PTR [r13+rdi*1+0x2]",
+        "cls": "load"
+      },
+      {
+        "a": 17277855,
+        "m": "add",
+        "o": "dl,BYTE PTR [rbp-0x30]",
+        "cls": "other"
+      },
+      {
+        "a": 17277858,
+        "m": "movzx",
+        "o": "edx,dl",
+        "cls": "other"
+      },
+      {
+        "a": 17277861,
+        "m": "cmovb",
+        "o": "edx,r10d",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277865,
+        "m": "mov",
+        "o": "BYTE PTR [r13+rdi*1+0x2],dl",
+        "cls": "store"
+      },
+      {
+        "a": 17277870,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r8*1+0x0],0xff",
+        "cls": "store"
+      },
+      {
+        "a": 17277876,
+        "m": "inc",
+        "o": "r15",
+        "cls": "other"
+      },
+      {
+        "a": 17277879,
+        "m": "cmp",
+        "o": "DWORD PTR [rbp-0x38],r15d",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277883,
+        "m": "jbe",
+        "o": "107a1b1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>",
+        "cls": "branch",
+        "bt": 218
+      },
+      {
+        "a": 17277889,
+        "m": "add",
+        "o": "r9,r15",
+        "cls": "other"
+      },
+      {
+        "a": 17277892,
+        "m": "lea",
+        "o": "rdx,[r9*4+0x3]",
+        "cls": "other"
+      },
+      {
+        "a": 17277900,
+        "m": "cmp",
+        "o": "rdx,QWORD PTR [rbp-0x40]",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277904,
+        "m": "jae",
+        "o": "107a1b1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>",
+        "cls": "branch",
+        "bt": 218
+      },
+      {
+        "a": 17277910,
+        "m": "shl",
+        "o": "r9,0x2",
+        "cls": "other"
+      },
+      {
+        "a": 17277914,
+        "m": "mov",
+        "o": "r8d,0xff",
+        "cls": "other"
+      },
+      {
+        "a": 17277920,
+        "m": "add",
+        "o": "r12b,BYTE PTR [r13+r9*1+0x0]",
+        "cls": "other"
+      },
+      {
+        "a": 17277925,
+        "m": "movzx",
+        "o": "edi,r12b",
+        "cls": "other"
+      },
+      {
+        "a": 17277929,
+        "m": "cmovb",
+        "o": "edi,r8d",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277933,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r9*1+0x0],dil",
+        "cls": "store"
+      },
+      {
+        "a": 17277938,
+        "m": "add",
+        "o": "r11b,BYTE PTR [r13+r9*1+0x1]",
+        "cls": "other"
+      },
+      {
+        "a": 17277943,
+        "m": "movzx",
+        "o": "edi,r11b",
+        "cls": "other"
+      },
+      {
+        "a": 17277947,
+        "m": "cmovb",
+        "o": "edi,r8d",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277951,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r9*1+0x1],dil",
+        "cls": "store"
+      },
+      {
+        "a": 17277956,
+        "m": "mov",
+        "o": "edi,DWORD PTR [rbp-0x30]",
+        "cls": "load"
+      },
+      {
+        "a": 17277959,
+        "m": "add",
+        "o": "dil,BYTE PTR [r13+r9*1+0x2]",
+        "cls": "other"
+      },
+      {
+        "a": 17277964,
+        "m": "movzx",
+        "o": "edi,dil",
+        "cls": "other"
+      },
+      {
+        "a": 17277968,
+        "m": "cmovb",
+        "o": "edi,r8d",
+        "cls": "cmp"
+      },
+      {
+        "a": 17277972,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r9*1+0x2],dil",
+        "cls": "store"
+      },
+      {
+        "a": 17277977,
+        "m": "mov",
+        "o": "BYTE PTR [r13+rdx*1+0x0],0xff",
+        "cls": "store"
+      },
+      {
+        "a": 17277983,
+        "m": "jmp",
+        "o": "107a1b1 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-halide.LP2-opt.H).step+0x5d1>",
+        "cls": "branch",
+        "bt": 218
+      },
+      {
+        "a": 17277988,
+        "m": "mov",
+        "o": "rax,QWORD PTR [rbp-0x50]",
+        "cls": "load"
+      },
+      {
+        "a": 17277992,
+        "m": "inc",
+        "o": "QWORD PTR [rax+0x68]",
+        "cls": "other"
+      },
+      {
+        "a": 17277996,
+        "m": "add",
+        "o": "rsp,0x448",
+        "cls": "other"
+      },
+      {
+        "a": 17278003,
+        "m": "pop",
+        "o": "rbx",
+        "cls": "other"
+      },
+      {
+        "a": 17278004,
+        "m": "pop",
+        "o": "r12",
+        "cls": "other"
+      },
+      {
+        "a": 17278006,
+        "m": "pop",
+        "o": "r13",
+        "cls": "other"
+      },
+      {
+        "a": 17278008,
+        "m": "pop",
+        "o": "r14",
+        "cls": "other"
+      },
+      {
+        "a": 17278010,
+        "m": "pop",
+        "o": "r15",
+        "cls": "other"
+      },
+      {
+        "a": 17278012,
+        "m": "pop",
+        "o": "rbp",
+        "cls": "other"
+      },
+      {
+        "a": 17278013,
+        "m": "ret",
+        "o": "",
+        "cls": "branch"
       },
       {
-        "source": "            self.frame +%= 1; // AF02-blend hash RNG frame counter (free otherwise)",
-        "asm": [
-          "inc\tQWORD PTR [rax+0x68]",
-          "add\trsp,0x448",
-          "pop\trbx",
-          "pop\tr12",
-          "pop\tr13",
-          "pop\tr14",
-          "pop\tr15",
-          "pop\trbp",
-          "ret",
-          "xchg\tax,ax"
+        "a": 17278014,
+        "m": "xchg",
+        "o": "ax,ax",
+        "cls": "other"
+      }
+    ],
+    "attribution": {
+      "files": [
+        "/data/sandbox/zig-test/src/framework/sim.zig",
+        "/data/sandbox/zig-test/src/layouts/ML01/AF02.LP1-halide_api.zig",
+        "/data/sandbox/zig-test/src/layouts/ML01/AF02.LP1-halide.LP2-opt.zig",
+        "/data/sandbox/zig-test/src/layouts/common/render_opt.zig",
+        "/data/sandbox/zig-test/src/layouts/common/render_simple.zig"
+      ],
+      "chains": [
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            1,
+            100
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            104
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            121
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            122
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            123
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            124
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            125
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            126
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            127
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            128
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            130
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            131
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            102
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            102
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            102
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            106
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            122
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            104
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            121
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            122
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            123
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            124
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            125
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            126
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            127
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            128
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            130
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            131
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            104
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            121
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            122
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            123
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            124
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            125
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            126
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            127
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            128
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            130
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            131
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            77
+          ],
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            102
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            102
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            102
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            106
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            106
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            102
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            106
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            106
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            106
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            106
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            100
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            102
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            100
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            100
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            100
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            100
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            78
+          ],
+          [
+            1,
+            121
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            78
+          ],
+          [
+            1,
+            122
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            122
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            78
+          ],
+          [
+            1,
+            128
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            102
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            106
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            123
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            78
+          ],
+          [
+            1,
+            123
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            78
+          ],
+          [
+            1,
+            124
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            78
+          ],
+          [
+            1,
+            125
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            78
+          ],
+          [
+            1,
+            126
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            78
+          ],
+          [
+            1,
+            127
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            78
+          ],
+          [
+            1,
+            130
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            78
+          ],
+          [
+            1,
+            131
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            78
+          ],
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            78
+          ],
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            128
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            128
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            122
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            122
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            122
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            128
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            128
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            128
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            121
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            121
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            121
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            121
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            121
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            122
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            122
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            122
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            123
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            124
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            128
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            130
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            123
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            123
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            123
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            123
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            123
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            128
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            124
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            125
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            130
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            130
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            124
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            124
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            124
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            130
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            130
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            130
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            124
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            125
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            126
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            130
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            131
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            125
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            125
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            125
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            125
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            125
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            130
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            126
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            127
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            131
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            126
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            126
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            126
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            126
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            126
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            131
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            131
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            126
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            127
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            131
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            127
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            127
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            127
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            127
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            131
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            131
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            131
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            132
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            134
+          ],
+          [
+            2,
+            32
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            34
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            139
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            137
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            139
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            141
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            141
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            141
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            142
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            143
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            143
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            143
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [],
+        [
+          [
+            4,
+            26
+          ],
+          [
+            3,
+            128
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            26
+          ],
+          [
+            3,
+            128
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            27
+          ],
+          [
+            3,
+            128
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            27
+          ],
+          [
+            3,
+            128
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            34
+          ],
+          [
+            3,
+            129
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            132
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            132
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            34
+          ],
+          [
+            3,
+            129
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            35
+          ],
+          [
+            3,
+            129
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            35
+          ],
+          [
+            3,
+            129
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            155
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            3,
+            156
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            157
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            157
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            157
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            161
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            153
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            155
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            156
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            157
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            157
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            157
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            161
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            155
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            3,
+            156
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            157
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            157
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            157
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            161
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            153
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            155
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            3,
+            156
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            157
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            157
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            157
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            158
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            159
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            160
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            161
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            162
+          ],
+          [
+            2,
+            35
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ]
+      ],
+      "call_site": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        32,
+        32,
+        null,
+        null,
+        null,
+        null,
+        32,
+        32,
+        null,
+        null,
+        null,
+        null,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        34,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        null,
+        null,
+        null,
+        35,
+        null,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        35,
+        35,
+        35,
+        35,
+        35,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        35,
+        35,
+        null,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        null,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        null,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "repo_files": [
+        "AF02.LP1-halide.LP2-opt.zig",
+        "AF02.LP1-halide_api.zig",
+        "config.zig",
+        "data.zig",
+        "render_opt.zig",
+        "render_simple.zig",
+        "sim.zig",
+        "vec.zig"
+      ]
+    },
+    "loops": [
+      {
+        "loop": 1,
+        "addr_span": [
+          17277312,
+          17277983
+        ],
+        "lines": [
+          35,
+          35
+        ],
+        "insns": 160,
+        "cond_branches": 13,
+        "vector_fp": 0,
+        "scalar_fp": 6,
+        "stride_bytes": 68,
+        "notes": [
+          "select-based (csel/cmov \u00d712)",
+          "byte-granular scatter (\u00d719)",
+          "scalar FP (\u00d76)"
         ]
       }
     ],
+    "calls": [
+      {
+        "sym": "halide_b2",
+        "line": 32,
+        "std": false
+      }
+    ],
+    "fconst": [],
     "algo_source": {
       "file": "src/layouts/ML01/AF02.LP1-halide.LP2-opt.zig",
       "lines": [
@@ -1077,128 +7558,6 @@
         "};",
         "",
         "pub const Sim = fw.Strategy(Data, H);"
-      ],
-      "group_lines": [
-        null,
-        null,
-        32,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        34,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        35,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        36,
-        null,
-        null
       ]
     }
   }

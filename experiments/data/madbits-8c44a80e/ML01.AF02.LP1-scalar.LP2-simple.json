@@ -1,6 +1,8 @@
 {
   "source_hash": "702688309d1384d78fea6b2cec04c40975ce8be65df5d0b5620c2f11d80cb76a",
   "asm": {
+    "schema": 2,
+    "arch": "x86_64",
     "source_hash": "702688309d1384d78fea6b2cec04c40975ce8be65df5d0b5620c2f11d80cb76a",
     "symbol": "framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step",
     "n_instructions": 360,
@@ -52,1145 +54,7579 @@
       "ret": 1,
       "cs": 1
     },
-    "vector_insns": 0,
-    "excerpt": "000000000107f5a0\tpush\trbp\n000000000107f5a1\tmov\trbp,rsp\n000000000107f5a4\tpush\tr15\n000000000107f5a6\tpush\tr14\n000000000107f5a8\tpush\tr13\n000000000107f5aa\tpush\tr12\n000000000107f5ac\tpush\trbx\n000000000107f5ad\tsub\trsp,0x28\n000000000107f5b1\tmov\tr15,QWORD PTR [rdi+0x18]\n000000000107f5b5\tmov\tr12,rdi\n000000000107f5b8\tmov\tDWORD PTR [rbp-0x30],r8d\n000000000107f5bc\tmov\tDWORD PTR [rbp-0x2c],ecx\n000000000107f5bf\tmov\tQWORD PTR [rbp-0x40],rdx\n000000000107f5c3\ttest\tr15,r15\n000000000107f5c6\tje\t107fb62 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x5c2>\n000000000107f5cc\tvmovss\txmm6,DWORD PTR [rip+0xfffffffffff82fd0]        # 10025a4 <__anon_12819+0x10>\n000000000107f5d4\tmov\trbx,QWORD PTR [r12+0x10]\n000000000107f5d9\tmov\tr13,rsi\n000000000107f5dc\tlea\tr14,[r12+0x10]\n000000000107f5e1\tvxorps\txmm7,xmm7,xmm7\n000000000107f5e5\tjmp\t107f616 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x76>\n000000000107f5e7\tnop\tWORD PTR [rax+rax*1+0x0]\n000000000107f5f0\tmov\trdi,r14\n000000000107f5f3\tlea\trsi,[r12+0x28]\n000000000107f5f8\tcall\t107fbe0 <layouts.ML01.data.Data.spawn>\n000000000107f5fd\tvmovss\txmm6,DWORD PTR [rip+0xfffffffffff82f9f]        # 10025a4 <__anon_12819+0x10>\n000000000107f605\tvxorps\txmm7,xmm7,xmm7\n000000000107f609\tadd\trbx,0x44\n000000000107f60d\tdec\tr15\n000000000107f610\tje\t107f7f8 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x258>\n000000000107f616\tvmovss\txmm4,DWORD PTR [rip+0xfffffffffff82f66]        # 1002584 <__anon_30509+0x10>\n000000000107f61e\tvmovss\txmm0,DWORD PTR [rbx]\n000000000107f622\tvmovss\txmm1,DWORD PTR [rbx+0xc]\n000000000107f627\tvmovss\txmm5,DWORD PTR [rip+0xfffffffffff82fc1]        # 10025f0 <__anon_12825+0xc>\n000000000107f62f\tvmulss\txmm1,xmm1,xmm4\n000000000107f633\tvaddss\txmm0,xmm0,xmm1\n000000000107f637\tvmovss\tDWORD PTR [rbx],xmm0\n000000000107f63b\tvmovss\txmm0,DWORD PTR [rbx+0x4]\n000000000107f640\tvmovss\txmm1,DWORD PTR [rbx+0x10]\n000000000107f645\tvmulss\txmm1,xmm1,xmm4\n000000000107f649\tvaddss\txmm0,xmm0,xmm1\n000000000107f64d\tvmovss\tDWORD PTR [rbx+0x4],xmm0\n000000000107f652\tvmovss\txmm0,DWORD PTR [rbx+0x8]\n000000000107f657\tvmovss\txmm1,DWORD PTR [rbx+0x14]\n000000000107f65c\tvmulss\txmm1,xmm1,xmm4\n000000000107f660\tvaddss\txmm0,xmm0,xmm1\n000000000107f664\tvmovss\tDWORD PTR [rbx+0x8],xmm0\n000000000107f669\tvmovss\txmm0,DWORD PTR [rbx+0xc]\n000000000107f66e\tvmulss\txmm3,xmm0,xmm5\n000000000107f672\tvmovss\txmm1,DWORD PTR [rbx+0x10]\n000000000107f677\tvmovss\txmm2,DWORD PTR [rbx+0x14]\n000000000107f67c\tvaddss\txmm3,xmm3,xmm7\n000000000107f680\tvmulss\txmm3,xmm3,xmm4\n000000000107f684\tvaddss\txmm0,xmm0,xmm3\n000000000107f688\tvmovss\tDWORD PTR [rbx+0xc],xmm0\n000000000107f68d\tvmulss\txmm0,xmm1,xmm5\n000000000107f691\tvaddss\txmm0,xmm0,DWORD PTR [rip+0xfffffffffff82ee7]        # 1002580 <__anon_30509+0xc>\n000000000107f699\tvmulss\txmm0,xmm0,xmm4\n000000000107f69d\tvaddss\txmm0,xmm1,xmm0\n000000000107f6a1\tvmovss\tDWORD PTR [rbx+0x10],xmm0\n000000000107f6a6\tvmulss\txmm0,xmm2,xmm5\n000000000107f6aa\tvaddss\txmm0,xmm0,xmm7\n000000000107f6ae\tvmulss\txmm0,xmm0,xmm4\n000000000107f6b2\tvaddss\txmm0,xmm2,xmm0\n000000000107f6b6\tvmovss\tDWORD PTR [rbx+0x14],xmm0\n000000000107f6bb\tvmovss\txmm0,DWORD PTR [rbx+0x1c]\n000000000107f6c0\tvaddss\txmm0,xmm0,xmm4\n000000000107f6c4\tvucomiss\txmm0,xmm6\n000000000107f6c8\tvmovss\tDWORD PTR [rbx+0x1c],xmm0\n000000000107f6cd\tjae\t107f770 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x1d0>\n000000000107f6d3\tvmovss\txmm1,DWORD PTR [rip+0x145cd]        # 1093ca8 <framework.config.q>\n000000000107f6db\tvucomiss\txmm1,xmm7\n000000000107f6df\tjne\t107f6e7 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x147>\n000000000107f6e1\tjnp\t107f609 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x69>\n000000000107f6e7\tmov\trdx,QWORD PTR [r12+0x50]\n000000000107f6ec\tmov\trax,QWORD PTR [r12+0x60]\n000000000107f6f1\tmov\trcx,QWORD PTR [r12+0x48]\n000000000107f6f6\tmov\trdi,QWORD PTR [r12+0x58]\n000000000107f6fb\tlea\trsi,[rax+rcx*1]\n000000000107f6ff\tmov\tr8,rdx\n000000000107f702\txor\trdi,rcx\n000000000107f705\txor\trax,rdx\n000000000107f708\trorx\tr14,rsi,0x29\n000000000107f70e\tshl\tr8,0x11\n000000000107f712\txor\trdx,rdi\n000000000107f715\tadd\tr14,rcx\n000000000107f718\txor\trcx,rax\n000000000107f71b\txor\trdi,r8\n000000000107f71e\trorx\trax,rax,0x13\n000000000107f724\tmov\tQWORD PTR [r12+0x50],rdx\n000000000107f729\tmov\tQWORD PTR [r12+0x48],rcx\n000000000107f72e\tmov\tQWORD PTR [r12+0x58],rdi\n000000000107f733\tmov\tQWORD PTR [r12+0x60],rax\n000000000107f738\tcmp\tr14,0x7fffff\n000000000107f73f\tjbe\t107f78c <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x1ec>\n000000000107f741\tlzcnt\trax,r14\n000000000107f746\tand\tr14d,0x7fffff\n000000000107f74d\tshl\teax,0x17\n000000000107f750\tor\tr14d,0x3f000000\n000000000107f757\tsub\tr14d,eax\n000000000107f75a\tvmovd\txmm0,r14d\n000000000107f75f\tlea\tr14,[r12+0x10]\n000000000107f764\tvucomiss\txmm1,xmm0\n000000000107f768\tjbe\t107f609 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x69>\n000000000107f76e\txchg\tax,ax\n000000000107f770\tmov\tedx,DWORD PTR [rbx+0x3c]\n000000000107f773\tmov\trcx,QWORD PTR [r12+0x18]\n000000000107f778\tcmp\trdx,rcx\n000000000107f77b\tjb\t107f5f0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x50>\n000000000107f781\tmov\teax,edx\n000000000107f783\txor\tedx,edx\n000000000107f785\tdiv\tecx\n000000000107f787\tjmp\t107f5f0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x50>\n000000000107f78c\tmov\tedx,0x8\n000000000107f791\tlea\trdi,[r12+0x48]\n000000000107f796\tlea\trsi,[rbp-0x50]\n000000000107f79a\tvmovss\tDWORD PTR [rbp-0x38],xmm1\n000000000107f79f\tcall\t1080050 <Random.init__anon_33128.gen.fill>\n000000000107f7a4\tlzcnt\trax,QWORD PTR [rbp-0x50]\n000000000107f7aa\tadd\tal,0x29\n000000000107f7ac\tmov\tecx,eax\n000000000107f7ae\tand\tcl,0x7f\n000000000107f7b1\tcmp\tcl,0x69\n000000000107f7b4\tje\t107f7d2 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x232>\n000000000107f7b6\tmovzx\teax,al\n000000000107f7b9\tand\teax,0x7f\n000000000107f7bc\tvmovss\txmm6,DWORD PTR [rip+0xfffffffffff82de0]        # 10025a4 <__anon_12819+0x10>\n000000000107f7c4\tvmovss\txmm1,DWORD PTR [rbp-0x38]\n000000000107f7c9\tvxorps\txmm7,xmm7,xmm7\n000000000107f7cd\tjmp\t107f746 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x1a6>\n000000000107f7d2\tmov\tedx,0x4\n000000000107f7d7\tlea\trdi,[r12+0x48]\n000000000107f7dc\tlea\trsi,[rbp-0x44]\n000000000107f7e0\tcall\t1080050 <Random.init__anon_33128.gen.fill>\n000000000107f7e5\tmov\teax,DWORD PTR [rbp-0x44]\n000000000107f7e8\tmov\tecx,0x7ff\n000000000107f7ed\tor\teax,ecx\n000000000107f7ef\tlzcnt\teax,eax\n000000000107f7f3\tadd\teax,0x69\n000000000107f7f6\tjmp\t107f7bc <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x21c>\n000000000107f7f8\tmov\trax,QWORD PTR [r12+0x18]\n000000000107f7fd\ttest\trax,rax\n000000000107f800\tje\t107fb62 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x5c2>\n000000000107f806\tmov\tedx,DWORD PTR [rbp-0x2c]\n000000000107f809\tvmovss\txmm3,DWORD PTR [rip+0xfffffffffff82dc3]        # 10025d4 <__anon_23489+0x2c>\n000000000107f811\tvmovss\txmm4,DWORD PTR [rip+0xfffffffffff82d6f]        # 1002588 <__anon_30509+0x14>\n000000000107f819\tmov\trcx,QWORD PTR [r12+0x10]\n000000000107f81e\tvxorps\txmm2,xmm2,xmm2\n000000000107f822\tvcvtsi2ss\txmm0,xmm15,edx\n000000000107f826\tvcvtsi2ss\txmm1,xmm15,DWORD PTR [rbp-0x30]\n000000000107f82b\tmov\tedx,edx\n000000000107f82d\tadd\trcx,0x28\n000000000107f831\tmov\tQWORD PTR [rbp-0x38],rdx\n000000000107f835\tjmp\t107f84d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2ad>\n000000000107f837\tnop\tWORD PTR [rax+rax*1+0x0]\n000000000107f840\tadd\trcx,0x44\n000000000107f844\tdec\trax\n000000000107f847\tje\t107fb62 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x5c2>\n000000000107f84d\tvmovss\txmm5,DWORD PTR [rcx-0x8]\n000000000107f852\tvucomiss\txmm2,xmm5\n000000000107f856\tjae\t107f8b0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x310>\n000000000107f858\tvucomiss\txmm5,xmm3\n000000000107f85c\tmov\tdi,0xff\n000000000107f860\tjae\t107f86a <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2ca>\n000000000107f862\tvcvttss2si\tedi,xmm5\n000000000107f866\tmovzx\tedi,dil\n000000000107f86a\tvmovss\txmm5,DWORD PTR [rcx-0x4]\n000000000107f86f\tvucomiss\txmm2,xmm5\n000000000107f873\tjae\t107f8bd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x31d>\n000000000107f875\tvucomiss\txmm5,xmm3\n000000000107f879\tmov\tr8w,0xff\n000000000107f87e\tjae\t107f888 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2e8>\n000000000107f880\tvcvttss2si\tr8d,xmm5\n000000000107f884\tmovzx\tr8d,r8b\n000000000107f888\tvmovss\txmm5,DWORD PTR [rcx]\n000000000107f88c\tvucomiss\txmm2,xmm5\n000000000107f890\tjae\t107f8ca <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x32a>\n000000000107f892\tvucomiss\txmm5,xmm3\n000000000107f896\tmov\tr9w,0xff\n000000000107f89b\tjae\t107f8cd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x32d>\n000000000107f89d\tvcvttss2si\tr9d,xmm5\n000000000107f8a1\tmovzx\tr9d,r9b\n000000000107f8a5\tjmp\t107f8cd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x32d>\n000000000107f8a7\tnop\tWORD PTR [rax+rax*1+0x0]\n000000000107f8b0\txor\tedi,edi\n000000000107f8b2\tvmovss\txmm5,DWORD PTR [rcx-0x4]\n000000000107f8b7\tvucomiss\txmm2,xmm5\n000000000107f8bb\tjb\t107f875 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2d5>\n000000000107f8bd\txor\tr8d,r8d\n000000000107f8c0\tvmovss\txmm5,DWORD PTR [rcx]\n000000000107f8c4\tvucomiss\txmm2,xmm5\n000000000107f8c8\tjb\t107f892 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2f2>\n000000000107f8ca\txor\tr9d,r9d\n000000000107f8cd\tvaddss\txmm5,xmm6,DWORD PTR [rcx-0x28]\n000000000107f8d2\tvmulss\txmm5,xmm5,xmm4\n000000000107f8d6\tvmulss\txmm5,xmm5,xmm0\n000000000107f8da\tvcvttss2si\tr10d,xmm5\n000000000107f8de\tvsubss\txmm5,xmm6,DWORD PTR [rcx-0x24]\n000000000107f8e3\tmovsxd\tr10,r10d\n000000000107f8e6\tvmulss\txmm5,xmm5,xmm4\n000000000107f8ea\tvmulss\txmm5,xmm5,xmm1\n000000000107f8ee\tvcvttss2si\tr11d,xmm5\n000000000107f8f2\ttest\tr11d,r11d\n000000000107f8f5\tsets\tbl\n000000000107f8f8\tcmp\tr11d,DWORD PTR [rbp-0x30]\n000000000107f8fc\tsetge\tr14b\n000000000107f900\tor\tr14b,bl\n000000000107f903\tjne\t107fa30 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x490>\n000000000107f909\tmov\tedx,DWORD PTR [rbp-0x2c]\n000000000107f90c\tmov\tebx,r11d\n000000000107f90f\timul\tebx,edx\n000000000107f912\ttest\tr10d,r10d\n000000000107f915\tsets\tr14b\n000000000107f919\tcmp\tedx,r10d\n000000000107f91c\tsetle\tr15b\n000000000107f920\tor\tr15b,r14b\n000000000107f923\tjne\t107f99a <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x3fa>\n000000000107f925\tlea\tr14,[rbx+r10*1]\n000000000107f929\tlea\tr15,[r14*4+0x3]\n000000000107f931\tcmp\tr15,QWORD PTR [rbp-0x40]\n000000000107f935\tjae\t107f99a <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x3fa>\n000000000107f937\tshl\tr14,0x2\n000000000107f93b\tmovzx\tedx,di\n000000000107f93e\tmovzx\tesi,BYTE PTR [r13+r14*1+0x0]\n000000000107f944\tadd\tedx,esi\n000000000107f946\tmov\tesi,0xff\n000000000107f94b\tcmp\tdx,0xff\n000000000107f950\tcmovae\tedx,esi\n000000000107f953\tmovzx\tesi,r8w\n000000000107f957\tmov\tBYTE PTR [r13+r14*1+0x0],dl\n000000000107f95c\tmovzx\tedx,BYTE PTR [r13+r14*1+0x1]\n000000000107f962\tadd\tesi,edx\n000000000107f964\tmov\tedx,0xff\n000000000107f969\tcmp\tsi,0xff\n000000000107f96e\tcmovae\tesi,edx\n000000000107f971\tmov\tBYTE PTR [r13+r14*1+0x1],sil\n000000000107f976\tmovzx\tesi,r9w\n000000000107f97a\tmovzx\tedx,BYTE PTR [r13+r14*1+0x2]\n000000000107f980\tadd\tesi,edx\n000000000107f982\tmov\tedx,0xff\n000000000107f987\tcmp\tsi,0xff\n000000000107f98c\tcmovae\tesi,edx\n000000000107f98f\tmov\tBYTE PTR [r13+r14*1+0x2],sil\n000000000107f994\tmov\tBYTE PTR [r13+r15*1+0x0],0xff\n000000000107f99a\tcmp\tr10d,0xffffffff\n000000000107f99e\tlea\tr14,[r10+0x1]\n000000000107f9a2\tsetl\tsil\n000000000107f9a6\tcmp\tr14,QWORD PTR [rbp-0x38]\n000000000107f9aa\tsetge\tr15b\n000000000107f9ae\tor\tr15b,sil\n000000000107f9b1\tjne\t107fa30 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x490>\n000000000107f9b7\tadd\tr14,rbx\n000000000107f9ba\tlea\trbx,[r14*4+0x3]\n000000000107f9c2\tcmp\trbx,QWORD PTR [rbp-0x40]\n000000000107f9c6\tjae\t107fa30 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x490>\n000000000107f9c8\tshl\tr14,0x2\n000000000107f9cc\tmovzx\tr15d,di\n000000000107f9d0\tmov\tedx,0xff\n000000000107f9d5\tmovzx\tesi,BYTE PTR [r13+r14*1+0x0]\n000000000107f9db\tadd\tr15d,esi\n000000000107f9de\tcmp\tr15w,0xff\n000000000107f9e4\tcmovae\tr15d,edx\n000000000107f9e8\tmov\tBYTE PTR [r13+r14*1+0x0],r15b\n000000000107f9ed\tmovzx\tr15d,r8w\n000000000107f9f1\tmovzx\tesi,BYTE PTR [r13+r14*1+0x1]\n000000000107f9f7\tadd\tr15d,esi\n000000000107f9fa\tcmp\tr15w,0xff\n000000000107fa00\tcmovae\tr15d,edx\n000000000107fa04\tmov\tBYTE PTR [r13+r14*1+0x1],r15b\n000000000107fa09\tmovzx\tr15d,r9w\n000000000107fa0d\tmovzx\tesi,BYTE PTR [r13+r14*1+0x2]\n000000000107fa13\tadd\tr15d,esi\n000000000107fa16\tcmp\tr15w,0xff\n000000000107fa1c\tcmovae\tr15d,edx\n000000000107fa20\tmov\tBYTE PTR [r13+r14*1+0x2],r15b\n000000000107fa25\tmov\tBYTE PTR [r13+rbx*1+0x0],0xff\n000000000107fa2b\tnop\tDWORD PTR [rax+rax*1+0x0]\n000000000107fa30\tinc\tr11d\n000000000107fa33\tsets\tbl\n000000000107fa36\tcmp\tr11d,DWORD PTR [rbp-0x30]\n000000000107fa3a\tsetge\tr14b\n000000000107fa3e\tor\tr14b,bl\n000000000107fa41\tjne\t107f840 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>\n000000000107fa47\tmov\tedx,DWORD PTR [rbp-0x2c]\n000000000107fa4a\timul\tr11d,edx\n000000000107fa4e\ttest\tr10d,r10d\n000000000107fa51\tsets\tbl\n000000000107fa54\tcmp\tedx,r10d\n000000000107fa57\tsetle\tr14b\n000000000107fa5b\tor\tr14b,bl\n000000000107fa5e\tjne\t107fad2 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x532>\n000000000107fa60\tlea\trbx,[r11+r10*1]\n000000000107fa64\tlea\tr14,[rbx*4+0x3]\n000000000107fa6c\tcmp\tr14,QWORD PTR [rbp-0x40]\n000000000107fa70\tjae\t107fad2 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x532>\n000000000107fa72\tshl\trbx,0x2\n000000000107fa76\tmovzx\tesi,di\n000000000107fa79\tmov\tedx,0xff\n000000000107fa7e\tmovzx\tr15d,BYTE PTR [r13+rbx*1+0x0]\n000000000107fa84\tadd\tesi,r15d\n000000000107fa87\tmovzx\tr15d,r8w\n000000000107fa8b\tcmp\tsi,0xff\n000000000107fa90\tcmovae\tesi,edx\n000000000107fa93\tmov\tBYTE PTR [r13+rbx*1+0x0],sil\n000000000107fa98\tmovzx\tesi,BYTE PTR [r13+rbx*1+0x1]\n000000000107fa9e\tadd\tr15d,esi\n000000000107faa1\tcmp\tr15w,0xff\n000000000107faa7\tcmovae\tr15d,edx\n000000000107faab\tmov\tBYTE PTR [r13+rbx*1+0x1],r15b\n000000000107fab0\tmovzx\tr15d,r9w\n000000000107fab4\tmovzx\tesi,BYTE PTR [r13+rbx*1+0x2]\n000000000107faba\tadd\tr15d,esi\n000000000107fabd\tcmp\tr15w,0xff\n000000000107fac3\tcmovae\tr15d,edx\n000000000107fac7\tmov\tBYTE PTR [r13+rbx*1+0x2],r15b\n000000000107facc\tmov\tBYTE PTR [r13+r14*1+0x0],0xff\n000000000107fad2\tmov\tesi,r10d\n000000000107fad5\tinc\tr10\n000000000107fad8\tcmp\tesi,0xffffffff\n000000000107fadb\tsetl\tsil\n000000000107fadf\tcmp\tr10,QWORD PTR [rbp-0x38]\n000000000107fae3\tsetge\tbl\n000000000107fae6\tor\tbl,sil\n000000000107fae9\tjne\t107f840 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>\n000000000107faef\tadd\tr10,r11\n000000000107faf2\tlea\tr11,[r10*4+0x3]\n000000000107fafa\tcmp\tr11,QWORD PTR [rbp-0x40]\n000000000107fafe\tjae\t107f840 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>\n000000000107fb04\tshl\tr10,0x2\n000000000107fb08\tmovzx\tedi,di\n000000000107fb0b\tmov\tedx,0xff\n000000000107fb10\tmovzx\tesi,BYTE PTR [r13+r10*1+0x0]\n000000000107fb16\tadd\tedi,esi\n000000000107fb18\tcmp\tdi,0xff\n000000000107fb1d\tcmovae\tedi,edx\n000000000107fb20\tmov\tBYTE PTR [r13+r10*1+0x0],dil\n000000000107fb25\tmovzx\tedi,r8w\n000000000107fb29\tmovzx\tesi,BYTE PTR [r13+r10*1+0x1]\n000000000107fb2f\tadd\tedi,esi\n000000000107fb31\tcmp\tdi,0xff\n000000000107fb36\tcmovae\tedi,edx\n000000000107fb39\tmov\tBYTE PTR [r13+r10*1+0x1],dil\n000000000107fb3e\tmovzx\tedi,r9w\n000000000107fb42\tmovzx\tesi,BYTE PTR [r13+r10*1+0x2]\n000000000107fb48\tadd\tedi,esi\n000000000107fb4a\tcmp\tdi,0xff\n000000000107fb4f\tcmovae\tedi,edx\n000000000107fb52\tmov\tBYTE PTR [r13+r10*1+0x2],dil\n000000000107fb57\tmov\tBYTE PTR [r13+r11*1+0x0],0xff\n000000000107fb5d\tjmp\t107f840 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>\n000000000107fb62\tinc\tQWORD PTR [r12+0x68]\n000000000107fb67\tadd\trsp,0x28\n000000000107fb6b\tpop\trbx\n000000000107fb6c\tpop\tr12\n000000000107fb6e\tpop\tr13\n000000000107fb70\tpop\tr14\n000000000107fb72\tpop\tr15\n000000000107fb74\tpop\trbp\n000000000107fb75\tret\t\n000000000107fb76\tcs\tnop WORD PTR [rax+rax*1+0x0]",
-    "source_attributed": [
-      {
-        "source": "        pub fn step(self: *Self, dt: f32, fb: []u8, w: u32, h: u32) void {",
-        "asm": [
-          "push\trbp",
-          "mov\trbp,rsp",
-          "push\tr15",
-          "push\tr14",
-          "push\tr13",
-          "push\tr12",
-          "push\trbx",
-          "sub\trsp,0x28"
-        ]
+    "vector_insns": 4,
+    "excerpt": "000000000107eed0\tpush\trbp\n000000000107eed1\tmov\trbp,rsp\n000000000107eed4\tpush\tr15\n000000000107eed6\tpush\tr14\n000000000107eed8\tpush\tr13\n000000000107eeda\tpush\tr12\n000000000107eedc\tpush\trbx\n000000000107eedd\tsub\trsp,0x28\n000000000107eee1\tmov\tr15,QWORD PTR [rdi+0x18]\n000000000107eee5\tmov\tr12,rdi\n000000000107eee8\tmov\tDWORD PTR [rbp-0x30],r8d\n000000000107eeec\tmov\tDWORD PTR [rbp-0x2c],ecx\n000000000107eeef\tmov\tQWORD PTR [rbp-0x40],rdx\n000000000107eef3\ttest\tr15,r15\n000000000107eef6\tje\t107f492 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x5c2>\n000000000107eefc\tvmovss\txmm6,DWORD PTR [rip+0xfffffffffff836a0]        # 10025a4 <__anon_12630+0x10>\n000000000107ef04\tmov\trbx,QWORD PTR [r12+0x10]\n000000000107ef09\tmov\tr13,rsi\n000000000107ef0c\tlea\tr14,[r12+0x10]\n000000000107ef11\tvxorps\txmm7,xmm7,xmm7\n000000000107ef15\tjmp\t107ef46 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x76>\n000000000107ef17\tnop\tWORD PTR [rax+rax*1+0x0]\n000000000107ef20\tmov\trdi,r14\n000000000107ef23\tlea\trsi,[r12+0x28]\n000000000107ef28\tcall\t107f510 <layouts.ML01.data.Data.spawn>\n000000000107ef2d\tvmovss\txmm6,DWORD PTR [rip+0xfffffffffff8366f]        # 10025a4 <__anon_12630+0x10>\n000000000107ef35\tvxorps\txmm7,xmm7,xmm7\n000000000107ef39\tadd\trbx,0x44\n000000000107ef3d\tdec\tr15\n000000000107ef40\tje\t107f128 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x258>\n000000000107ef46\tvmovss\txmm4,DWORD PTR [rip+0xfffffffffff83636]        # 1002584 <__anon_30329+0x10>\n000000000107ef4e\tvmovss\txmm0,DWORD PTR [rbx]\n000000000107ef52\tvmovss\txmm1,DWORD PTR [rbx+0xc]\n000000000107ef57\tvmovss\txmm5,DWORD PTR [rip+0xfffffffffff83691]        # 10025f0 <__anon_12636+0xc>\n000000000107ef5f\tvmulss\txmm1,xmm1,xmm4\n000000000107ef63\tvaddss\txmm0,xmm0,xmm1\n000000000107ef67\tvmovss\tDWORD PTR [rbx],xmm0\n000000000107ef6b\tvmovss\txmm0,DWORD PTR [rbx+0x4]\n000000000107ef70\tvmovss\txmm1,DWORD PTR [rbx+0x10]\n000000000107ef75\tvmulss\txmm1,xmm1,xmm4\n000000000107ef79\tvaddss\txmm0,xmm0,xmm1\n000000000107ef7d\tvmovss\tDWORD PTR [rbx+0x4],xmm0\n000000000107ef82\tvmovss\txmm0,DWORD PTR [rbx+0x8]\n000000000107ef87\tvmovss\txmm1,DWORD PTR [rbx+0x14]\n000000000107ef8c\tvmulss\txmm1,xmm1,xmm4\n000000000107ef90\tvaddss\txmm0,xmm0,xmm1\n000000000107ef94\tvmovss\tDWORD PTR [rbx+0x8],xmm0\n000000000107ef99\tvmovss\txmm0,DWORD PTR [rbx+0xc]\n000000000107ef9e\tvmulss\txmm3,xmm0,xmm5\n000000000107efa2\tvmovss\txmm1,DWORD PTR [rbx+0x10]\n000000000107efa7\tvmovss\txmm2,DWORD PTR [rbx+0x14]\n000000000107efac\tvaddss\txmm3,xmm3,xmm7\n000000000107efb0\tvmulss\txmm3,xmm3,xmm4\n000000000107efb4\tvaddss\txmm0,xmm0,xmm3\n000000000107efb8\tvmovss\tDWORD PTR [rbx+0xc],xmm0\n000000000107efbd\tvmulss\txmm0,xmm1,xmm5\n000000000107efc1\tvaddss\txmm0,xmm0,DWORD PTR [rip+0xfffffffffff835b7]        # 1002580 <__anon_30329+0xc>\n000000000107efc9\tvmulss\txmm0,xmm0,xmm4\n000000000107efcd\tvaddss\txmm0,xmm1,xmm0\n000000000107efd1\tvmovss\tDWORD PTR [rbx+0x10],xmm0\n000000000107efd6\tvmulss\txmm0,xmm2,xmm5\n000000000107efda\tvaddss\txmm0,xmm0,xmm7\n000000000107efde\tvmulss\txmm0,xmm0,xmm4\n000000000107efe2\tvaddss\txmm0,xmm2,xmm0\n000000000107efe6\tvmovss\tDWORD PTR [rbx+0x14],xmm0\n000000000107efeb\tvmovss\txmm0,DWORD PTR [rbx+0x1c]\n000000000107eff0\tvaddss\txmm0,xmm0,xmm4\n000000000107eff4\tvucomiss\txmm0,xmm6\n000000000107eff8\tvmovss\tDWORD PTR [rbx+0x1c],xmm0\n000000000107effd\tjae\t107f0a0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x1d0>\n000000000107f003\tvmovss\txmm1,DWORD PTR [rip+0x145cd]        # 10935d8 <framework.config.q>\n000000000107f00b\tvucomiss\txmm1,xmm7\n000000000107f00f\tjne\t107f017 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x147>\n000000000107f011\tjnp\t107ef39 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x69>\n000000000107f017\tmov\trdx,QWORD PTR [r12+0x50]\n000000000107f01c\tmov\trax,QWORD PTR [r12+0x60]\n000000000107f021\tmov\trcx,QWORD PTR [r12+0x48]\n000000000107f026\tmov\trdi,QWORD PTR [r12+0x58]\n000000000107f02b\tlea\trsi,[rax+rcx*1]\n000000000107f02f\tmov\tr8,rdx\n000000000107f032\txor\trdi,rcx\n000000000107f035\txor\trax,rdx\n000000000107f038\trorx\tr14,rsi,0x29\n000000000107f03e\tshl\tr8,0x11\n000000000107f042\txor\trdx,rdi\n000000000107f045\tadd\tr14,rcx\n000000000107f048\txor\trcx,rax\n000000000107f04b\txor\trdi,r8\n000000000107f04e\trorx\trax,rax,0x13\n000000000107f054\tmov\tQWORD PTR [r12+0x50],rdx\n000000000107f059\tmov\tQWORD PTR [r12+0x48],rcx\n000000000107f05e\tmov\tQWORD PTR [r12+0x58],rdi\n000000000107f063\tmov\tQWORD PTR [r12+0x60],rax\n000000000107f068\tcmp\tr14,0x7fffff\n000000000107f06f\tjbe\t107f0bc <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x1ec>\n000000000107f071\tlzcnt\trax,r14\n000000000107f076\tand\tr14d,0x7fffff\n000000000107f07d\tshl\teax,0x17\n000000000107f080\tor\tr14d,0x3f000000\n000000000107f087\tsub\tr14d,eax\n000000000107f08a\tvmovd\txmm0,r14d\n000000000107f08f\tlea\tr14,[r12+0x10]\n000000000107f094\tvucomiss\txmm1,xmm0\n000000000107f098\tjbe\t107ef39 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x69>\n000000000107f09e\txchg\tax,ax\n000000000107f0a0\tmov\tedx,DWORD PTR [rbx+0x3c]\n000000000107f0a3\tmov\trcx,QWORD PTR [r12+0x18]\n000000000107f0a8\tcmp\trdx,rcx\n000000000107f0ab\tjb\t107ef20 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x50>\n000000000107f0b1\tmov\teax,edx\n000000000107f0b3\txor\tedx,edx\n000000000107f0b5\tdiv\tecx\n000000000107f0b7\tjmp\t107ef20 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x50>\n000000000107f0bc\tmov\tedx,0x8\n000000000107f0c1\tlea\trdi,[r12+0x48]\n000000000107f0c6\tlea\trsi,[rbp-0x50]\n000000000107f0ca\tvmovss\tDWORD PTR [rbp-0x38],xmm1\n000000000107f0cf\tcall\t107f980 <Random.init__anon_32907.gen.fill>\n000000000107f0d4\tlzcnt\trax,QWORD PTR [rbp-0x50]\n000000000107f0da\tadd\tal,0x29\n000000000107f0dc\tmov\tecx,eax\n000000000107f0de\tand\tcl,0x7f\n000000000107f0e1\tcmp\tcl,0x69\n000000000107f0e4\tje\t107f102 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x232>\n000000000107f0e6\tmovzx\teax,al\n000000000107f0e9\tand\teax,0x7f\n000000000107f0ec\tvmovss\txmm6,DWORD PTR [rip+0xfffffffffff834b0]        # 10025a4 <__anon_12630+0x10>\n000000000107f0f4\tvmovss\txmm1,DWORD PTR [rbp-0x38]\n000000000107f0f9\tvxorps\txmm7,xmm7,xmm7\n000000000107f0fd\tjmp\t107f076 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x1a6>\n000000000107f102\tmov\tedx,0x4\n000000000107f107\tlea\trdi,[r12+0x48]\n000000000107f10c\tlea\trsi,[rbp-0x44]\n000000000107f110\tcall\t107f980 <Random.init__anon_32907.gen.fill>\n000000000107f115\tmov\teax,DWORD PTR [rbp-0x44]\n000000000107f118\tmov\tecx,0x7ff\n000000000107f11d\tor\teax,ecx\n000000000107f11f\tlzcnt\teax,eax\n000000000107f123\tadd\teax,0x69\n000000000107f126\tjmp\t107f0ec <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x21c>\n000000000107f128\tmov\trax,QWORD PTR [r12+0x18]\n000000000107f12d\ttest\trax,rax\n000000000107f130\tje\t107f492 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x5c2>\n000000000107f136\tmov\tedx,DWORD PTR [rbp-0x2c]\n000000000107f139\tvmovss\txmm3,DWORD PTR [rip+0xfffffffffff83493]        # 10025d4 <__anon_23305+0x2c>\n000000000107f141\tvmovss\txmm4,DWORD PTR [rip+0xfffffffffff8343f]        # 1002588 <__anon_30329+0x14>\n000000000107f149\tmov\trcx,QWORD PTR [r12+0x10]\n000000000107f14e\tvxorps\txmm2,xmm2,xmm2\n000000000107f152\tvcvtsi2ss\txmm0,xmm15,edx\n000000000107f156\tvcvtsi2ss\txmm1,xmm15,DWORD PTR [rbp-0x30]\n000000000107f15b\tmov\tedx,edx\n000000000107f15d\tadd\trcx,0x28\n000000000107f161\tmov\tQWORD PTR [rbp-0x38],rdx\n000000000107f165\tjmp\t107f17d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2ad>\n000000000107f167\tnop\tWORD PTR [rax+rax*1+0x0]\n000000000107f170\tadd\trcx,0x44\n000000000107f174\tdec\trax\n000000000107f177\tje\t107f492 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x5c2>\n000000000107f17d\tvmovss\txmm5,DWORD PTR [rcx-0x8]\n000000000107f182\tvucomiss\txmm2,xmm5\n000000000107f186\tjae\t107f1e0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x310>\n000000000107f188\tvucomiss\txmm5,xmm3\n000000000107f18c\tmov\tdi,0xff\n000000000107f190\tjae\t107f19a <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2ca>\n000000000107f192\tvcvttss2si\tedi,xmm5\n000000000107f196\tmovzx\tedi,dil\n000000000107f19a\tvmovss\txmm5,DWORD PTR [rcx-0x4]\n000000000107f19f\tvucomiss\txmm2,xmm5\n000000000107f1a3\tjae\t107f1ed <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x31d>\n000000000107f1a5\tvucomiss\txmm5,xmm3\n000000000107f1a9\tmov\tr8w,0xff\n000000000107f1ae\tjae\t107f1b8 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2e8>\n000000000107f1b0\tvcvttss2si\tr8d,xmm5\n000000000107f1b4\tmovzx\tr8d,r8b\n000000000107f1b8\tvmovss\txmm5,DWORD PTR [rcx]\n000000000107f1bc\tvucomiss\txmm2,xmm5\n000000000107f1c0\tjae\t107f1fa <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x32a>\n000000000107f1c2\tvucomiss\txmm5,xmm3\n000000000107f1c6\tmov\tr9w,0xff\n000000000107f1cb\tjae\t107f1fd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x32d>\n000000000107f1cd\tvcvttss2si\tr9d,xmm5\n000000000107f1d1\tmovzx\tr9d,r9b\n000000000107f1d5\tjmp\t107f1fd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x32d>\n000000000107f1d7\tnop\tWORD PTR [rax+rax*1+0x0]\n000000000107f1e0\txor\tedi,edi\n000000000107f1e2\tvmovss\txmm5,DWORD PTR [rcx-0x4]\n000000000107f1e7\tvucomiss\txmm2,xmm5\n000000000107f1eb\tjb\t107f1a5 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2d5>\n000000000107f1ed\txor\tr8d,r8d\n000000000107f1f0\tvmovss\txmm5,DWORD PTR [rcx]\n000000000107f1f4\tvucomiss\txmm2,xmm5\n000000000107f1f8\tjb\t107f1c2 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2f2>\n000000000107f1fa\txor\tr9d,r9d\n000000000107f1fd\tvaddss\txmm5,xmm6,DWORD PTR [rcx-0x28]\n000000000107f202\tvmulss\txmm5,xmm5,xmm4\n000000000107f206\tvmulss\txmm5,xmm5,xmm0\n000000000107f20a\tvcvttss2si\tr10d,xmm5\n000000000107f20e\tvsubss\txmm5,xmm6,DWORD PTR [rcx-0x24]\n000000000107f213\tmovsxd\tr10,r10d\n000000000107f216\tvmulss\txmm5,xmm5,xmm4\n000000000107f21a\tvmulss\txmm5,xmm5,xmm1\n000000000107f21e\tvcvttss2si\tr11d,xmm5\n000000000107f222\ttest\tr11d,r11d\n000000000107f225\tsets\tbl\n000000000107f228\tcmp\tr11d,DWORD PTR [rbp-0x30]\n000000000107f22c\tsetge\tr14b\n000000000107f230\tor\tr14b,bl\n000000000107f233\tjne\t107f360 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x490>\n000000000107f239\tmov\tedx,DWORD PTR [rbp-0x2c]\n000000000107f23c\tmov\tebx,r11d\n000000000107f23f\timul\tebx,edx\n000000000107f242\ttest\tr10d,r10d\n000000000107f245\tsets\tr14b\n000000000107f249\tcmp\tedx,r10d\n000000000107f24c\tsetle\tr15b\n000000000107f250\tor\tr15b,r14b\n000000000107f253\tjne\t107f2ca <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x3fa>\n000000000107f255\tlea\tr14,[rbx+r10*1]\n000000000107f259\tlea\tr15,[r14*4+0x3]\n000000000107f261\tcmp\tr15,QWORD PTR [rbp-0x40]\n000000000107f265\tjae\t107f2ca <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x3fa>\n000000000107f267\tshl\tr14,0x2\n000000000107f26b\tmovzx\tedx,di\n000000000107f26e\tmovzx\tesi,BYTE PTR [r13+r14*1+0x0]\n000000000107f274\tadd\tedx,esi\n000000000107f276\tmov\tesi,0xff\n000000000107f27b\tcmp\tdx,0xff\n000000000107f280\tcmovae\tedx,esi\n000000000107f283\tmovzx\tesi,r8w\n000000000107f287\tmov\tBYTE PTR [r13+r14*1+0x0],dl\n000000000107f28c\tmovzx\tedx,BYTE PTR [r13+r14*1+0x1]\n000000000107f292\tadd\tesi,edx\n000000000107f294\tmov\tedx,0xff\n000000000107f299\tcmp\tsi,0xff\n000000000107f29e\tcmovae\tesi,edx\n000000000107f2a1\tmov\tBYTE PTR [r13+r14*1+0x1],sil\n000000000107f2a6\tmovzx\tesi,r9w\n000000000107f2aa\tmovzx\tedx,BYTE PTR [r13+r14*1+0x2]\n000000000107f2b0\tadd\tesi,edx\n000000000107f2b2\tmov\tedx,0xff\n000000000107f2b7\tcmp\tsi,0xff\n000000000107f2bc\tcmovae\tesi,edx\n000000000107f2bf\tmov\tBYTE PTR [r13+r14*1+0x2],sil\n000000000107f2c4\tmov\tBYTE PTR [r13+r15*1+0x0],0xff\n000000000107f2ca\tcmp\tr10d,0xffffffff\n000000000107f2ce\tlea\tr14,[r10+0x1]\n000000000107f2d2\tsetl\tsil\n000000000107f2d6\tcmp\tr14,QWORD PTR [rbp-0x38]\n000000000107f2da\tsetge\tr15b\n000000000107f2de\tor\tr15b,sil\n000000000107f2e1\tjne\t107f360 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x490>\n000000000107f2e7\tadd\tr14,rbx\n000000000107f2ea\tlea\trbx,[r14*4+0x3]\n000000000107f2f2\tcmp\trbx,QWORD PTR [rbp-0x40]\n000000000107f2f6\tjae\t107f360 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x490>\n000000000107f2f8\tshl\tr14,0x2\n000000000107f2fc\tmovzx\tr15d,di\n000000000107f300\tmov\tedx,0xff\n000000000107f305\tmovzx\tesi,BYTE PTR [r13+r14*1+0x0]\n000000000107f30b\tadd\tr15d,esi\n000000000107f30e\tcmp\tr15w,0xff\n000000000107f314\tcmovae\tr15d,edx\n000000000107f318\tmov\tBYTE PTR [r13+r14*1+0x0],r15b\n000000000107f31d\tmovzx\tr15d,r8w\n000000000107f321\tmovzx\tesi,BYTE PTR [r13+r14*1+0x1]\n000000000107f327\tadd\tr15d,esi\n000000000107f32a\tcmp\tr15w,0xff\n000000000107f330\tcmovae\tr15d,edx\n000000000107f334\tmov\tBYTE PTR [r13+r14*1+0x1],r15b\n000000000107f339\tmovzx\tr15d,r9w\n000000000107f33d\tmovzx\tesi,BYTE PTR [r13+r14*1+0x2]\n000000000107f343\tadd\tr15d,esi\n000000000107f346\tcmp\tr15w,0xff\n000000000107f34c\tcmovae\tr15d,edx\n000000000107f350\tmov\tBYTE PTR [r13+r14*1+0x2],r15b\n000000000107f355\tmov\tBYTE PTR [r13+rbx*1+0x0],0xff\n000000000107f35b\tnop\tDWORD PTR [rax+rax*1+0x0]\n000000000107f360\tinc\tr11d\n000000000107f363\tsets\tbl\n000000000107f366\tcmp\tr11d,DWORD PTR [rbp-0x30]\n000000000107f36a\tsetge\tr14b\n000000000107f36e\tor\tr14b,bl\n000000000107f371\tjne\t107f170 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>\n000000000107f377\tmov\tedx,DWORD PTR [rbp-0x2c]\n000000000107f37a\timul\tr11d,edx\n000000000107f37e\ttest\tr10d,r10d\n000000000107f381\tsets\tbl\n000000000107f384\tcmp\tedx,r10d\n000000000107f387\tsetle\tr14b\n000000000107f38b\tor\tr14b,bl\n000000000107f38e\tjne\t107f402 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x532>\n000000000107f390\tlea\trbx,[r11+r10*1]\n000000000107f394\tlea\tr14,[rbx*4+0x3]\n000000000107f39c\tcmp\tr14,QWORD PTR [rbp-0x40]\n000000000107f3a0\tjae\t107f402 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x532>\n000000000107f3a2\tshl\trbx,0x2\n000000000107f3a6\tmovzx\tesi,di\n000000000107f3a9\tmov\tedx,0xff\n000000000107f3ae\tmovzx\tr15d,BYTE PTR [r13+rbx*1+0x0]\n000000000107f3b4\tadd\tesi,r15d\n000000000107f3b7\tmovzx\tr15d,r8w\n000000000107f3bb\tcmp\tsi,0xff\n000000000107f3c0\tcmovae\tesi,edx\n000000000107f3c3\tmov\tBYTE PTR [r13+rbx*1+0x0],sil\n000000000107f3c8\tmovzx\tesi,BYTE PTR [r13+rbx*1+0x1]\n000000000107f3ce\tadd\tr15d,esi\n000000000107f3d1\tcmp\tr15w,0xff\n000000000107f3d7\tcmovae\tr15d,edx\n000000000107f3db\tmov\tBYTE PTR [r13+rbx*1+0x1],r15b\n000000000107f3e0\tmovzx\tr15d,r9w\n000000000107f3e4\tmovzx\tesi,BYTE PTR [r13+rbx*1+0x2]\n000000000107f3ea\tadd\tr15d,esi\n000000000107f3ed\tcmp\tr15w,0xff\n000000000107f3f3\tcmovae\tr15d,edx\n000000000107f3f7\tmov\tBYTE PTR [r13+rbx*1+0x2],r15b\n000000000107f3fc\tmov\tBYTE PTR [r13+r14*1+0x0],0xff\n000000000107f402\tmov\tesi,r10d\n000000000107f405\tinc\tr10\n000000000107f408\tcmp\tesi,0xffffffff\n000000000107f40b\tsetl\tsil\n000000000107f40f\tcmp\tr10,QWORD PTR [rbp-0x38]\n000000000107f413\tsetge\tbl\n000000000107f416\tor\tbl,sil\n000000000107f419\tjne\t107f170 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>\n000000000107f41f\tadd\tr10,r11\n000000000107f422\tlea\tr11,[r10*4+0x3]\n000000000107f42a\tcmp\tr11,QWORD PTR [rbp-0x40]\n000000000107f42e\tjae\t107f170 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>\n000000000107f434\tshl\tr10,0x2\n000000000107f438\tmovzx\tedi,di\n000000000107f43b\tmov\tedx,0xff\n000000000107f440\tmovzx\tesi,BYTE PTR [r13+r10*1+0x0]\n000000000107f446\tadd\tedi,esi\n000000000107f448\tcmp\tdi,0xff\n000000000107f44d\tcmovae\tedi,edx\n000000000107f450\tmov\tBYTE PTR [r13+r10*1+0x0],dil\n000000000107f455\tmovzx\tedi,r8w\n000000000107f459\tmovzx\tesi,BYTE PTR [r13+r10*1+0x1]\n000000000107f45f\tadd\tedi,esi\n000000000107f461\tcmp\tdi,0xff\n000000000107f466\tcmovae\tedi,edx\n000000000107f469\tmov\tBYTE PTR [r13+r10*1+0x1],dil\n000000000107f46e\tmovzx\tedi,r9w\n000000000107f472\tmovzx\tesi,BYTE PTR [r13+r10*1+0x2]\n000000000107f478\tadd\tedi,esi\n000000000107f47a\tcmp\tdi,0xff\n000000000107f47f\tcmovae\tedi,edx\n000000000107f482\tmov\tBYTE PTR [r13+r10*1+0x2],dil\n000000000107f487\tmov\tBYTE PTR [r13+r11*1+0x0],0xff\n000000000107f48d\tjmp\t107f170 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>\n000000000107f492\tinc\tQWORD PTR [r12+0x68]\n000000000107f497\tadd\trsp,0x28\n000000000107f49b\tpop\trbx\n000000000107f49c\tpop\tr12\n000000000107f49e\tpop\tr13\n000000000107f4a0\tpop\tr14\n000000000107f4a2\tpop\tr15\n000000000107f4a4\tpop\trbp\n000000000107f4a5\tret\t\n000000000107f4a6\tcs\tnop WORD PTR [rax+rax*1+0x0]",
+    "insns": [
+      {
+        "a": 17297104,
+        "m": "push",
+        "o": "rbp",
+        "cls": "other"
+      },
+      {
+        "a": 17297105,
+        "m": "mov",
+        "o": "rbp,rsp",
+        "cls": "other"
+      },
+      {
+        "a": 17297108,
+        "m": "push",
+        "o": "r15",
+        "cls": "other"
+      },
+      {
+        "a": 17297110,
+        "m": "push",
+        "o": "r14",
+        "cls": "other"
+      },
+      {
+        "a": 17297112,
+        "m": "push",
+        "o": "r13",
+        "cls": "other"
+      },
+      {
+        "a": 17297114,
+        "m": "push",
+        "o": "r12",
+        "cls": "other"
+      },
+      {
+        "a": 17297116,
+        "m": "push",
+        "o": "rbx",
+        "cls": "other"
+      },
+      {
+        "a": 17297117,
+        "m": "sub",
+        "o": "rsp,0x28",
+        "cls": "other"
+      },
+      {
+        "a": 17297121,
+        "m": "mov",
+        "o": "r15,QWORD PTR [rdi+0x18]",
+        "cls": "load"
+      },
+      {
+        "a": 17297125,
+        "m": "mov",
+        "o": "r12,rdi",
+        "cls": "other"
+      },
+      {
+        "a": 17297128,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x30],r8d",
+        "cls": "store"
+      },
+      {
+        "a": 17297132,
+        "m": "mov",
+        "o": "DWORD PTR [rbp-0x2c],ecx",
+        "cls": "store"
+      },
+      {
+        "a": 17297135,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x40],rdx",
+        "cls": "store"
+      },
+      {
+        "a": 17297139,
+        "m": "test",
+        "o": "r15,r15",
+        "cls": "cmp"
+      },
+      {
+        "a": 17297142,
+        "m": "je",
+        "o": "107f492 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x5c2>",
+        "cls": "branch",
+        "bt": 350
+      },
+      {
+        "a": 17297148,
+        "m": "vmovss",
+        "o": "xmm6,DWORD PTR [rip+0xfffffffffff836a0]        # 10025a4 <__anon_12630+0x10>",
+        "cls": "load"
+      },
+      {
+        "a": 17297156,
+        "m": "mov",
+        "o": "rbx,QWORD PTR [r12+0x10]",
+        "cls": "load"
+      },
+      {
+        "a": 17297161,
+        "m": "mov",
+        "o": "r13,rsi",
+        "cls": "other"
+      },
+      {
+        "a": 17297164,
+        "m": "lea",
+        "o": "r14,[r12+0x10]",
+        "cls": "other"
+      },
+      {
+        "a": 17297169,
+        "m": "vxorps",
+        "o": "xmm7,xmm7,xmm7",
+        "cls": "other"
+      },
+      {
+        "a": 17297173,
+        "m": "jmp",
+        "o": "107ef46 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x76>",
+        "cls": "branch",
+        "bt": 30
+      },
+      {
+        "a": 17297175,
+        "m": "nop",
+        "o": "WORD PTR [rax+rax*1+0x0]",
+        "cls": "other"
+      },
+      {
+        "a": 17297184,
+        "m": "mov",
+        "o": "rdi,r14",
+        "cls": "other"
+      },
+      {
+        "a": 17297187,
+        "m": "lea",
+        "o": "rsi,[r12+0x28]",
+        "cls": "other"
+      },
+      {
+        "a": 17297192,
+        "m": "call",
+        "o": "107f510 <layouts.ML01.data.Data.spawn>",
+        "cls": "branch",
+        "t": "layouts.ML01.data.Data.spawn"
+      },
+      {
+        "a": 17297197,
+        "m": "vmovss",
+        "o": "xmm6,DWORD PTR [rip+0xfffffffffff8366f]        # 10025a4 <__anon_12630+0x10>",
+        "cls": "load"
+      },
+      {
+        "a": 17297205,
+        "m": "vxorps",
+        "o": "xmm7,xmm7,xmm7",
+        "cls": "other"
+      },
+      {
+        "a": 17297209,
+        "m": "add",
+        "o": "rbx,0x44",
+        "cls": "other"
+      },
+      {
+        "a": 17297213,
+        "m": "dec",
+        "o": "r15",
+        "cls": "other"
+      },
+      {
+        "a": 17297216,
+        "m": "je",
+        "o": "107f128 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x258>",
+        "cls": "branch",
+        "bt": 140
+      },
+      {
+        "a": 17297222,
+        "m": "vmovss",
+        "o": "xmm4,DWORD PTR [rip+0xfffffffffff83636]        # 1002584 <__anon_30329+0x10>",
+        "cls": "load"
+      },
+      {
+        "a": 17297230,
+        "m": "vmovss",
+        "o": "xmm0,DWORD PTR [rbx]",
+        "cls": "load"
+      },
+      {
+        "a": 17297234,
+        "m": "vmovss",
+        "o": "xmm1,DWORD PTR [rbx+0xc]",
+        "cls": "load"
+      },
+      {
+        "a": 17297239,
+        "m": "vmovss",
+        "o": "xmm5,DWORD PTR [rip+0xfffffffffff83691]        # 10025f0 <__anon_12636+0xc>",
+        "cls": "load"
+      },
+      {
+        "a": 17297247,
+        "m": "vmulss",
+        "o": "xmm1,xmm1,xmm4",
+        "cls": "fp"
+      },
+      {
+        "a": 17297251,
+        "m": "vaddss",
+        "o": "xmm0,xmm0,xmm1",
+        "cls": "fp"
+      },
+      {
+        "a": 17297255,
+        "m": "vmovss",
+        "o": "DWORD PTR [rbx],xmm0",
+        "cls": "store"
+      },
+      {
+        "a": 17297259,
+        "m": "vmovss",
+        "o": "xmm0,DWORD PTR [rbx+0x4]",
+        "cls": "load"
+      },
+      {
+        "a": 17297264,
+        "m": "vmovss",
+        "o": "xmm1,DWORD PTR [rbx+0x10]",
+        "cls": "load"
+      },
+      {
+        "a": 17297269,
+        "m": "vmulss",
+        "o": "xmm1,xmm1,xmm4",
+        "cls": "fp"
+      },
+      {
+        "a": 17297273,
+        "m": "vaddss",
+        "o": "xmm0,xmm0,xmm1",
+        "cls": "fp"
+      },
+      {
+        "a": 17297277,
+        "m": "vmovss",
+        "o": "DWORD PTR [rbx+0x4],xmm0",
+        "cls": "store"
+      },
+      {
+        "a": 17297282,
+        "m": "vmovss",
+        "o": "xmm0,DWORD PTR [rbx+0x8]",
+        "cls": "load"
+      },
+      {
+        "a": 17297287,
+        "m": "vmovss",
+        "o": "xmm1,DWORD PTR [rbx+0x14]",
+        "cls": "load"
+      },
+      {
+        "a": 17297292,
+        "m": "vmulss",
+        "o": "xmm1,xmm1,xmm4",
+        "cls": "fp"
+      },
+      {
+        "a": 17297296,
+        "m": "vaddss",
+        "o": "xmm0,xmm0,xmm1",
+        "cls": "fp"
+      },
+      {
+        "a": 17297300,
+        "m": "vmovss",
+        "o": "DWORD PTR [rbx+0x8],xmm0",
+        "cls": "store"
+      },
+      {
+        "a": 17297305,
+        "m": "vmovss",
+        "o": "xmm0,DWORD PTR [rbx+0xc]",
+        "cls": "load"
+      },
+      {
+        "a": 17297310,
+        "m": "vmulss",
+        "o": "xmm3,xmm0,xmm5",
+        "cls": "fp"
+      },
+      {
+        "a": 17297314,
+        "m": "vmovss",
+        "o": "xmm1,DWORD PTR [rbx+0x10]",
+        "cls": "load"
+      },
+      {
+        "a": 17297319,
+        "m": "vmovss",
+        "o": "xmm2,DWORD PTR [rbx+0x14]",
+        "cls": "load"
+      },
+      {
+        "a": 17297324,
+        "m": "vaddss",
+        "o": "xmm3,xmm3,xmm7",
+        "cls": "fp"
+      },
+      {
+        "a": 17297328,
+        "m": "vmulss",
+        "o": "xmm3,xmm3,xmm4",
+        "cls": "fp"
+      },
+      {
+        "a": 17297332,
+        "m": "vaddss",
+        "o": "xmm0,xmm0,xmm3",
+        "cls": "fp"
+      },
+      {
+        "a": 17297336,
+        "m": "vmovss",
+        "o": "DWORD PTR [rbx+0xc],xmm0",
+        "cls": "store"
+      },
+      {
+        "a": 17297341,
+        "m": "vmulss",
+        "o": "xmm0,xmm1,xmm5",
+        "cls": "fp"
+      },
+      {
+        "a": 17297345,
+        "m": "vaddss",
+        "o": "xmm0,xmm0,DWORD PTR [rip+0xfffffffffff835b7]        # 1002580 <__anon_30329+0xc>",
+        "cls": "fp"
+      },
+      {
+        "a": 17297353,
+        "m": "vmulss",
+        "o": "xmm0,xmm0,xmm4",
+        "cls": "fp"
+      },
+      {
+        "a": 17297357,
+        "m": "vaddss",
+        "o": "xmm0,xmm1,xmm0",
+        "cls": "fp"
+      },
+      {
+        "a": 17297361,
+        "m": "vmovss",
+        "o": "DWORD PTR [rbx+0x10],xmm0",
+        "cls": "store"
+      },
+      {
+        "a": 17297366,
+        "m": "vmulss",
+        "o": "xmm0,xmm2,xmm5",
+        "cls": "fp"
+      },
+      {
+        "a": 17297370,
+        "m": "vaddss",
+        "o": "xmm0,xmm0,xmm7",
+        "cls": "fp"
+      },
+      {
+        "a": 17297374,
+        "m": "vmulss",
+        "o": "xmm0,xmm0,xmm4",
+        "cls": "fp"
+      },
+      {
+        "a": 17297378,
+        "m": "vaddss",
+        "o": "xmm0,xmm2,xmm0",
+        "cls": "fp"
+      },
+      {
+        "a": 17297382,
+        "m": "vmovss",
+        "o": "DWORD PTR [rbx+0x14],xmm0",
+        "cls": "store"
+      },
+      {
+        "a": 17297387,
+        "m": "vmovss",
+        "o": "xmm0,DWORD PTR [rbx+0x1c]",
+        "cls": "load"
+      },
+      {
+        "a": 17297392,
+        "m": "vaddss",
+        "o": "xmm0,xmm0,xmm4",
+        "cls": "fp"
+      },
+      {
+        "a": 17297396,
+        "m": "vucomiss",
+        "o": "xmm0,xmm6",
+        "cls": "fp"
+      },
+      {
+        "a": 17297400,
+        "m": "vmovss",
+        "o": "DWORD PTR [rbx+0x1c],xmm0",
+        "cls": "store"
+      },
+      {
+        "a": 17297405,
+        "m": "jae",
+        "o": "107f0a0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x1d0>",
+        "cls": "branch",
+        "bt": 105
+      },
+      {
+        "a": 17297411,
+        "m": "vmovss",
+        "o": "xmm1,DWORD PTR [rip+0x145cd]        # 10935d8 <framework.config.q>",
+        "cls": "load"
+      },
+      {
+        "a": 17297419,
+        "m": "vucomiss",
+        "o": "xmm1,xmm7",
+        "cls": "fp"
+      },
+      {
+        "a": 17297423,
+        "m": "jne",
+        "o": "107f017 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x147>",
+        "cls": "branch",
+        "bt": 74
+      },
+      {
+        "a": 17297425,
+        "m": "jnp",
+        "o": "107ef39 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x69>",
+        "cls": "branch",
+        "bt": 27
+      },
+      {
+        "a": 17297431,
+        "m": "mov",
+        "o": "rdx,QWORD PTR [r12+0x50]",
+        "cls": "load"
+      },
+      {
+        "a": 17297436,
+        "m": "mov",
+        "o": "rax,QWORD PTR [r12+0x60]",
+        "cls": "load"
+      },
+      {
+        "a": 17297441,
+        "m": "mov",
+        "o": "rcx,QWORD PTR [r12+0x48]",
+        "cls": "load"
+      },
+      {
+        "a": 17297446,
+        "m": "mov",
+        "o": "rdi,QWORD PTR [r12+0x58]",
+        "cls": "load"
+      },
+      {
+        "a": 17297451,
+        "m": "lea",
+        "o": "rsi,[rax+rcx*1]",
+        "cls": "other"
+      },
+      {
+        "a": 17297455,
+        "m": "mov",
+        "o": "r8,rdx",
+        "cls": "other"
+      },
+      {
+        "a": 17297458,
+        "m": "xor",
+        "o": "rdi,rcx",
+        "cls": "other"
+      },
+      {
+        "a": 17297461,
+        "m": "xor",
+        "o": "rax,rdx",
+        "cls": "other"
+      },
+      {
+        "a": 17297464,
+        "m": "rorx",
+        "o": "r14,rsi,0x29",
+        "cls": "other"
+      },
+      {
+        "a": 17297470,
+        "m": "shl",
+        "o": "r8,0x11",
+        "cls": "other"
+      },
+      {
+        "a": 17297474,
+        "m": "xor",
+        "o": "rdx,rdi",
+        "cls": "other"
+      },
+      {
+        "a": 17297477,
+        "m": "add",
+        "o": "r14,rcx",
+        "cls": "other"
+      },
+      {
+        "a": 17297480,
+        "m": "xor",
+        "o": "rcx,rax",
+        "cls": "other"
+      },
+      {
+        "a": 17297483,
+        "m": "xor",
+        "o": "rdi,r8",
+        "cls": "other"
+      },
+      {
+        "a": 17297486,
+        "m": "rorx",
+        "o": "rax,rax,0x13",
+        "cls": "other"
+      },
+      {
+        "a": 17297492,
+        "m": "mov",
+        "o": "QWORD PTR [r12+0x50],rdx",
+        "cls": "store"
+      },
+      {
+        "a": 17297497,
+        "m": "mov",
+        "o": "QWORD PTR [r12+0x48],rcx",
+        "cls": "store"
+      },
+      {
+        "a": 17297502,
+        "m": "mov",
+        "o": "QWORD PTR [r12+0x58],rdi",
+        "cls": "store"
+      },
+      {
+        "a": 17297507,
+        "m": "mov",
+        "o": "QWORD PTR [r12+0x60],rax",
+        "cls": "store"
+      },
+      {
+        "a": 17297512,
+        "m": "cmp",
+        "o": "r14,0x7fffff",
+        "cls": "cmp"
+      },
+      {
+        "a": 17297519,
+        "m": "jbe",
+        "o": "107f0bc <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x1ec>",
+        "cls": "branch",
+        "bt": 113
+      },
+      {
+        "a": 17297521,
+        "m": "lzcnt",
+        "o": "rax,r14",
+        "cls": "other"
+      },
+      {
+        "a": 17297526,
+        "m": "and",
+        "o": "r14d,0x7fffff",
+        "cls": "other"
+      },
+      {
+        "a": 17297533,
+        "m": "shl",
+        "o": "eax,0x17",
+        "cls": "other"
+      },
+      {
+        "a": 17297536,
+        "m": "or",
+        "o": "r14d,0x3f000000",
+        "cls": "other"
+      },
+      {
+        "a": 17297543,
+        "m": "sub",
+        "o": "r14d,eax",
+        "cls": "other"
+      },
+      {
+        "a": 17297546,
+        "m": "vmovd",
+        "o": "xmm0,r14d",
+        "cls": "vec"
+      },
+      {
+        "a": 17297551,
+        "m": "lea",
+        "o": "r14,[r12+0x10]",
+        "cls": "other"
+      },
+      {
+        "a": 17297556,
+        "m": "vucomiss",
+        "o": "xmm1,xmm0",
+        "cls": "fp"
+      },
+      {
+        "a": 17297560,
+        "m": "jbe",
+        "o": "107ef39 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x69>",
+        "cls": "branch",
+        "bt": 27
+      },
+      {
+        "a": 17297566,
+        "m": "xchg",
+        "o": "ax,ax",
+        "cls": "other"
+      },
+      {
+        "a": 17297568,
+        "m": "mov",
+        "o": "edx,DWORD PTR [rbx+0x3c]",
+        "cls": "load"
+      },
+      {
+        "a": 17297571,
+        "m": "mov",
+        "o": "rcx,QWORD PTR [r12+0x18]",
+        "cls": "load"
+      },
+      {
+        "a": 17297576,
+        "m": "cmp",
+        "o": "rdx,rcx",
+        "cls": "cmp"
+      },
+      {
+        "a": 17297579,
+        "m": "jb",
+        "o": "107ef20 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x50>",
+        "cls": "branch",
+        "bt": 22
+      },
+      {
+        "a": 17297585,
+        "m": "mov",
+        "o": "eax,edx",
+        "cls": "other"
+      },
+      {
+        "a": 17297587,
+        "m": "xor",
+        "o": "edx,edx",
+        "cls": "other"
+      },
+      {
+        "a": 17297589,
+        "m": "div",
+        "o": "ecx",
+        "cls": "other"
+      },
+      {
+        "a": 17297591,
+        "m": "jmp",
+        "o": "107ef20 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x50>",
+        "cls": "branch",
+        "bt": 22
+      },
+      {
+        "a": 17297596,
+        "m": "mov",
+        "o": "edx,0x8",
+        "cls": "other"
+      },
+      {
+        "a": 17297601,
+        "m": "lea",
+        "o": "rdi,[r12+0x48]",
+        "cls": "other"
+      },
+      {
+        "a": 17297606,
+        "m": "lea",
+        "o": "rsi,[rbp-0x50]",
+        "cls": "other"
+      },
+      {
+        "a": 17297610,
+        "m": "vmovss",
+        "o": "DWORD PTR [rbp-0x38],xmm1",
+        "cls": "store"
+      },
+      {
+        "a": 17297615,
+        "m": "call",
+        "o": "107f980 <Random.init__anon_32907.gen.fill>",
+        "cls": "branch",
+        "t": "Random.init__anon_32907.gen.fill"
+      },
+      {
+        "a": 17297620,
+        "m": "lzcnt",
+        "o": "rax,QWORD PTR [rbp-0x50]",
+        "cls": "other"
+      },
+      {
+        "a": 17297626,
+        "m": "add",
+        "o": "al,0x29",
+        "cls": "other"
+      },
+      {
+        "a": 17297628,
+        "m": "mov",
+        "o": "ecx,eax",
+        "cls": "other"
+      },
+      {
+        "a": 17297630,
+        "m": "and",
+        "o": "cl,0x7f",
+        "cls": "other"
+      },
+      {
+        "a": 17297633,
+        "m": "cmp",
+        "o": "cl,0x69",
+        "cls": "cmp"
+      },
+      {
+        "a": 17297636,
+        "m": "je",
+        "o": "107f102 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x232>",
+        "cls": "branch",
+        "bt": 130
+      },
+      {
+        "a": 17297638,
+        "m": "movzx",
+        "o": "eax,al",
+        "cls": "other"
+      },
+      {
+        "a": 17297641,
+        "m": "and",
+        "o": "eax,0x7f",
+        "cls": "other"
+      },
+      {
+        "a": 17297644,
+        "m": "vmovss",
+        "o": "xmm6,DWORD PTR [rip+0xfffffffffff834b0]        # 10025a4 <__anon_12630+0x10>",
+        "cls": "load"
+      },
+      {
+        "a": 17297652,
+        "m": "vmovss",
+        "o": "xmm1,DWORD PTR [rbp-0x38]",
+        "cls": "load"
+      },
+      {
+        "a": 17297657,
+        "m": "vxorps",
+        "o": "xmm7,xmm7,xmm7",
+        "cls": "other"
+      },
+      {
+        "a": 17297661,
+        "m": "jmp",
+        "o": "107f076 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x1a6>",
+        "cls": "branch",
+        "bt": 96
+      },
+      {
+        "a": 17297666,
+        "m": "mov",
+        "o": "edx,0x4",
+        "cls": "other"
+      },
+      {
+        "a": 17297671,
+        "m": "lea",
+        "o": "rdi,[r12+0x48]",
+        "cls": "other"
+      },
+      {
+        "a": 17297676,
+        "m": "lea",
+        "o": "rsi,[rbp-0x44]",
+        "cls": "other"
+      },
+      {
+        "a": 17297680,
+        "m": "call",
+        "o": "107f980 <Random.init__anon_32907.gen.fill>",
+        "cls": "branch",
+        "t": "Random.init__anon_32907.gen.fill"
+      },
+      {
+        "a": 17297685,
+        "m": "mov",
+        "o": "eax,DWORD PTR [rbp-0x44]",
+        "cls": "load"
+      },
+      {
+        "a": 17297688,
+        "m": "mov",
+        "o": "ecx,0x7ff",
+        "cls": "other"
+      },
+      {
+        "a": 17297693,
+        "m": "or",
+        "o": "eax,ecx",
+        "cls": "other"
+      },
+      {
+        "a": 17297695,
+        "m": "lzcnt",
+        "o": "eax,eax",
+        "cls": "other"
+      },
+      {
+        "a": 17297699,
+        "m": "add",
+        "o": "eax,0x69",
+        "cls": "other"
+      },
+      {
+        "a": 17297702,
+        "m": "jmp",
+        "o": "107f0ec <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x21c>",
+        "cls": "branch",
+        "bt": 126
+      },
+      {
+        "a": 17297704,
+        "m": "mov",
+        "o": "rax,QWORD PTR [r12+0x18]",
+        "cls": "load"
+      },
+      {
+        "a": 17297709,
+        "m": "test",
+        "o": "rax,rax",
+        "cls": "cmp"
+      },
+      {
+        "a": 17297712,
+        "m": "je",
+        "o": "107f492 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x5c2>",
+        "cls": "branch",
+        "bt": 350
+      },
+      {
+        "a": 17297718,
+        "m": "mov",
+        "o": "edx,DWORD PTR [rbp-0x2c]",
+        "cls": "load"
+      },
+      {
+        "a": 17297721,
+        "m": "vmovss",
+        "o": "xmm3,DWORD PTR [rip+0xfffffffffff83493]        # 10025d4 <__anon_23305+0x2c>",
+        "cls": "load"
+      },
+      {
+        "a": 17297729,
+        "m": "vmovss",
+        "o": "xmm4,DWORD PTR [rip+0xfffffffffff8343f]        # 1002588 <__anon_30329+0x14>",
+        "cls": "load"
+      },
+      {
+        "a": 17297737,
+        "m": "mov",
+        "o": "rcx,QWORD PTR [r12+0x10]",
+        "cls": "load"
+      },
+      {
+        "a": 17297742,
+        "m": "vxorps",
+        "o": "xmm2,xmm2,xmm2",
+        "cls": "other"
+      },
+      {
+        "a": 17297746,
+        "m": "vcvtsi2ss",
+        "o": "xmm0,xmm15,edx",
+        "cls": "vec"
+      },
+      {
+        "a": 17297750,
+        "m": "vcvtsi2ss",
+        "o": "xmm1,xmm15,DWORD PTR [rbp-0x30]",
+        "cls": "vec"
+      },
+      {
+        "a": 17297755,
+        "m": "mov",
+        "o": "edx,edx",
+        "cls": "other"
+      },
+      {
+        "a": 17297757,
+        "m": "add",
+        "o": "rcx,0x28",
+        "cls": "other"
+      },
+      {
+        "a": 17297761,
+        "m": "mov",
+        "o": "QWORD PTR [rbp-0x38],rdx",
+        "cls": "store"
+      },
+      {
+        "a": 17297765,
+        "m": "jmp",
+        "o": "107f17d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2ad>",
+        "cls": "branch",
+        "bt": 158
       },
       {
-        "source": "        for (data.particles) |*p| {",
-        "asm": [
-          "mov\tr15,QWORD PTR [rdi+0x18]",
-          "mov\tr12,rdi"
-        ]
+        "a": 17297767,
+        "m": "nop",
+        "o": "WORD PTR [rax+rax*1+0x0]",
+        "cls": "other"
       },
       {
-        "source": "framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step():",
-        "asm": [
-          "mov\tDWORD PTR [rbp-0x30],r8d"
-        ]
+        "a": 17297776,
+        "m": "add",
+        "o": "rcx,0x44",
+        "cls": "other"
       },
       {
-        "source": "layouts.ML01.AF02.LP1-scalar.LP2-simple.H.step__anon_32976():",
-        "asm": [
-          "mov\tDWORD PTR [rbp-0x2c],ecx",
-          "mov\tQWORD PTR [rbp-0x40],rdx",
-          "test\tr15,r15",
-          "je\t107fb62 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x5c2>",
-          "vmovss\txmm6,DWORD PTR [rip+0xfffffffffff82fd0]        # 10025a4 <__anon_12819+0x10>",
-          "mov\trbx,QWORD PTR [r12+0x10]",
-          "mov\tr13,rsi",
-          "lea\tr14,[r12+0x10]",
-          "vxorps\txmm7,xmm7,xmm7",
-          "jmp\t107f616 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x76>",
-          "nop\tWORD PTR [rax+rax*1+0x0]"
-        ]
+        "a": 17297780,
+        "m": "dec",
+        "o": "rax",
+        "cls": "other"
       },
       {
-        "source": "                data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));",
-        "asm": [
-          "mov\trdi,r14",
-          "lea\trsi,[r12+0x28]",
-          "call\t107fbe0 <layouts.ML01.data.Data.spawn>",
-          "vmovss\txmm6,DWORD PTR [rip+0xfffffffffff82f9f]        # 10025a4 <__anon_12819+0x10>",
-          "vxorps\txmm7,xmm7,xmm7"
-        ]
+        "a": 17297783,
+        "m": "je",
+        "o": "107f492 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x5c2>",
+        "cls": "branch",
+        "bt": 350
       },
       {
-        "source": "        for (data.particles) |*p| {",
-        "asm": [
-          "add\trbx,0x44",
-          "dec\tr15",
-          "je\t107f7f8 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x258>",
-          "vmovss\txmm4,DWORD PTR [rip+0xfffffffffff82f66]        # 1002584 <__anon_30509+0x10>"
-        ]
+        "a": 17297789,
+        "m": "vmovss",
+        "o": "xmm5,DWORD PTR [rcx-0x8]",
+        "cls": "load"
       },
       {
-        "source": "            p.pos.x = box(box(p.pos.x) + box(p.vel.x) * dt);",
-        "asm": [
-          "vmovss\txmm0,DWORD PTR [rbx]",
-          "vmovss\txmm1,DWORD PTR [rbx+0xc]"
-        ]
+        "a": 17297794,
+        "m": "vucomiss",
+        "o": "xmm2,xmm5",
+        "cls": "fp"
       },
       {
-        "source": "layouts.common.devec.box():",
-        "asm": [
-          "vmovss\txmm5,DWORD PTR [rip+0xfffffffffff82fc1]        # 10025f0 <__anon_12825+0xc>"
-        ]
+        "a": 17297798,
+        "m": "jae",
+        "o": "107f1e0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x310>",
+        "cls": "branch",
+        "bt": 184
       },
       {
-        "source": "layouts.ML01.AF02.LP1-scalar.LP2-simple.H.step__anon_32976():",
-        "asm": [
-          "vmulss\txmm1,xmm1,xmm4",
-          "vaddss\txmm0,xmm0,xmm1",
-          "vmovss\tDWORD PTR [rbx],xmm0"
-        ]
+        "a": 17297800,
+        "m": "vucomiss",
+        "o": "xmm5,xmm3",
+        "cls": "fp"
       },
       {
-        "source": "            p.pos.y = box(box(p.pos.y) + box(p.vel.y) * dt);",
-        "asm": [
-          "vmovss\txmm0,DWORD PTR [rbx+0x4]",
-          "vmovss\txmm1,DWORD PTR [rbx+0x10]",
-          "vmulss\txmm1,xmm1,xmm4",
-          "vaddss\txmm0,xmm0,xmm1",
-          "vmovss\tDWORD PTR [rbx+0x4],xmm0"
-        ]
+        "a": 17297804,
+        "m": "mov",
+        "o": "di,0xff",
+        "cls": "other"
       },
       {
-        "source": "            p.pos.z = box(box(p.pos.z) + box(p.vel.z) * dt);",
-        "asm": [
-          "vmovss\txmm0,DWORD PTR [rbx+0x8]",
-          "vmovss\txmm1,DWORD PTR [rbx+0x14]",
-          "vmulss\txmm1,xmm1,xmm4",
-          "vaddss\txmm0,xmm0,xmm1",
-          "vmovss\tDWORD PTR [rbx+0x8],xmm0"
-        ]
+        "a": 17297808,
+        "m": "jae",
+        "o": "107f19a <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2ca>",
+        "cls": "branch",
+        "bt": 166
       },
       {
-        "source": "            const vx = box(p.vel.x);",
-        "asm": [
-          "vmovss\txmm0,DWORD PTR [rbx+0xc]"
-        ]
+        "a": 17297810,
+        "m": "vcvttss2si",
+        "o": "edi,xmm5",
+        "cls": "vec"
       },
       {
-        "source": "            p.vel.x = box(vx + (config.gravity.x + config.drag * vx) * dt);",
-        "asm": [
-          "vmulss\txmm3,xmm0,xmm5"
-        ]
+        "a": 17297814,
+        "m": "movzx",
+        "o": "edi,dil",
+        "cls": "other"
       },
       {
-        "source": "            const vy = box(p.vel.y);",
-        "asm": [
-          "vmovss\txmm1,DWORD PTR [rbx+0x10]"
-        ]
+        "a": 17297818,
+        "m": "vmovss",
+        "o": "xmm5,DWORD PTR [rcx-0x4]",
+        "cls": "load"
       },
       {
-        "source": "            const vz = box(p.vel.z);",
-        "asm": [
-          "vmovss\txmm2,DWORD PTR [rbx+0x14]"
-        ]
+        "a": 17297823,
+        "m": "vucomiss",
+        "o": "xmm2,xmm5",
+        "cls": "fp"
       },
       {
-        "source": "            p.vel.x = box(vx + (config.gravity.x + config.drag * vx) * dt);",
-        "asm": [
-          "vaddss\txmm3,xmm3,xmm7",
-          "vmulss\txmm3,xmm3,xmm4",
-          "vaddss\txmm0,xmm0,xmm3",
-          "vmovss\tDWORD PTR [rbx+0xc],xmm0"
-        ]
+        "a": 17297827,
+        "m": "jae",
+        "o": "107f1ed <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x31d>",
+        "cls": "branch",
+        "bt": 188
       },
       {
-        "source": "            p.vel.y = box(vy + (config.gravity.y + config.drag * vy) * dt);",
-        "asm": [
-          "vmulss\txmm0,xmm1,xmm5",
-          "vaddss\txmm0,xmm0,DWORD PTR [rip+0xfffffffffff82ee7]        # 1002580 <__anon_30509+0xc>",
-          "vmulss\txmm0,xmm0,xmm4",
-          "vaddss\txmm0,xmm1,xmm0",
-          "vmovss\tDWORD PTR [rbx+0x10],xmm0"
-        ]
+        "a": 17297829,
+        "m": "vucomiss",
+        "o": "xmm5,xmm3",
+        "cls": "fp"
       },
       {
-        "source": "            p.vel.z = box(vz + (config.gravity.z + config.drag * vz) * dt);",
-        "asm": [
-          "vmulss\txmm0,xmm2,xmm5",
-          "vaddss\txmm0,xmm0,xmm7",
-          "vmulss\txmm0,xmm0,xmm4",
-          "vaddss\txmm0,xmm2,xmm0",
-          "vmovss\tDWORD PTR [rbx+0x14],xmm0"
-        ]
+        "a": 17297833,
+        "m": "mov",
+        "o": "r8w,0xff",
+        "cls": "other"
       },
       {
-        "source": "            p.age = box(p.age) + dt;",
-        "asm": [
-          "vmovss\txmm0,DWORD PTR [rbx+0x1c]",
-          "vaddss\txmm0,xmm0,xmm4"
-        ]
+        "a": 17297838,
+        "m": "jae",
+        "o": "107f1b8 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2e8>",
+        "cls": "branch",
+        "bt": 174
       },
       {
-        "source": "    if (age >= kill_age) return true;",
-        "asm": [
-          "vucomiss\txmm0,xmm6"
-        ]
+        "a": 17297840,
+        "m": "vcvttss2si",
+        "o": "r8d,xmm5",
+        "cls": "vec"
       },
       {
-        "source": "layouts.ML01.AF02.LP1-scalar.LP2-simple.H.step__anon_32976():",
-        "asm": [
-          "vmovss\tDWORD PTR [rbx+0x1c],xmm0"
-        ]
+        "a": 17297844,
+        "m": "movzx",
+        "o": "r8d,r8b",
+        "cls": "other"
       },
       {
-        "source": "framework.config.isDead():",
-        "asm": [
-          "jae\t107f770 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x1d0>"
-        ]
+        "a": 17297848,
+        "m": "vmovss",
+        "o": "xmm5,DWORD PTR [rcx]",
+        "cls": "load"
       },
       {
-        "source": "    if (q == 0) return false; // runtime short-circuit; no kill-RNG draw at q=0",
-        "asm": [
-          "vmovss\txmm1,DWORD PTR [rip+0x145cd]        # 1093ca8 <framework.config.q>",
-          "vucomiss\txmm1,xmm7",
-          "jne\t107f6e7 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x147>",
-          "jnp\t107f609 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x69>"
-        ]
+        "a": 17297852,
+        "m": "vucomiss",
+        "o": "xmm2,xmm5",
+        "cls": "fp"
       },
       {
-        "source": "const t = self.s[1] << 17;",
-        "asm": [
-          "mov\trdx,QWORD PTR [r12+0x50]"
-        ]
+        "a": 17297856,
+        "m": "jae",
+        "o": "107f1fa <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x32a>",
+        "cls": "branch",
+        "bt": 192
       },
       {
-        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
-        "asm": [
-          "mov\trax,QWORD PTR [r12+0x60]",
-          "mov\trcx,QWORD PTR [r12+0x48]",
-          "mov\trdi,QWORD PTR [r12+0x58]",
-          "lea\trsi,[rax+rcx*1]"
-        ]
+        "a": 17297858,
+        "m": "vucomiss",
+        "o": "xmm5,xmm3",
+        "cls": "fp"
       },
       {
-        "source": "const t = self.s[1] << 17;",
-        "asm": [
-          "mov\tr8,rdx"
-        ]
+        "a": 17297862,
+        "m": "mov",
+        "o": "r9w,0xff",
+        "cls": "other"
       },
       {
-        "source": "self.s[2] ^= self.s[0];",
-        "asm": [
-          "xor\trdi,rcx"
-        ]
+        "a": 17297867,
+        "m": "jae",
+        "o": "107f1fd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x32d>",
+        "cls": "branch",
+        "bt": 193
       },
       {
-        "source": "self.s[3] ^= self.s[1];",
-        "asm": [
-          "xor\trax,rdx"
-        ]
+        "a": 17297869,
+        "m": "vcvttss2si",
+        "o": "r9d,xmm5",
+        "cls": "vec"
       },
       {
-        "source": "return x << ar | x >> 1 +% ~ar;",
-        "asm": [
-          "rorx\tr14,rsi,0x29"
-        ]
+        "a": 17297873,
+        "m": "movzx",
+        "o": "r9d,r9b",
+        "cls": "other"
       },
       {
-        "source": "const t = self.s[1] << 17;",
-        "asm": [
-          "shl\tr8,0x11"
-        ]
+        "a": 17297877,
+        "m": "jmp",
+        "o": "107f1fd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x32d>",
+        "cls": "branch",
+        "bt": 193
       },
       {
-        "source": "self.s[1] ^= self.s[2];",
-        "asm": [
-          "xor\trdx,rdi"
-        ]
+        "a": 17297879,
+        "m": "nop",
+        "o": "WORD PTR [rax+rax*1+0x0]",
+        "cls": "other"
       },
       {
-        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
-        "asm": [
-          "add\tr14,rcx"
-        ]
+        "a": 17297888,
+        "m": "xor",
+        "o": "edi,edi",
+        "cls": "other"
       },
       {
-        "source": "self.s[0] ^= self.s[3];",
-        "asm": [
-          "xor\trcx,rax"
-        ]
+        "a": 17297890,
+        "m": "vmovss",
+        "o": "xmm5,DWORD PTR [rcx-0x4]",
+        "cls": "load"
       },
       {
-        "source": "self.s[2] ^= t;",
-        "asm": [
-          "xor\trdi,r8"
-        ]
+        "a": 17297895,
+        "m": "vucomiss",
+        "o": "xmm2,xmm5",
+        "cls": "fp"
       },
       {
-        "source": "math.rotl__anon_33191():",
-        "asm": [
-          "rorx\trax,rax,0x13"
-        ]
+        "a": 17297899,
+        "m": "jb",
+        "o": "107f1a5 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2d5>",
+        "cls": "branch",
+        "bt": 169
       },
       {
-        "source": "self.s[1] ^= self.s[2];",
-        "asm": [
-          "mov\tQWORD PTR [r12+0x50],rdx"
-        ]
+        "a": 17297901,
+        "m": "xor",
+        "o": "r8d,r8d",
+        "cls": "other"
       },
       {
-        "source": "self.s[0] ^= self.s[3];",
-        "asm": [
-          "mov\tQWORD PTR [r12+0x48],rcx"
-        ]
+        "a": 17297904,
+        "m": "vmovss",
+        "o": "xmm5,DWORD PTR [rcx]",
+        "cls": "load"
       },
       {
-        "source": "self.s[2] ^= t;",
-        "asm": [
-          "mov\tQWORD PTR [r12+0x58],rdi"
-        ]
+        "a": 17297908,
+        "m": "vucomiss",
+        "o": "xmm2,xmm5",
+        "cls": "fp"
       },
       {
-        "source": "self.s[3] = math.rotl(u64, self.s[3], 45);",
-        "asm": [
-          "mov\tQWORD PTR [r12+0x60],rax"
-        ]
+        "a": 17297912,
+        "m": "jb",
+        "o": "107f1c2 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2f2>",
+        "cls": "branch",
+        "bt": 177
       },
       {
-        "source": "if (rand_lz >= 41) {",
-        "asm": [
-          "cmp\tr14,0x7fffff",
-          "jbe\t107f78c <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x1ec>",
-          "lzcnt\trax,r14"
-        ]
+        "a": 17297914,
+        "m": "xor",
+        "o": "r9d,r9d",
+        "cls": "other"
       },
       {
-        "source": "return @bitCast(exponent | mantissa);",
-        "asm": [
-          "and\tr14d,0x7fffff",
-          "shl\teax,0x17",
-          "or\tr14d,0x3f000000",
-          "sub\tr14d,eax",
-          "vmovd\txmm0,r14d",
-          "lea\tr14,[r12+0x10]"
-        ]
+        "a": 17297917,
+        "m": "vaddss",
+        "o": "xmm5,xmm6,DWORD PTR [rcx-0x28]",
+        "cls": "fp"
       },
       {
-        "source": "    return kill_rng.random().float(f32) < q;",
-        "asm": [
-          "vucomiss\txmm1,xmm0"
-        ]
+        "a": 17297922,
+        "m": "vmulss",
+        "o": "xmm5,xmm5,xmm4",
+        "cls": "fp"
       },
       {
-        "source": "            if (config.isDead(p.age, &sim.kill_rng)) {",
-        "asm": [
-          "jbe\t107f609 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x69>",
-          "xchg\tax,ax"
-        ]
+        "a": 17297926,
+        "m": "vmulss",
+        "o": "xmm5,xmm5,xmm0",
+        "cls": "fp"
       },
       {
-        "source": "                data.spawn(&sim.rng, @intCast(p.seed % data.particles.len));",
-        "asm": [
-          "mov\tedx,DWORD PTR [rbx+0x3c]",
-          "mov\trcx,QWORD PTR [r12+0x18]",
-          "cmp\trdx,rcx",
-          "jb\t107f5f0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x50>",
-          "mov\teax,edx",
-          "xor\tedx,edx",
-          "div\tecx",
-          "jmp\t107f5f0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x50>"
-        ]
+        "a": 17297930,
+        "m": "vcvttss2si",
+        "o": "r10d,xmm5",
+        "cls": "vec"
       },
       {
-        "source": "r.fillFn(r.ptr, buf);",
-        "asm": [
-          "mov\tedx,0x8",
-          "lea\trdi,[r12+0x48]",
-          "lea\trsi,[rbp-0x50]",
-          "vmovss\tDWORD PTR [rbp-0x38],xmm1",
-          "call\t1080050 <Random.init__anon_33128.gen.fill>"
-        ]
+        "a": 17297934,
+        "m": "vsubss",
+        "o": "xmm5,xmm6,DWORD PTR [rcx-0x24]",
+        "cls": "fp"
       },
       {
-        "source": "rand_lz = 41 + @clz(r.int(u64));",
-        "asm": [
-          "lzcnt\trax,QWORD PTR [rbp-0x50]",
-          "add\tal,0x29",
-          "mov\tecx,eax",
-          "and\tcl,0x7f"
-        ]
+        "a": 17297939,
+        "m": "movsxd",
+        "o": "r10,r10d",
+        "cls": "other"
       },
       {
-        "source": "if (rand_lz == 41 + 64) {",
-        "asm": [
-          "cmp\tcl,0x69",
-          "je\t107f7d2 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x232>",
-          "movzx\teax,al",
-          "and\teax,0x7f",
-          "vmovss\txmm6,DWORD PTR [rip+0xfffffffffff82de0]        # 10025a4 <__anon_12819+0x10>",
-          "vmovss\txmm1,DWORD PTR [rbp-0x38]",
-          "vxorps\txmm7,xmm7,xmm7",
-          "jmp\t107f746 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x1a6>"
-        ]
+        "a": 17297942,
+        "m": "vmulss",
+        "o": "xmm5,xmm5,xmm4",
+        "cls": "fp"
       },
       {
-        "source": "r.fillFn(r.ptr, buf);",
-        "asm": [
-          "mov\tedx,0x4",
-          "lea\trdi,[r12+0x48]",
-          "lea\trsi,[rbp-0x44]",
-          "call\t1080050 <Random.init__anon_33128.gen.fill>",
-          "mov\teax,DWORD PTR [rbp-0x44]"
-        ]
+        "a": 17297946,
+        "m": "vmulss",
+        "o": "xmm5,xmm5,xmm1",
+        "cls": "fp"
       },
       {
-        "source": "rand_lz += @clz(r.int(u32) | 0x7FF);",
-        "asm": [
-          "mov\tecx,0x7ff",
-          "or\teax,ecx",
-          "lzcnt\teax,eax",
-          "add\teax,0x69",
-          "jmp\t107f7bc <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x21c>"
-        ]
+        "a": 17297950,
+        "m": "vcvttss2si",
+        "o": "r11d,xmm5",
+        "cls": "vec"
       },
       {
-        "source": "        for (data.particles) |p| {",
-        "asm": [
-          "mov\trax,QWORD PTR [r12+0x18]",
-          "test\trax,rax",
-          "je\t107fb62 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x5c2>",
-          "mov\tedx,DWORD PTR [rbp-0x2c]",
-          "vmovss\txmm3,DWORD PTR [rip+0xfffffffffff82dc3]        # 10025d4 <__anon_23489+0x2c>",
-          "vmovss\txmm4,DWORD PTR [rip+0xfffffffffff82d6f]        # 1002588 <__anon_30509+0x14>",
-          "mov\trcx,QWORD PTR [r12+0x10]",
-          "vxorps\txmm2,xmm2,xmm2",
-          "vcvtsi2ss\txmm0,xmm15,edx",
-          "vcvtsi2ss\txmm1,xmm15,DWORD PTR [rbp-0x30]",
-          "mov\tedx,edx",
-          "add\trcx,0x28",
-          "mov\tQWORD PTR [rbp-0x38],rdx",
-          "jmp\t107f84d <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2ad>",
-          "nop\tWORD PTR [rax+rax*1+0x0]",
-          "add\trcx,0x44",
-          "dec\trax",
-          "je\t107fb62 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x5c2>",
-          "vmovss\txmm5,DWORD PTR [rcx-0x8]"
-        ]
+        "a": 17297954,
+        "m": "test",
+        "o": "r11d,r11d",
+        "cls": "cmp"
       },
       {
-        "source": "    if (v <= 0) return 0;",
-        "asm": [
-          "vucomiss\txmm2,xmm5",
-          "jae\t107f8b0 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x310>"
-        ]
+        "a": 17297957,
+        "m": "sets",
+        "o": "bl",
+        "cls": "cmp"
       },
       {
-        "source": "    if (v >= 255) return 255;",
-        "asm": [
-          "vucomiss\txmm5,xmm3",
-          "mov\tdi,0xff",
-          "jae\t107f86a <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2ca>"
-        ]
+        "a": 17297960,
+        "m": "cmp",
+        "o": "r11d,DWORD PTR [rbp-0x30]",
+        "cls": "cmp"
       },
       {
-        "source": "    return @intFromFloat(v);",
-        "asm": [
-          "vcvttss2si\tedi,xmm5"
-        ]
+        "a": 17297964,
+        "m": "setge",
+        "o": "r14b",
+        "cls": "cmp"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tedi,dil"
-        ]
+        "a": 17297968,
+        "m": "or",
+        "o": "r14b,bl",
+        "cls": "other"
       },
       {
-        "source": "layouts.ML01.AF02.LP1-scalar.LP2-simple.H.step__anon_32976():",
-        "asm": [
-          "vmovss\txmm5,DWORD PTR [rcx-0x4]"
-        ]
+        "a": 17297971,
+        "m": "jne",
+        "o": "107f360 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x490>",
+        "cls": "branch",
+        "bt": 277
       },
       {
-        "source": "    if (v <= 0) return 0;",
-        "asm": [
-          "vucomiss\txmm2,xmm5",
-          "jae\t107f8bd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x31d>"
-        ]
+        "a": 17297977,
+        "m": "mov",
+        "o": "edx,DWORD PTR [rbp-0x2c]",
+        "cls": "load"
       },
       {
-        "source": "    if (v >= 255) return 255;",
-        "asm": [
-          "vucomiss\txmm5,xmm3",
-          "mov\tr8w,0xff",
-          "jae\t107f888 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2e8>"
-        ]
+        "a": 17297980,
+        "m": "mov",
+        "o": "ebx,r11d",
+        "cls": "other"
       },
       {
-        "source": "    return @intFromFloat(v);",
-        "asm": [
-          "vcvttss2si\tr8d,xmm5"
-        ]
+        "a": 17297983,
+        "m": "imul",
+        "o": "ebx,edx",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tr8d,r8b"
-        ]
+        "a": 17297986,
+        "m": "test",
+        "o": "r10d,r10d",
+        "cls": "cmp"
       },
       {
-        "source": "layouts.ML01.AF02.LP1-scalar.LP2-simple.H.step__anon_32976():",
-        "asm": [
-          "vmovss\txmm5,DWORD PTR [rcx]"
-        ]
+        "a": 17297989,
+        "m": "sets",
+        "o": "r14b",
+        "cls": "cmp"
       },
       {
-        "source": "    if (v <= 0) return 0;",
-        "asm": [
-          "vucomiss\txmm2,xmm5",
-          "jae\t107f8ca <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x32a>"
-        ]
+        "a": 17297993,
+        "m": "cmp",
+        "o": "edx,r10d",
+        "cls": "cmp"
       },
       {
-        "source": "    if (v >= 255) return 255;",
-        "asm": [
-          "vucomiss\txmm5,xmm3",
-          "mov\tr9w,0xff",
-          "jae\t107f8cd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x32d>"
-        ]
+        "a": 17297996,
+        "m": "setle",
+        "o": "r15b",
+        "cls": "cmp"
       },
       {
-        "source": "    return @intFromFloat(v);",
-        "asm": [
-          "vcvttss2si\tr9d,xmm5"
-        ]
+        "a": 17298000,
+        "m": "or",
+        "o": "r15b,r14b",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tr9d,r9b",
-          "jmp\t107f8cd <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x32d>"
-        ]
+        "a": 17298003,
+        "m": "jne",
+        "o": "107f2ca <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x3fa>",
+        "cls": "branch",
+        "bt": 244
       },
       {
-        "source": "layouts.ML01.AF02.LP1-scalar.LP2-simple.H.step__anon_32976():",
-        "asm": [
-          "nop\tWORD PTR [rax+rax*1+0x0]",
-          "xor\tedi,edi",
-          "vmovss\txmm5,DWORD PTR [rcx-0x4]"
-        ]
+        "a": 17298005,
+        "m": "lea",
+        "o": "r14,[rbx+r10*1]",
+        "cls": "other"
       },
       {
-        "source": "    if (v <= 0) return 0;",
-        "asm": [
-          "vucomiss\txmm2,xmm5",
-          "jb\t107f875 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2d5>"
-        ]
+        "a": 17298009,
+        "m": "lea",
+        "o": "r15,[r14*4+0x3]",
+        "cls": "other"
       },
       {
-        "source": "layouts.ML01.AF02.LP1-scalar.LP2-simple.H.step__anon_32976():",
-        "asm": [
-          "xor\tr8d,r8d",
-          "vmovss\txmm5,DWORD PTR [rcx]"
-        ]
+        "a": 17298017,
+        "m": "cmp",
+        "o": "r15,QWORD PTR [rbp-0x40]",
+        "cls": "cmp"
       },
       {
-        "source": "layouts.common.render_simple.clamp255():",
-        "asm": [
-          "vucomiss\txmm2,xmm5",
-          "jb\t107f892 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2f2>"
-        ]
+        "a": 17298021,
+        "m": "jae",
+        "o": "107f2ca <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x3fa>",
+        "cls": "branch",
+        "bt": 244
       },
       {
-        "source": "layouts.common.render_simple.splat():",
-        "asm": [
-          "xor\tr9d,r9d"
-        ]
+        "a": 17298023,
+        "m": "shl",
+        "o": "r14,0x2",
+        "cls": "other"
       },
       {
-        "source": "    const norm = (x + config.view_half) / (2.0 * config.view_half); // [0,1)",
-        "asm": [
-          "vaddss\txmm5,xmm6,DWORD PTR [rcx-0x28]",
-          "vmulss\txmm5,xmm5,xmm4"
-        ]
+        "a": 17298027,
+        "m": "movzx",
+        "o": "edx,di",
+        "cls": "other"
       },
       {
-        "source": "    return @intFromFloat(norm * half);",
-        "asm": [
-          "vmulss\txmm5,xmm5,xmm0",
-          "vcvttss2si\tr10d,xmm5"
-        ]
+        "a": 17298030,
+        "m": "movzx",
+        "o": "esi,BYTE PTR [r13+r14*1+0x0]",
+        "cls": "load"
       },
       {
-        "source": "    const norm = (config.view_half - y) / (2.0 * config.view_half); // [0,1)",
-        "asm": [
-          "vsubss\txmm5,xmm6,DWORD PTR [rcx-0x24]"
-        ]
+        "a": 17298036,
+        "m": "add",
+        "o": "edx,esi",
+        "cls": "other"
       },
       {
-        "source": "    while (dy < 2) : (dy += 1) {",
-        "asm": [
-          "movsxd\tr10,r10d"
-        ]
+        "a": 17298038,
+        "m": "mov",
+        "o": "esi,0xff",
+        "cls": "other"
       },
       {
-        "source": "    const norm = (config.view_half - y) / (2.0 * config.view_half); // [0,1)",
-        "asm": [
-          "vmulss\txmm5,xmm5,xmm4"
-        ]
+        "a": 17298043,
+        "m": "cmp",
+        "o": "dx,0xff",
+        "cls": "cmp"
       },
       {
-        "source": "    return @intFromFloat(norm * half);",
-        "asm": [
-          "vmulss\txmm5,xmm5,xmm1",
-          "vcvttss2si\tr11d,xmm5",
-          "test\tr11d,r11d",
-          "sets\tbl",
-          "cmp\tr11d,DWORD PTR [rbp-0x30]",
-          "setge\tr14b",
-          "or\tr14b,bl",
-          "jne\t107fa30 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x490>"
-        ]
+        "a": 17298048,
+        "m": "cmovae",
+        "o": "edx,esi",
+        "cls": "cmp"
       },
       {
-        "source": "layouts.common.render_simple.splat():",
-        "asm": [
-          "mov\tedx,DWORD PTR [rbp-0x2c]",
-          "mov\tebx,r11d",
-          "imul\tebx,edx"
-        ]
+        "a": 17298051,
+        "m": "movzx",
+        "o": "esi,r8w",
+        "cls": "other"
       },
       {
-        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
-        "asm": [
-          "test\tr10d,r10d",
-          "sets\tr14b",
-          "cmp\tedx,r10d",
-          "setle\tr15b",
-          "or\tr15b,r14b",
-          "jne\t107f99a <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x3fa>"
-        ]
+        "a": 17298055,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r14*1+0x0],dl",
+        "cls": "store"
       },
       {
-        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
-        "asm": [
-          "lea\tr14,[rbx+r10*1]"
-        ]
+        "a": 17298060,
+        "m": "movzx",
+        "o": "edx,BYTE PTR [r13+r14*1+0x1]",
+        "cls": "load"
       },
       {
-        "source": "            if (i + 3 >= fb.len) continue;",
-        "asm": [
-          "lea\tr15,[r14*4+0x3]",
-          "cmp\tr15,QWORD PTR [rbp-0x40]",
-          "jae\t107f99a <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x3fa>",
-          "shl\tr14,0x2"
-        ]
+        "a": 17298066,
+        "m": "add",
+        "o": "esi,edx",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tedx,di"
-        ]
+        "a": 17298068,
+        "m": "mov",
+        "o": "edx,0xff",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "movzx\tesi,BYTE PTR [r13+r14*1+0x0]"
-        ]
+        "a": 17298073,
+        "m": "cmp",
+        "o": "si,0xff",
+        "cls": "cmp"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tedx,esi",
-          "mov\tesi,0xff"
-        ]
+        "a": 17298078,
+        "m": "cmovae",
+        "o": "esi,edx",
+        "cls": "cmp"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tdx,0xff",
-          "cmovae\tedx,esi"
-        ]
+        "a": 17298081,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r14*1+0x1],sil",
+        "cls": "store"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tesi,r8w"
-        ]
+        "a": 17298086,
+        "m": "movzx",
+        "o": "esi,r9w",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "mov\tBYTE PTR [r13+r14*1+0x0],dl"
-        ]
+        "a": 17298090,
+        "m": "movzx",
+        "o": "edx,BYTE PTR [r13+r14*1+0x2]",
+        "cls": "load"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "movzx\tedx,BYTE PTR [r13+r14*1+0x1]"
-        ]
+        "a": 17298096,
+        "m": "add",
+        "o": "esi,edx",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tesi,edx"
-        ]
+        "a": 17298098,
+        "m": "mov",
+        "o": "edx,0xff",
+        "cls": "other"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "mov\tedx,0xff",
-          "cmp\tsi,0xff",
-          "cmovae\tesi,edx"
-        ]
+        "a": 17298103,
+        "m": "cmp",
+        "o": "si,0xff",
+        "cls": "cmp"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "mov\tBYTE PTR [r13+r14*1+0x1],sil"
-        ]
+        "a": 17298108,
+        "m": "cmovae",
+        "o": "esi,edx",
+        "cls": "cmp"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tesi,r9w"
-        ]
+        "a": 17298111,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r14*1+0x2],sil",
+        "cls": "store"
       },
       {
-        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
-        "asm": [
-          "movzx\tedx,BYTE PTR [r13+r14*1+0x2]"
-        ]
+        "a": 17298116,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r15*1+0x0],0xff",
+        "cls": "store"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tesi,edx"
-        ]
+        "a": 17298122,
+        "m": "cmp",
+        "o": "r10d,0xffffffff",
+        "cls": "cmp"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "mov\tedx,0xff",
-          "cmp\tsi,0xff",
-          "cmovae\tesi,edx"
-        ]
+        "a": 17298126,
+        "m": "lea",
+        "o": "r14,[r10+0x1]",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
-        "asm": [
-          "mov\tBYTE PTR [r13+r14*1+0x2],sil"
-        ]
+        "a": 17298130,
+        "m": "setl",
+        "o": "sil",
+        "cls": "cmp"
       },
       {
-        "source": "            fb[i + 3] = 255;",
-        "asm": [
-          "mov\tBYTE PTR [r13+r15*1+0x0],0xff"
-        ]
+        "a": 17298134,
+        "m": "cmp",
+        "o": "r14,QWORD PTR [rbp-0x38]",
+        "cls": "cmp"
       },
       {
-        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
-        "asm": [
-          "cmp\tr10d,0xffffffff"
-        ]
+        "a": 17298138,
+        "m": "setge",
+        "o": "r15b",
+        "cls": "cmp"
       },
       {
-        "source": "            const fx = px + dx;",
-        "asm": [
-          "lea\tr14,[r10+0x1]"
-        ]
+        "a": 17298142,
+        "m": "or",
+        "o": "r15b,sil",
+        "cls": "other"
       },
       {
-        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
-        "asm": [
-          "setl\tsil",
-          "cmp\tr14,QWORD PTR [rbp-0x38]",
-          "setge\tr15b",
-          "or\tr15b,sil",
-          "jne\t107fa30 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x490>"
-        ]
+        "a": 17298145,
+        "m": "jne",
+        "o": "107f360 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x490>",
+        "cls": "branch",
+        "bt": 277
       },
       {
-        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
-        "asm": [
-          "add\tr14,rbx"
-        ]
+        "a": 17298151,
+        "m": "add",
+        "o": "r14,rbx",
+        "cls": "other"
       },
       {
-        "source": "            if (i + 3 >= fb.len) continue;",
-        "asm": [
-          "lea\trbx,[r14*4+0x3]",
-          "cmp\trbx,QWORD PTR [rbp-0x40]",
-          "jae\t107fa30 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x490>",
-          "shl\tr14,0x2"
-        ]
+        "a": 17298154,
+        "m": "lea",
+        "o": "rbx,[r14*4+0x3]",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tr15d,di",
-          "mov\tedx,0xff"
-        ]
+        "a": 17298162,
+        "m": "cmp",
+        "o": "rbx,QWORD PTR [rbp-0x40]",
+        "cls": "cmp"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "movzx\tesi,BYTE PTR [r13+r14*1+0x0]"
-        ]
+        "a": 17298166,
+        "m": "jae",
+        "o": "107f360 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x490>",
+        "cls": "branch",
+        "bt": 277
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tr15d,esi"
-        ]
+        "a": 17298168,
+        "m": "shl",
+        "o": "r14,0x2",
+        "cls": "other"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tr15w,0xff",
-          "cmovae\tr15d,edx"
-        ]
+        "a": 17298172,
+        "m": "movzx",
+        "o": "r15d,di",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "mov\tBYTE PTR [r13+r14*1+0x0],r15b"
-        ]
+        "a": 17298176,
+        "m": "mov",
+        "o": "edx,0xff",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tr15d,r8w"
-        ]
+        "a": 17298181,
+        "m": "movzx",
+        "o": "esi,BYTE PTR [r13+r14*1+0x0]",
+        "cls": "load"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "movzx\tesi,BYTE PTR [r13+r14*1+0x1]"
-        ]
+        "a": 17298187,
+        "m": "add",
+        "o": "r15d,esi",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tr15d,esi"
-        ]
+        "a": 17298190,
+        "m": "cmp",
+        "o": "r15w,0xff",
+        "cls": "cmp"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tr15w,0xff",
-          "cmovae\tr15d,edx"
-        ]
+        "a": 17298196,
+        "m": "cmovae",
+        "o": "r15d,edx",
+        "cls": "cmp"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "mov\tBYTE PTR [r13+r14*1+0x1],r15b"
-        ]
+        "a": 17298200,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r14*1+0x0],r15b",
+        "cls": "store"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tr15d,r9w"
-        ]
+        "a": 17298205,
+        "m": "movzx",
+        "o": "r15d,r8w",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
-        "asm": [
-          "movzx\tesi,BYTE PTR [r13+r14*1+0x2]"
-        ]
+        "a": 17298209,
+        "m": "movzx",
+        "o": "esi,BYTE PTR [r13+r14*1+0x1]",
+        "cls": "load"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tr15d,esi"
-        ]
+        "a": 17298215,
+        "m": "add",
+        "o": "r15d,esi",
+        "cls": "other"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tr15w,0xff",
-          "cmovae\tr15d,edx"
-        ]
+        "a": 17298218,
+        "m": "cmp",
+        "o": "r15w,0xff",
+        "cls": "cmp"
       },
       {
-        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
-        "asm": [
-          "mov\tBYTE PTR [r13+r14*1+0x2],r15b"
-        ]
+        "a": 17298224,
+        "m": "cmovae",
+        "o": "r15d,edx",
+        "cls": "cmp"
       },
       {
-        "source": "            fb[i + 3] = 255;",
-        "asm": [
-          "mov\tBYTE PTR [r13+rbx*1+0x0],0xff",
-          "nop\tDWORD PTR [rax+rax*1+0x0]",
-          "inc\tr11d",
-          "sets\tbl",
-          "cmp\tr11d,DWORD PTR [rbp-0x30]",
-          "setge\tr14b",
-          "or\tr14b,bl",
-          "jne\t107f840 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>",
-          "mov\tedx,DWORD PTR [rbp-0x2c]",
-          "imul\tr11d,edx"
-        ]
+        "a": 17298228,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r14*1+0x1],r15b",
+        "cls": "store"
       },
       {
-        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
-        "asm": [
-          "test\tr10d,r10d",
-          "sets\tbl",
-          "cmp\tedx,r10d",
-          "setle\tr14b",
-          "or\tr14b,bl",
-          "jne\t107fad2 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x532>"
-        ]
+        "a": 17298233,
+        "m": "movzx",
+        "o": "r15d,r9w",
+        "cls": "other"
       },
       {
-        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
-        "asm": [
-          "lea\trbx,[r11+r10*1]"
-        ]
+        "a": 17298237,
+        "m": "movzx",
+        "o": "esi,BYTE PTR [r13+r14*1+0x2]",
+        "cls": "load"
       },
       {
-        "source": "            if (i + 3 >= fb.len) continue;",
-        "asm": [
-          "lea\tr14,[rbx*4+0x3]",
-          "cmp\tr14,QWORD PTR [rbp-0x40]",
-          "jae\t107fad2 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x532>",
-          "shl\trbx,0x2"
-        ]
+        "a": 17298243,
+        "m": "add",
+        "o": "r15d,esi",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tesi,di",
-          "mov\tedx,0xff"
-        ]
+        "a": 17298246,
+        "m": "cmp",
+        "o": "r15w,0xff",
+        "cls": "cmp"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "movzx\tr15d,BYTE PTR [r13+rbx*1+0x0]"
-        ]
+        "a": 17298252,
+        "m": "cmovae",
+        "o": "r15d,edx",
+        "cls": "cmp"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tesi,r15d",
-          "movzx\tr15d,r8w"
-        ]
+        "a": 17298256,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r14*1+0x2],r15b",
+        "cls": "store"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tsi,0xff",
-          "cmovae\tesi,edx"
-        ]
+        "a": 17298261,
+        "m": "mov",
+        "o": "BYTE PTR [r13+rbx*1+0x0],0xff",
+        "cls": "store"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "mov\tBYTE PTR [r13+rbx*1+0x0],sil"
-        ]
+        "a": 17298267,
+        "m": "nop",
+        "o": "DWORD PTR [rax+rax*1+0x0]",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "movzx\tesi,BYTE PTR [r13+rbx*1+0x1]"
-        ]
+        "a": 17298272,
+        "m": "inc",
+        "o": "r11d",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tr15d,esi"
-        ]
+        "a": 17298275,
+        "m": "sets",
+        "o": "bl",
+        "cls": "cmp"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tr15w,0xff",
-          "cmovae\tr15d,edx"
-        ]
+        "a": 17298278,
+        "m": "cmp",
+        "o": "r11d,DWORD PTR [rbp-0x30]",
+        "cls": "cmp"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "mov\tBYTE PTR [r13+rbx*1+0x1],r15b"
-        ]
+        "a": 17298282,
+        "m": "setge",
+        "o": "r14b",
+        "cls": "cmp"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tr15d,r9w"
-        ]
+        "a": 17298286,
+        "m": "or",
+        "o": "r14b,bl",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
-        "asm": [
-          "movzx\tesi,BYTE PTR [r13+rbx*1+0x2]"
-        ]
+        "a": 17298289,
+        "m": "jne",
+        "o": "107f170 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>",
+        "cls": "branch",
+        "bt": 155
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tr15d,esi"
-        ]
+        "a": 17298295,
+        "m": "mov",
+        "o": "edx,DWORD PTR [rbp-0x2c]",
+        "cls": "load"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tr15w,0xff",
-          "cmovae\tr15d,edx"
-        ]
+        "a": 17298298,
+        "m": "imul",
+        "o": "r11d,edx",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
-        "asm": [
-          "mov\tBYTE PTR [r13+rbx*1+0x2],r15b"
-        ]
+        "a": 17298302,
+        "m": "test",
+        "o": "r10d,r10d",
+        "cls": "cmp"
       },
       {
-        "source": "            fb[i + 3] = 255;",
-        "asm": [
-          "mov\tBYTE PTR [r13+r14*1+0x0],0xff",
-          "mov\tesi,r10d"
-        ]
+        "a": 17298305,
+        "m": "sets",
+        "o": "bl",
+        "cls": "cmp"
       },
       {
-        "source": "            const fx = px + dx;",
-        "asm": [
-          "inc\tr10"
-        ]
+        "a": 17298308,
+        "m": "cmp",
+        "o": "edx,r10d",
+        "cls": "cmp"
       },
       {
-        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
-        "asm": [
-          "cmp\tesi,0xffffffff",
-          "setl\tsil",
-          "cmp\tr10,QWORD PTR [rbp-0x38]",
-          "setge\tbl",
-          "or\tbl,sil",
-          "jne\t107f840 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>"
-        ]
+        "a": 17298311,
+        "m": "setle",
+        "o": "r14b",
+        "cls": "cmp"
       },
       {
-        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
-        "asm": [
-          "add\tr10,r11"
-        ]
+        "a": 17298315,
+        "m": "or",
+        "o": "r14b,bl",
+        "cls": "other"
       },
       {
-        "source": "            if (i + 3 >= fb.len) continue;",
-        "asm": [
-          "lea\tr11,[r10*4+0x3]",
-          "cmp\tr11,QWORD PTR [rbp-0x40]",
-          "jae\t107f840 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>",
-          "shl\tr10,0x2"
-        ]
+        "a": 17298318,
+        "m": "jne",
+        "o": "107f402 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x532>",
+        "cls": "branch",
+        "bt": 316
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tedi,di",
-          "mov\tedx,0xff"
-        ]
+        "a": 17298320,
+        "m": "lea",
+        "o": "rbx,[r11+r10*1]",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "movzx\tesi,BYTE PTR [r13+r10*1+0x0]"
-        ]
+        "a": 17298324,
+        "m": "lea",
+        "o": "r14,[rbx*4+0x3]",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tedi,esi"
-        ]
+        "a": 17298332,
+        "m": "cmp",
+        "o": "r14,QWORD PTR [rbp-0x40]",
+        "cls": "cmp"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tdi,0xff",
-          "cmovae\tedi,edx"
-        ]
+        "a": 17298336,
+        "m": "jae",
+        "o": "107f402 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x532>",
+        "cls": "branch",
+        "bt": 316
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "mov\tBYTE PTR [r13+r10*1+0x0],dil"
-        ]
+        "a": 17298338,
+        "m": "shl",
+        "o": "rbx,0x2",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tedi,r8w"
-        ]
+        "a": 17298342,
+        "m": "movzx",
+        "o": "esi,di",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "movzx\tesi,BYTE PTR [r13+r10*1+0x1]"
-        ]
+        "a": 17298345,
+        "m": "mov",
+        "o": "edx,0xff",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tedi,esi"
-        ]
+        "a": 17298350,
+        "m": "movzx",
+        "o": "r15d,BYTE PTR [r13+rbx*1+0x0]",
+        "cls": "load"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tdi,0xff",
-          "cmovae\tedi,edx"
-        ]
+        "a": 17298356,
+        "m": "add",
+        "o": "esi,r15d",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "mov\tBYTE PTR [r13+r10*1+0x1],dil"
-        ]
+        "a": 17298359,
+        "m": "movzx",
+        "o": "r15d,r8w",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "movzx\tedi,r9w"
-        ]
+        "a": 17298363,
+        "m": "cmp",
+        "o": "si,0xff",
+        "cls": "cmp"
       },
       {
-        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
-        "asm": [
-          "movzx\tesi,BYTE PTR [r13+r10*1+0x2]"
-        ]
+        "a": 17298368,
+        "m": "cmovae",
+        "o": "esi,edx",
+        "cls": "cmp"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tedi,esi"
-        ]
+        "a": 17298371,
+        "m": "mov",
+        "o": "BYTE PTR [r13+rbx*1+0x0],sil",
+        "cls": "store"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tdi,0xff",
-          "cmovae\tedi,edx"
-        ]
+        "a": 17298376,
+        "m": "movzx",
+        "o": "esi,BYTE PTR [r13+rbx*1+0x1]",
+        "cls": "load"
       },
       {
-        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
-        "asm": [
-          "mov\tBYTE PTR [r13+r10*1+0x2],dil"
-        ]
+        "a": 17298382,
+        "m": "add",
+        "o": "r15d,esi",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 3] = 255;",
-        "asm": [
-          "mov\tBYTE PTR [r13+r11*1+0x0],0xff",
-          "jmp\t107f840 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>"
-        ]
+        "a": 17298385,
+        "m": "cmp",
+        "o": "r15w,0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298391,
+        "m": "cmovae",
+        "o": "r15d,edx",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298395,
+        "m": "mov",
+        "o": "BYTE PTR [r13+rbx*1+0x1],r15b",
+        "cls": "store"
+      },
+      {
+        "a": 17298400,
+        "m": "movzx",
+        "o": "r15d,r9w",
+        "cls": "other"
+      },
+      {
+        "a": 17298404,
+        "m": "movzx",
+        "o": "esi,BYTE PTR [r13+rbx*1+0x2]",
+        "cls": "load"
+      },
+      {
+        "a": 17298410,
+        "m": "add",
+        "o": "r15d,esi",
+        "cls": "other"
+      },
+      {
+        "a": 17298413,
+        "m": "cmp",
+        "o": "r15w,0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298419,
+        "m": "cmovae",
+        "o": "r15d,edx",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298423,
+        "m": "mov",
+        "o": "BYTE PTR [r13+rbx*1+0x2],r15b",
+        "cls": "store"
+      },
+      {
+        "a": 17298428,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r14*1+0x0],0xff",
+        "cls": "store"
+      },
+      {
+        "a": 17298434,
+        "m": "mov",
+        "o": "esi,r10d",
+        "cls": "other"
+      },
+      {
+        "a": 17298437,
+        "m": "inc",
+        "o": "r10",
+        "cls": "other"
+      },
+      {
+        "a": 17298440,
+        "m": "cmp",
+        "o": "esi,0xffffffff",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298443,
+        "m": "setl",
+        "o": "sil",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298447,
+        "m": "cmp",
+        "o": "r10,QWORD PTR [rbp-0x38]",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298451,
+        "m": "setge",
+        "o": "bl",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298454,
+        "m": "or",
+        "o": "bl,sil",
+        "cls": "other"
+      },
+      {
+        "a": 17298457,
+        "m": "jne",
+        "o": "107f170 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>",
+        "cls": "branch",
+        "bt": 155
+      },
+      {
+        "a": 17298463,
+        "m": "add",
+        "o": "r10,r11",
+        "cls": "other"
+      },
+      {
+        "a": 17298466,
+        "m": "lea",
+        "o": "r11,[r10*4+0x3]",
+        "cls": "other"
+      },
+      {
+        "a": 17298474,
+        "m": "cmp",
+        "o": "r11,QWORD PTR [rbp-0x40]",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298478,
+        "m": "jae",
+        "o": "107f170 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>",
+        "cls": "branch",
+        "bt": 155
+      },
+      {
+        "a": 17298484,
+        "m": "shl",
+        "o": "r10,0x2",
+        "cls": "other"
+      },
+      {
+        "a": 17298488,
+        "m": "movzx",
+        "o": "edi,di",
+        "cls": "other"
+      },
+      {
+        "a": 17298491,
+        "m": "mov",
+        "o": "edx,0xff",
+        "cls": "other"
+      },
+      {
+        "a": 17298496,
+        "m": "movzx",
+        "o": "esi,BYTE PTR [r13+r10*1+0x0]",
+        "cls": "load"
+      },
+      {
+        "a": 17298502,
+        "m": "add",
+        "o": "edi,esi",
+        "cls": "other"
+      },
+      {
+        "a": 17298504,
+        "m": "cmp",
+        "o": "di,0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298509,
+        "m": "cmovae",
+        "o": "edi,edx",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298512,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r10*1+0x0],dil",
+        "cls": "store"
+      },
+      {
+        "a": 17298517,
+        "m": "movzx",
+        "o": "edi,r8w",
+        "cls": "other"
+      },
+      {
+        "a": 17298521,
+        "m": "movzx",
+        "o": "esi,BYTE PTR [r13+r10*1+0x1]",
+        "cls": "load"
+      },
+      {
+        "a": 17298527,
+        "m": "add",
+        "o": "edi,esi",
+        "cls": "other"
+      },
+      {
+        "a": 17298529,
+        "m": "cmp",
+        "o": "di,0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298534,
+        "m": "cmovae",
+        "o": "edi,edx",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298537,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r10*1+0x1],dil",
+        "cls": "store"
+      },
+      {
+        "a": 17298542,
+        "m": "movzx",
+        "o": "edi,r9w",
+        "cls": "other"
+      },
+      {
+        "a": 17298546,
+        "m": "movzx",
+        "o": "esi,BYTE PTR [r13+r10*1+0x2]",
+        "cls": "load"
+      },
+      {
+        "a": 17298552,
+        "m": "add",
+        "o": "edi,esi",
+        "cls": "other"
+      },
+      {
+        "a": 17298554,
+        "m": "cmp",
+        "o": "di,0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298559,
+        "m": "cmovae",
+        "o": "edi,edx",
+        "cls": "cmp"
+      },
+      {
+        "a": 17298562,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r10*1+0x2],dil",
+        "cls": "store"
+      },
+      {
+        "a": 17298567,
+        "m": "mov",
+        "o": "BYTE PTR [r13+r11*1+0x0],0xff",
+        "cls": "store"
+      },
+      {
+        "a": 17298573,
+        "m": "jmp",
+        "o": "107f170 <framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF02.LP1-scalar.LP2-simple.H).step+0x2a0>",
+        "cls": "branch",
+        "bt": 155
+      },
+      {
+        "a": 17298578,
+        "m": "inc",
+        "o": "QWORD PTR [r12+0x68]",
+        "cls": "other"
+      },
+      {
+        "a": 17298583,
+        "m": "add",
+        "o": "rsp,0x28",
+        "cls": "other"
+      },
+      {
+        "a": 17298587,
+        "m": "pop",
+        "o": "rbx",
+        "cls": "other"
+      },
+      {
+        "a": 17298588,
+        "m": "pop",
+        "o": "r12",
+        "cls": "other"
+      },
+      {
+        "a": 17298590,
+        "m": "pop",
+        "o": "r13",
+        "cls": "other"
+      },
+      {
+        "a": 17298592,
+        "m": "pop",
+        "o": "r14",
+        "cls": "other"
+      },
+      {
+        "a": 17298594,
+        "m": "pop",
+        "o": "r15",
+        "cls": "other"
+      },
+      {
+        "a": 17298596,
+        "m": "pop",
+        "o": "rbp",
+        "cls": "other"
+      },
+      {
+        "a": 17298597,
+        "m": "ret",
+        "o": "",
+        "cls": "branch"
       },
       {
-        "source": "            self.frame +%= 1; // AF02-blend hash RNG frame counter (free otherwise)",
-        "asm": [
-          "inc\tQWORD PTR [r12+0x68]",
-          "add\trsp,0x28",
-          "pop\trbx",
-          "pop\tr12",
-          "pop\tr13",
-          "pop\tr14",
-          "pop\tr15",
-          "pop\trbp",
-          "ret",
-          "cs\tnop WORD PTR [rax+rax*1+0x0]"
+        "a": 17298598,
+        "m": "cs",
+        "o": "nop WORD PTR [rax+rax*1+0x0]",
+        "cls": "other"
+      }
+    ],
+    "attribution": {
+      "files": [
+        "/data/sandbox/zig-test/src/framework/sim.zig",
+        "/data/sandbox/zig-test/src/layouts/ML01/AF02.LP1-scalar.LP2-simple.zig",
+        "/data/sandbox/zig-test/src/framework/config.zig",
+        "/home/sayre/.local/zigs/zig-x86_64-linux-0.17.0-dev.1756+613c03321/lib/std/Random/Xoshiro256.zig",
+        "/home/sayre/.local/zigs/zig-x86_64-linux-0.17.0-dev.1756+613c03321/lib/std/Random.zig",
+        "/home/sayre/.local/zigs/zig-x86_64-linux-0.17.0-dev.1756+613c03321/lib/std/math.zig",
+        "/data/sandbox/zig-test/src/layouts/common/render_simple.zig"
+      ],
+      "chains": [
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            1,
+            40
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            40
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            42
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            1,
+            42
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [],
+        [
+          [
+            1,
+            43
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+          [
+            1,
+            44
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+          [
+            1,
+            47
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            50
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            48
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            49
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            50
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            50
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            50
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            1,
+            52
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            52
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            52
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            52
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            1,
+            55
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            2,
+            70
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            2,
+            70
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            71
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            71
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            71
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            71
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            27
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            25
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            25
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            25
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            25
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            27
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            29
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            30
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            756
+          ],
+          [
+            3,
+            25
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            27
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            31
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            25
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            32
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            34
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            756
+          ],
+          [
+            3,
+            36
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            31
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            32
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            34
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            36
+          ],
+          [
+            3,
+            73
+          ],
+          [
+            4,
+            61
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            295
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            297
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            297
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            308
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            308
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            308
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            308
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            308
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            308
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            59
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            299
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            299
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            299
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            299
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            299
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            299
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            299
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            299
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            299
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            300
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            300
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            303
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            303
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            303
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            73
+          ],
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            303
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            133
+          ],
+          [
+            4,
+            303
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [
+          [
+            4,
+            303
+          ],
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            2,
+            72
+          ],
+          [
+            1,
+            58
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            63
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+          [
+            6,
+            73
+          ],
+          [
+            6,
+            50
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            73
+          ],
+          [
+            6,
+            50
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            74
+          ],
+          [
+            6,
+            50
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            74
+          ],
+          [
+            6,
+            50
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            74
+          ],
+          [
+            6,
+            50
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            75
+          ],
+          [
+            6,
+            50
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            73
+          ],
+          [
+            6,
+            51
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            73
+          ],
+          [
+            6,
+            51
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            74
+          ],
+          [
+            6,
+            51
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            74
+          ],
+          [
+            6,
+            51
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            74
+          ],
+          [
+            6,
+            51
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            75
+          ],
+          [
+            6,
+            51
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            73
+          ],
+          [
+            6,
+            52
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            73
+          ],
+          [
+            6,
+            52
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            74
+          ],
+          [
+            6,
+            52
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            74
+          ],
+          [
+            6,
+            52
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            74
+          ],
+          [
+            6,
+            52
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            75
+          ],
+          [
+            6,
+            52
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            73
+          ],
+          [
+            6,
+            51
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            73
+          ],
+          [
+            6,
+            51
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            73
+          ],
+          [
+            6,
+            52
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            73
+          ],
+          [
+            6,
+            52
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            26
+          ],
+          [
+            6,
+            53
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            26
+          ],
+          [
+            6,
+            53
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            27
+          ],
+          [
+            6,
+            53
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            27
+          ],
+          [
+            6,
+            53
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            34
+          ],
+          [
+            6,
+            54
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            6,
+            34
+          ],
+          [
+            6,
+            54
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            35
+          ],
+          [
+            6,
+            54
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            35
+          ],
+          [
+            6,
+            54
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            54
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            54
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            54
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            54
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            54
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            54
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            6,
+            62
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            63
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            63
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            63
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            67
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            59
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            62
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            63
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            63
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            63
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            67
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            6,
+            62
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            63
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            63
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            63
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            67
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            59
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            61
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [],
+        [
+          [
+            6,
+            62
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            63
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            63
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            63
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            64
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            65
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            79
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            80
+          ],
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            66
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            67
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            67
+          ],
+          [
+            1,
+            64
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ]
+      ],
+      "call_site": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        40,
+        40,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        59,
+        59,
+        59,
+        59,
+        59,
+        null,
+        null,
+        null,
+        null,
+        42,
+        null,
+        42,
+        null,
+        null,
+        null,
+        43,
+        null,
+        null,
+        null,
+        null,
+        44,
+        null,
+        null,
+        null,
+        null,
+        47,
+        50,
+        48,
+        49,
+        50,
+        50,
+        50,
+        null,
+        51,
+        51,
+        51,
+        51,
+        null,
+        52,
+        52,
+        52,
+        52,
+        null,
+        55,
+        null,
+        58,
+        null,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        null,
+        null,
+        59,
+        59,
+        59,
+        59,
+        59,
+        59,
+        59,
+        59,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        null,
+        null,
+        58,
+        null,
+        58,
+        63,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        null,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        null,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        null,
+        null,
+        null,
+        64,
+        64,
+        null,
+        null,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        null,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        null,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        null,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        null,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        64,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "repo_files": [
+        "AF02.LP1-scalar.LP2-simple.zig",
+        "config.zig",
+        "data.zig",
+        "devec.zig",
+        "render_simple.zig",
+        "sim.zig",
+        "vec.zig"
+      ]
+    },
+    "loops": [
+      {
+        "loop": 1,
+        "addr_span": [
+          17297184,
+          17297702
+        ],
+        "lines": [
+          42,
+          59
+        ],
+        "insns": 118,
+        "cond_branches": 14,
+        "vector_fp": 0,
+        "scalar_fp": 22,
+        "stride_bytes": 68,
+        "notes": [
+          "branchy respawn (\u2192 L59)",
+          "byte-granular scatter (\u00d712)",
+          "scalar FP (\u00d722)"
+        ]
+      },
+      {
+        "loop": 2,
+        "addr_span": [
+          17297776,
+          17298573
+        ],
+        "lines": [
+          64,
+          64
+        ],
+        "insns": 195,
+        "cond_branches": 21,
+        "vector_fp": 0,
+        "scalar_fp": 14,
+        "stride_bytes": 68,
+        "notes": [
+          "select-based (csel/cmov \u00d712)",
+          "byte-granular scatter (\u00d716)",
+          "scalar FP (\u00d714)"
         ]
       }
     ],
+    "calls": [
+      {
+        "sym": "layouts.ML01.data.Data.spawn",
+        "line": 59,
+        "std": true
+      },
+      {
+        "sym": "Random.init__anon_32907.gen.fill",
+        "line": 58,
+        "std": true
+      }
+    ],
+    "fconst": [],
     "algo_source": {
       "file": "src/layouts/ML01/AF02.LP1-scalar.LP2-simple.zig",
       "lines": [
@@ -1263,163 +7699,6 @@
         "};",
         "",
         "pub const Sim = fw.Strategy(Data, H);"
-      ],
-      "group_lines": [
-        null,
-        40,
-        null,
-        null,
-        59,
-        40,
-        42,
-        null,
-        null,
-        43,
-        44,
-        47,
-        50,
-        48,
-        49,
-        50,
-        51,
-        52,
-        55,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        58,
-        59,
-        null,
-        null,
-        null,
-        null,
-        null,
-        63,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
       ]
     }
   }
