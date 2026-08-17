@@ -6,7 +6,7 @@ The only honest cross-machine view: each machine's hardware facts side by side. 
 
 | machine_id | cpu | streaming BW | L1d | L2 | L3 | layouts |
 |---|---|---|---|---|---|---|
-| [`madbits-8c44a80e`](madbits-8c44a80e/) | AMD Ryzen 9 3900X 12-Core Processor | 12.69 GB/s | 32 KB | 0 MB | 16777216 | ML01 |
-| [`minibits-82398588`](minibits-82398588/) | Apple M4 | 29.9 GB/s | 64 KB | 4 MB | — | ML01 |
+| [`madbits-8c44a80e`](madbits-8c44a80e/) | AMD Ryzen 9 3900X 12-Core Processor | 12.69 GB/s | 32 KB | 512 KB | 16.0 MB | ML01 |
+| [`minibits-82398588`](minibits-82398588/) | Apple M4 | 29.9 GB/s | 64 KB | 4.0 MB | — | ML01 |
 
 Per machine: `<machine_id>/README.md` (overview) → `<machine_id>/<L>.mem_layout.md` (mem_layout) → `<machine_id>/<algo>.md` (the per-algo narrative).

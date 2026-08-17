@@ -18,6 +18,343 @@
   ],
   "streaming_bw_gbs": 12.69,
   "memory_layout": "particles: []Particle        ONE AoS array, plain alloc, natural alignment\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502pos 12B \u2502vel 12B \u2502life 4\u2502age 4\u2502color16\u2502size 4\u2502rotation 4\u2502mass 4\u2502flags 1\u2502kind 1\u2502seed 4\u2502  = 68 B\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2518",
+  "layout_facts": {
+    "struct": "Particle (AoS, full 11-field)",
+    "fields": [
+      {
+        "name": "pos",
+        "bytes": 12,
+        "type": "Vec3"
+      },
+      {
+        "name": "vel",
+        "bytes": 12,
+        "type": "Vec3"
+      },
+      {
+        "name": "life",
+        "bytes": 4,
+        "type": "f32"
+      },
+      {
+        "name": "age",
+        "bytes": 4,
+        "type": "f32"
+      },
+      {
+        "name": "color",
+        "bytes": 16,
+        "type": "Vec4"
+      },
+      {
+        "name": "size",
+        "bytes": 4,
+        "type": "f32"
+      },
+      {
+        "name": "rotation",
+        "bytes": 4,
+        "type": "f32"
+      },
+      {
+        "name": "mass",
+        "bytes": 4,
+        "type": "f32"
+      },
+      {
+        "name": "flags",
+        "bytes": 1,
+        "type": "u8"
+      },
+      {
+        "name": "kind",
+        "bytes": 1,
+        "type": "enum"
+      },
+      {
+        "name": "seed",
+        "bytes": 4,
+        "type": "u32"
+      }
+    ],
+    "loops_by_fam": {
+      "AF01": [
+        {
+          "stages": [
+            "integrate",
+            "decide",
+            "respawn",
+            "render"
+          ],
+          "fields": [
+            "age",
+            "color",
+            "pos",
+            "seed",
+            "vel"
+          ],
+          "hot_bytes": 48,
+          "stride_bytes": 68,
+          "hot_frac": 0.706
+        }
+      ],
+      "AF02": [
+        {
+          "stages": [
+            "integrate",
+            "decide",
+            "respawn"
+          ],
+          "fields": [
+            "age",
+            "pos",
+            "seed",
+            "vel"
+          ],
+          "hot_bytes": 32,
+          "stride_bytes": 68,
+          "hot_frac": 0.471
+        },
+        {
+          "stages": [
+            "render"
+          ],
+          "fields": [
+            "color",
+            "pos"
+          ],
+          "hot_bytes": 28,
+          "stride_bytes": 68,
+          "hot_frac": 0.412
+        }
+      ],
+      "AF03": [
+        {
+          "stages": [
+            "integrate",
+            "decide"
+          ],
+          "fields": [
+            "age",
+            "pos",
+            "vel"
+          ],
+          "hot_bytes": 28,
+          "stride_bytes": 68,
+          "hot_frac": 0.412
+        },
+        {
+          "stages": [
+            "respawn",
+            "render"
+          ],
+          "fields": [
+            "color",
+            "pos",
+            "seed"
+          ],
+          "hot_bytes": 32,
+          "stride_bytes": 68,
+          "hot_frac": 0.471
+        }
+      ],
+      "AF04": [
+        {
+          "stages": [
+            "integrate"
+          ],
+          "fields": [
+            "pos",
+            "vel"
+          ],
+          "hot_bytes": 24,
+          "stride_bytes": 68,
+          "hot_frac": 0.353
+        },
+        {
+          "stages": [
+            "decide",
+            "respawn",
+            "render"
+          ],
+          "fields": [
+            "age",
+            "color",
+            "pos",
+            "seed"
+          ],
+          "hot_bytes": 36,
+          "stride_bytes": 68,
+          "hot_frac": 0.529
+        }
+      ],
+      "AF05": [
+        {
+          "stages": [
+            "integrate"
+          ],
+          "fields": [
+            "pos",
+            "vel"
+          ],
+          "hot_bytes": 24,
+          "stride_bytes": 68,
+          "hot_frac": 0.353
+        },
+        {
+          "stages": [
+            "decide",
+            "respawn"
+          ],
+          "fields": [
+            "age",
+            "seed"
+          ],
+          "hot_bytes": 8,
+          "stride_bytes": 68,
+          "hot_frac": 0.118
+        },
+        {
+          "stages": [
+            "render"
+          ],
+          "fields": [
+            "color",
+            "pos"
+          ],
+          "hot_bytes": 28,
+          "stride_bytes": 68,
+          "hot_frac": 0.412
+        }
+      ],
+      "AF06": [
+        {
+          "stages": [
+            "integrate",
+            "decide"
+          ],
+          "fields": [
+            "age",
+            "pos",
+            "vel"
+          ],
+          "hot_bytes": 28,
+          "stride_bytes": 68,
+          "hot_frac": 0.412
+        },
+        {
+          "stages": [
+            "respawn"
+          ],
+          "fields": [
+            "seed"
+          ],
+          "hot_bytes": 4,
+          "stride_bytes": 68,
+          "hot_frac": 0.059
+        },
+        {
+          "stages": [
+            "render"
+          ],
+          "fields": [
+            "color",
+            "pos"
+          ],
+          "hot_bytes": 28,
+          "stride_bytes": 68,
+          "hot_frac": 0.412
+        }
+      ],
+      "AF07": [
+        {
+          "stages": [
+            "integrate"
+          ],
+          "fields": [
+            "pos",
+            "vel"
+          ],
+          "hot_bytes": 24,
+          "stride_bytes": 68,
+          "hot_frac": 0.353
+        },
+        {
+          "stages": [
+            "decide"
+          ],
+          "fields": [
+            "age"
+          ],
+          "hot_bytes": 4,
+          "stride_bytes": 68,
+          "hot_frac": 0.059
+        },
+        {
+          "stages": [
+            "respawn",
+            "render"
+          ],
+          "fields": [
+            "color",
+            "pos",
+            "seed"
+          ],
+          "hot_bytes": 32,
+          "stride_bytes": 68,
+          "hot_frac": 0.471
+        }
+      ],
+      "AF08": [
+        {
+          "stages": [
+            "integrate"
+          ],
+          "fields": [
+            "pos",
+            "vel"
+          ],
+          "hot_bytes": 24,
+          "stride_bytes": 68,
+          "hot_frac": 0.353
+        },
+        {
+          "stages": [
+            "decide"
+          ],
+          "fields": [
+            "age"
+          ],
+          "hot_bytes": 4,
+          "stride_bytes": 68,
+          "hot_frac": 0.059
+        },
+        {
+          "stages": [
+            "respawn"
+          ],
+          "fields": [
+            "seed"
+          ],
+          "hot_bytes": 4,
+          "stride_bytes": 68,
+          "hot_frac": 0.059
+        },
+        {
+          "stages": [
+            "render"
+          ],
+          "fields": [
+            "color",
+            "pos"
+          ],
+          "hot_bytes": 28,
+          "stride_bytes": 68,
+          "hot_frac": 0.412
+        }
+      ]
+    }
+  },
   "champions": [
     {
       "algo": "ML01.AF02.LP1-autovec.LP2-opt",

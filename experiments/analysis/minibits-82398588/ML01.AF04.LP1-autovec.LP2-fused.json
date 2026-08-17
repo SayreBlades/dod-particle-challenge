@@ -22,125 +22,737 @@
       61680
     ]
   ],
+  "regimes": {
+    "380": "L1d-resident",
+    "640": "L1d-resident",
+    "960": "L1d-resident",
+    "1400": "L2-resident",
+    "2400": "L2-resident",
+    "10000": "L2-resident",
+    "25000": "L2-resident",
+    "41000": "L2-resident",
+    "62000": "DRAM",
+    "93000": "DRAM",
+    "100000": "DRAM",
+    "150000": "DRAM",
+    "1000000": "DRAM",
+    "10000000": "DRAM"
+  },
+  "memory_floor_ns": 2.274,
+  "layout_facts": {
+    "struct": "Particle (AoS, full 11-field)",
+    "loops": [
+      {
+        "stages": [
+          "integrate"
+        ],
+        "fields": [
+          "pos",
+          "vel"
+        ],
+        "hot_bytes": 24,
+        "stride_bytes": 68,
+        "hot_frac": 0.353
+      },
+      {
+        "stages": [
+          "decide",
+          "respawn",
+          "render"
+        ],
+        "fields": [
+          "age",
+          "color",
+          "pos",
+          "seed"
+        ],
+        "hot_bytes": 36,
+        "stride_bytes": 68,
+        "hot_frac": 0.529
+      }
+    ],
+    "intermediate_bpp": 0
+  },
+  "baseline": "ML01.AF02.LP1-scalar.LP2-simple",
   "series": {
     "0.01": [
       {
+        "N": 380,
+        "threads": 1,
+        "ns_particle": 6.349,
+        "ns_frame": 2412.8,
+        "achieved_bw_gbs": 10.71,
+        "baseline_ns": 7.272,
+        "ratio_baseline": 0.873,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 3.631,
+        "ratio_winner": 1.749
+      },
+      {
+        "N": 640,
+        "threads": 1,
+        "ns_particle": 6.37,
+        "ns_frame": 4077.1,
+        "achieved_bw_gbs": 10.67,
+        "baseline_ns": 7.357,
+        "ratio_baseline": 0.866,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 3.79,
+        "ratio_winner": 1.681
+      },
+      {
+        "N": 960,
+        "threads": 1,
+        "ns_particle": 6.595,
+        "ns_frame": 6331.0,
+        "achieved_bw_gbs": 10.31,
+        "baseline_ns": 7.48,
+        "ratio_baseline": 0.882,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 3.841,
+        "ratio_winner": 1.717
+      },
+      {
+        "N": 1400,
+        "threads": 1,
+        "ns_particle": 6.753,
+        "ns_frame": 9453.7,
+        "achieved_bw_gbs": 10.07,
+        "baseline_ns": 7.553,
+        "ratio_baseline": 0.894,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 3.919,
+        "ratio_winner": 1.723
+      },
+      {
+        "N": 2400,
+        "threads": 1,
+        "ns_particle": 6.893,
+        "ns_frame": 16543.7,
+        "achieved_bw_gbs": 9.86,
+        "baseline_ns": 7.733,
+        "ratio_baseline": 0.891,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 4.221,
+        "ratio_winner": 1.633
+      },
+      {
         "N": 10000,
         "threads": 1,
-        "ns_particle": 7.589,
-        "ns_frame": 75894.4,
-        "achieved_bw_gbs": 8.96
+        "ns_particle": 6.733,
+        "ns_frame": 67329.4,
+        "achieved_bw_gbs": 10.1,
+        "baseline_ns": 7.972,
+        "ratio_baseline": 0.845,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 4.984,
+        "ratio_winner": 1.351
+      },
+      {
+        "N": 25000,
+        "threads": 1,
+        "ns_particle": 6.837,
+        "ns_frame": 170917.1,
+        "achieved_bw_gbs": 9.95,
+        "baseline_ns": 7.778,
+        "ratio_baseline": 0.879,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 4.691,
+        "ratio_winner": 1.458
+      },
+      {
+        "N": 41000,
+        "threads": 1,
+        "ns_particle": 6.507,
+        "ns_frame": 266775.0,
+        "achieved_bw_gbs": 10.45,
+        "baseline_ns": 7.445,
+        "ratio_baseline": 0.874,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 4.473,
+        "ratio_winner": 1.455
+      },
+      {
+        "N": 62000,
+        "threads": 1,
+        "ns_particle": 6.336,
+        "ns_frame": 392820.9,
+        "achieved_bw_gbs": 10.73,
+        "baseline_ns": 7.301,
+        "ratio_baseline": 0.868,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 4.254,
+        "ratio_winner": 1.49
+      },
+      {
+        "N": 93000,
+        "threads": 1,
+        "ns_particle": 6.271,
+        "ns_frame": 583226.7,
+        "achieved_bw_gbs": 10.84,
+        "baseline_ns": 7.253,
+        "ratio_baseline": 0.865,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 4.184,
+        "ratio_winner": 1.499
       },
       {
         "N": 100000,
         "threads": 1,
-        "ns_particle": 6.458,
-        "ns_frame": 645767.9,
-        "achieved_bw_gbs": 10.53
+        "ns_particle": 6.156,
+        "ns_frame": 615634.0,
+        "achieved_bw_gbs": 11.05,
+        "baseline_ns": 7.392,
+        "ratio_baseline": 0.833,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 4.242,
+        "ratio_winner": 1.451
+      },
+      {
+        "N": 150000,
+        "threads": 1,
+        "ns_particle": 6.267,
+        "ns_frame": 940030.5,
+        "achieved_bw_gbs": 10.85,
+        "baseline_ns": 7.179,
+        "ratio_baseline": 0.873,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 4.195,
+        "ratio_winner": 1.494
       },
       {
         "N": 1000000,
         "threads": 1,
-        "ns_particle": 6.654,
-        "ns_frame": 6653701.4,
-        "achieved_bw_gbs": 10.22
+        "ns_particle": 6.51,
+        "ns_frame": 6509687.5,
+        "achieved_bw_gbs": 10.45,
+        "baseline_ns": 7.351,
+        "ratio_baseline": 0.886,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 4.354,
+        "ratio_winner": 1.495
       },
       {
         "N": 10000000,
         "threads": 1,
         "ns_particle": 6.728,
         "ns_frame": 67277187.5,
-        "achieved_bw_gbs": 10.11
+        "achieved_bw_gbs": 10.11,
+        "baseline_ns": 7.379,
+        "ratio_baseline": 0.912,
+        "winner": "AF02.LP1-autovec.LP2-opt",
+        "winner_ns": 4.35,
+        "ratio_winner": 1.547
       }
     ],
     "0.1": [
+      {
+        "N": 380,
+        "threads": 1,
+        "ns_particle": 7.508,
+        "ns_frame": 2853.2,
+        "achieved_bw_gbs": 9.06,
+        "baseline_ns": 8.493,
+        "ratio_baseline": 0.884,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.733,
+        "ratio_winner": 1.586
+      },
+      {
+        "N": 640,
+        "threads": 1,
+        "ns_particle": 7.488,
+        "ns_frame": 4792.3,
+        "achieved_bw_gbs": 9.08,
+        "baseline_ns": 8.598,
+        "ratio_baseline": 0.871,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.888,
+        "ratio_winner": 1.532
+      },
+      {
+        "N": 960,
+        "threads": 1,
+        "ns_particle": 7.516,
+        "ns_frame": 7215.8,
+        "achieved_bw_gbs": 9.05,
+        "baseline_ns": 8.62,
+        "ratio_baseline": 0.872,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.737,
+        "ratio_winner": 1.586
+      },
+      {
+        "N": 1400,
+        "threads": 1,
+        "ns_particle": 7.502,
+        "ns_frame": 10502.4,
+        "achieved_bw_gbs": 9.06,
+        "baseline_ns": 8.663,
+        "ratio_baseline": 0.866,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.702,
+        "ratio_winner": 1.595
+      },
+      {
+        "N": 2400,
+        "threads": 1,
+        "ns_particle": 7.739,
+        "ns_frame": 18572.5,
+        "achieved_bw_gbs": 8.79,
+        "baseline_ns": 8.83,
+        "ratio_baseline": 0.876,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.947,
+        "ratio_winner": 1.565
+      },
       {
         "N": 10000,
         "threads": 1,
         "ns_particle": 7.759,
         "ns_frame": 77587.9,
-        "achieved_bw_gbs": 8.76
+        "achieved_bw_gbs": 8.76,
+        "baseline_ns": 9.241,
+        "ratio_baseline": 0.84,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.11,
+        "ratio_winner": 1.518
+      },
+      {
+        "N": 25000,
+        "threads": 1,
+        "ns_particle": 7.754,
+        "ns_frame": 193855.6,
+        "achieved_bw_gbs": 8.77,
+        "baseline_ns": 8.984,
+        "ratio_baseline": 0.863,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.154,
+        "ratio_winner": 1.505
+      },
+      {
+        "N": 41000,
+        "threads": 1,
+        "ns_particle": 7.731,
+        "ns_frame": 316990.1,
+        "achieved_bw_gbs": 8.8,
+        "baseline_ns": 8.984,
+        "ratio_baseline": 0.861,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.006,
+        "ratio_winner": 1.544
+      },
+      {
+        "N": 62000,
+        "threads": 1,
+        "ns_particle": 7.713,
+        "ns_frame": 478224.1,
+        "achieved_bw_gbs": 8.82,
+        "baseline_ns": 8.935,
+        "ratio_baseline": 0.863,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.958,
+        "ratio_winner": 1.556
+      },
+      {
+        "N": 93000,
+        "threads": 1,
+        "ns_particle": 7.693,
+        "ns_frame": 715441.7,
+        "achieved_bw_gbs": 8.84,
+        "baseline_ns": 8.861,
+        "ratio_baseline": 0.868,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.96,
+        "ratio_winner": 1.551
       },
       {
         "N": 100000,
         "threads": 1,
-        "ns_particle": 7.718,
-        "ns_frame": 771781.7,
-        "achieved_bw_gbs": 8.81
+        "ns_particle": 7.679,
+        "ns_frame": 767856.9,
+        "achieved_bw_gbs": 8.86,
+        "baseline_ns": 9.074,
+        "ratio_baseline": 0.846,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.886,
+        "ratio_winner": 1.572
+      },
+      {
+        "N": 150000,
+        "threads": 1,
+        "ns_particle": 7.709,
+        "ns_frame": 1156333.3,
+        "achieved_bw_gbs": 8.82,
+        "baseline_ns": 8.774,
+        "ratio_baseline": 0.879,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.887,
+        "ratio_winner": 1.577
       },
       {
         "N": 1000000,
         "threads": 1,
         "ns_particle": 8.101,
         "ns_frame": 8100652.8,
-        "achieved_bw_gbs": 8.39
+        "achieved_bw_gbs": 8.39,
+        "baseline_ns": 8.995,
+        "ratio_baseline": 0.901,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.744,
+        "ratio_winner": 1.708
       },
       {
         "N": 10000000,
         "threads": 1,
         "ns_particle": 8.183,
         "ns_frame": 81831250.0,
-        "achieved_bw_gbs": 8.31
+        "achieved_bw_gbs": 8.31,
+        "baseline_ns": 9.045,
+        "ratio_baseline": 0.905,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.704,
+        "ratio_winner": 1.739
       }
     ],
     "0.25": [
+      {
+        "N": 380,
+        "threads": 1,
+        "ns_particle": 9.681,
+        "ns_frame": 3678.8,
+        "achieved_bw_gbs": 7.02,
+        "baseline_ns": 10.346,
+        "ratio_baseline": 0.936,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.799,
+        "ratio_winner": 2.017
+      },
+      {
+        "N": 640,
+        "threads": 1,
+        "ns_particle": 9.705,
+        "ns_frame": 6211.2,
+        "achieved_bw_gbs": 7.01,
+        "baseline_ns": 10.396,
+        "ratio_baseline": 0.934,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.782,
+        "ratio_winner": 2.03
+      },
+      {
+        "N": 960,
+        "threads": 1,
+        "ns_particle": 9.646,
+        "ns_frame": 9259.7,
+        "achieved_bw_gbs": 7.05,
+        "baseline_ns": 10.441,
+        "ratio_baseline": 0.924,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.686,
+        "ratio_winner": 2.059
+      },
+      {
+        "N": 1400,
+        "threads": 1,
+        "ns_particle": 9.789,
+        "ns_frame": 13704.5,
+        "achieved_bw_gbs": 6.95,
+        "baseline_ns": 10.526,
+        "ratio_baseline": 0.93,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.685,
+        "ratio_winner": 2.09
+      },
+      {
+        "N": 2400,
+        "threads": 1,
+        "ns_particle": 9.899,
+        "ns_frame": 23757.5,
+        "achieved_bw_gbs": 6.87,
+        "baseline_ns": 10.801,
+        "ratio_baseline": 0.916,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.816,
+        "ratio_winner": 2.055
+      },
       {
         "N": 10000,
         "threads": 1,
         "ns_particle": 9.867,
         "ns_frame": 98669.0,
-        "achieved_bw_gbs": 6.89
+        "achieved_bw_gbs": 6.89,
+        "baseline_ns": 11.027,
+        "ratio_baseline": 0.895,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.767,
+        "ratio_winner": 2.07
+      },
+      {
+        "N": 25000,
+        "threads": 1,
+        "ns_particle": 10.028,
+        "ns_frame": 250703.2,
+        "achieved_bw_gbs": 6.78,
+        "baseline_ns": 10.999,
+        "ratio_baseline": 0.912,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.726,
+        "ratio_winner": 2.122
+      },
+      {
+        "N": 41000,
+        "threads": 1,
+        "ns_particle": 10.027,
+        "ns_frame": 411128.0,
+        "achieved_bw_gbs": 6.78,
+        "baseline_ns": 11.473,
+        "ratio_baseline": 0.874,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.796,
+        "ratio_winner": 2.091
+      },
+      {
+        "N": 62000,
+        "threads": 1,
+        "ns_particle": 9.921,
+        "ns_frame": 615117.1,
+        "achieved_bw_gbs": 6.85,
+        "baseline_ns": 11.097,
+        "ratio_baseline": 0.894,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.77,
+        "ratio_winner": 2.08
+      },
+      {
+        "N": 93000,
+        "threads": 1,
+        "ns_particle": 10.012,
+        "ns_frame": 931166.7,
+        "achieved_bw_gbs": 6.79,
+        "baseline_ns": 11.018,
+        "ratio_baseline": 0.909,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.787,
+        "ratio_winner": 2.091
       },
       {
         "N": 100000,
         "threads": 1,
         "ns_particle": 9.963,
         "ns_frame": 996283.8,
-        "achieved_bw_gbs": 6.83
+        "achieved_bw_gbs": 6.83,
+        "baseline_ns": 11.23,
+        "ratio_baseline": 0.887,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.716,
+        "ratio_winner": 2.113
+      },
+      {
+        "N": 150000,
+        "threads": 1,
+        "ns_particle": 9.99,
+        "ns_frame": 1498433.3,
+        "achieved_bw_gbs": 6.81,
+        "baseline_ns": 10.864,
+        "ratio_baseline": 0.92,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.832,
+        "ratio_winner": 2.067
       },
       {
         "N": 1000000,
         "threads": 1,
         "ns_particle": 10.376,
         "ns_frame": 10376076.4,
-        "achieved_bw_gbs": 6.55
+        "achieved_bw_gbs": 6.55,
+        "baseline_ns": 11.166,
+        "ratio_baseline": 0.929,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.735,
+        "ratio_winner": 2.191
       },
       {
         "N": 10000000,
         "threads": 1,
         "ns_particle": 10.598,
         "ns_frame": 105981304.2,
-        "achieved_bw_gbs": 6.42
+        "achieved_bw_gbs": 6.42,
+        "baseline_ns": 11.223,
+        "ratio_baseline": 0.944,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 4.708,
+        "ratio_winner": 2.251
       }
     ],
     "0.5": [
       {
+        "N": 380,
+        "threads": 1,
+        "ns_particle": 13.11,
+        "ns_frame": 4981.7,
+        "achieved_bw_gbs": 5.19,
+        "baseline_ns": 12.786,
+        "ratio_baseline": 1.025,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.442,
+        "ratio_winner": 2.409
+      },
+      {
+        "N": 640,
+        "threads": 1,
+        "ns_particle": 13.239,
+        "ns_frame": 8473.0,
+        "achieved_bw_gbs": 5.14,
+        "baseline_ns": 12.831,
+        "ratio_baseline": 1.032,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.457,
+        "ratio_winner": 2.426
+      },
+      {
+        "N": 960,
+        "threads": 1,
+        "ns_particle": 13.136,
+        "ns_frame": 12610.0,
+        "achieved_bw_gbs": 5.18,
+        "baseline_ns": 12.87,
+        "ratio_baseline": 1.021,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.41,
+        "ratio_winner": 2.428
+      },
+      {
+        "N": 1400,
+        "threads": 1,
+        "ns_particle": 13.158,
+        "ns_frame": 18421.1,
+        "achieved_bw_gbs": 5.17,
+        "baseline_ns": 12.889,
+        "ratio_baseline": 1.021,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.392,
+        "ratio_winner": 2.44
+      },
+      {
+        "N": 2400,
+        "threads": 1,
+        "ns_particle": 13.368,
+        "ns_frame": 32083.7,
+        "achieved_bw_gbs": 5.09,
+        "baseline_ns": 13.303,
+        "ratio_baseline": 1.005,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.412,
+        "ratio_winner": 2.47
+      },
+      {
         "N": 10000,
         "threads": 1,
-        "ns_particle": 13.425,
-        "ns_frame": 134254.0,
-        "achieved_bw_gbs": 5.07
+        "ns_particle": 13.396,
+        "ns_frame": 133960.0,
+        "achieved_bw_gbs": 5.08,
+        "baseline_ns": 13.332,
+        "ratio_baseline": 1.005,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.446,
+        "ratio_winner": 2.46
+      },
+      {
+        "N": 25000,
+        "threads": 1,
+        "ns_particle": 13.426,
+        "ns_frame": 335661.1,
+        "achieved_bw_gbs": 5.06,
+        "baseline_ns": 13.147,
+        "ratio_baseline": 1.021,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.299,
+        "ratio_winner": 2.533
+      },
+      {
+        "N": 41000,
+        "threads": 1,
+        "ns_particle": 13.442,
+        "ns_frame": 551126.5,
+        "achieved_bw_gbs": 5.06,
+        "baseline_ns": 13.298,
+        "ratio_baseline": 1.011,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.361,
+        "ratio_winner": 2.508
+      },
+      {
+        "N": 62000,
+        "threads": 1,
+        "ns_particle": 13.561,
+        "ns_frame": 840793.9,
+        "achieved_bw_gbs": 5.01,
+        "baseline_ns": 13.298,
+        "ratio_baseline": 1.02,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.326,
+        "ratio_winner": 2.546
+      },
+      {
+        "N": 93000,
+        "threads": 1,
+        "ns_particle": 13.464,
+        "ns_frame": 1252170.0,
+        "achieved_bw_gbs": 5.05,
+        "baseline_ns": 13.209,
+        "ratio_baseline": 1.019,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.358,
+        "ratio_winner": 2.513
       },
       {
         "N": 100000,
         "threads": 1,
-        "ns_particle": 13.487,
-        "ns_frame": 1348708.8,
-        "achieved_bw_gbs": 5.04
+        "ns_particle": 13.48,
+        "ns_frame": 1348032.6,
+        "achieved_bw_gbs": 5.04,
+        "baseline_ns": 13.576,
+        "ratio_baseline": 0.993,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.408,
+        "ratio_winner": 2.492
+      },
+      {
+        "N": 150000,
+        "threads": 1,
+        "ns_particle": 13.6,
+        "ns_frame": 2040002.8,
+        "achieved_bw_gbs": 5.0,
+        "baseline_ns": 13.444,
+        "ratio_baseline": 1.012,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.353,
+        "ratio_winner": 2.541
       },
       {
         "N": 1000000,
         "threads": 1,
         "ns_particle": 13.905,
         "ns_frame": 13905099.3,
-        "achieved_bw_gbs": 4.89
+        "achieved_bw_gbs": 4.89,
+        "baseline_ns": 13.559,
+        "ratio_baseline": 1.026,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.426,
+        "ratio_winner": 2.563
       },
       {
         "N": 10000000,
         "threads": 1,
         "ns_particle": 14.128,
         "ns_frame": 141278850.0,
-        "achieved_bw_gbs": 4.81
+        "achieved_bw_gbs": 4.81,
+        "baseline_ns": 13.588,
+        "ratio_baseline": 1.04,
+        "winner": "AF02.LP1-halide.LP2-opt",
+        "winner_ns": 5.419,
+        "ratio_winner": 2.607
       }
     ]
   },
@@ -338,6 +950,5 @@
       "branch_flush_pct": 30.4
     }
   ],
-  "verified": true,
-  "verify_errors": []
+  "asm_digest": "loop 1 @L34-L42: ~23 insns/iter, cond-branches 1, stride 68B; mixed FP (vec 6 / scalar 3); indexed gather present\n  loop 2 @L45-L50: ~214 insns/iter, cond-branches 24, stride 68B; select-based (csel/cmov \u00d718); byte-granular scatter (\u00d719); scalar FP (\u00d721)\n  vector-insns 9/297 across the whole step"
 }

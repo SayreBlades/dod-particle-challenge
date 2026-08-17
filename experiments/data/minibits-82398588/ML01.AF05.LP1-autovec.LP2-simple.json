@@ -1,6 +1,8 @@
 {
   "source_hash": "b89708957b42b83ae196343d55b1b6ed765503e5baa7c63e6752a9e926b32c45",
   "asm": {
+    "schema": 2,
+    "arch": "arm64",
     "source_hash": "b89708957b42b83ae196343d55b1b6ed765503e5baa7c63e6752a9e926b32c45",
     "symbol": "_framework.sim.Strategy(layouts.ML01.data.Data,layouts.ML01.AF05.LP1-autovec.LP2-simple.H).step",
     "n_instructions": 295,
@@ -50,792 +52,6640 @@
       "ret": 1
     },
     "vector_insns": 9,
-    "excerpt": "000000010004d9dc\tsub\tsp, sp, #0x90\n000000010004d9e0\tstp\td9, d8, [sp, #0x20]\n000000010004d9e4\tstp\tx28, x27, [sp, #0x30]\n000000010004d9e8\tstp\tx26, x25, [sp, #0x40]\n000000010004d9ec\tstp\tx24, x23, [sp, #0x50]\n000000010004d9f0\tstp\tx22, x21, [sp, #0x60]\n000000010004d9f4\tstp\tx20, x19, [sp, #0x70]\n000000010004d9f8\tstp\tx29, x30, [sp, #0x80]\n000000010004d9fc\tadd\tx29, sp, #0x80\n000000010004da00\tmov\tx20, x0\n000000010004da04\tmov\tx24, x0\n000000010004da08\tldp\tx9, x8, [x24, #0x10]!\n000000010004da0c\tcbz\tx8, 0x10004de48\n000000010004da10\tmov\tx19, x4\n000000010004da14\tmov\tx21, x3\n000000010004da18\tmov\tx22, x2\n000000010004da1c\tadd\tx9, x9, #0x10\n000000010004da20\tmov\tw10, #0xd70a\n000000010004da24\tmovk\tw10, #0x3ca3, lsl #16\n000000010004da28\tdup.2s\tv0, w10\n000000010004da2c\tfmov\ts1, w10\n000000010004da30\tmovi.2d\tv2, #0000000000000000\n000000010004da34\tmov\tw10, #0x8889\n000000010004da38\tmovk\tw10, #0x3c88, lsl #16\n000000010004da3c\tdup.4s\tv3, w10\n000000010004da40\tadrp\tx11, 7 ; 0x100054000\n000000010004da44\tldr\td4, [x11, #0xd00]\n000000010004da48\tfmov\ts5, w10\n000000010004da4c\tadd\tx10, x9, #0x4\n000000010004da50\tldur\ts6, [x9, #-0x4]\n000000010004da54\tldur\tq7, [x9, #-0x10]\n000000010004da58\tldr\td16, [x9]\n000000010004da5c\tfmul\ts6, s6, s1\n000000010004da60\tfadd\ts6, s6, s2\n000000010004da64\text.16b\tv17, v7, v16, #0xc\n000000010004da68\tmov.s\tv17[3], v6[0]\n000000010004da6c\tfmul.4s\tv6, v17, v3\n000000010004da70\tfadd.4s\tv6, v7, v6\n000000010004da74\tstur\tq6, [x9, #-0x10]\n000000010004da78\tld1.s\t{ v16 }[1], [x10]\n000000010004da7c\tfmul.2s\tv6, v16, v0\n000000010004da80\tfadd.2s\tv6, v6, v4\n000000010004da84\tfmul.2s\tv6, v6, v3\n000000010004da88\tfadd.2s\tv6, v16, v6\n000000010004da8c\tstr\td6, [x9]\n000000010004da90\tldr\ts6, [x9, #0xc]\n000000010004da94\tfadd\ts6, s6, s5\n000000010004da98\tstr\ts6, [x9, #0xc]\n000000010004da9c\tadd\tx9, x9, #0x44\n000000010004daa0\tsubs\tx8, x8, #0x1\n000000010004daa4\tb.ne\t0x10004da4c\n000000010004daa8\tldr\tx26, [x20, #0x18]\n000000010004daac\tcbz\tx26, 0x10004de48\n000000010004dab0\tstr\tx1, [sp]\n000000010004dab4\tmov\tx25, #0x0\n000000010004dab8\tldr\tx8, [x20, #0x10]\n000000010004dabc\tadd\tx27, x8, #0x1c\n000000010004dac0\tfmov\ts8, #2.00000000\n000000010004dac4\tadrp\tx28, 101 ; 0x1000b2000\n000000010004dac8\tb\t0x10004dae8\n000000010004dacc\tadd\tx1, x20, #0x28\n000000010004dad0\tmov\tx0, x24\n000000010004dad4\tmov\tx2, x25\n000000010004dad8\tbl\t_layouts.ML01.data.Data.spawn\n000000010004dadc\tadd\tx25, x25, #0x1\n000000010004dae0\tcmp\tx26, x25\n000000010004dae4\tb.eq\t0x10004dbc4\n000000010004dae8\tldr\ts0, [x27], #0x44\n000000010004daec\tfcmp\ts0, s8\n000000010004daf0\tb.ge\t0x10004dacc\n000000010004daf4\tldr\ts9, [x28, #0x8a8]\n000000010004daf8\tfcmp\ts9, #0.0\n000000010004dafc\tb.eq\t0x10004dadc\n000000010004db00\tldp\tx8, x9, [x20, #0x48]\n000000010004db04\tldp\tx11, x10, [x20, #0x58]\n000000010004db08\tadd\tx12, x10, x8\n000000010004db0c\tror\tx12, x12, #0x29\n000000010004db10\tadd\tx23, x12, x8\n000000010004db14\teor\tx11, x11, x8\n000000010004db18\teor\tx10, x9, x10\n000000010004db1c\teor\tx12, x11, x9\n000000010004db20\teor\tx8, x10, x8\n000000010004db24\tstp\tx8, x12, [x20, #0x48]\n000000010004db28\teor\tx8, x11, x9, lsl #17\n000000010004db2c\tror\tx9, x10, #0x13\n000000010004db30\tstp\tx8, x9, [x20, #0x58]\n000000010004db34\tclz\tx8, x23\n000000010004db38\tstrb\tw8, [sp, #0xf]\n000000010004db3c\tand\tw8, w8, #0xff\n000000010004db40\tand\tw9, w8, #0x7f\n000000010004db44\tcmp\tw9, #0x29\n000000010004db48\tb.hs\t0x10004db6c\n000000010004db4c\tmov\tw9, #0x7e\n000000010004db50\tsub\tw8, w9, w8\n000000010004db54\tand\tw9, w23, #0x7fffff\n000000010004db58\tbfi\tw9, w8, #23, #7\n000000010004db5c\tfmov\ts0, w9\n000000010004db60\tfcmp\ts9, s0\n000000010004db64\tb.gt\t0x10004dacc\n000000010004db68\tb\t0x10004dadc\n000000010004db6c\tadd\tx0, x20, #0x48\n000000010004db70\tadd\tx1, sp, #0x10\n000000010004db74\tmov\tw2, #0x8\n000000010004db78\tbl\t_Random.init__anon_29065.gen.fill\n000000010004db7c\tldr\tx8, [sp, #0x10]\n000000010004db80\tclz\tx8, x8\n000000010004db84\tadd\tw8, w8, #0x29\n000000010004db88\tand\tw8, w8, #0x7f\n000000010004db8c\tstrb\tw8, [sp, #0xf]\n000000010004db90\tcmp\tw8, #0x69\n000000010004db94\tb.ne\t0x10004db4c\n000000010004db98\tadd\tx0, x20, #0x48\n000000010004db9c\tadd\tx1, sp, #0x1c\n000000010004dba0\tmov\tw2, #0x4\n000000010004dba4\tbl\t_Random.init__anon_29065.gen.fill\n000000010004dba8\tldr\tw8, [sp, #0x1c]\n000000010004dbac\torr\tw8, w8, #0x7ff\n000000010004dbb0\tclz\tw8, w8\n000000010004dbb4\tadd\tw8, w8, #0x69\n000000010004dbb8\tand\tw8, w8, #0x7f\n000000010004dbbc\tstrb\tw8, [sp, #0xf]\n000000010004dbc0\tb\t0x10004db4c\n000000010004dbc4\tldr\tx8, [x20, #0x18]\n000000010004dbc8\tldr\tx3, [sp]\n000000010004dbcc\tcbz\tx8, 0x10004de48\n000000010004dbd0\tldr\tx10, [x20, #0x10]\n000000010004dbd4\tucvtf\ts0, w21\n000000010004dbd8\tucvtf\ts1, w19\n000000010004dbdc\tmov\tw9, w21\n000000010004dbe0\tadd\tx10, x10, #0x28\n000000010004dbe4\tmov\tw11, #0xff\n000000010004dbe8\tmov\tw12, #0x437f0000\n000000010004dbec\tfmov\ts2, w12\n000000010004dbf0\tfmov\ts3, #2.00000000\n000000010004dbf4\tfmov\ts4, #0.25000000\n000000010004dbf8\tb\t0x10004dc28\n000000010004dbfc\tadd\tx17, x15, #0x1\n000000010004dc00\tcmn\tw15, #0x1\n000000010004dc04\tccmp\tx17, x9, #0x0, ge\n000000010004dc08\tadd\tx16, x17, x16\n000000010004dc0c\tmov\tw15, #0x3\n000000010004dc10\tbfi\tx15, x16, #2, #61\n000000010004dc14\tccmp\tx15, x22, #0x2, lt\n000000010004dc18\tb.lo\t0x10004dda4\n000000010004dc1c\tadd\tx10, x10, #0x44\n000000010004dc20\tsubs\tx8, x8, #0x1\n000000010004dc24\tb.eq\t0x10004de48\n000000010004dc28\tldp\ts5, s6, [x10, #-0x28]\n000000010004dc2c\tldp\ts7, s16, [x10, #-0x8]\n000000010004dc30\tldr\ts17, [x10]\n000000010004dc34\tfcmp\ts7, s2\n000000010004dc38\tfcvtzs\tw12, s7\n000000010004dc3c\tcsel\tw12, w11, w12, ge\n000000010004dc40\tfcmp\ts7, #0.0\n000000010004dc44\tcsel\tw12, wzr, w12, ls\n000000010004dc48\tfcmp\ts16, s2\n000000010004dc4c\tfcvtzs\tw13, s16\n000000010004dc50\tcsel\tw13, w11, w13, ge\n000000010004dc54\tfcmp\ts16, #0.0\n000000010004dc58\tcsel\tw13, wzr, w13, ls\n000000010004dc5c\tfcmp\ts17, s2\n000000010004dc60\tfcvtzs\tw14, s17\n000000010004dc64\tcsel\tw14, w11, w14, ge\n000000010004dc68\tfcmp\ts17, #0.0\n000000010004dc6c\tcsel\tw14, wzr, w14, ls\n000000010004dc70\tfadd\ts5, s5, s3\n000000010004dc74\tfmul\ts5, s5, s4\n000000010004dc78\tfmul\ts5, s5, s0\n000000010004dc7c\tfcvtzs\tw15, s5\n000000010004dc80\tfsub\ts5, s3, s6\n000000010004dc84\tfmul\ts5, s5, s4\n000000010004dc88\tfmul\ts5, s5, s1\n000000010004dc8c\tfcvtzs\tw16, s5\n000000010004dc90\tsxtw\tx15, w15\n000000010004dc94\tcmp\tw16, w19\n000000010004dc98\tb.ge\t0x10004dd28\n000000010004dc9c\ttbnz\tw16, #0x1f, 0x10004dd28\n000000010004dca0\tmul\tw17, w16, w21\n000000010004dca4\ttbnz\tw15, #0x1f, 0x10004dd08\n000000010004dca8\tcmp\tw21, w15\n000000010004dcac\tadd\tx1, x17, x15\n000000010004dcb0\tmov\tw0, #0x3\n000000010004dcb4\tbfi\tx0, x1, #2, #61\n000000010004dcb8\tccmp\tx0, x22, #0x2, gt\n000000010004dcbc\tb.hs\t0x10004dd08\n000000010004dcc0\tlsl\tx1, x1, #2\n000000010004dcc4\tadd\tx1, x3, x1\n000000010004dcc8\tldrb\tw2, [x1]\n000000010004dccc\tadd\tw2, w2, w12\n000000010004dcd0\tcmp\tw2, #0xff\n000000010004dcd4\tcsel\tw2, w2, w11, lo\n000000010004dcd8\tstrb\tw2, [x1]\n000000010004dcdc\tldrb\tw2, [x1, #0x1]\n000000010004dce0\tadd\tw2, w2, w13\n000000010004dce4\tcmp\tw2, #0xff\n000000010004dce8\tcsel\tw2, w2, w11, lo\n000000010004dcec\tstrb\tw2, [x1, #0x1]\n000000010004dcf0\tldrb\tw2, [x1, #0x2]\n000000010004dcf4\tadd\tw2, w2, w14\n000000010004dcf8\tcmp\tw2, #0xff\n000000010004dcfc\tcsel\tw2, w2, w11, lo\n000000010004dd00\tstrb\tw2, [x1, #0x2]\n000000010004dd04\tstrb\tw11, [x3, x0]\n000000010004dd08\tadd\tx0, x15, #0x1\n000000010004dd0c\tcmn\tw15, #0x1\n000000010004dd10\tccmp\tx0, x9, #0x0, ge\n000000010004dd14\tadd\tx0, x0, x17\n000000010004dd18\tmov\tw17, #0x3\n000000010004dd1c\tbfi\tx17, x0, #2, #61\n000000010004dd20\tccmp\tx17, x22, #0x2, lt\n000000010004dd24\tb.lo\t0x10004ddf0\n000000010004dd28\tadd\tw16, w16, #0x1\n000000010004dd2c\tcmp\tw16, w19\n000000010004dd30\tb.ge\t0x10004dc1c\n000000010004dd34\ttbnz\tw16, #0x1f, 0x10004dc1c\n000000010004dd38\tmul\tw16, w16, w21\n000000010004dd3c\ttbnz\tw15, #0x1f, 0x10004dbfc\n000000010004dd40\tcmp\tw21, w15\n000000010004dd44\tadd\tx0, x16, x15\n000000010004dd48\tmov\tw17, #0x3\n000000010004dd4c\tbfi\tx17, x0, #2, #61\n000000010004dd50\tccmp\tx17, x22, #0x2, gt\n000000010004dd54\tb.hs\t0x10004dbfc\n000000010004dd58\tlsl\tx0, x0, #2\n000000010004dd5c\tadd\tx0, x3, x0\n000000010004dd60\tldrb\tw1, [x0]\n000000010004dd64\tadd\tw1, w1, w12\n000000010004dd68\tcmp\tw1, #0xff\n000000010004dd6c\tcsel\tw1, w1, w11, lo\n000000010004dd70\tstrb\tw1, [x0]\n000000010004dd74\tldrb\tw1, [x0, #0x1]\n000000010004dd78\tadd\tw1, w1, w13\n000000010004dd7c\tcmp\tw1, #0xff\n000000010004dd80\tcsel\tw1, w1, w11, lo\n000000010004dd84\tstrb\tw1, [x0, #0x1]\n000000010004dd88\tldrb\tw1, [x0, #0x2]\n000000010004dd8c\tadd\tw1, w1, w14\n000000010004dd90\tcmp\tw1, #0xff\n000000010004dd94\tcsel\tw1, w1, w11, lo\n000000010004dd98\tstrb\tw1, [x0, #0x2]\n000000010004dd9c\tstrb\tw11, [x3, x17]\n000000010004dda0\tb\t0x10004dbfc\n000000010004dda4\tlsl\tx16, x16, #2\n000000010004dda8\tadd\tx16, x3, x16\n000000010004ddac\tldrb\tw17, [x16]\n000000010004ddb0\tadd\tw12, w17, w12\n000000010004ddb4\tcmp\tw12, #0xff\n000000010004ddb8\tcsel\tw12, w12, w11, lo\n000000010004ddbc\tstrb\tw12, [x16]\n000000010004ddc0\tldrb\tw12, [x16, #0x1]\n000000010004ddc4\tadd\tw12, w12, w13\n000000010004ddc8\tcmp\tw12, #0xff\n000000010004ddcc\tcsel\tw12, w12, w11, lo\n000000010004ddd0\tstrb\tw12, [x16, #0x1]\n000000010004ddd4\tldrb\tw12, [x16, #0x2]\n000000010004ddd8\tadd\tw12, w12, w14\n000000010004dddc\tcmp\tw12, #0xff\n000000010004dde0\tcsel\tw12, w12, w11, lo\n000000010004dde4\tstrb\tw12, [x16, #0x2]\n000000010004dde8\tstrb\tw11, [x3, x15]\n000000010004ddec\tb\t0x10004dc1c\n000000010004ddf0\tlsl\tx0, x0, #2\n000000010004ddf4\tadd\tx0, x3, x0\n000000010004ddf8\tldrb\tw1, [x0]\n000000010004ddfc\tadd\tw1, w1, w12\n000000010004de00\tcmp\tw1, #0xff\n000000010004de04\tcsel\tw1, w1, w11, lo\n000000010004de08\tstrb\tw1, [x0]\n000000010004de0c\tldrb\tw1, [x0, #0x1]\n000000010004de10\tadd\tw1, w1, w13\n000000010004de14\tcmp\tw1, #0xff\n000000010004de18\tcsel\tw1, w1, w11, lo\n000000010004de1c\tstrb\tw1, [x0, #0x1]\n000000010004de20\tldrb\tw1, [x0, #0x2]\n000000010004de24\tadd\tw1, w1, w14\n000000010004de28\tcmp\tw1, #0xff\n000000010004de2c\tcsel\tw1, w1, w11, lo\n000000010004de30\tstrb\tw1, [x0, #0x2]\n000000010004de34\tstrb\tw11, [x3, x17]\n000000010004de38\tadd\tw16, w16, #0x1\n000000010004de3c\tcmp\tw16, w19\n000000010004de40\tb.lt\t0x10004dd34\n000000010004de44\tb\t0x10004dc1c\n000000010004de48\tldr\tx8, [x20, #0x68]\n000000010004de4c\tadd\tx8, x8, #0x1\n000000010004de50\tstr\tx8, [x20, #0x68]\n000000010004de54\tldp\tx29, x30, [sp, #0x80]\n000000010004de58\tldp\tx20, x19, [sp, #0x70]\n000000010004de5c\tldp\tx22, x21, [sp, #0x60]\n000000010004de60\tldp\tx24, x23, [sp, #0x50]\n000000010004de64\tldp\tx26, x25, [sp, #0x40]\n000000010004de68\tldp\tx28, x27, [sp, #0x30]\n000000010004de6c\tldp\td9, d8, [sp, #0x20]\n000000010004de70\tadd\tsp, sp, #0x90\n000000010004de74\tret",
-    "source_attributed": [
-      {
-        "source": "        pub fn step(self: *Self, dt: f32, fb: []u8, w: u32, h: u32) void {",
-        "asm": [
-          "sub\tsp, sp, #0x90",
-          "stp\td9, d8, [sp, #0x20]",
-          "stp\tx28, x27, [sp, #0x30]",
-          "stp\tx26, x25, [sp, #0x40]",
-          "stp\tx24, x23, [sp, #0x50]",
-          "stp\tx22, x21, [sp, #0x60]",
-          "stp\tx20, x19, [sp, #0x70]",
-          "stp\tx29, x30, [sp, #0x80]",
-          "add\tx29, sp, #0x80",
-          "mov\tx20, x0"
-        ]
+    "excerpt": "000000010004d864\tsub\tsp, sp, #0x90\n000000010004d868\tstp\td9, d8, [sp, #0x20]\n000000010004d86c\tstp\tx28, x27, [sp, #0x30]\n000000010004d870\tstp\tx26, x25, [sp, #0x40]\n000000010004d874\tstp\tx24, x23, [sp, #0x50]\n000000010004d878\tstp\tx22, x21, [sp, #0x60]\n000000010004d87c\tstp\tx20, x19, [sp, #0x70]\n000000010004d880\tstp\tx29, x30, [sp, #0x80]\n000000010004d884\tadd\tx29, sp, #0x80\n000000010004d888\tmov\tx20, x0\n000000010004d88c\tmov\tx24, x0\n000000010004d890\tldp\tx9, x8, [x24, #0x10]!\n000000010004d894\tcbz\tx8, 0x10004dcd0\n000000010004d898\tmov\tx19, x4\n000000010004d89c\tmov\tx21, x3\n000000010004d8a0\tmov\tx22, x2\n000000010004d8a4\tadd\tx9, x9, #0x10\n000000010004d8a8\tmov\tw10, #0xd70a\n000000010004d8ac\tmovk\tw10, #0x3ca3, lsl #16\n000000010004d8b0\tdup.2s\tv0, w10\n000000010004d8b4\tfmov\ts1, w10\n000000010004d8b8\tmovi.2d\tv2, #0000000000000000\n000000010004d8bc\tmov\tw10, #0x8889\n000000010004d8c0\tmovk\tw10, #0x3c88, lsl #16\n000000010004d8c4\tdup.4s\tv3, w10\n000000010004d8c8\tadrp\tx11, 7 ; 0x100054000\n000000010004d8cc\tldr\td4, [x11, #0xba0]\n000000010004d8d0\tfmov\ts5, w10\n000000010004d8d4\tadd\tx10, x9, #0x4\n000000010004d8d8\tldur\ts6, [x9, #-0x4]\n000000010004d8dc\tldur\tq7, [x9, #-0x10]\n000000010004d8e0\tldr\td16, [x9]\n000000010004d8e4\tfmul\ts6, s6, s1\n000000010004d8e8\tfadd\ts6, s6, s2\n000000010004d8ec\text.16b\tv17, v7, v16, #0xc\n000000010004d8f0\tmov.s\tv17[3], v6[0]\n000000010004d8f4\tfmul.4s\tv6, v17, v3\n000000010004d8f8\tfadd.4s\tv6, v7, v6\n000000010004d8fc\tstur\tq6, [x9, #-0x10]\n000000010004d900\tld1.s\t{ v16 }[1], [x10]\n000000010004d904\tfmul.2s\tv6, v16, v0\n000000010004d908\tfadd.2s\tv6, v6, v4\n000000010004d90c\tfmul.2s\tv6, v6, v3\n000000010004d910\tfadd.2s\tv6, v16, v6\n000000010004d914\tstr\td6, [x9]\n000000010004d918\tldr\ts6, [x9, #0xc]\n000000010004d91c\tfadd\ts6, s6, s5\n000000010004d920\tstr\ts6, [x9, #0xc]\n000000010004d924\tadd\tx9, x9, #0x44\n000000010004d928\tsubs\tx8, x8, #0x1\n000000010004d92c\tb.ne\t0x10004d8d4\n000000010004d930\tldr\tx26, [x20, #0x18]\n000000010004d934\tcbz\tx26, 0x10004dcd0\n000000010004d938\tstr\tx1, [sp]\n000000010004d93c\tmov\tx25, #0x0\n000000010004d940\tldr\tx8, [x20, #0x10]\n000000010004d944\tadd\tx27, x8, #0x1c\n000000010004d948\tfmov\ts8, #2.00000000\n000000010004d94c\tadrp\tx28, 101 ; 0x1000b2000\n000000010004d950\tb\t0x10004d970\n000000010004d954\tadd\tx1, x20, #0x28\n000000010004d958\tmov\tx0, x24\n000000010004d95c\tmov\tx2, x25\n000000010004d960\tbl\t_layouts.ML01.data.Data.spawn\n000000010004d964\tadd\tx25, x25, #0x1\n000000010004d968\tcmp\tx26, x25\n000000010004d96c\tb.eq\t0x10004da4c\n000000010004d970\tldr\ts0, [x27], #0x44\n000000010004d974\tfcmp\ts0, s8\n000000010004d978\tb.ge\t0x10004d954\n000000010004d97c\tldr\ts9, [x28, #0x8a8]\n000000010004d980\tfcmp\ts9, #0.0\n000000010004d984\tb.eq\t0x10004d964\n000000010004d988\tldp\tx8, x9, [x20, #0x48]\n000000010004d98c\tldp\tx11, x10, [x20, #0x58]\n000000010004d990\tadd\tx12, x10, x8\n000000010004d994\tror\tx12, x12, #0x29\n000000010004d998\tadd\tx23, x12, x8\n000000010004d99c\teor\tx11, x11, x8\n000000010004d9a0\teor\tx10, x9, x10\n000000010004d9a4\teor\tx12, x11, x9\n000000010004d9a8\teor\tx8, x10, x8\n000000010004d9ac\tstp\tx8, x12, [x20, #0x48]\n000000010004d9b0\teor\tx8, x11, x9, lsl #17\n000000010004d9b4\tror\tx9, x10, #0x13\n000000010004d9b8\tstp\tx8, x9, [x20, #0x58]\n000000010004d9bc\tclz\tx8, x23\n000000010004d9c0\tstrb\tw8, [sp, #0xf]\n000000010004d9c4\tand\tw8, w8, #0xff\n000000010004d9c8\tand\tw9, w8, #0x7f\n000000010004d9cc\tcmp\tw9, #0x29\n000000010004d9d0\tb.hs\t0x10004d9f4\n000000010004d9d4\tmov\tw9, #0x7e\n000000010004d9d8\tsub\tw8, w9, w8\n000000010004d9dc\tand\tw9, w23, #0x7fffff\n000000010004d9e0\tbfi\tw9, w8, #23, #7\n000000010004d9e4\tfmov\ts0, w9\n000000010004d9e8\tfcmp\ts9, s0\n000000010004d9ec\tb.gt\t0x10004d954\n000000010004d9f0\tb\t0x10004d964\n000000010004d9f4\tadd\tx0, x20, #0x48\n000000010004d9f8\tadd\tx1, sp, #0x10\n000000010004d9fc\tmov\tw2, #0x8\n000000010004da00\tbl\t_Random.init__anon_28835.gen.fill\n000000010004da04\tldr\tx8, [sp, #0x10]\n000000010004da08\tclz\tx8, x8\n000000010004da0c\tadd\tw8, w8, #0x29\n000000010004da10\tand\tw8, w8, #0x7f\n000000010004da14\tstrb\tw8, [sp, #0xf]\n000000010004da18\tcmp\tw8, #0x69\n000000010004da1c\tb.ne\t0x10004d9d4\n000000010004da20\tadd\tx0, x20, #0x48\n000000010004da24\tadd\tx1, sp, #0x1c\n000000010004da28\tmov\tw2, #0x4\n000000010004da2c\tbl\t_Random.init__anon_28835.gen.fill\n000000010004da30\tldr\tw8, [sp, #0x1c]\n000000010004da34\torr\tw8, w8, #0x7ff\n000000010004da38\tclz\tw8, w8\n000000010004da3c\tadd\tw8, w8, #0x69\n000000010004da40\tand\tw8, w8, #0x7f\n000000010004da44\tstrb\tw8, [sp, #0xf]\n000000010004da48\tb\t0x10004d9d4\n000000010004da4c\tldr\tx8, [x20, #0x18]\n000000010004da50\tldr\tx3, [sp]\n000000010004da54\tcbz\tx8, 0x10004dcd0\n000000010004da58\tldr\tx10, [x20, #0x10]\n000000010004da5c\tucvtf\ts0, w21\n000000010004da60\tucvtf\ts1, w19\n000000010004da64\tmov\tw9, w21\n000000010004da68\tadd\tx10, x10, #0x28\n000000010004da6c\tmov\tw11, #0xff\n000000010004da70\tmov\tw12, #0x437f0000\n000000010004da74\tfmov\ts2, w12\n000000010004da78\tfmov\ts3, #2.00000000\n000000010004da7c\tfmov\ts4, #0.25000000\n000000010004da80\tb\t0x10004dab0\n000000010004da84\tadd\tx17, x15, #0x1\n000000010004da88\tcmn\tw15, #0x1\n000000010004da8c\tccmp\tx17, x9, #0x0, ge\n000000010004da90\tadd\tx16, x17, x16\n000000010004da94\tmov\tw15, #0x3\n000000010004da98\tbfi\tx15, x16, #2, #61\n000000010004da9c\tccmp\tx15, x22, #0x2, lt\n000000010004daa0\tb.lo\t0x10004dc2c\n000000010004daa4\tadd\tx10, x10, #0x44\n000000010004daa8\tsubs\tx8, x8, #0x1\n000000010004daac\tb.eq\t0x10004dcd0\n000000010004dab0\tldp\ts5, s6, [x10, #-0x28]\n000000010004dab4\tldp\ts7, s16, [x10, #-0x8]\n000000010004dab8\tldr\ts17, [x10]\n000000010004dabc\tfcmp\ts7, s2\n000000010004dac0\tfcvtzs\tw12, s7\n000000010004dac4\tcsel\tw12, w11, w12, ge\n000000010004dac8\tfcmp\ts7, #0.0\n000000010004dacc\tcsel\tw12, wzr, w12, ls\n000000010004dad0\tfcmp\ts16, s2\n000000010004dad4\tfcvtzs\tw13, s16\n000000010004dad8\tcsel\tw13, w11, w13, ge\n000000010004dadc\tfcmp\ts16, #0.0\n000000010004dae0\tcsel\tw13, wzr, w13, ls\n000000010004dae4\tfcmp\ts17, s2\n000000010004dae8\tfcvtzs\tw14, s17\n000000010004daec\tcsel\tw14, w11, w14, ge\n000000010004daf0\tfcmp\ts17, #0.0\n000000010004daf4\tcsel\tw14, wzr, w14, ls\n000000010004daf8\tfadd\ts5, s5, s3\n000000010004dafc\tfmul\ts5, s5, s4\n000000010004db00\tfmul\ts5, s5, s0\n000000010004db04\tfcvtzs\tw15, s5\n000000010004db08\tfsub\ts5, s3, s6\n000000010004db0c\tfmul\ts5, s5, s4\n000000010004db10\tfmul\ts5, s5, s1\n000000010004db14\tfcvtzs\tw16, s5\n000000010004db18\tsxtw\tx15, w15\n000000010004db1c\tcmp\tw16, w19\n000000010004db20\tb.ge\t0x10004dbb0\n000000010004db24\ttbnz\tw16, #0x1f, 0x10004dbb0\n000000010004db28\tmul\tw17, w16, w21\n000000010004db2c\ttbnz\tw15, #0x1f, 0x10004db90\n000000010004db30\tcmp\tw21, w15\n000000010004db34\tadd\tx1, x17, x15\n000000010004db38\tmov\tw0, #0x3\n000000010004db3c\tbfi\tx0, x1, #2, #61\n000000010004db40\tccmp\tx0, x22, #0x2, gt\n000000010004db44\tb.hs\t0x10004db90\n000000010004db48\tlsl\tx1, x1, #2\n000000010004db4c\tadd\tx1, x3, x1\n000000010004db50\tldrb\tw2, [x1]\n000000010004db54\tadd\tw2, w2, w12\n000000010004db58\tcmp\tw2, #0xff\n000000010004db5c\tcsel\tw2, w2, w11, lo\n000000010004db60\tstrb\tw2, [x1]\n000000010004db64\tldrb\tw2, [x1, #0x1]\n000000010004db68\tadd\tw2, w2, w13\n000000010004db6c\tcmp\tw2, #0xff\n000000010004db70\tcsel\tw2, w2, w11, lo\n000000010004db74\tstrb\tw2, [x1, #0x1]\n000000010004db78\tldrb\tw2, [x1, #0x2]\n000000010004db7c\tadd\tw2, w2, w14\n000000010004db80\tcmp\tw2, #0xff\n000000010004db84\tcsel\tw2, w2, w11, lo\n000000010004db88\tstrb\tw2, [x1, #0x2]\n000000010004db8c\tstrb\tw11, [x3, x0]\n000000010004db90\tadd\tx0, x15, #0x1\n000000010004db94\tcmn\tw15, #0x1\n000000010004db98\tccmp\tx0, x9, #0x0, ge\n000000010004db9c\tadd\tx0, x0, x17\n000000010004dba0\tmov\tw17, #0x3\n000000010004dba4\tbfi\tx17, x0, #2, #61\n000000010004dba8\tccmp\tx17, x22, #0x2, lt\n000000010004dbac\tb.lo\t0x10004dc78\n000000010004dbb0\tadd\tw16, w16, #0x1\n000000010004dbb4\tcmp\tw16, w19\n000000010004dbb8\tb.ge\t0x10004daa4\n000000010004dbbc\ttbnz\tw16, #0x1f, 0x10004daa4\n000000010004dbc0\tmul\tw16, w16, w21\n000000010004dbc4\ttbnz\tw15, #0x1f, 0x10004da84\n000000010004dbc8\tcmp\tw21, w15\n000000010004dbcc\tadd\tx0, x16, x15\n000000010004dbd0\tmov\tw17, #0x3\n000000010004dbd4\tbfi\tx17, x0, #2, #61\n000000010004dbd8\tccmp\tx17, x22, #0x2, gt\n000000010004dbdc\tb.hs\t0x10004da84\n000000010004dbe0\tlsl\tx0, x0, #2\n000000010004dbe4\tadd\tx0, x3, x0\n000000010004dbe8\tldrb\tw1, [x0]\n000000010004dbec\tadd\tw1, w1, w12\n000000010004dbf0\tcmp\tw1, #0xff\n000000010004dbf4\tcsel\tw1, w1, w11, lo\n000000010004dbf8\tstrb\tw1, [x0]\n000000010004dbfc\tldrb\tw1, [x0, #0x1]\n000000010004dc00\tadd\tw1, w1, w13\n000000010004dc04\tcmp\tw1, #0xff\n000000010004dc08\tcsel\tw1, w1, w11, lo\n000000010004dc0c\tstrb\tw1, [x0, #0x1]\n000000010004dc10\tldrb\tw1, [x0, #0x2]\n000000010004dc14\tadd\tw1, w1, w14\n000000010004dc18\tcmp\tw1, #0xff\n000000010004dc1c\tcsel\tw1, w1, w11, lo\n000000010004dc20\tstrb\tw1, [x0, #0x2]\n000000010004dc24\tstrb\tw11, [x3, x17]\n000000010004dc28\tb\t0x10004da84\n000000010004dc2c\tlsl\tx16, x16, #2\n000000010004dc30\tadd\tx16, x3, x16\n000000010004dc34\tldrb\tw17, [x16]\n000000010004dc38\tadd\tw12, w17, w12\n000000010004dc3c\tcmp\tw12, #0xff\n000000010004dc40\tcsel\tw12, w12, w11, lo\n000000010004dc44\tstrb\tw12, [x16]\n000000010004dc48\tldrb\tw12, [x16, #0x1]\n000000010004dc4c\tadd\tw12, w12, w13\n000000010004dc50\tcmp\tw12, #0xff\n000000010004dc54\tcsel\tw12, w12, w11, lo\n000000010004dc58\tstrb\tw12, [x16, #0x1]\n000000010004dc5c\tldrb\tw12, [x16, #0x2]\n000000010004dc60\tadd\tw12, w12, w14\n000000010004dc64\tcmp\tw12, #0xff\n000000010004dc68\tcsel\tw12, w12, w11, lo\n000000010004dc6c\tstrb\tw12, [x16, #0x2]\n000000010004dc70\tstrb\tw11, [x3, x15]\n000000010004dc74\tb\t0x10004daa4\n000000010004dc78\tlsl\tx0, x0, #2\n000000010004dc7c\tadd\tx0, x3, x0\n000000010004dc80\tldrb\tw1, [x0]\n000000010004dc84\tadd\tw1, w1, w12\n000000010004dc88\tcmp\tw1, #0xff\n000000010004dc8c\tcsel\tw1, w1, w11, lo\n000000010004dc90\tstrb\tw1, [x0]\n000000010004dc94\tldrb\tw1, [x0, #0x1]\n000000010004dc98\tadd\tw1, w1, w13\n000000010004dc9c\tcmp\tw1, #0xff\n000000010004dca0\tcsel\tw1, w1, w11, lo\n000000010004dca4\tstrb\tw1, [x0, #0x1]\n000000010004dca8\tldrb\tw1, [x0, #0x2]\n000000010004dcac\tadd\tw1, w1, w14\n000000010004dcb0\tcmp\tw1, #0xff\n000000010004dcb4\tcsel\tw1, w1, w11, lo\n000000010004dcb8\tstrb\tw1, [x0, #0x2]\n000000010004dcbc\tstrb\tw11, [x3, x17]\n000000010004dcc0\tadd\tw16, w16, #0x1\n000000010004dcc4\tcmp\tw16, w19\n000000010004dcc8\tb.lt\t0x10004dbbc\n000000010004dccc\tb\t0x10004daa4\n000000010004dcd0\tldr\tx8, [x20, #0x68]\n000000010004dcd4\tadd\tx8, x8, #0x1\n000000010004dcd8\tstr\tx8, [x20, #0x68]\n000000010004dcdc\tldp\tx29, x30, [sp, #0x80]\n000000010004dce0\tldp\tx20, x19, [sp, #0x70]\n000000010004dce4\tldp\tx22, x21, [sp, #0x60]\n000000010004dce8\tldp\tx24, x23, [sp, #0x50]\n000000010004dcec\tldp\tx26, x25, [sp, #0x40]\n000000010004dcf0\tldp\tx28, x27, [sp, #0x30]\n000000010004dcf4\tldp\td9, d8, [sp, #0x20]\n000000010004dcf8\tadd\tsp, sp, #0x90\n000000010004dcfc\tret",
+    "insns": [
+      {
+        "a": 4295284836,
+        "m": "sub",
+        "o": "sp, sp, #0x90",
+        "cls": "other"
       },
       {
-        "source": "        for (data.particles) |*p| {",
-        "asm": [
-          "mov\tx24, x0",
-          "ldp\tx9, x8, [x24, #0x10]!",
-          "cbz\tx8, 0x10004de48",
-          "mov\tx19, x4",
-          "mov\tx21, x3",
-          "mov\tx22, x2",
-          "add\tx9, x9, #0x10",
-          "mov\tw10, #0xd70a",
-          "movk\tw10, #0x3ca3, lsl #16",
-          "dup.2s\tv0, w10",
-          "fmov\ts1, w10",
-          "movi.2d\tv2, #0000000000000000",
-          "mov\tw10, #0x8889",
-          "movk\tw10, #0x3c88, lsl #16",
-          "dup.4s\tv3, w10",
-          "adrp\tx11, 7 ; 0x100054000",
-          "ldr\td4, [x11, #0xd00]",
-          "fmov\ts5, w10"
-        ]
+        "a": 4295284840,
+        "m": "stp",
+        "o": "d9, d8, [sp, #0x20]",
+        "cls": "store"
       },
       {
-        "source": "            p.pos = p.pos.add(p.vel.scale(dt));",
-        "asm": [
-          "add\tx10, x9, #0x4",
-          "ldur\ts6, [x9, #-0x4]",
-          "ldur\tq7, [x9, #-0x10]",
-          "ldr\td16, [x9]"
-        ]
+        "a": 4295284844,
+        "m": "stp",
+        "o": "x28, x27, [sp, #0x30]",
+        "cls": "store"
       },
       {
-        "source": "                .x = v.x + (config.gravity.x + config.drag * v.x) * dt,",
-        "asm": [
-          "fmul\ts6, s6, s1",
-          "fadd\ts6, s6, s2",
-          "ext.16b\tv17, v7, v16, #0xc",
-          "mov.s\tv17[3], v6[0]",
-          "fmul.4s\tv6, v17, v3",
-          "fadd.4s\tv6, v7, v6"
-        ]
+        "a": 4295284848,
+        "m": "stp",
+        "o": "x26, x25, [sp, #0x40]",
+        "cls": "store"
       },
       {
-        "source": "            p.pos = p.pos.add(p.vel.scale(dt));",
-        "asm": [
-          "stur\tq6, [x9, #-0x10]"
-        ]
+        "a": 4295284852,
+        "m": "stp",
+        "o": "x24, x23, [sp, #0x50]",
+        "cls": "store"
       },
       {
-        "source": "                .y = v.y + (config.gravity.y + config.drag * v.y) * dt,",
-        "asm": [
-          "ld1.s\t{ v16 }[1], [x10]",
-          "fmul.2s\tv6, v16, v0",
-          "fadd.2s\tv6, v6, v4",
-          "fmul.2s\tv6, v6, v3",
-          "fadd.2s\tv6, v16, v6",
-          "str\td6, [x9]"
-        ]
+        "a": 4295284856,
+        "m": "stp",
+        "o": "x22, x21, [sp, #0x60]",
+        "cls": "store"
       },
       {
-        "source": "            p.age += dt;",
-        "asm": [
-          "ldr\ts6, [x9, #0xc]",
-          "fadd\ts6, s6, s5",
-          "str\ts6, [x9, #0xc]"
-        ]
+        "a": 4295284860,
+        "m": "stp",
+        "o": "x20, x19, [sp, #0x70]",
+        "cls": "store"
       },
       {
-        "source": "        for (data.particles) |*p| {",
-        "asm": [
-          "add\tx9, x9, #0x44",
-          "subs\tx8, x8, #0x1",
-          "b.ne\t0x10004da4c",
-          "ldr\tx26, [x20, #0x18]",
-          "cbz\tx26, 0x10004de48",
-          "str\tx1, [sp]",
-          "mov\tx25, #0x0",
-          "ldr\tx8, [x20, #0x10]"
-        ]
+        "a": 4295284864,
+        "m": "stp",
+        "o": "x29, x30, [sp, #0x80]",
+        "cls": "store"
       },
       {
-        "source": "        for (data.particles, 0..) |*p, i| {",
-        "asm": [
-          "add\tx27, x8, #0x1c",
-          "fmov\ts8, #2.00000000",
-          "adrp\tx28, 101 ; 0x1000b2000",
-          "b\t0x10004dae8"
-        ]
+        "a": 4295284868,
+        "m": "add",
+        "o": "x29, sp, #0x80",
+        "cls": "other"
       },
       {
-        "source": "                data.spawn(&sim.rng, i);",
-        "asm": [
-          "add\tx1, x20, #0x28",
-          "mov\tx0, x24",
-          "mov\tx2, x25",
-          "bl\t_layouts.ML01.data.Data.spawn",
-          "add\tx25, x25, #0x1",
-          "cmp\tx26, x25"
-        ]
+        "a": 4295284872,
+        "m": "mov",
+        "o": "x20, x0",
+        "cls": "other"
       },
       {
-        "source": "        for (data.particles, 0..) |*p, i| {",
-        "asm": [
-          "b.eq\t0x10004dbc4"
-        ]
+        "a": 4295284876,
+        "m": "mov",
+        "o": "x24, x0",
+        "cls": "other"
       },
       {
-        "source": "            if (config.isDead(p.age, &sim.kill_rng)) {",
-        "asm": [
-          "ldr\ts0, [x27], #0x44"
-        ]
+        "a": 4295284880,
+        "m": "ldp",
+        "o": "x9, x8, [x24, #0x10]!",
+        "cls": "load"
       },
       {
-        "source": "    if (age >= kill_age) return true;",
-        "asm": [
-          "fcmp\ts0, s8",
-          "b.ge\t0x10004dacc"
-        ]
+        "a": 4295284884,
+        "m": "cbz",
+        "o": "x8, 0x10004dcd0",
+        "cls": "branch",
+        "bt": 283
       },
       {
-        "source": "    if (q == 0) return false; // runtime short-circuit; no kill-RNG draw at q=0",
-        "asm": [
-          "ldr\ts9, [x28, #0x8a8]",
-          "fcmp\ts9, #0.0",
-          "b.eq\t0x10004dadc"
-        ]
+        "a": 4295284888,
+        "m": "mov",
+        "o": "x19, x4",
+        "cls": "other"
       },
       {
-        "source": "const r = math.rotl(u64, self.s[0] +% self.s[3], 23) +% self.s[0];",
-        "asm": [
-          "ldp\tx8, x9, [x20, #0x48]",
-          "ldp\tx11, x10, [x20, #0x58]",
-          "add\tx12, x10, x8",
-          "ror\tx12, x12, #0x29",
-          "add\tx23, x12, x8"
-        ]
+        "a": 4295284892,
+        "m": "mov",
+        "o": "x21, x3",
+        "cls": "other"
       },
       {
-        "source": "self.s[2] ^= self.s[0];",
-        "asm": [
-          "eor\tx11, x11, x8"
-        ]
+        "a": 4295284896,
+        "m": "mov",
+        "o": "x22, x2",
+        "cls": "other"
       },
       {
-        "source": "self.s[3] ^= self.s[1];",
-        "asm": [
-          "eor\tx10, x9, x10"
-        ]
+        "a": 4295284900,
+        "m": "add",
+        "o": "x9, x9, #0x10",
+        "cls": "other"
       },
       {
-        "source": "self.s[1] ^= self.s[2];",
-        "asm": [
-          "eor\tx12, x11, x9"
-        ]
+        "a": 4295284904,
+        "m": "mov",
+        "o": "w10, #0xd70a",
+        "cls": "other"
       },
       {
-        "source": "self.s[0] ^= self.s[3];",
-        "asm": [
-          "eor\tx8, x10, x8"
-        ]
+        "a": 4295284908,
+        "m": "movk",
+        "o": "w10, #0x3ca3, lsl #16",
+        "cls": "other"
       },
       {
-        "source": "self.s[1] ^= self.s[2];",
-        "asm": [
-          "stp\tx8, x12, [x20, #0x48]"
-        ]
+        "a": 4295284912,
+        "m": "dup.2s",
+        "o": "v0, w10",
+        "cls": "vec"
       },
       {
-        "source": "self.s[2] ^= t;",
-        "asm": [
-          "eor\tx8, x11, x9, lsl #17"
-        ]
+        "a": 4295284916,
+        "m": "fmov",
+        "o": "s1, w10",
+        "cls": "fp"
       },
       {
-        "source": "return x << ar | x >> 1 +% ~ar;",
-        "asm": [
-          "ror\tx9, x10, #0x13"
-        ]
+        "a": 4295284920,
+        "m": "movi.2d",
+        "o": "v2, #0000000000000000",
+        "cls": "vec"
       },
       {
-        "source": "self.s[2] ^= t;",
-        "asm": [
-          "stp\tx8, x9, [x20, #0x58]",
-          "clz\tx8, x23",
-          "strb\tw8, [sp, #0xf]",
-          "and\tw8, w8, #0xff",
-          "and\tw9, w8, #0x7f"
-        ]
+        "a": 4295284924,
+        "m": "mov",
+        "o": "w10, #0x8889",
+        "cls": "other"
       },
       {
-        "source": "if (rand_lz >= 41) {",
-        "asm": [
-          "cmp\tw9, #0x29",
-          "b.hs\t0x10004db6c"
-        ]
+        "a": 4295284928,
+        "m": "movk",
+        "o": "w10, #0x3c88, lsl #16",
+        "cls": "other"
       },
       {
-        "source": "const exponent = @as(u32, 126 - rand_lz) << 23;",
-        "asm": [
-          "mov\tw9, #0x7e",
-          "sub\tw8, w9, w8"
-        ]
+        "a": 4295284932,
+        "m": "dup.4s",
+        "o": "v3, w10",
+        "cls": "vec"
       },
       {
-        "source": "return @bitCast(exponent | mantissa);",
-        "asm": [
-          "and\tw9, w23, #0x7fffff",
-          "bfi\tw9, w8, #23, #7",
-          "fmov\ts0, w9"
-        ]
+        "a": 4295284936,
+        "m": "adrp",
+        "o": "x11, 7 ; 0x100054000",
+        "cls": "other"
       },
       {
-        "source": "            if (config.isDead(p.age, &sim.kill_rng)) {",
-        "asm": [
-          "fcmp\ts9, s0",
-          "b.gt\t0x10004dacc",
-          "b\t0x10004dadc",
-          "add\tx0, x20, #0x48",
-          "add\tx1, sp, #0x10"
-        ]
+        "a": 4295284940,
+        "m": "ldr",
+        "o": "d4, [x11, #0xba0]",
+        "cls": "load"
       },
       {
-        "source": "r.fillFn(r.ptr, buf);",
-        "asm": [
-          "mov\tw2, #0x8",
-          "bl\t_Random.init__anon_29065.gen.fill"
-        ]
+        "a": 4295284944,
+        "m": "fmov",
+        "o": "s5, w10",
+        "cls": "fp"
       },
       {
-        "source": "const value: T = @bitCast(buffer.*);",
-        "asm": [
-          "ldr\tx8, [sp, #0x10]"
-        ]
+        "a": 4295284948,
+        "m": "add",
+        "o": "x10, x9, #0x4",
+        "cls": "other"
       },
       {
-        "source": "rand_lz = 41 + @clz(r.int(u64));",
-        "asm": [
-          "clz\tx8, x8",
-          "add\tw8, w8, #0x29",
-          "and\tw8, w8, #0x7f",
-          "strb\tw8, [sp, #0xf]"
-        ]
+        "a": 4295284952,
+        "m": "ldur",
+        "o": "s6, [x9, #-0x4]",
+        "cls": "load"
       },
       {
-        "source": "if (rand_lz == 41 + 64) {",
-        "asm": [
-          "cmp\tw8, #0x69",
-          "b.ne\t0x10004db4c",
-          "add\tx0, x20, #0x48",
-          "add\tx1, sp, #0x1c",
-          "mov\tw2, #0x4"
-        ]
+        "a": 4295284956,
+        "m": "ldur",
+        "o": "q7, [x9, #-0x10]",
+        "cls": "load"
       },
       {
-        "source": "r.fillFn(r.ptr, buf);",
-        "asm": [
-          "bl\t_Random.init__anon_29065.gen.fill"
-        ]
+        "a": 4295284960,
+        "m": "ldr",
+        "o": "d16, [x9]",
+        "cls": "load"
       },
       {
-        "source": "const value: T = @bitCast(buffer.*);",
-        "asm": [
-          "ldr\tw8, [sp, #0x1c]"
-        ]
+        "a": 4295284964,
+        "m": "fmul",
+        "o": "s6, s6, s1",
+        "cls": "fp"
       },
       {
-        "source": "rand_lz += @clz(r.int(u32) | 0x7FF);",
-        "asm": [
-          "orr\tw8, w8, #0x7ff",
-          "clz\tw8, w8",
-          "add\tw8, w8, #0x69",
-          "and\tw8, w8, #0x7f",
-          "strb\tw8, [sp, #0xf]",
-          "b\t0x10004db4c"
-        ]
+        "a": 4295284968,
+        "m": "fadd",
+        "o": "s6, s6, s2",
+        "cls": "fp"
       },
       {
-        "source": "        for (data.particles) |p| {",
-        "asm": [
-          "ldr\tx8, [x20, #0x18]",
-          "ldr\tx3, [sp]",
-          "cbz\tx8, 0x10004de48",
-          "ldr\tx10, [x20, #0x10]",
-          "ucvtf\ts0, w21",
-          "ucvtf\ts1, w19",
-          "mov\tw9, w21",
-          "add\tx10, x10, #0x28",
-          "mov\tw11, #0xff",
-          "mov\tw12, #0x437f0000",
-          "fmov\ts2, w12",
-          "fmov\ts3, #2.00000000",
-          "fmov\ts4, #0.25000000",
-          "b\t0x10004dc28"
-        ]
+        "a": 4295284972,
+        "m": "ext.16b",
+        "o": "v17, v7, v16, #0xc",
+        "cls": "vec"
       },
       {
-        "source": "            const fx = px + dx;",
-        "asm": [
-          "add\tx17, x15, #0x1"
-        ]
+        "a": 4295284976,
+        "m": "mov.s",
+        "o": "v17[3], v6[0]",
+        "cls": "other"
       },
       {
-        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
-        "asm": [
-          "cmn\tw15, #0x1",
-          "ccmp\tx17, x9, #0x0, ge"
-        ]
+        "a": 4295284980,
+        "m": "fmul.4s",
+        "o": "v6, v17, v3",
+        "cls": "fp"
       },
       {
-        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
-        "asm": [
-          "add\tx16, x17, x16"
-        ]
+        "a": 4295284984,
+        "m": "fadd.4s",
+        "o": "v6, v7, v6",
+        "cls": "fp"
       },
       {
-        "source": "            if (i + 3 >= fb.len) continue;",
-        "asm": [
-          "mov\tw15, #0x3",
-          "bfi\tx15, x16, #2, #61",
-          "ccmp\tx15, x22, #0x2, lt",
-          "b.lo\t0x10004dda4",
-          "add\tx10, x10, #0x44",
-          "subs\tx8, x8, #0x1"
-        ]
+        "a": 4295284988,
+        "m": "stur",
+        "o": "q6, [x9, #-0x10]",
+        "cls": "store"
       },
       {
-        "source": "        for (data.particles) |p| {",
-        "asm": [
-          "b.eq\t0x10004de48",
-          "ldp\ts5, s6, [x10, #-0x28]",
-          "ldp\ts7, s16, [x10, #-0x8]",
-          "ldr\ts17, [x10]"
-        ]
+        "a": 4295284992,
+        "m": "ld1.s",
+        "o": "{ v16 }[1], [x10]",
+        "cls": "vload"
       },
       {
-        "source": "    if (v >= 255) return 255;",
-        "asm": [
-          "fcmp\ts7, s2"
-        ]
+        "a": 4295284996,
+        "m": "fmul.2s",
+        "o": "v6, v16, v0",
+        "cls": "fp"
       },
       {
-        "source": "    return @intFromFloat(v);",
-        "asm": [
-          "fcvtzs\tw12, s7"
-        ]
+        "a": 4295285000,
+        "m": "fadd.2s",
+        "o": "v6, v6, v4",
+        "cls": "fp"
       },
       {
-        "source": "    if (v >= 255) return 255;",
-        "asm": [
-          "csel\tw12, w11, w12, ge"
-        ]
+        "a": 4295285004,
+        "m": "fmul.2s",
+        "o": "v6, v6, v3",
+        "cls": "fp"
       },
       {
-        "source": "    if (v <= 0) return 0;",
-        "asm": [
-          "fcmp\ts7, #0.0",
-          "csel\tw12, wzr, w12, ls"
-        ]
+        "a": 4295285008,
+        "m": "fadd.2s",
+        "o": "v6, v16, v6",
+        "cls": "fp"
       },
       {
-        "source": "    if (v >= 255) return 255;",
-        "asm": [
-          "fcmp\ts16, s2"
-        ]
+        "a": 4295285012,
+        "m": "str",
+        "o": "d6, [x9]",
+        "cls": "store"
       },
       {
-        "source": "    return @intFromFloat(v);",
-        "asm": [
-          "fcvtzs\tw13, s16"
-        ]
+        "a": 4295285016,
+        "m": "ldr",
+        "o": "s6, [x9, #0xc]",
+        "cls": "load"
       },
       {
-        "source": "    if (v >= 255) return 255;",
-        "asm": [
-          "csel\tw13, w11, w13, ge",
-          "fcmp\ts16, #0.0",
-          "csel\tw13, wzr, w13, ls",
-          "fcmp\ts17, s2",
-          "fcvtzs\tw14, s17",
-          "csel\tw14, w11, w14, ge"
-        ]
+        "a": 4295285020,
+        "m": "fadd",
+        "o": "s6, s6, s5",
+        "cls": "fp"
       },
       {
-        "source": "    if (v <= 0) return 0;",
-        "asm": [
-          "fcmp\ts17, #0.0",
-          "csel\tw14, wzr, w14, ls"
-        ]
+        "a": 4295285024,
+        "m": "str",
+        "o": "s6, [x9, #0xc]",
+        "cls": "store"
       },
       {
-        "source": "    const norm = (x + config.view_half) / (2.0 * config.view_half); // [0,1)",
-        "asm": [
-          "fadd\ts5, s5, s3",
-          "fmul\ts5, s5, s4"
-        ]
+        "a": 4295285028,
+        "m": "add",
+        "o": "x9, x9, #0x44",
+        "cls": "other"
       },
       {
-        "source": "    return @intFromFloat(norm * half);",
-        "asm": [
-          "fmul\ts5, s5, s0",
-          "fcvtzs\tw15, s5"
-        ]
+        "a": 4295285032,
+        "m": "subs",
+        "o": "x8, x8, #0x1",
+        "cls": "other"
       },
       {
-        "source": "    const norm = (config.view_half - y) / (2.0 * config.view_half); // [0,1)",
-        "asm": [
-          "fsub\ts5, s3, s6",
-          "fmul\ts5, s5, s4",
-          "fmul\ts5, s5, s1",
-          "fcvtzs\tw16, s5",
-          "sxtw\tx15, w15",
-          "cmp\tw16, w19",
-          "b.ge\t0x10004dd28",
-          "tbnz\tw16, #0x1f, 0x10004dd28",
-          "mul\tw17, w16, w21"
-        ]
+        "a": 4295285036,
+        "m": "b.ne",
+        "o": "0x10004d8d4",
+        "cls": "branch",
+        "bt": 28
       },
       {
-        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
-        "asm": [
-          "tbnz\tw15, #0x1f, 0x10004dd08",
-          "cmp\tw21, w15"
-        ]
+        "a": 4295285040,
+        "m": "ldr",
+        "o": "x26, [x20, #0x18]",
+        "cls": "load"
       },
       {
-        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
-        "asm": [
-          "add\tx1, x17, x15"
-        ]
+        "a": 4295285044,
+        "m": "cbz",
+        "o": "x26, 0x10004dcd0",
+        "cls": "branch",
+        "bt": 283
       },
       {
-        "source": "            if (i + 3 >= fb.len) continue;",
-        "asm": [
-          "mov\tw0, #0x3",
-          "bfi\tx0, x1, #2, #61",
-          "ccmp\tx0, x22, #0x2, gt",
-          "b.hs\t0x10004dd08",
-          "lsl\tx1, x1, #2"
-        ]
+        "a": 4295285048,
+        "m": "str",
+        "o": "x1, [sp]",
+        "cls": "store"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "add\tx1, x3, x1",
-          "ldrb\tw2, [x1]"
-        ]
+        "a": 4295285052,
+        "m": "mov",
+        "o": "x25, #0x0",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tw2, w2, w12"
-        ]
+        "a": 4295285056,
+        "m": "ldr",
+        "o": "x8, [x20, #0x10]",
+        "cls": "load"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tw2, #0xff",
-          "csel\tw2, w2, w11, lo"
-        ]
+        "a": 4295285060,
+        "m": "add",
+        "o": "x27, x8, #0x1c",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "strb\tw2, [x1]"
-        ]
+        "a": 4295285064,
+        "m": "fmov",
+        "o": "s8, #2.00000000",
+        "cls": "fp"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "ldrb\tw2, [x1, #0x1]"
-        ]
+        "a": 4295285068,
+        "m": "adrp",
+        "o": "x28, 101 ; 0x1000b2000",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tw2, w2, w13",
-          "cmp\tw2, #0xff",
-          "csel\tw2, w2, w11, lo",
-          "strb\tw2, [x1, #0x1]",
-          "ldrb\tw2, [x1, #0x2]",
-          "add\tw2, w2, w14"
-        ]
+        "a": 4295285072,
+        "m": "b",
+        "o": "0x10004d970",
+        "cls": "branch",
+        "bt": 67
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tw2, #0xff",
-          "csel\tw2, w2, w11, lo"
-        ]
+        "a": 4295285076,
+        "m": "add",
+        "o": "x1, x20, #0x28",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
-        "asm": [
-          "strb\tw2, [x1, #0x2]"
-        ]
+        "a": 4295285080,
+        "m": "mov",
+        "o": "x0, x24",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 3] = 255;",
-        "asm": [
-          "strb\tw11, [x3, x0]"
-        ]
+        "a": 4295285084,
+        "m": "mov",
+        "o": "x2, x25",
+        "cls": "other"
       },
       {
-        "source": "            const fx = px + dx;",
-        "asm": [
-          "add\tx0, x15, #0x1"
-        ]
+        "a": 4295285088,
+        "m": "bl",
+        "o": "_layouts.ML01.data.Data.spawn",
+        "cls": "branch",
+        "t": "_layouts.ML01.data.Data.spawn"
       },
       {
-        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
-        "asm": [
-          "cmn\tw15, #0x1",
-          "ccmp\tx0, x9, #0x0, ge"
-        ]
+        "a": 4295285092,
+        "m": "add",
+        "o": "x25, x25, #0x1",
+        "cls": "other"
       },
       {
-        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
-        "asm": [
-          "add\tx0, x0, x17"
-        ]
+        "a": 4295285096,
+        "m": "cmp",
+        "o": "x26, x25",
+        "cls": "cmp"
       },
       {
-        "source": "            if (i + 3 >= fb.len) continue;",
-        "asm": [
-          "mov\tw17, #0x3",
-          "bfi\tx17, x0, #2, #61",
-          "ccmp\tx17, x22, #0x2, lt",
-          "b.lo\t0x10004ddf0",
-          "add\tw16, w16, #0x1",
-          "cmp\tw16, w19",
-          "b.ge\t0x10004dc1c",
-          "tbnz\tw16, #0x1f, 0x10004dc1c",
-          "mul\tw16, w16, w21"
-        ]
+        "a": 4295285100,
+        "m": "b.eq",
+        "o": "0x10004da4c",
+        "cls": "branch",
+        "bt": 122
       },
       {
-        "source": "            if (fx < 0 or fx >= w or fy < 0 or fy >= h) continue;",
-        "asm": [
-          "tbnz\tw15, #0x1f, 0x10004dbfc",
-          "cmp\tw21, w15"
-        ]
+        "a": 4295285104,
+        "m": "ldr",
+        "o": "s0, [x27], #0x44",
+        "cls": "load"
       },
       {
-        "source": "            const i: usize = @intCast((fy * @as(i32, @intCast(w)) + fx) * 4);",
-        "asm": [
-          "add\tx0, x16, x15"
-        ]
+        "a": 4295285108,
+        "m": "fcmp",
+        "o": "s0, s8",
+        "cls": "fp"
       },
       {
-        "source": "            if (i + 3 >= fb.len) continue;",
-        "asm": [
-          "mov\tw17, #0x3",
-          "bfi\tx17, x0, #2, #61",
-          "ccmp\tx17, x22, #0x2, gt",
-          "b.hs\t0x10004dbfc",
-          "lsl\tx0, x0, #2"
-        ]
+        "a": 4295285112,
+        "m": "b.ge",
+        "o": "0x10004d954",
+        "cls": "branch",
+        "bt": 60
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "add\tx0, x3, x0",
-          "ldrb\tw1, [x0]",
-          "add\tw1, w1, w12",
-          "cmp\tw1, #0xff",
-          "csel\tw1, w1, w11, lo",
-          "strb\tw1, [x0]"
-        ]
+        "a": 4295285116,
+        "m": "ldr",
+        "o": "s9, [x28, #0x8a8]",
+        "cls": "load"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "ldrb\tw1, [x0, #0x1]"
-        ]
+        "a": 4295285120,
+        "m": "fcmp",
+        "o": "s9, #0.0",
+        "cls": "fp"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tw1, w1, w13"
-        ]
+        "a": 4295285124,
+        "m": "b.eq",
+        "o": "0x10004d964",
+        "cls": "branch",
+        "bt": 64
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tw1, #0xff",
-          "csel\tw1, w1, w11, lo"
-        ]
+        "a": 4295285128,
+        "m": "ldp",
+        "o": "x8, x9, [x20, #0x48]",
+        "cls": "load"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "strb\tw1, [x0, #0x1]"
-        ]
+        "a": 4295285132,
+        "m": "ldp",
+        "o": "x11, x10, [x20, #0x58]",
+        "cls": "load"
       },
       {
-        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
-        "asm": [
-          "ldrb\tw1, [x0, #0x2]"
-        ]
+        "a": 4295285136,
+        "m": "add",
+        "o": "x12, x10, x8",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tw1, w1, w14"
-        ]
+        "a": 4295285140,
+        "m": "ror",
+        "o": "x12, x12, #0x29",
+        "cls": "other"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tw1, #0xff",
-          "csel\tw1, w1, w11, lo",
-          "strb\tw1, [x0, #0x2]",
-          "strb\tw11, [x3, x17]",
-          "b\t0x10004dbfc",
-          "lsl\tx16, x16, #2"
-        ]
+        "a": 4295285144,
+        "m": "add",
+        "o": "x23, x12, x8",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "add\tx16, x3, x16",
-          "ldrb\tw17, [x16]"
-        ]
+        "a": 4295285148,
+        "m": "eor",
+        "o": "x11, x11, x8",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tw12, w17, w12"
-        ]
+        "a": 4295285152,
+        "m": "eor",
+        "o": "x10, x9, x10",
+        "cls": "other"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tw12, #0xff",
-          "csel\tw12, w12, w11, lo"
-        ]
+        "a": 4295285156,
+        "m": "eor",
+        "o": "x12, x11, x9",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "strb\tw12, [x16]"
-        ]
+        "a": 4295285160,
+        "m": "eor",
+        "o": "x8, x10, x8",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "ldrb\tw12, [x16, #0x1]"
-        ]
+        "a": 4295285164,
+        "m": "stp",
+        "o": "x8, x12, [x20, #0x48]",
+        "cls": "store"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tw12, w12, w13"
-        ]
+        "a": 4295285168,
+        "m": "eor",
+        "o": "x8, x11, x9, lsl #17",
+        "cls": "other"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tw12, #0xff",
-          "csel\tw12, w12, w11, lo"
-        ]
+        "a": 4295285172,
+        "m": "ror",
+        "o": "x9, x10, #0x13",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "strb\tw12, [x16, #0x1]",
-          "ldrb\tw12, [x16, #0x2]",
-          "add\tw12, w12, w14",
-          "cmp\tw12, #0xff",
-          "csel\tw12, w12, w11, lo"
-        ]
+        "a": 4295285176,
+        "m": "stp",
+        "o": "x8, x9, [x20, #0x58]",
+        "cls": "store"
       },
       {
-        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
-        "asm": [
-          "strb\tw12, [x16, #0x2]"
-        ]
+        "a": 4295285180,
+        "m": "clz",
+        "o": "x8, x23",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 3] = 255;",
-        "asm": [
-          "strb\tw11, [x3, x15]",
-          "b\t0x10004dc1c",
-          "lsl\tx0, x0, #2"
-        ]
+        "a": 4295285184,
+        "m": "strb",
+        "o": "w8, [sp, #0xf]",
+        "cls": "store"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "add\tx0, x3, x0",
-          "ldrb\tw1, [x0]"
-        ]
+        "a": 4295285188,
+        "m": "and",
+        "o": "w8, w8, #0xff",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tw1, w1, w12"
-        ]
+        "a": 4295285192,
+        "m": "and",
+        "o": "w9, w8, #0x7f",
+        "cls": "other"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tw1, #0xff",
-          "csel\tw1, w1, w11, lo"
-        ]
+        "a": 4295285196,
+        "m": "cmp",
+        "o": "w9, #0x29",
+        "cls": "cmp"
       },
       {
-        "source": "            fb[i + 0] = addClamp(fb[i + 0], r8);",
-        "asm": [
-          "strb\tw1, [x0]"
-        ]
+        "a": 4295285200,
+        "m": "b.hs",
+        "o": "0x10004d9f4",
+        "cls": "branch",
+        "bt": 100
       },
       {
-        "source": "            fb[i + 1] = addClamp(fb[i + 1], g8);",
-        "asm": [
-          "ldrb\tw1, [x0, #0x1]"
-        ]
+        "a": 4295285204,
+        "m": "mov",
+        "o": "w9, #0x7e",
+        "cls": "other"
       },
       {
-        "source": "    const sum: u16 = @as(u16, a) + @as(u16, b);",
-        "asm": [
-          "add\tw1, w1, w13",
-          "cmp\tw1, #0xff",
-          "csel\tw1, w1, w11, lo",
-          "strb\tw1, [x0, #0x1]",
-          "ldrb\tw1, [x0, #0x2]",
-          "add\tw1, w1, w14"
-        ]
+        "a": 4295285208,
+        "m": "sub",
+        "o": "w8, w9, w8",
+        "cls": "other"
       },
       {
-        "source": "    return if (sum > 255) 255 else @intCast(sum);",
-        "asm": [
-          "cmp\tw1, #0xff",
-          "csel\tw1, w1, w11, lo"
-        ]
+        "a": 4295285212,
+        "m": "and",
+        "o": "w9, w23, #0x7fffff",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 2] = addClamp(fb[i + 2], b8);",
-        "asm": [
-          "strb\tw1, [x0, #0x2]"
-        ]
+        "a": 4295285216,
+        "m": "bfi",
+        "o": "w9, w8, #23, #7",
+        "cls": "other"
       },
       {
-        "source": "            fb[i + 3] = 255;",
-        "asm": [
-          "strb\tw11, [x3, x17]",
-          "add\tw16, w16, #0x1",
-          "cmp\tw16, w19",
-          "b.lt\t0x10004dd34",
-          "b\t0x10004dc1c",
-          "ldr\tx8, [x20, #0x68]",
-          "add\tx8, x8, #0x1",
-          "str\tx8, [x20, #0x68]"
-        ]
+        "a": 4295285220,
+        "m": "fmov",
+        "o": "s0, w9",
+        "cls": "fp"
       },
       {
-        "source": "            self.frame +%= 1; // AF02-blend hash RNG frame counter (free otherwise)",
-        "asm": [
-          "ldp\tx29, x30, [sp, #0x80]",
-          "ldp\tx20, x19, [sp, #0x70]",
-          "ldp\tx22, x21, [sp, #0x60]",
-          "ldp\tx24, x23, [sp, #0x50]",
-          "ldp\tx26, x25, [sp, #0x40]",
-          "ldp\tx28, x27, [sp, #0x30]",
-          "ldp\td9, d8, [sp, #0x20]",
-          "add\tsp, sp, #0x90",
-          "ret"
-        ]
+        "a": 4295285224,
+        "m": "fcmp",
+        "o": "s9, s0",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285228,
+        "m": "b.gt",
+        "o": "0x10004d954",
+        "cls": "branch",
+        "bt": 60
+      },
+      {
+        "a": 4295285232,
+        "m": "b",
+        "o": "0x10004d964",
+        "cls": "branch",
+        "bt": 64
+      },
+      {
+        "a": 4295285236,
+        "m": "add",
+        "o": "x0, x20, #0x48",
+        "cls": "other"
+      },
+      {
+        "a": 4295285240,
+        "m": "add",
+        "o": "x1, sp, #0x10",
+        "cls": "other"
+      },
+      {
+        "a": 4295285244,
+        "m": "mov",
+        "o": "w2, #0x8",
+        "cls": "other"
+      },
+      {
+        "a": 4295285248,
+        "m": "bl",
+        "o": "_Random.init__anon_28835.gen.fill",
+        "cls": "branch",
+        "t": "_Random.init__anon_28835.gen.fill"
+      },
+      {
+        "a": 4295285252,
+        "m": "ldr",
+        "o": "x8, [sp, #0x10]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285256,
+        "m": "clz",
+        "o": "x8, x8",
+        "cls": "other"
+      },
+      {
+        "a": 4295285260,
+        "m": "add",
+        "o": "w8, w8, #0x29",
+        "cls": "other"
+      },
+      {
+        "a": 4295285264,
+        "m": "and",
+        "o": "w8, w8, #0x7f",
+        "cls": "other"
+      },
+      {
+        "a": 4295285268,
+        "m": "strb",
+        "o": "w8, [sp, #0xf]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285272,
+        "m": "cmp",
+        "o": "w8, #0x69",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285276,
+        "m": "b.ne",
+        "o": "0x10004d9d4",
+        "cls": "branch",
+        "bt": 92
+      },
+      {
+        "a": 4295285280,
+        "m": "add",
+        "o": "x0, x20, #0x48",
+        "cls": "other"
+      },
+      {
+        "a": 4295285284,
+        "m": "add",
+        "o": "x1, sp, #0x1c",
+        "cls": "other"
+      },
+      {
+        "a": 4295285288,
+        "m": "mov",
+        "o": "w2, #0x4",
+        "cls": "other"
+      },
+      {
+        "a": 4295285292,
+        "m": "bl",
+        "o": "_Random.init__anon_28835.gen.fill",
+        "cls": "branch",
+        "t": "_Random.init__anon_28835.gen.fill"
+      },
+      {
+        "a": 4295285296,
+        "m": "ldr",
+        "o": "w8, [sp, #0x1c]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285300,
+        "m": "orr",
+        "o": "w8, w8, #0x7ff",
+        "cls": "other"
+      },
+      {
+        "a": 4295285304,
+        "m": "clz",
+        "o": "w8, w8",
+        "cls": "other"
+      },
+      {
+        "a": 4295285308,
+        "m": "add",
+        "o": "w8, w8, #0x69",
+        "cls": "other"
+      },
+      {
+        "a": 4295285312,
+        "m": "and",
+        "o": "w8, w8, #0x7f",
+        "cls": "other"
+      },
+      {
+        "a": 4295285316,
+        "m": "strb",
+        "o": "w8, [sp, #0xf]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285320,
+        "m": "b",
+        "o": "0x10004d9d4",
+        "cls": "branch",
+        "bt": 92
+      },
+      {
+        "a": 4295285324,
+        "m": "ldr",
+        "o": "x8, [x20, #0x18]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285328,
+        "m": "ldr",
+        "o": "x3, [sp]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285332,
+        "m": "cbz",
+        "o": "x8, 0x10004dcd0",
+        "cls": "branch",
+        "bt": 283
+      },
+      {
+        "a": 4295285336,
+        "m": "ldr",
+        "o": "x10, [x20, #0x10]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285340,
+        "m": "ucvtf",
+        "o": "s0, w21",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285344,
+        "m": "ucvtf",
+        "o": "s1, w19",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285348,
+        "m": "mov",
+        "o": "w9, w21",
+        "cls": "other"
+      },
+      {
+        "a": 4295285352,
+        "m": "add",
+        "o": "x10, x10, #0x28",
+        "cls": "other"
+      },
+      {
+        "a": 4295285356,
+        "m": "mov",
+        "o": "w11, #0xff",
+        "cls": "other"
+      },
+      {
+        "a": 4295285360,
+        "m": "mov",
+        "o": "w12, #0x437f0000",
+        "cls": "other"
+      },
+      {
+        "a": 4295285364,
+        "m": "fmov",
+        "o": "s2, w12",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285368,
+        "m": "fmov",
+        "o": "s3, #2.00000000",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285372,
+        "m": "fmov",
+        "o": "s4, #0.25000000",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285376,
+        "m": "b",
+        "o": "0x10004dab0",
+        "cls": "branch",
+        "bt": 147
+      },
+      {
+        "a": 4295285380,
+        "m": "add",
+        "o": "x17, x15, #0x1",
+        "cls": "other"
+      },
+      {
+        "a": 4295285384,
+        "m": "cmn",
+        "o": "w15, #0x1",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285388,
+        "m": "ccmp",
+        "o": "x17, x9, #0x0, ge",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285392,
+        "m": "add",
+        "o": "x16, x17, x16",
+        "cls": "other"
+      },
+      {
+        "a": 4295285396,
+        "m": "mov",
+        "o": "w15, #0x3",
+        "cls": "other"
+      },
+      {
+        "a": 4295285400,
+        "m": "bfi",
+        "o": "x15, x16, #2, #61",
+        "cls": "other"
+      },
+      {
+        "a": 4295285404,
+        "m": "ccmp",
+        "o": "x15, x22, #0x2, lt",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285408,
+        "m": "b.lo",
+        "o": "0x10004dc2c",
+        "cls": "branch",
+        "bt": 242
+      },
+      {
+        "a": 4295285412,
+        "m": "add",
+        "o": "x10, x10, #0x44",
+        "cls": "other"
+      },
+      {
+        "a": 4295285416,
+        "m": "subs",
+        "o": "x8, x8, #0x1",
+        "cls": "other"
+      },
+      {
+        "a": 4295285420,
+        "m": "b.eq",
+        "o": "0x10004dcd0",
+        "cls": "branch",
+        "bt": 283
+      },
+      {
+        "a": 4295285424,
+        "m": "ldp",
+        "o": "s5, s6, [x10, #-0x28]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285428,
+        "m": "ldp",
+        "o": "s7, s16, [x10, #-0x8]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285432,
+        "m": "ldr",
+        "o": "s17, [x10]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285436,
+        "m": "fcmp",
+        "o": "s7, s2",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285440,
+        "m": "fcvtzs",
+        "o": "w12, s7",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285444,
+        "m": "csel",
+        "o": "w12, w11, w12, ge",
+        "cls": "other"
+      },
+      {
+        "a": 4295285448,
+        "m": "fcmp",
+        "o": "s7, #0.0",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285452,
+        "m": "csel",
+        "o": "w12, wzr, w12, ls",
+        "cls": "other"
+      },
+      {
+        "a": 4295285456,
+        "m": "fcmp",
+        "o": "s16, s2",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285460,
+        "m": "fcvtzs",
+        "o": "w13, s16",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285464,
+        "m": "csel",
+        "o": "w13, w11, w13, ge",
+        "cls": "other"
+      },
+      {
+        "a": 4295285468,
+        "m": "fcmp",
+        "o": "s16, #0.0",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285472,
+        "m": "csel",
+        "o": "w13, wzr, w13, ls",
+        "cls": "other"
+      },
+      {
+        "a": 4295285476,
+        "m": "fcmp",
+        "o": "s17, s2",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285480,
+        "m": "fcvtzs",
+        "o": "w14, s17",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285484,
+        "m": "csel",
+        "o": "w14, w11, w14, ge",
+        "cls": "other"
+      },
+      {
+        "a": 4295285488,
+        "m": "fcmp",
+        "o": "s17, #0.0",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285492,
+        "m": "csel",
+        "o": "w14, wzr, w14, ls",
+        "cls": "other"
+      },
+      {
+        "a": 4295285496,
+        "m": "fadd",
+        "o": "s5, s5, s3",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285500,
+        "m": "fmul",
+        "o": "s5, s5, s4",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285504,
+        "m": "fmul",
+        "o": "s5, s5, s0",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285508,
+        "m": "fcvtzs",
+        "o": "w15, s5",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285512,
+        "m": "fsub",
+        "o": "s5, s3, s6",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285516,
+        "m": "fmul",
+        "o": "s5, s5, s4",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285520,
+        "m": "fmul",
+        "o": "s5, s5, s1",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285524,
+        "m": "fcvtzs",
+        "o": "w16, s5",
+        "cls": "fp"
+      },
+      {
+        "a": 4295285528,
+        "m": "sxtw",
+        "o": "x15, w15",
+        "cls": "other"
+      },
+      {
+        "a": 4295285532,
+        "m": "cmp",
+        "o": "w16, w19",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285536,
+        "m": "b.ge",
+        "o": "0x10004dbb0",
+        "cls": "branch",
+        "bt": 211
+      },
+      {
+        "a": 4295285540,
+        "m": "tbnz",
+        "o": "w16, #0x1f, 0x10004dbb0",
+        "cls": "branch",
+        "bt": 211
+      },
+      {
+        "a": 4295285544,
+        "m": "mul",
+        "o": "w17, w16, w21",
+        "cls": "other"
+      },
+      {
+        "a": 4295285548,
+        "m": "tbnz",
+        "o": "w15, #0x1f, 0x10004db90",
+        "cls": "branch",
+        "bt": 203
+      },
+      {
+        "a": 4295285552,
+        "m": "cmp",
+        "o": "w21, w15",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285556,
+        "m": "add",
+        "o": "x1, x17, x15",
+        "cls": "other"
+      },
+      {
+        "a": 4295285560,
+        "m": "mov",
+        "o": "w0, #0x3",
+        "cls": "other"
+      },
+      {
+        "a": 4295285564,
+        "m": "bfi",
+        "o": "x0, x1, #2, #61",
+        "cls": "other"
+      },
+      {
+        "a": 4295285568,
+        "m": "ccmp",
+        "o": "x0, x22, #0x2, gt",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285572,
+        "m": "b.hs",
+        "o": "0x10004db90",
+        "cls": "branch",
+        "bt": 203
+      },
+      {
+        "a": 4295285576,
+        "m": "lsl",
+        "o": "x1, x1, #2",
+        "cls": "other"
+      },
+      {
+        "a": 4295285580,
+        "m": "add",
+        "o": "x1, x3, x1",
+        "cls": "other"
+      },
+      {
+        "a": 4295285584,
+        "m": "ldrb",
+        "o": "w2, [x1]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285588,
+        "m": "add",
+        "o": "w2, w2, w12",
+        "cls": "other"
+      },
+      {
+        "a": 4295285592,
+        "m": "cmp",
+        "o": "w2, #0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285596,
+        "m": "csel",
+        "o": "w2, w2, w11, lo",
+        "cls": "other"
+      },
+      {
+        "a": 4295285600,
+        "m": "strb",
+        "o": "w2, [x1]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285604,
+        "m": "ldrb",
+        "o": "w2, [x1, #0x1]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285608,
+        "m": "add",
+        "o": "w2, w2, w13",
+        "cls": "other"
+      },
+      {
+        "a": 4295285612,
+        "m": "cmp",
+        "o": "w2, #0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285616,
+        "m": "csel",
+        "o": "w2, w2, w11, lo",
+        "cls": "other"
+      },
+      {
+        "a": 4295285620,
+        "m": "strb",
+        "o": "w2, [x1, #0x1]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285624,
+        "m": "ldrb",
+        "o": "w2, [x1, #0x2]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285628,
+        "m": "add",
+        "o": "w2, w2, w14",
+        "cls": "other"
+      },
+      {
+        "a": 4295285632,
+        "m": "cmp",
+        "o": "w2, #0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285636,
+        "m": "csel",
+        "o": "w2, w2, w11, lo",
+        "cls": "other"
+      },
+      {
+        "a": 4295285640,
+        "m": "strb",
+        "o": "w2, [x1, #0x2]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285644,
+        "m": "strb",
+        "o": "w11, [x3, x0]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285648,
+        "m": "add",
+        "o": "x0, x15, #0x1",
+        "cls": "other"
+      },
+      {
+        "a": 4295285652,
+        "m": "cmn",
+        "o": "w15, #0x1",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285656,
+        "m": "ccmp",
+        "o": "x0, x9, #0x0, ge",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285660,
+        "m": "add",
+        "o": "x0, x0, x17",
+        "cls": "other"
+      },
+      {
+        "a": 4295285664,
+        "m": "mov",
+        "o": "w17, #0x3",
+        "cls": "other"
+      },
+      {
+        "a": 4295285668,
+        "m": "bfi",
+        "o": "x17, x0, #2, #61",
+        "cls": "other"
+      },
+      {
+        "a": 4295285672,
+        "m": "ccmp",
+        "o": "x17, x22, #0x2, lt",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285676,
+        "m": "b.lo",
+        "o": "0x10004dc78",
+        "cls": "branch",
+        "bt": 261
+      },
+      {
+        "a": 4295285680,
+        "m": "add",
+        "o": "w16, w16, #0x1",
+        "cls": "other"
+      },
+      {
+        "a": 4295285684,
+        "m": "cmp",
+        "o": "w16, w19",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285688,
+        "m": "b.ge",
+        "o": "0x10004daa4",
+        "cls": "branch",
+        "bt": 144
+      },
+      {
+        "a": 4295285692,
+        "m": "tbnz",
+        "o": "w16, #0x1f, 0x10004daa4",
+        "cls": "branch",
+        "bt": 144
+      },
+      {
+        "a": 4295285696,
+        "m": "mul",
+        "o": "w16, w16, w21",
+        "cls": "other"
+      },
+      {
+        "a": 4295285700,
+        "m": "tbnz",
+        "o": "w15, #0x1f, 0x10004da84",
+        "cls": "branch",
+        "bt": 136
+      },
+      {
+        "a": 4295285704,
+        "m": "cmp",
+        "o": "w21, w15",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285708,
+        "m": "add",
+        "o": "x0, x16, x15",
+        "cls": "other"
+      },
+      {
+        "a": 4295285712,
+        "m": "mov",
+        "o": "w17, #0x3",
+        "cls": "other"
+      },
+      {
+        "a": 4295285716,
+        "m": "bfi",
+        "o": "x17, x0, #2, #61",
+        "cls": "other"
+      },
+      {
+        "a": 4295285720,
+        "m": "ccmp",
+        "o": "x17, x22, #0x2, gt",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285724,
+        "m": "b.hs",
+        "o": "0x10004da84",
+        "cls": "branch",
+        "bt": 136
+      },
+      {
+        "a": 4295285728,
+        "m": "lsl",
+        "o": "x0, x0, #2",
+        "cls": "other"
+      },
+      {
+        "a": 4295285732,
+        "m": "add",
+        "o": "x0, x3, x0",
+        "cls": "other"
+      },
+      {
+        "a": 4295285736,
+        "m": "ldrb",
+        "o": "w1, [x0]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285740,
+        "m": "add",
+        "o": "w1, w1, w12",
+        "cls": "other"
+      },
+      {
+        "a": 4295285744,
+        "m": "cmp",
+        "o": "w1, #0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285748,
+        "m": "csel",
+        "o": "w1, w1, w11, lo",
+        "cls": "other"
+      },
+      {
+        "a": 4295285752,
+        "m": "strb",
+        "o": "w1, [x0]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285756,
+        "m": "ldrb",
+        "o": "w1, [x0, #0x1]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285760,
+        "m": "add",
+        "o": "w1, w1, w13",
+        "cls": "other"
+      },
+      {
+        "a": 4295285764,
+        "m": "cmp",
+        "o": "w1, #0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285768,
+        "m": "csel",
+        "o": "w1, w1, w11, lo",
+        "cls": "other"
+      },
+      {
+        "a": 4295285772,
+        "m": "strb",
+        "o": "w1, [x0, #0x1]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285776,
+        "m": "ldrb",
+        "o": "w1, [x0, #0x2]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285780,
+        "m": "add",
+        "o": "w1, w1, w14",
+        "cls": "other"
+      },
+      {
+        "a": 4295285784,
+        "m": "cmp",
+        "o": "w1, #0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285788,
+        "m": "csel",
+        "o": "w1, w1, w11, lo",
+        "cls": "other"
+      },
+      {
+        "a": 4295285792,
+        "m": "strb",
+        "o": "w1, [x0, #0x2]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285796,
+        "m": "strb",
+        "o": "w11, [x3, x17]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285800,
+        "m": "b",
+        "o": "0x10004da84",
+        "cls": "branch",
+        "bt": 136
+      },
+      {
+        "a": 4295285804,
+        "m": "lsl",
+        "o": "x16, x16, #2",
+        "cls": "other"
+      },
+      {
+        "a": 4295285808,
+        "m": "add",
+        "o": "x16, x3, x16",
+        "cls": "other"
+      },
+      {
+        "a": 4295285812,
+        "m": "ldrb",
+        "o": "w17, [x16]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285816,
+        "m": "add",
+        "o": "w12, w17, w12",
+        "cls": "other"
+      },
+      {
+        "a": 4295285820,
+        "m": "cmp",
+        "o": "w12, #0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285824,
+        "m": "csel",
+        "o": "w12, w12, w11, lo",
+        "cls": "other"
+      },
+      {
+        "a": 4295285828,
+        "m": "strb",
+        "o": "w12, [x16]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285832,
+        "m": "ldrb",
+        "o": "w12, [x16, #0x1]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285836,
+        "m": "add",
+        "o": "w12, w12, w13",
+        "cls": "other"
+      },
+      {
+        "a": 4295285840,
+        "m": "cmp",
+        "o": "w12, #0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285844,
+        "m": "csel",
+        "o": "w12, w12, w11, lo",
+        "cls": "other"
+      },
+      {
+        "a": 4295285848,
+        "m": "strb",
+        "o": "w12, [x16, #0x1]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285852,
+        "m": "ldrb",
+        "o": "w12, [x16, #0x2]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285856,
+        "m": "add",
+        "o": "w12, w12, w14",
+        "cls": "other"
+      },
+      {
+        "a": 4295285860,
+        "m": "cmp",
+        "o": "w12, #0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285864,
+        "m": "csel",
+        "o": "w12, w12, w11, lo",
+        "cls": "other"
+      },
+      {
+        "a": 4295285868,
+        "m": "strb",
+        "o": "w12, [x16, #0x2]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285872,
+        "m": "strb",
+        "o": "w11, [x3, x15]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285876,
+        "m": "b",
+        "o": "0x10004daa4",
+        "cls": "branch",
+        "bt": 144
+      },
+      {
+        "a": 4295285880,
+        "m": "lsl",
+        "o": "x0, x0, #2",
+        "cls": "other"
+      },
+      {
+        "a": 4295285884,
+        "m": "add",
+        "o": "x0, x3, x0",
+        "cls": "other"
+      },
+      {
+        "a": 4295285888,
+        "m": "ldrb",
+        "o": "w1, [x0]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285892,
+        "m": "add",
+        "o": "w1, w1, w12",
+        "cls": "other"
+      },
+      {
+        "a": 4295285896,
+        "m": "cmp",
+        "o": "w1, #0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285900,
+        "m": "csel",
+        "o": "w1, w1, w11, lo",
+        "cls": "other"
+      },
+      {
+        "a": 4295285904,
+        "m": "strb",
+        "o": "w1, [x0]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285908,
+        "m": "ldrb",
+        "o": "w1, [x0, #0x1]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285912,
+        "m": "add",
+        "o": "w1, w1, w13",
+        "cls": "other"
+      },
+      {
+        "a": 4295285916,
+        "m": "cmp",
+        "o": "w1, #0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285920,
+        "m": "csel",
+        "o": "w1, w1, w11, lo",
+        "cls": "other"
+      },
+      {
+        "a": 4295285924,
+        "m": "strb",
+        "o": "w1, [x0, #0x1]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285928,
+        "m": "ldrb",
+        "o": "w1, [x0, #0x2]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285932,
+        "m": "add",
+        "o": "w1, w1, w14",
+        "cls": "other"
+      },
+      {
+        "a": 4295285936,
+        "m": "cmp",
+        "o": "w1, #0xff",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285940,
+        "m": "csel",
+        "o": "w1, w1, w11, lo",
+        "cls": "other"
+      },
+      {
+        "a": 4295285944,
+        "m": "strb",
+        "o": "w1, [x0, #0x2]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285948,
+        "m": "strb",
+        "o": "w11, [x3, x17]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285952,
+        "m": "add",
+        "o": "w16, w16, #0x1",
+        "cls": "other"
+      },
+      {
+        "a": 4295285956,
+        "m": "cmp",
+        "o": "w16, w19",
+        "cls": "cmp"
+      },
+      {
+        "a": 4295285960,
+        "m": "b.lt",
+        "o": "0x10004dbbc",
+        "cls": "branch",
+        "bt": 214
+      },
+      {
+        "a": 4295285964,
+        "m": "b",
+        "o": "0x10004daa4",
+        "cls": "branch",
+        "bt": 144
+      },
+      {
+        "a": 4295285968,
+        "m": "ldr",
+        "o": "x8, [x20, #0x68]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285972,
+        "m": "add",
+        "o": "x8, x8, #0x1",
+        "cls": "other"
+      },
+      {
+        "a": 4295285976,
+        "m": "str",
+        "o": "x8, [x20, #0x68]",
+        "cls": "store"
+      },
+      {
+        "a": 4295285980,
+        "m": "ldp",
+        "o": "x29, x30, [sp, #0x80]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285984,
+        "m": "ldp",
+        "o": "x20, x19, [sp, #0x70]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285988,
+        "m": "ldp",
+        "o": "x22, x21, [sp, #0x60]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285992,
+        "m": "ldp",
+        "o": "x24, x23, [sp, #0x50]",
+        "cls": "load"
+      },
+      {
+        "a": 4295285996,
+        "m": "ldp",
+        "o": "x26, x25, [sp, #0x40]",
+        "cls": "load"
+      },
+      {
+        "a": 4295286000,
+        "m": "ldp",
+        "o": "x28, x27, [sp, #0x30]",
+        "cls": "load"
+      },
+      {
+        "a": 4295286004,
+        "m": "ldp",
+        "o": "d9, d8, [sp, #0x20]",
+        "cls": "load"
+      },
+      {
+        "a": 4295286008,
+        "m": "add",
+        "o": "sp, sp, #0x90",
+        "cls": "other"
+      },
+      {
+        "a": 4295286012,
+        "m": "ret",
+        "o": "",
+        "cls": "branch"
+      }
+    ],
+    "attribution": {
+      "files": [
+        "sim.zig",
+        "AF05.LP1-autovec.LP2-simple.zig",
+        "vec.zig",
+        "config.zig",
+        "Xoshiro256.zig",
+        "Random.zig",
+        "math.zig",
+        "mem.zig",
+        "render_simple.zig"
+      ],
+      "chains": [
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            0,
+            287
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            40
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            40
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            40
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            40
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            43
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            43
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            13
+          ],
+          [
+            1,
+            40
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            13
+          ],
+          [
+            1,
+            40
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            13
+          ],
+          [
+            1,
+            40
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            2,
+            9
+          ],
+          [
+            1,
+            40
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            40
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            44
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            44
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            44
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            44
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            44
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            44
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            47
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            47
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            47
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            39
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            50
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            50
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            50
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            50
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            50
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            50
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            52
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            52
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            52
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            52
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            54
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            50
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            50
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            70
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            70
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            71
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            71
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            3,
+            71
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            25
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            25
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            25
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            756
+          ],
+          [
+            4,
+            25
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            25
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            29
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            30
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            31
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            32
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            31
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            34
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            6,
+            756
+          ],
+          [
+            4,
+            36
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            4,
+            34
+          ],
+          [
+            4,
+            73
+          ],
+          [
+            5,
+            61
+          ],
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            295
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            296
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            296
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            297
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            297
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            297
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            297
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            307
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            307
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            308
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            308
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            308
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            299
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            299
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            299
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            299
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            7,
+            1899
+          ],
+          [
+            5,
+            138
+          ],
+          [
+            5,
+            299
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            299
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            299
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            299
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            299
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            300
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            300
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            303
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            303
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            303
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            73
+          ],
+          [
+            5,
+            133
+          ],
+          [
+            5,
+            303
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            7,
+            1899
+          ],
+          [
+            5,
+            138
+          ],
+          [
+            5,
+            303
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            303
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            303
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            303
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            303
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            303
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            5,
+            303
+          ],
+          [
+            3,
+            72
+          ],
+          [
+            1,
+            51
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            59
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            61
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            61
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            62
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            1,
+            56
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            74
+          ],
+          [
+            8,
+            50
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            75
+          ],
+          [
+            8,
+            50
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            74
+          ],
+          [
+            8,
+            50
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            73
+          ],
+          [
+            8,
+            50
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            73
+          ],
+          [
+            8,
+            50
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            74
+          ],
+          [
+            8,
+            51
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            75
+          ],
+          [
+            8,
+            51
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            74
+          ],
+          [
+            8,
+            51
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            73
+          ],
+          [
+            8,
+            51
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            73
+          ],
+          [
+            8,
+            51
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            74
+          ],
+          [
+            8,
+            52
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            75
+          ],
+          [
+            8,
+            52
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            74
+          ],
+          [
+            8,
+            52
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            73
+          ],
+          [
+            8,
+            52
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            73
+          ],
+          [
+            8,
+            52
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            26
+          ],
+          [
+            8,
+            53
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            26
+          ],
+          [
+            8,
+            53
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            27
+          ],
+          [
+            8,
+            53
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            27
+          ],
+          [
+            8,
+            53
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            34
+          ],
+          [
+            8,
+            54
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            34
+          ],
+          [
+            8,
+            54
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            35
+          ],
+          [
+            8,
+            54
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            35
+          ],
+          [
+            8,
+            54
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            56
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            61
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            61
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            62
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            79
+          ],
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            79
+          ],
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            79
+          ],
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            67
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            59
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            61
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            61
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            62
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            61
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            61
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            62
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            63
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            79
+          ],
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            79
+          ],
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            79
+          ],
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            67
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            67
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            79
+          ],
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            79
+          ],
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            79
+          ],
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            67
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            67
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            79
+          ],
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            64
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            79
+          ],
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            65
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            79
+          ],
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            80
+          ],
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            66
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            67
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            8,
+            0
+          ],
+          [
+            1,
+            57
+          ],
+          [
+            0,
+            288
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ],
+        [
+          [
+            0,
+            289
+          ]
+        ]
+      ],
+      "call_site": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        39,
+        39,
+        39,
+        null,
+        null,
+        null,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        40,
+        40,
+        40,
+        40,
+        43,
+        43,
+        40,
+        40,
+        40,
+        40,
+        40,
+        44,
+        44,
+        44,
+        44,
+        44,
+        44,
+        47,
+        47,
+        47,
+        39,
+        39,
+        39,
+        50,
+        50,
+        null,
+        null,
+        null,
+        50,
+        50,
+        50,
+        50,
+        52,
+        52,
+        52,
+        52,
+        54,
+        50,
+        50,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        56,
+        56,
+        56,
+        null,
+        null,
+        null,
+        null,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        56,
+        56,
+        56,
+        56,
+        56,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        57,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "repo_files": [
+        "AF05.LP1-autovec.LP2-simple.zig",
+        "config.zig",
+        "data.zig",
+        "render_simple.zig",
+        "sim.zig",
+        "vec.zig"
+      ]
+    },
+    "loops": [
+      {
+        "loop": 1,
+        "addr_span": [
+          4295284948,
+          4295285036
+        ],
+        "lines": [
+          39,
+          47
+        ],
+        "insns": 23,
+        "cond_branches": 1,
+        "vector_fp": 6,
+        "scalar_fp": 3,
+        "stride_bytes": 68,
+        "notes": [
+          "mixed FP (vec 6 / scalar 3)",
+          "indexed gather present"
+        ]
+      },
+      {
+        "loop": 2,
+        "addr_span": [
+          4295285076,
+          4295285320
+        ],
+        "lines": [
+          50,
+          54
+        ],
+        "insns": 62,
+        "cond_branches": 11,
+        "vector_fp": 0,
+        "scalar_fp": 4,
+        "stride_bytes": null,
+        "notes": [
+          "branchy respawn (\u2192 L52)",
+          "scalar FP (\u00d74)"
+        ]
+      },
+      {
+        "loop": 3,
+        "addr_span": [
+          4295285380,
+          4295285964
+        ],
+        "lines": [
+          56,
+          57
+        ],
+        "insns": 147,
+        "cond_branches": 15,
+        "vector_fp": 0,
+        "scalar_fp": 17,
+        "stride_bytes": 68,
+        "notes": [
+          "select-based (csel/cmov \u00d718)",
+          "byte-granular scatter (\u00d716)",
+          "scalar FP (\u00d717)"
+        ]
+      }
+    ],
+    "calls": [
+      {
+        "sym": "layouts.ML01.data.Data.spawn",
+        "line": 52,
+        "std": true
+      },
+      {
+        "sym": "Random.init__anon_28835.gen.fill",
+        "line": 51,
+        "std": true
+      }
+    ],
+    "fconst": [
+      {
+        "i": 20,
+        "v": 0.02
+      },
+      {
+        "i": 27,
+        "v": 0.016667
+      },
+      {
+        "i": 96,
+        "v": 0.0
+      },
+      {
+        "i": 132,
+        "v": 255.0
       }
     ],
     "algo_source": {
@@ -903,106 +6753,6 @@
         "};",
         "",
         "pub const Sim = fw.Strategy(Data, H);"
-      ],
-      "group_lines": [
-        null,
-        39,
-        40,
-        43,
-        40,
-        44,
-        47,
-        39,
-        50,
-        52,
-        50,
-        51,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        51,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        56,
-        null,
-        null,
-        null,
-        null,
-        56,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
       ]
     }
   }
