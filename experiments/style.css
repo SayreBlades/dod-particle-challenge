@@ -212,3 +212,79 @@ footer { color: #666; font-size: 12px; padding: 20px 0; border-top: 1px solid #2
 a.gb-ln { color: #3a3f47; text-decoration: none; }
 a.gb-ln:hover { color: #5dade2; }
 
+
+/* ---- report-v2 additions ---- */
+
+/* q chips (churn palette keyed by death rate) */
+.chiprow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 10px; }
+.chiprow.refs label { font-size: 12px; color: #aaa; display: inline-flex; gap: 4px; align-items: center; }
+.qchip { background: #1c1f23; border: 1px solid #2c2c2c; color: #bbb; border-radius: 12px;
+  padding: 2px 10px; font-size: 11.5px; cursor: pointer; font-family: inherit; transition: all .1s; }
+.qchip.on { background: #2c3540; color: #e8f0f8; border-color: #4a6a8a; }
+.qchip:hover { border-color: #5dade2; }
+
+/* hot-bytes layout strip */
+.hotrow { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 4px; }
+.hotcell { background: #0f1115; border: 1px solid #23262b; border-radius: 5px; padding: 8px 12px;
+  font-size: 11.5px; color: #9fb4c7; line-height: 1.6; }
+.hotcell b { color: #8ab4f8; }
+.hotcell span { color: #7a8a99; font-variant-numeric: tabular-nums; }
+.hotbar { display: inline-block; width: 90px; height: 7px; background: #23262b; border-radius: 4px;
+  overflow: hidden; vertical-align: middle; margin: 0 6px; }
+.hotbar i { display: block; height: 100%; background: linear-gradient(90deg, #2ecc71, #f1c40f); }
+
+/* ratio strip */
+table.ratio { border-collapse: separate; border-spacing: 4px; font-size: 12px; }
+table.ratio th, table.ratio td { border: 1px solid #2c2c2c; border-radius: 4px; padding: 5px 10px;
+  background: #23262b; text-align: center; font-variant-numeric: tabular-nums; }
+table.ratio tbody th { color: #aaa; white-space: nowrap; }
+table.ratio thead th { color: #888; font-weight: 600; }
+table.ratio td .w { color: #888; font-size: 10.5px; display: block; margin-top: 2px; }
+
+/* how-to-read (bottlenecks) */
+details.howto { background: #15171a; border: 1px solid #2a2a2a; border-radius: 5px;
+  padding: 8px 12px; margin: 8px 0; font-size: 12px; color: #aab; }
+details.howto summary { cursor: pointer; color: #8ab4f8; font-weight: 600; }
+details.howto p, details.howto ul { margin: 8px 0; }
+details.howto li { margin: 2px 0 2px 16px; }
+
+/* radar small multiples */
+.radargrid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.radarcell { flex: 1 1 240px; min-width: 220px; max-width: 340px; background: #0f1115;
+  border: 1px solid #23262b; border-radius: 5px; padding: 6px; }
+.radartitle { text-align: center; color: #9aa; font-size: 11.5px; padding: 2px 0 4px; }
+
+/* loop digest cards */
+.digestrow { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.digest { background: #0f1115; border: 1px solid #23262b; border-left: 3px solid #2d5a44;
+  border-radius: 5px; padding: 7px 11px; font-size: 11.5px; color: #9fb4c7; }
+.digest b { color: #8ab4f8; }
+.digest .dnotes { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px; }
+.digest .dnotes span { background: #1a2027; border-radius: 3px; padding: 1px 7px; color: #a8b8c8; }
+.digest.wide { flex: 1 1 420px; }
+
+/* folded interleave view */
+.fold-view { background: #0f1115; border-radius: 4px; padding: 6px 0; overflow: auto; }
+.fold-group { margin: 0 0 2px 0; }
+.fold-src { white-space: pre; font-size: 11.5px; line-height: var(--rh); color: #9ad0a0;
+  padding: 1px 12px 1px 0; border-left: 3px solid #2d5a44; margin-top: 7px; }
+.fold-src.none { color: #566069; border-left-color: #23262b; }
+details.fold { margin-left: 16px; border-left: 3px solid #2a2d33; }
+details.fold.repo { border-left-color: #3a5a2d; }
+details.fold.std { border-left-color: #2a2d33; opacity: 0.85; }
+details.fold summary { cursor: pointer; font-size: 10.5px; color: #7a8a99; padding: 1px 10px;
+  user-select: none; white-space: nowrap; }
+details.fold summary:hover { color: #5dade2; }
+details.fold .foldn { color: #556; margin-left: 6px; }
+details.fold .fold-body { padding-left: 6px; }
+.asm-ann { color: #5a7a6a; font-size: 10.5px; margin-left: 12px; }
+.asm-grp.unatt .asm-row { opacity: 0.6; }
+.asm-unatt-h { font-size: 10px; color: #556; padding: 3px 10px 0; letter-spacing: 0.4px; text-transform: uppercase; }
+
+/* compare page */
+.cmpk { font-size: 11.5px; color: #aaa; background: #1c1f23; border: 1px solid #2c2c2c;
+  border-radius: 4px; padding: 3px 8px; cursor: pointer; }
+.cmpk input { accent-color: #5dade2; }
+.mixgrid { display: flex; flex-wrap: wrap; gap: 8px; }
+.mixbar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: #23262b; margin: 6px 0; }
+.mixbar i { display: block; height: 100%; }
