@@ -23,6 +23,8 @@ Usage:
     scripts/collect.py ML01.AF05.LP1-autovec.LP2-simple   # one algorithm
     scripts/collect.py ML01 --with-profile           # + cycle attribution
     scripts/collect.py ML01 --only profile           # just the profile loop
+    scripts/collect.py ML01 --only asm               # just the asm bundles (schema v2)
+    scripts/collect.py ML01 --refresh-asm            # force-rewrite asm bundles
     NS=10000,1000000 TRIALS=5 scripts/collect.py ML01
 """
 from __future__ import annotations
@@ -130,10 +132,13 @@ def main():
     ap.add_argument("--skip-done", action=argparse.BooleanOptionalAction,
                     default=env("SKIP_DONE", "1") == "1",
                     help="skip points already present at the current source_hash (default on)")
+    ap.add_argument("--refresh-asm", action="store_true",
+                    help="force-rewrite the asm bundles (schema bumps self-invalidate; this forces even on match)")
+    ap.add_argument("--only", choices=["profile", "asm"], default=None,
+                    help="run only the profile loop or only the asm-bundle rewrite")
     ap.add_argument("--with-profile", action="store_true",
                     help="also collect cycle attribution (where a profiler backend exists)")
-    ap.add_argument("--only", choices=["profile"], default=None,
-                    help="run only the profile loop (the radar's data source)")
+
     ap.add_argument("--refresh-hw", action="store_true", default=env("REFRESH_HW", "0") == "1")
     ap.add_argument("--verbose", action="store_true", default=env("VERBOSE", "0") == "1",
                     help="per-step chatter instead of the progress bar (default: bar)")
@@ -158,8 +163,10 @@ def main():
     print(f"=== collect: target={a.target} run={run_id} ===", file=sys.stderr)
     print(f"  algos:   {' '.join(algos)}", file=sys.stderr)
     print(f"  machine: {machine_id} ({host})", file=sys.stderr)
-    print(f"  ns:      {a.n_list or sweep_config.N_GRID}  trials={a.trials}  (T=1 only)", file=sys.stderr)
-    print(f"  profile: {'--with-profile' if a.with_profile else ('--only profile' if a.only == 'profile' else 'off')}  "
+    grid_n = a.n_list or sweep_config.machine_grid(machine_id)
+    print(f"  ns:      {grid_n}  trials={a.trials}  (T=1 only)", file=sys.stderr)
+    print(f"  profile: {'--with-profile' if a.with_profile else ('--only profile' if a.only == 'profile' else 'off')}"
+          f"{'  --only asm' if a.only == 'asm' else ''}  "
           f"backends={profilers or 'none'}", file=sys.stderr)
     print(f"  skip_done={int(a.skip_done)}", file=sys.stderr)
 
@@ -171,22 +178,25 @@ def main():
     # Interleaved: fully process one algorithm (bundle + bench + profile) before
     # the next, so progress tracks by completed algorithm. Bench and profile
     # can't share a run (xctrace perturbs timing), but they share the binary.
-    do_bench = a.only != "profile"
+    do_asm = a.only != "profile"
+    do_bench = a.only not in ("profile", "asm")
     do_profile = (a.only == "profile" or a.with_profile) and bool(profilers)
     rates = sweep_config.death_rates()
-    n_list = a.n_list or sweep_config.N_GRID
+    n_list = grid_n
 
     def _units(al):
         u = 0
         if do_bench:
             u += len(rates)
         if do_profile:
-            u += len(n_list) * len(rates)
+            u += len(sweep_config.PROFILE_N_GRID) * len(rates)
         return u
 
-    total = sum(_units(al) for al in algos)
+    if a.only == "asm":
+        pass  # units = one per algo (the asm bundle itself)
+    total = sum(_units(al) + (1 if do_asm else 0) for al in algos)
     what = ("bench+profile" if do_bench and do_profile
-            else "profile" if do_profile else "bench")
+            else "profile" if do_profile else ("asm" if not do_bench else "bench"))
     if do_profile and not profilers:
         print("  (profile requested but no backend — timing only)", file=sys.stderr)
     print(f"  phase 2: collect {len(algos)} algos serially ({total} units, {what})", file=sys.stderr)
@@ -198,20 +208,21 @@ def main():
             failed = al in FAILED
         if failed:
             counts["fail"] += 1
-            bar.update(f"{tag} {al} (build failed)", _units(al))
+            bar.update(f"{tag} {al} (build failed)", _units(al) + (1 if do_asm else 0))
             continue
-        # asm bundle (full/bench path only; --only profile assumes it exists)
-        if do_bench:
+        # asm bundle (skipped by --only profile, which assumes it exists)
+        if do_asm:
             try:
-                algo.write_bundle(al)
+                algo.write_bundle(al, force=a.refresh_asm)
                 counts["algo"] += 1
             except SystemExit as e:
                 print(f"\n    ALGO FAIL {al}: {e}", file=sys.stderr)
                 with STATE_LOCK:
                     FAILED.add(al)
                 counts["fail"] += 1
-                bar.update(f"{tag} {al} ALGO FAIL", _units(al))
+                bar.update(f"{tag} {al} ALGO FAIL", _units(al) + (1 if do_asm else 0))
                 continue
+            bar.update(f"{tag} {al} asm")
         if do_bench:
             for q in rates:
                 try:
@@ -225,8 +236,10 @@ def main():
                     counts["fail"] += 1
                 bar.update(f"{tag} {al} q={q}")
         if do_profile:
+            prof_n = ([n for n in a.n_list if n in sweep_config.PROFILE_N_GRID]
+                      if a.n_list else sweep_config.PROFILE_N_GRID)
             for q in rates:
-                for n in n_list:
+                for n in prof_n:
                     try:
                         profile.profile_point(al, n, q, machine_id=machine_id,
                                               run_id=run_id, ts_utc=ts_utc,

@@ -153,7 +153,7 @@ def bench_column(algo, q, threads=1, n_list=None, trials=None, machine_id=None,
     host = host_of(machine_id)
     shash = source_hash(algo)
     bp = build_binary(algo)
-    n_list = n_list or sweep_config.N_GRID
+    n_list = n_list or sweep_config.machine_grid(machine_id)
     trials = trials if trials is not None else 3
     now = datetime.datetime.now(datetime.timezone.utc)
     ts_utc = ts_utc or now.strftime("%Y%m%dT%H%M%SZ")
