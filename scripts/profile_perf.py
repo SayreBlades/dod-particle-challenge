@@ -7,31 +7,33 @@ point and returns the four cycle buckets normalized to the common schema:
     perf (AMD Zen 2)                            common bucket
     ------------------------------------------  ----------------
     cycles − (stalls + flush)                   compute          (retire-ready)
-    l2_latency.l2_cycles_waiting_on_fills × 4   backend_stall    (data hazards / cache misses)
+    ic_fetch_stall.ic_stall_back_pressure       backend_stall    (data hazards / cache misses)
     ic_fetch_stall.ic_stall_dq_empty            frontend_stall   (instruction-fetch starvation)
-    ex_ret_brn_misp × ~17                        branch_flush     (pipeline flushes / mispredicts)
+    ex_ret_brn_misp × ~17                       branch_flush     (pipeline flushes / mispredicts)
+    (l2_latency.l2_cycles_waiting_on_fills      l2_fill_wait     — advisory, NOT a bucket)
 
 The buckets sum to `cycles` (compute is the remainder, with a rescale safety net
 for the rare case the stall proxies over-count).
 
-EVENT SET: AMD Zen 2 (Family 17h, Model 71h — e.g. Ryzen 9 3900X). Four events
+EVENT SET: AMD Zen 2 (Family 17h, Model 71h — e.g. Ryzen 9 3900X). Five events
 → fits the 6 GP PMCs with headroom (no multiplexing even if the NMI watchdog
-steals one). Validated live on madbits (kernel 6.12, perf 5.15) 2026-08-17:
-the previous event set — `de_dis_dispatch_token_stalls1.*` + `ex_ret_brn_resync`
-— was SUPPORTED but read ~0 on this µarch/workload (123 load-queue token
-stalls and 45 resyncs per 1.4 BILLION cycles), collapsing the attribution to
-Compute+Frontend only. The replacements, chosen from the same PMU vocabulary:
-
-- `l2_latency.l2_cycles_waiting_on_fills` — core cycles waiting on L2 fills
-  from L3/DRAM, counted ÷4 (scale factor applied) — the Zen 2 memory-latency
-  proxy. An upper bound on true backend stall (a fill can be outstanding while
-  independent work retires) — documented approximation.
-- `ic_fetch_stall.ic_stall_dq_empty` — the HONEST frontend stall (dispatch
-  queue empty = genuinely fetch-starved), unlike `ic_stall_any` which also
-  counts back-pressure cycles when the backend isn't consuming (~64% here —
-  it was absorbing the entire backend signal).
-- `ex_ret_brn_misp` — retired mispredicted branches; `ex_ret_brn_resync`
-  counts only the rare resync class (12.6M vs 57 events on the same run).
+steals one). The ic_fetch_stall pair partitions the fetch pipeline's stall
+cycles the way AMD's Fam17h guidance recommends: `dq_empty` = genuinely
+fetch-starved (frontend) vs `back_pressure` = blocked because the backend
+couldn't accept (backend-bound; includes execution-busy and memory-wait
+overlap — a pressure indicator, not pure memory latency). Validated live on
+madbits (kernel 6.12, perf 5.15) 2026-08-17 after TWO dead prior sets:
+- v0 (dispatch-token stalls + ex_ret_brn_resync): supported but inert — 123
+  load-queue token stalls and 45 resyncs per 1.4B cycles; the buckets
+  collapsed to Compute+ic_stall_any(64% inflated).
+- v1 (l2_cycles_waiting_on_fills ×4 as backend): saturates — the counter is
+  dominated by steady-state outstanding fills (MLP) and init/page-fault
+  traffic; ×4-restore pinned ≥cycles at DRAM-resident N and the rescale net
+  degenerated every row to compute≈0. Kept as the advisory `l2_fill_wait`
+  raw (a memory-pressure index in ÷4 units: ~5–8% L3-resident vs ~80% raw
+  at DRAM — discriminating, just not stall CYCLES).
+- ex_ret_brn_misp (12.6M events) not ex_ret_brn_resync (57) — resync is a
+  rare mispredict class, not the flush signal.
 
 On other µarches these named events may be unsupported; `measure()` raises and
 collect.py logs PROFILE FAIL (graceful — the row is simply not written).
@@ -47,15 +49,14 @@ import glob, os, shutil, subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# AMD Zen 2 (17h/71h). 4 events → no multiplexing (headroom for the NMI watchdog).
+# AMD Zen 2 (17h/71h). 5 events → no multiplexing (headroom for the NMI watchdog).
 EVENTS = [
     "cycles",
-    "l2_latency.l2_cycles_waiting_on_fills",   # backend: L2 fill-wait cycles (÷4 — see EVENT_SCALE)
-    "ic_fetch_stall.ic_stall_dq_empty",         # frontend: IC stall with dispatch queue EMPTY (honest fetch starvation)
-    "ex_ret_brn_misp",                           # branch flush (mispredict COUNT; × penalty below)
+    "ic_fetch_stall.ic_stall_back_pressure",    # backend: fetch blocked on backend (AMD's Fam17h backend indicator)
+    "ic_fetch_stall.ic_stall_dq_empty",          # frontend: fetch-starved (dispatch queue empty)
+    "ex_ret_brn_misp",                            # branch flush (mispredict COUNT; × penalty below)
+    "l2_latency.l2_cycles_waiting_on_fills",     # ADVISORY (l2_fill_wait raw): memory-pressure index, ÷4 units
 ]
-# Counters that do not increment 1:1 per cycle (per the event description).
-EVENT_SCALE = {"l2_latency.l2_cycles_waiting_on_fills": 4}
 # AMD 17h PPR, approx: a branch mispredict flushes this many frontend cycles.
 MISP_PENALTY_CYCLES = 17
 
@@ -138,8 +139,7 @@ def measure(algo, n, q, threads, iters, trial, bin_path):
 
     frontend_stall = get("ic_fetch_stall.ic_stall_dq_empty")
     misp = get("ex_ret_brn_misp")
-    fills = get("l2_latency.l2_cycles_waiting_on_fills")
-    backend_stall = fills * EVENT_SCALE["l2_latency.l2_cycles_waiting_on_fills"]
+    backend_stall = get("ic_fetch_stall.ic_stall_back_pressure")
     branch_flush = misp * MISP_PENALTY_CYCLES
 
     # Partition: compute is the remainder. If the stall proxies over-count
@@ -160,6 +160,8 @@ def measure(algo, n, q, threads, iters, trial, bin_path):
         "backend_stall": backend_stall,
         "frontend_stall": frontend_stall,
         "branch_flush": branch_flush,
+        # advisory (not a bucket): memory-pressure index in ÷4 units — see docstring
+        "l2_fill_wait": get("l2_latency.l2_cycles_waiting_on_fills"),
     }
 
 

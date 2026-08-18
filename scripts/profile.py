@@ -115,6 +115,7 @@ def profile_point(algo, n, q, threads, trial=1, iters=None, machine_id=None,
         "backend_stall_pct": pct(raw["backend_stall"]),
         "frontend_stall_pct": pct(raw["frontend_stall"]),
         "branch_flush_pct": pct(raw["branch_flush"]),
+        **({"l2_fill_wait": raw["l2_fill_wait"]} if raw.get("l2_fill_wait") is not None else {}),
     }
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "a") as f:
