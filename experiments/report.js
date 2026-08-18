@@ -19,7 +19,7 @@ const AX = { axisLine: { lineStyle: { color: "#666" } }, axisLabel: { color: "#a
 
 let MACHINES, machine, threads = 1;
 const ovCache = {}, layCache = {}, algoCache = {};
-const REPORT_V = "v4";   // cache-bust key for SPA fetches — bump when bundle schemas change
+const REPORT_V = "v6";   // cache-bust key for SPA fetches — bump when bundle schemas change
 const fetchJSON = (u) => fetch(`${u}?${REPORT_V}`).then((r) => r.ok ? r.json() : null);
 const fetchText = (u) => fetch(`${u}?${REPORT_V}`).then((r) => r.ok ? r.text() : "");
 
@@ -415,7 +415,7 @@ const BUCKET_META = [
 ];
 function howtoHtml(profiler) {
   const p = profiler === "perf"
-    ? "<code>perf stat</code> on AMD Zen 2: compute = cycles − stalls − flush; backend = dispatch-token stalls (load/store queue, FP sched); frontend = ic_fetch_stall (over-attributed when the backend is full — documented caveat); branch = resyncs × 16-cycle penalty."
+    ? "<code>perf stat</code> on AMD Zen 2: compute = cycles − stalls − flush; backend = l2_latency.l2_cycles_waiting_on_fills ×4 (core cycles waiting on L2 fills from L3/DRAM — an upper-bound memory-latency proxy); frontend = ic_fetch_stall.ic_stall_dq_empty (dispatch-queue-empty = genuine fetch starvation); branch = ex_ret_brn_misp × 17-cycle penalty. Stall proxies are documented approximations (AMD 17h PPR)."
     : "<code>xctrace</code> CPU Counters (Apple): useful / processing / delivery / discarded — retire-ready, data-hazard, fetch-starved, and flushed cycles, normalized to sum = cycles.";
   return `<details class="howto"><summary>How to read the radar & cycle bars</summary>
   <p>The radar plots five <b>goodness axes</b> (bigger = <i>fewer cycles lost</i>, NOT faster — a compute-heavy polygon can still be the slowest algorithm):</p>

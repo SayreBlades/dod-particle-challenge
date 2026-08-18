@@ -7,30 +7,39 @@ point and returns the four cycle buckets normalized to the common schema:
     perf (AMD Zen 2)                            common bucket
     ------------------------------------------  ----------------
     cycles − (stalls + flush)                   compute          (retire-ready)
-    de_dis_dispatch_token_stalls* (memory)      backend_stall    (data hazards / cache misses)
-    ic_fetch_stall.ic_stall_any                 frontend_stall   (instruction-fetch starvation)
-    ex_ret_brn_resync × penalty                 branch_flush     (pipeline flushes / mispredicts)
+    l2_latency.l2_cycles_waiting_on_fills × 4   backend_stall    (data hazards / cache misses)
+    ic_fetch_stall.ic_stall_dq_empty            frontend_stall   (instruction-fetch starvation)
+    ex_ret_brn_misp × ~17                        branch_flush     (pipeline flushes / mispredicts)
 
 The buckets sum to `cycles` (compute is the remainder, with a rescale safety net
 for the rare case the stall proxies over-count).
 
-EVENT SET: AMD Zen 2 (Family 17h, Model 71h — e.g. Ryzen 9 3900X). Six events,
-which fits the 6 general-purpose PMCs per core → no multiplexing → every counter
-is 100%-counted → cycle-accurate attribution. On other µarches these named
-events may be unsupported; `measure()` raises and collect.py logs PROFILE FAIL
-(graceful — the row is simply not written). `measure()` also raises if perf
-silently dropped or scaled any event (e.g. the NMI watchdog stealing a GP PMC
-and forcing multiplexing) — that would otherwise collapse the buckets to a
-misleading all-`compute` row.
+EVENT SET: AMD Zen 2 (Family 17h, Model 71h — e.g. Ryzen 9 3900X). Four events
+→ fits the 6 GP PMCs with headroom (no multiplexing even if the NMI watchdog
+steals one). Validated live on madbits (kernel 6.12, perf 5.15) 2026-08-17:
+the previous event set — `de_dis_dispatch_token_stalls1.*` + `ex_ret_brn_resync`
+— was SUPPORTED but read ~0 on this µarch/workload (123 load-queue token
+stalls and 45 resyncs per 1.4 BILLION cycles), collapsing the attribution to
+Compute+Frontend only. The replacements, chosen from the same PMU vocabulary:
+
+- `l2_latency.l2_cycles_waiting_on_fills` — core cycles waiting on L2 fills
+  from L3/DRAM, counted ÷4 (scale factor applied) — the Zen 2 memory-latency
+  proxy. An upper bound on true backend stall (a fill can be outstanding while
+  independent work retires) — documented approximation.
+- `ic_fetch_stall.ic_stall_dq_empty` — the HONEST frontend stall (dispatch
+  queue empty = genuinely fetch-starved), unlike `ic_stall_any` which also
+  counts back-pressure cycles when the backend isn't consuming (~64% here —
+  it was absorbing the entire backend signal).
+- `ex_ret_brn_misp` — retired mispredicted branches; `ex_ret_brn_resync`
+  counts only the rare resync class (12.6M vs 57 events on the same run).
+
+On other µarches these named events may be unsupported; `measure()` raises and
+collect.py logs PROFILE FAIL (graceful — the row is simply not written).
+`measure()` also raises if perf silently dropped or scaled any event (that
+would otherwise collapse the buckets to a misleading all-`compute` row).
 
 Requires: `perf` on PATH and permission to read PMCs —
-`kernel.perf_event_paranoid <= 1` (or `CAP_PERFMON`), and
-`kernel.nmi_watchdog=0` so all 6 GP PMCs are free for the event set.
-
-CAVEAT: on Zen 2, `ic_fetch_stall.ic_stall_any` counts cycles the front end did
-not supply ops, INCLUDING cycles where the back end was not consuming — so the
-frontend bucket may be over-attributed for back-end-bound code. Tune EVENTS (and
-add Intel/other-AMD maps) for tighter attribution; the schema is unchanged.
+`kernel.perf_event_paranoid <= 1` (or `CAP_PERFMON`).
 Penalty constants are documented approximations from the AMD 17h PPR.
 """
 from __future__ import annotations
@@ -38,17 +47,17 @@ import glob, os, shutil, subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# AMD Zen 2 (17h/71h). 6 events → 6 GP PMCs → no multiplexing.
+# AMD Zen 2 (17h/71h). 4 events → no multiplexing (headroom for the NMI watchdog).
 EVENTS = [
     "cycles",
-    "ic_fetch_stall.ic_stall_any",                                   # frontend (IC-pipe stall)
-    "ex_ret_brn_resync",                                             # branch flush (resync COUNT)
-    "de_dis_dispatch_token_stalls1.load_queue_token_stall",          # backend: memory (loads)
-    "de_dis_dispatch_token_stalls1.store_queue_token_stall",         # backend: memory (stores)
-    "de_dis_dispatch_token_stalls1.fp_sch_rsrc_stall",               # backend: FP scheduler
+    "l2_latency.l2_cycles_waiting_on_fills",   # backend: L2 fill-wait cycles (÷4 — see EVENT_SCALE)
+    "ic_fetch_stall.ic_stall_dq_empty",         # frontend: IC stall with dispatch queue EMPTY (honest fetch starvation)
+    "ex_ret_brn_misp",                           # branch flush (mispredict COUNT; × penalty below)
 ]
-# AMD 17h PPR, approx: a branch resync flushes this many frontend cycles.
-RESYNC_PENALTY_CYCLES = 16
+# Counters that do not increment 1:1 per cycle (per the event description).
+EVENT_SCALE = {"l2_latency.l2_cycles_waiting_on_fills": 4}
+# AMD 17h PPR, approx: a branch mispredict flushes this many frontend cycles.
+MISP_PENALTY_CYCLES = 17
 
 
 def find_perf():
@@ -127,12 +136,11 @@ def measure(algo, n, q, threads, iters, trial, bin_path):
         raise RuntimeError(f"perf reported zero cycles (rc={r.returncode}): "
                            f"{r.stderr.strip()[:300]}")
 
-    frontend_stall = get("ic_fetch_stall.ic_stall_any")
-    resyncs = get("ex_ret_brn_resync")
-    backend_stall = (get("de_dis_dispatch_token_stalls1.load_queue_token_stall")
-                     + get("de_dis_dispatch_token_stalls1.store_queue_token_stall")
-                     + get("de_dis_dispatch_token_stalls1.fp_sch_rsrc_stall"))
-    branch_flush = resyncs * RESYNC_PENALTY_CYCLES
+    frontend_stall = get("ic_fetch_stall.ic_stall_dq_empty")
+    misp = get("ex_ret_brn_misp")
+    fills = get("l2_latency.l2_cycles_waiting_on_fills")
+    backend_stall = fills * EVENT_SCALE["l2_latency.l2_cycles_waiting_on_fills"]
+    branch_flush = misp * MISP_PENALTY_CYCLES
 
     # Partition: compute is the remainder. If the stall proxies over-count
     # (compute would go negative), clamp then rescale so the 4 buckets still
