@@ -241,7 +241,7 @@ def main():
             for q in rates:
                 for n in prof_n:
                     try:
-                        profile.profile_point(al, n, q, machine_id=machine_id,
+                        profile.profile_point(al, n, q, threads=1, machine_id=machine_id,
                                               run_id=run_id, ts_utc=ts_utc,
                                               skip_done=a.skip_done, verbose=a.verbose)
                     except (SystemExit, RuntimeError) as e:
