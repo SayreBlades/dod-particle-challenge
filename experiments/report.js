@@ -19,7 +19,7 @@ const AX = { axisLine: { lineStyle: { color: "#666" } }, axisLabel: { color: "#a
 
 let MACHINES, machine, threads = 1;
 const ovCache = {}, layCache = {}, algoCache = {};
-const REPORT_V = "v8";   // cache-bust key for SPA fetches — bump when bundle schemas change
+const REPORT_V = "v9";   // cache-bust key for SPA fetches — bump when bundle schemas change
 const fetchJSON = (u) => fetch(`${u}?${REPORT_V}`).then((r) => r.ok ? r.json() : null);
 const fetchText = (u) => fetch(`${u}?${REPORT_V}`).then((r) => r.ok ? r.text() : "");
 
@@ -418,6 +418,16 @@ function howtoHtml(profiler) {
     ? "<code>perf stat</code> on AMD Zen 2: compute = cycles − stalls − flush; backend = ic_fetch_stall.ic_stall_back_pressure (cycles the fetch pipeline was blocked because the backend couldn't accept — AMD's Fam17h backend indicator; includes execution-busy ∨ memory-wait overlap); frontend = ic_fetch_stall.ic_stall_dq_empty (dispatch-queue-empty = genuine fetch starvation); branch = ex_ret_brn_misp × 17-cycle penalty. Penalty is a documented approximation (AMD 17h PPR)."
     : "<code>xctrace</code> CPU Counters (Apple): useful / processing / delivery / discarded — retire-ready, data-hazard, fetch-starved, and flushed cycles, normalized to sum = cycles.";
   return `<details class="howto"><summary>How to read the radar & cycle bars</summary>
+  <p><b>Where do cycles go?</b> Every CPU cycle lands in exactly one of four buckets (they sum to 100% — that's what the stacked bars show, and what the radar is made of). The classic mental model is the two halves of an out-of-order core:</p>
+  <pre class="pipe">FRONTEND                          BACKEND
+fetch → decode → rename  →  schedule → execute → retire
+(get instructions ready)     (do the work, commit results)</pre>
+  <ul>
+    <li><b>Frontend stall</b> — the instruction <i>supply</i> failed: icache miss, decoder starved. "I have an empty execution engine and nothing to feed it."</li>
+    <li><b>Backend stall</b> — instructions are ready, but the <i>execution side</i> can't advance: a load missed cache and its consumer is waiting; an execution unit is occupied; a dependency chain is too tight to fill the pipeline. "I have work queued and the machinery is blocked or saturated."</li>
+    <li><b>Branch flush</b> — the pipeline did speculative work that got thrown away on a mispredict.</li>
+    <li><b>Compute</b> — cycles where instructions actually retired.</li>
+  </ul>
   <p>The radar plots five <b>goodness axes</b> (bigger = <i>fewer cycles lost</i>, NOT faster — a compute-heavy polygon can still be the slowest algorithm):</p>
   <ul>
     <li><b>Compute</b> = compute_pct (retire-ready)</li>
