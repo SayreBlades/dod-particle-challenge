@@ -240,15 +240,17 @@ uv run python scripts/algo_hash.py ML01.AF02.LP1-autovec.LP2-simple --files  # a
 
 ## sweep_config.py
 
-The single source of truth for the collection grid: the **machine-aware N grid**
-(`n_grid(hw)` — decades + 5 points bracketing each cache transition
-`size/bytes_per_particle`, ≥1.15× log-spacing dedupe, clamp [300, 1e7]; M4 gets
-13 points bracketing the 963 / 61680 spills), computed `iters_for(n)`/`warmup_for(n)`
+The single source of truth for the collection grid: the **canonical 12-point
+N grid** (`CANONICAL_N_GRID` = 4 decades + 8 fills, identical on every machine
+and layout — designed so every L2/L3 spill of the plausible fleet, cache sizes
+{L1d 32–128K, L2 512K–8M, L3 16–96M} × strides {29…68 B/p}, has a grid point
+on both sides within ~1.9×; loose by design only on L1d upper / big-L3 corners,
+where `NS=` targeted fills remain available), computed `iters_for(n)`/`warmup_for(n)`
 (≥~18ms timed region at a conservative 8 ns/p floor), the **frozen
-`PROFILE_N_GRID`** (dense-N is bench-only), `DEATH_RATES`, and the algorithm
-roster (`algo_roster()`/`mem_layout_algos()` — parsed from build.zig's
-`algo_labels` registry). Imported by `collect.py`, `bench.py`, and
-`analyze_algo.py`. (The legacy
+`PROFILE_N_GRID`** (4 decades), `DEATH_RATES`, and the algorithm roster
+(`algo_roster()`/`mem_layout_algos()` — parsed from build.zig's `algo_labels`
+registry). `n_grid(hw)` survives as the per-machine bracket generator for
+TARGETED `NS=` fill-ins. Imported by `collect.py`, `bench.py`, `analyze_algo.py`. (The legacy
 `experiments/sweeps/` config files — `death_rates.txt` + `<ML>.algos` rosters —
 were consolidated here; subset sweeps are a CLI concern: pass targets to
 `collect.py`.)
