@@ -44,7 +44,15 @@ EXCLUDE_DEATH_Q = (0.0, 0.75)
 
 # Particle counts (N) EXCLUDED from per-algo bundles — legacy sweep points
 # retired from the bench SWEEP (see build_report.py). Keep in sync.
-EXCLUDE_N = (16000,)
+# Particle counts (N) EXCLUDED from the report. The canonical 12-point grid
+# (sweep_config.CANONICAL_N_GRID) superseded the report-v2 machine-aware grids;
+# these are the retired per-machine bracket points (raw data retains them).
+# Plus 16000, a legacy sweep point retired earlier. Keep in sync with
+# build_report.py.
+EXCLUDE_N = (16000,
+             380, 640, 960, 1400, 2400, 25000, 41000, 62000, 93000,       # minibits v2 grid
+             320, 480, 720, 3100, 5100, 7700, 12000, 19000, 99000,       # madbits v2 grid
+             160000, 250000, 370000, 620000)
 
 
 def sh(cmd):

@@ -15,11 +15,19 @@ import os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# The FALLBACK N grid - decadal (10^4..10^7), machine-agnostic, used when no
-# hardware.json exists yet. The real grid is machine-aware: n_grid(hw) brackets
-# this machine's cache transitions (report-v2.md section 2) so knees are
-# visible. Override per-run with NS= env.
-N_GRID = [10000, 100000, 1000000, 10000000]
+# The CANONICAL N grid - one fixed 12-point bench grid shared by EVERY machine
+# and layout (report-v2 revision: the per-machine n_grid() scheme made machines
+# incomparable and would bracket each layout's knees separately). Design: the
+# 4 decades (the frozen PROFILE_N_GRID anchors + all historical data) + 8 fill
+# points placed so that every L2/L3 spill of the plausible fleet - cache sizes
+# {L1d 32-128K, L2 512K-8M, L3 16-96M} x layout strides {29,32,36,37,68 B/p} -
+# has a grid point on BOTH sides within ~1.9x. Verified against all 65 fleet
+# transitions: L2/L3 knees of both current machines land at <=1.9x; the loose
+# corners are deliberately the L1d upper cluster (1.3-4.5K; L1d knees are
+# empirically invisible in these curves) and >1M big-L3 machines (coarse
+# 1M->10M span; use NS= for a targeted bracket there).
+CANONICAL_N_GRID = [450, 1200, 7000, 10000, 20000, 50000, 100000, 150000,
+                    300000, 700000, 1000000, 10000000]
 
 # The PROFILE N grid - FROZEN at the coarse decades (decision: dense-N is a
 # bench-only change; profile collection stays 4 points x 4 q per algo).
@@ -57,22 +65,13 @@ def n_grid(hw: dict, bpp: int = 68) -> list[int]:
     return out
 
 
-_GRID_CACHE: dict[str, list[int]] = {}
-
-
-def machine_grid(machine_id: str) -> list[int]:
-    """n_grid for a measured machine (from its data/<id>/hardware.json); the
-    fallback decades when absent."""
-    if machine_id in _GRID_CACHE:
-        return list(_GRID_CACHE[machine_id])
-    p = os.path.join(ROOT, "experiments", "data", machine_id, "hardware.json")
-    try:
-        import json
-        grid = n_grid(json.load(open(p)))
-    except (OSError, ValueError):
-        grid = list(N_GRID)
-    _GRID_CACHE[machine_id] = grid
-    return list(grid)
+def machine_grid(machine_id: str = "") -> list[int]:
+    """The bench grid for any machine: the CANONICAL_N_GRID (identical
+    everywhere - that is the point). `machine_id` is accepted for call-site
+    compatibility and ignored. Use n_grid(hw) only for TARGETED fill-ins:
+    when a specific knee needs a tight bracket on one machine, run
+    `NS=... scripts/collect.py <algo>` with points from n_grid(hw)."""
+    return list(CANONICAL_N_GRID)
 
 
 # Timed frames per N (report takes min over trials). COMPUTED (was a fixed

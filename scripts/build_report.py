@@ -53,7 +53,10 @@ EXCLUDE_DEATH_Q = (0.0, 0.75)
 # from the bench SWEEP (src/framework/bench.zig); raw data retains them.
 # 16000 was an L1-era point, dropped in the one-pass sparse grid (97f2541) but
 # the collected rows were never purged. Same sync rule as EXCLUDE_DEATH_Q.
-EXCLUDE_N = (16000,)
+EXCLUDE_N = (16000,
+             380, 640, 960, 1400, 2400, 25000, 41000, 62000, 93000,
+             320, 480, 720, 3100, 5100, 7700, 12000, 19000, 99000,
+             160000, 250000, 370000, 620000)
 
 # Per-mem_layout struct diagram shown atop the algo page (the data-model identity).
 # TODO: read from the mem_layout README spec; hardcoded per-mem_layout for now (L1 only).
