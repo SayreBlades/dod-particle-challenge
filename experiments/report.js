@@ -11,7 +11,7 @@ const short = (algo) => algo.split(".").slice(1).join(".");
 const fmtq = (d) => (d === 0 ? "0" : String(d));
 const fmtN = (n) => n >= 1e6 ? `${n / 1e6}M` : n >= 1e3 ? `${n / 1e3}K` : `${n}`;
 const mhref = (path) => `#/${machine}/${path}`;  // machine-scoped hash link
-const axisTooltip = { trigger: "axis", formatter(params) { const p = Array.isArray(params) ? params : [params]; const hdr = `<div style="text-align:center;margin-bottom:4px">${fmtN(Math.round(p[0].axisValue))} Particles</div>`; return hdr + p.filter(x => x.seriesName !== '__cache' && x.seriesName !== '__marks' && !x.seriesName.startsWith('__')).map(x => { const name = x.seriesName.startsWith('q=') ? '' : x.seriesName + ': '; return `${x.marker} ${name}${x.value[1] != null ? x.value[1].toFixed(2) : '-'}`; }).join('<br/>'); } };
+const axisTooltip = { trigger: "axis", formatter(params) { const p = Array.isArray(params) ? params : [params]; const hdr = `<div style="text-align:center;margin-bottom:4px">${fmtN(Math.round(p[0].axisValue))} Particles</div>`; return hdr + p.map(x => { const name = x.seriesName.startsWith('q=') ? '' : x.seriesName + ': '; return `${x.marker} ${name}${x.value[1] != null ? x.value[1].toFixed(2) : '-'}`; }).join('<br/>'); } };
 const charts = [];
 window.addEventListener("resize", () => charts.forEach((c) => c.resize()));
 const AX = { axisLine: { lineStyle: { color: "#666" } }, axisLabel: { color: "#aaa" },
@@ -23,6 +23,37 @@ let MACHINES, machine, threads = 1;
 let qSel = [];        // selected death rates (strings); [] = all
 let qAvail = [];      // numbers, from the machine's overview death_rates
 let qRedraw = null;   // per-page redraw hook, fired on q change
+let refSel = { naive: true, winner: true };   // refs shown at single-q; header refs dropdown (naive+winner)
+// refs (naive baseline + best-of-grid winner) render only when exactly one
+// q is selected — they compare "this algo vs the field at one death rate",
+// which is meaningless averaged across multiple q's. The header refs
+// dropdown toggles them globally (visible only at single-q).
+// Consistent ref coding across ALL charts: naive = gray diamonds, winner =
+// white diamonds (radar: gray/white polygons).
+const REF_NAIVE = "#9aa", REF_WINNER = "#f0f0f0";
+function buildRefsDrop() {
+  const wrap = $("refwrap");
+  if (!wrap) return;
+  const single = activeQs().length === 1;
+  wrap.style.display = single ? "" : "none";
+  if (!single) { wrap.querySelector(".qdrop")?.classList.remove("open"); return; }
+  const el = $("refdrop");
+  const items = [["naive", "naive"], ["winner", "winner"]];
+  const label = items.filter(([k]) => refSel[k]).map(([, l]) => l).join(", ") || "none";
+  el.innerHTML = `<button type="button" class="qbtn" title="reference overlays: naive baseline + per-N winner">${label}</button>
+    <div class="qdrop-menu">${items.map(([k, l]) =>
+      `<div class="qdrop-item" data-ref="${k}" style="color:${k === "naive" ? REF_NAIVE : REF_WINNER}"><input type="checkbox" tabindex="-1" ${refSel[k] ? "checked" : ""}>${l}</div>`).join("")}</div>`;
+  el.querySelector("button").onclick = (e) => { e.stopPropagation(); el.classList.toggle("open"); };
+  el.querySelectorAll(".qdrop-item").forEach((it) => {
+    it.onclick = (e) => {
+      e.preventDefault(); e.stopPropagation();
+      refSel[it.dataset.ref] = !refSel[it.dataset.ref];
+      buildRefsDrop();
+      el.classList.add("open");
+      if (qRedraw) qRedraw();
+    };
+  });
+}
 function shortMachine(id) {
   // display name: name portion capped at 15 chars, hash suffix kept
   const m = String(id).match(/^(.*)-([0-9a-f]{8})$/);
@@ -41,6 +72,7 @@ function setQAvail(qs) {
   qSel = qSel.filter((s) => avail.includes(s));
   if (qSel.length === avail.length) qSel = [];   // all on = default state
   buildQDrop();
+  buildRefsDrop();
 }
 function buildQDrop() {
   const el = $("qdrop");
@@ -61,6 +93,7 @@ function buildQDrop() {
       if (!next.length) return;                                    // keep ≥ 1 active
       qSel = next.length === qAvail.length ? [] : next;
       buildQDrop();
+      buildRefsDrop();
       el.classList.add("open");
       if (qRedraw) qRedraw();
     };
@@ -354,7 +387,6 @@ function splitNarrative(md) {
 // ---- merged loop cards: per-loop stages + schedule + hot bytes ----
 
 // ---- latency chart: ns/p vs N, references + memory floor + cache bands ----
-let showBaseline = true, showWinner = true;
 function drawLatencyChart(j, grid, qActive) {
   const ceil = j.hardware.streaming_bw_gbs;
   const bpp = j.bytes_per_particle;
@@ -367,32 +399,31 @@ function drawLatencyChart(j, grid, qActive) {
     lineStyle: { width: 1.8, color: pal(+q) }, itemStyle: { color: pal(+q) },
     data: pickThreads(j.series[q]).map((r) => [r.N, r.ns_particle]),
   }));
-  // references from the grid: baseline ghost line + winner ghost scatter
-  const refSeries = [];
-  if (showBaseline && grid) {
-    for (const q of qs.filter((q) => qActive.includes(q))) {
-      const bl = grid.points.filter((p) => p.algo === BASELINE && p.threads === threads
-        && Math.abs(p.death_q - +q) < 1e-9 && p.algo !== j.algo).sort((a, b) => a.N - b.N);
-      if (bl.length && !(j.algo === BASELINE))
-        refSeries.push({ name: `__bl q=${q}`, type: "line", symbol: "none",
-          lineStyle: { width: 1.2, type: "dashed", color: pal(+q), opacity: 0.55 }, itemStyle: { color: pal(+q) },
-          data: bl.map((p) => [p.N, p.ns_particle]) });
-    }
+  // references, single-q only, consistent coding everywhere:
+  // naive = gray diamonds · winner = white diamonds
+  const singleQ = qActive.length === 1;
+  if (grid && singleQ && refSel.naive && j.algo !== BASELINE) {
+    const q = +qActive[0];
+    const bl = grid.points.filter((p) => p.algo === BASELINE && p.threads === threads
+      && Math.abs(p.death_q - q) < 1e-9).sort((a, b) => a.N - b.N);
+    if (bl.length)
+      series.push({ name: "naive", type: "scatter", symbol: "diamond", symbolSize: 8,
+        itemStyle: { color: REF_NAIVE, borderColor: "#444", borderWidth: 1 },
+        data: bl.map((p) => [p.N, p.ns_particle]) });
   }
-  if (showWinner && grid) {
-    const wpts = [];
-    for (const q of qs.filter((q) => qActive.includes(q))) {
-      const byN = {};
-      grid.points.filter((p) => p.threads === threads && Math.abs(p.death_q - +q) < 1e-9)
-        .forEach((p) => { if (!byN[p.N] || p.ns_particle < byN[p.N].ns_particle) byN[p.N] = p; });
-      Object.values(byN).forEach((p) => wpts.push({ value: [p.N, p.ns_particle], algo: p.algo, q }));
-    }
-    refSeries.push({ name: "__winner", type: "scatter", symbol: "diamond", symbolSize: 9,
-      itemStyle: { color: "#f0f0f0", borderColor: "#555", borderWidth: 1 },
-      data: wpts.map((p) => p.value), tooltip: { formatter: () => "best-of-grid" } });
+  if (grid && singleQ && refSel.winner) {
+    const q = +qActive[0];
+    const byN = {};
+    grid.points.filter((p) => p.threads === threads && Math.abs(p.death_q - q) < 1e-9)
+      .forEach((p) => { if (!byN[p.N] || p.ns_particle < byN[p.N].ns_particle) byN[p.N] = p; });
+    const pts = Object.values(byN).sort((a, b) => a.N - b.N);
+    if (pts.length)
+      series.push({ name: "winner", type: "scatter", symbol: "diamond", symbolSize: 8,
+        itemStyle: { color: REF_WINNER, borderColor: "#555", borderWidth: 1 },
+        data: pts.map((p) => [p.N, p.ns_particle]) });
   }
   const bands = cacheBands(j);
-  const carrier = { name: "__marks", type: "line", data: [], symbol: "none", lineStyle: { opacity: 0 }, silent: true,
+  const carrier = { name: "bands", type: "line", data: [], symbol: "none", lineStyle: { opacity: 0 }, silent: true,
     markArea: bands,
     markLine: { silent: true, symbol: "none", data: [
       { yAxis: floorNs, lineStyle: { type: "dotted", color: "#e67e22", width: 2 },
@@ -418,33 +449,28 @@ function drawLatencyChart(j, grid, qActive) {
   chart("latchart", {
     backgroundColor: "#0f1115",
     tooltip: { trigger: "axis", formatter(ps) {
-      const p0 = ps.find((x) => !x.seriesName.startsWith("__"));
-      if (!p0) return "";
-      const N = Math.round(p0.axisValue);
+      if (!ps.length) return "";
+      const N = Math.round(ps[0].axisValue);
       const hdr = `<div style="text-align:center;margin-bottom:4px">${fmtN(N)} Particles</div>`;
-      const rows = ps.filter((x) => !x.seriesName.startsWith("__")).map((x) => {
+      const rows = ps.map((x) => {
         const ns = x.value[1];
-        const bw = (bpp / ns).toFixed(2);
-        const pc = ((bpp / ns) / ceil * 100).toFixed(0);
-        const nm = x.seriesName.startsWith("q=") ? x.seriesName
-          : x.seriesName === "__winner" ? "best-of-grid" : x.seriesName.replace("__bl ", "naive ");
-        return `${x.marker} ${nm}: ${ns.toFixed(2)} ns/p · ${bw} GB/s (${pc}% ceiling)`;
+        return `${x.marker} ${x.seriesName}: ${ns.toFixed(2)} ns/p`;
       });
       return hdr + rows.join("<br/>");
     } },
-    legend: { top: 0, textStyle: { color: "#ccc", fontSize: 10 } },
+    legend: { top: 0, textStyle: { color: "#ccc", fontSize: 10 }, data: series.map((s) => s.name) },
     grid: { left: 10, right: 12, top: 30, bottom: 26, containLabel: true },
     xAxis: { type: "log", name: "N", min: bands.axisMin, max: 20e6, ...AX,
       axisLabel: { ...AX.axisLabel, formatter: (v) => v >= 1e6 ? `${v / 1e6}M` : v >= 1e3 ? `${v / 1e3}K` : v } },
     yAxis: { type: "value", name: "ns/particle", max: yMax, ...AX,
       axisLabel: { ...AX.axisLabel, formatter: (v) => +v.toFixed(2) } },
-    series: [...series, ...refSeries, carrier],
+    series: [...series, carrier],
     dataZoom: [{ type: "inside" }],
   });
 }
 
 // ---- bandwidth chart: achieved GB/s vs N, streaming ceiling + cache bands ----
-function drawBandwidthChart(j, qActive) {
+function drawBandwidthChart(j, grid, qActive) {
   const ceil = j.hardware.streaming_bw_gbs;
   const bpp = j.bytes_per_particle;
   const qs = Object.keys(j.series).sort((a, b) => +a - +b);
@@ -457,8 +483,33 @@ function drawBandwidthChart(j, qActive) {
     lineStyle: { width: 1.8, color: pal(+q) }, itemStyle: { color: pal(+q) },
     data: pickThreads(j.series[q]).map((r) => [r.N, bwOf(r)]).filter((p) => p[1] != null),
   }));
+  // references: naive line + winner diamonds, palette-styled like the q plots;
+  // only at single-q selection (see latency chart)
+  const singleQ = qActive.length === 1;
+  if (grid && singleQ && refSel.naive && j.algo !== BASELINE) {
+    const gbw = (p) => p.achieved_bw_gbs ?? (p.ns_particle ? bpp / p.ns_particle : null);
+    const q = +qActive[0];
+    const bl = grid.points.filter((p) => p.algo === BASELINE && p.threads === threads
+      && Math.abs(p.death_q - q) < 1e-9).sort((a, b) => a.N - b.N);
+    if (bl.length)
+      series.push({ name: "naive", type: "scatter", symbol: "diamond", symbolSize: 8,
+        itemStyle: { color: REF_NAIVE, borderColor: "#444", borderWidth: 1 },
+        data: bl.map((p) => [p.N, gbw(p)]).filter((d) => d[1] != null) });
+  }
+  if (grid && singleQ && refSel.winner) {
+    const gbw = (p) => p.achieved_bw_gbs ?? (p.ns_particle ? bpp / p.ns_particle : null);
+    const q = +qActive[0];
+    const byN = {};
+    grid.points.filter((p) => p.threads === threads && Math.abs(p.death_q - q) < 1e-9)
+      .forEach((p) => { if (!byN[p.N] || p.ns_particle < byN[p.N].ns_particle) byN[p.N] = p; });
+    const pts = Object.values(byN).sort((a, b) => a.N - b.N);
+    if (pts.length)
+      series.push({ name: "winner", type: "scatter", symbol: "diamond", symbolSize: 8,
+        itemStyle: { color: REF_WINNER, borderColor: "#555", borderWidth: 1 },
+        data: pts.map((p) => [p.N, gbw(p)]).filter((d) => d[1] != null) });
+  }
   const bands = cacheBands(j);
-  const carrier = { name: "__marks", type: "line", data: [], symbol: "none", lineStyle: { opacity: 0 }, silent: true,
+  const carrier = { name: "bands", type: "line", data: [], symbol: "none", lineStyle: { opacity: 0 }, silent: true,
     markArea: bands,
     markLine: { silent: true, symbol: "none", data: [
       { yAxis: ceil, lineStyle: { type: "dashed", color: "#e74c3c", width: 2, opacity: 0.9 },
@@ -467,12 +518,12 @@ function drawBandwidthChart(j, qActive) {
   chart("bwchart", {
     backgroundColor: "#0f1115",
     tooltip: { trigger: "axis", formatter(ps) {
-      const rows = ps.filter((x) => !x.seriesName.startsWith("__"));
+      const rows = ps.filter((x) => x.value != null && x.value[1] != null);
       if (!rows.length) return "";
       const hdr = `<div style="text-align:center;margin-bottom:4px">${fmtN(Math.round(rows[0].axisValue))} Particles</div>`;
       return hdr + rows.map((x) => `${x.marker} ${x.seriesName}: ${x.value[1].toFixed(2)} GB/s (${(x.value[1] / ceil * 100).toFixed(0)}% ceiling)`).join("<br/>");
     } },
-    legend: { top: 0, textStyle: { color: "#ccc", fontSize: 10 } },
+    legend: { top: 0, textStyle: { color: "#ccc", fontSize: 10 }, data: series.map((s) => s.name) },
     grid: { left: 10, right: 12, top: 30, bottom: 26, containLabel: true },
     xAxis: { type: "log", name: "N", min: bands.axisMin, max: 20e6, ...AX,
       axisLabel: { ...AX.axisLabel, formatter: (v) => v >= 1e6 ? `${v / 1e6}M` : v >= 1e3 ? `${v / 1e3}K` : v } },
@@ -543,7 +594,30 @@ fetch → decode → rename  →  schedule → execute → retire
   <p>One radar per profiled N (the profile grid is frozen at 4 decades); each polygon is one death-rate q in the page-wide churn palette. The stacked bars are the same four buckets as 100%-bars — the ground truth the radar summarizes.</p></details>`;
 }
 // ---- bottlenecks: one band per profiled N — cycle bars + radar together ----
-function drawBottleneckBands(j, qActive) {
+// refs for the bottleneck bands: naive bundle + winner bundle per profiled N
+// (winner can differ by N). Resolved before drawing; nulls skip cleanly.
+async function bottleneckRefs(j, grid, qAct) {
+  if (!grid || qAct.length !== 1) return { naive: null, winnerByN: {} };
+  const q = +qAct[0];
+  const ov = await getOverview(machine);   // radarScores needs hardware on each bundle
+  const naive = (j.algo === BASELINE) ? null : await getAlgoJson(machine, BASELINE);
+  if (naive) naive.hardware = ov;
+  const winnerByN = {};
+  const profNs = [...new Set((j.profile || []).map((p) => p.N))];
+  const algosByN = {};
+  for (const n of profNs) {
+    const pts = grid.points.filter((p) => p.threads === threads && p.N === n && Math.abs(p.death_q - q) < 1e-9);
+    const w = pts.reduce((a, b) => (!a || b.ns_particle < a.ns_particle ? b : a), null);
+    if (w && w.algo !== j.algo) algosByN[n] = w.algo;
+  }
+  const uniq = [...new Set(Object.values(algosByN))];
+  const bundles = await Promise.all(uniq.map((a) => getAlgoJson(machine, a)));
+  bundles.forEach((b) => { if (b) b.hardware = ov; });
+  const byAlgo = Object.fromEntries(uniq.map((a, i) => [a, bundles[i]]));
+  for (const [n, a] of Object.entries(algosByN)) winnerByN[n] = byAlgo[a];
+  return { naive, winnerByN, winnerNameByN: algosByN };
+}
+function drawBottleneckBands(j, qActive, refs) {
   const qs = Object.keys(j.series).map(Number).sort((a, b) => a - b);
   const pal = churnPalette(qs);
   const prof = (j.profile || []).filter((p) => p.threads === threads);
@@ -555,31 +629,60 @@ function drawBottleneckBands(j, qActive) {
   const cols = { compute_pct: "#5dade2", backend_stall_pct: "#e67e22", frontend_stall_pct: "#9b59b6", branch_flush_pct: "#e74c3c" };
   const keys = Object.keys(names);
   const AXES = ["Compute", "Bandwidth", "Latency", "Sync", "Control"];
+  const singleQ = qActive.length === 1 && refs;
   for (const n of nsAll) {
     const act = qs.filter((q) => qActive.includes(String(q)));
-    // cycle bars for this N: one stacked 100% bar per active q
+    // bar categories: this algo per active q; at single-q, naive + winner too
+    const winB = singleQ && refSel.winner ? refs.winnerByN[n] : null;
+    const winNm = singleQ && winB ? short(refs.winnerNameByN[n]) : null;
+    const cats = act.map((q) => `q=${fmtq(q)}`);
+    if (singleQ && refs.naive && refSel.naive) cats.push("naive");
+    if (winNm) cats.push(winNm);
+    const profOf = (b) => b && b.profile && b.profile.find((x) => x.N === n && Math.abs(x.death_q - act[0]) < 1e-9 && x.threads === threads);
+    const naiveP = singleQ && refs.naive && refSel.naive ? profOf(refs.naive) : null;
+    const winP = winB ? profOf(winB) : null;
+    // cycle bars for this N: one stacked 100% bar per category
     chart(`bars_${n}`, {
       tooltip: { trigger: "axis", axisPointer: { type: "shadow" },
         formatter: (ps) => `<b>${ps[0].axisValue}</b><br>` + ps.map((x) => `${x.marker} ${x.seriesName}: ${x.value == null ? "?" : x.value.toFixed(1)}%`).join("<br/>") },
       grid: { left: 40, right: 12, top: 8, bottom: 22, containLabel: true },
-      xAxis: { type: "category", data: act.map((q) => `q=${fmtq(q)}`),
-        axisLabel: { color: "#aaa", fontSize: 10 }, axisLine: { lineStyle: { color: "#666" } } },
+      xAxis: { type: "category", data: cats,
+        axisLabel: { color: "#aaa", fontSize: 9, interval: 0,
+          // long winner names wrap at a dot so every bar stays labeled
+          formatter: (v) => v.length > 12 ? v.split(".").slice(0, 2).join(".") + "\n" + v.split(".").slice(2).join(".") : v },
+        axisLine: { lineStyle: { color: "#666" } } },
       yAxis: { type: "value", max: 100, ...AX, axisLabel: { ...AX.axisLabel, fontSize: 9 } },
       series: keys.map((k) => ({ name: names[k], type: "bar", stack: "c", barMaxWidth: 30,
         itemStyle: { color: cols[k] },
-        data: act.map((q) => { const p = prof.find((x) => x.N === n && Math.abs(x.death_q - q) < 1e-9); return p ? p[k] : null; }) })),
+        data: [
+          ...act.map((q) => { const p = prof.find((x) => x.N === n && Math.abs(x.death_q - q) < 1e-9); return p ? p[k] : null; }),
+          ...(naiveP ? [naiveP[k]] : []),
+          ...(winP ? [winP[k]] : []),
+        ] })),
     });
-    // radar for this N: one polygon per active q (churn palette)
+    // radar for this N: this algo per active q (churn palette); at single-q,
+    // naive (gray, dashed) + winner (white) polygons
     const data = act.map((q) => {
       const s = radarScores(j, n, q, threads);
       return { value: [s.compute, s.bandwidth, s.latency, s.sync, s.control].map((v) => Math.round(v || 0)),
                name: `q=${fmtq(q)}`, lineStyle: { color: pal(q), width: 1.6 },
                itemStyle: { color: pal(q) }, areaStyle: { color: pal(q), opacity: 0.06 } };
     });
+    const refPoly = (b, nm, color, dashed) => {
+      if (!b) return;
+      const s = radarScores(b, n, act[0], threads);
+      if (s.compute == null) return;
+      data.push({ value: [s.compute, s.bandwidth, s.latency, s.sync, s.control].map((v) => Math.round(v || 0)),
+        name: nm, lineStyle: { color, width: 1.6, type: dashed ? "dashed" : "solid" },
+        itemStyle: { color }, areaStyle: { color, opacity: 0.04 } });
+    };
+    if (singleQ && refSel.naive) refPoly(refs.naive, "naive", REF_NAIVE, false);
+    if (winB && refSel.winner) refPoly(winB, winNm, REF_WINNER, false);
     chart(`radar_${n}`, {
       tooltip: { formatter: (p) => `${p.name}<br>` + AXES.map((a, i) => `${a}: ${p.value[i]}`).join("<br>") },
-      radar: { indicator: AXES.map((a) => ({ name: a, max: 100 })), radius: "64%", splitNumber: 4,
-        axisName: { color: "#bbb", fontSize: 9.5 },
+      radar: { indicator: AXES.map((a) => ({ name: a, max: 100 })), radius: "55%", splitNumber: 4,
+        center: ["50%", "54%"],
+        axisName: { color: "#bbb", fontSize: 9 },
         splitLine: { lineStyle: { color: "#2a2a2a" } },
         splitArea: { areaStyle: { color: ["rgba(255,255,255,0.015)", "rgba(255,255,255,0.035)"] } },
         axisLine: { lineStyle: { color: "#333" } } },
@@ -822,14 +925,13 @@ async function renderAlgo(algo) {
   $("page").innerHTML = `
     ${banner}
     <section class="cellhead"><h2>${algo}</h2>${decl}${mem}<h3>${d.algo_fam}: Loops</h3>${loopFacts}${hypo}${verdict}</section>
-    <section class="narrative"><h3>Latency <span class="sub">ns/particle vs N · dashed = naive baseline · ◇ = best-of-grid · dotted = memory floor</span></h3>
-      <div class="chiprow refs"><label><input type="checkbox" id="refBl" checked> naive</label><label><input type="checkbox" id="refWn" checked> winner</label></div>
+    <section class="narrative"><h3>Latency <span class="sub">ns/particle vs N · dashed = naive · ◇ = winner · dotted = memory floor · overlays via the header refs dropdown</span></h3>
       <div id="latchart" class="chart"></div>
       ${mp("Cache saturation")}</section>
     <section class="narrative"><h3>Bandwidth <span class="sub">achieved GB/s vs N · dashed = streaming ceiling · bands = cache residency</span></h3>
       <div id="bwchart" class="chart"></div>
       ${mp("Bandwidth")}</section>
-    ${(j.profile || []).length ? `<section class="narrative"><h3>Bottlenecks <span class="sub">one band per profiled N: cycle bars (ground truth) + radar (summary) · the header q selector filters all views</span></h3>
+    ${(j.profile || []).length ? `<section class="narrative"><h3>Bottlenecks <span class="sub">one band per profiled N: cycle bars (ground truth) + radar (summary) · at single-q, naive + winner bars/polygons join · header q filters all views</span></h3>
       ${howtoHtml(profiler)}
       <div id="radargrid" class="radargrid"></div></section>`
       : `<section class="narrative"><h3>Bottlenecks</h3><p class="hint">No cycle-attribution data for ${short(algo)} — run <code>scripts/collect.py ${algo} --only profile</code> to populate it.</p></section>`}
@@ -838,18 +940,19 @@ async function renderAlgo(algo) {
               : `<p class="hint">asm bundle <code>data/${machine}/${algo}.json</code> not found — run <code>make collect</code> or check the Pages publish step.</p>`}</section>`;
   status(j.asm ? `${algo} · ${j.asm.n_instructions} asm insns` : algo);
   // interactions — q filtering comes from the header selector via qRedraw
-  const redraw = () => {
+  const redraw = async () => {
     try {
       const qAct = activeQs().length ? activeQs() : Object.keys(j.series);
       drawLatencyChart(j, grid, qAct);
-      drawBandwidthChart(j, qAct);
-      if ((j.profile || []).length) drawBottleneckBands(j, qAct);
+      drawBandwidthChart(j, grid, qAct);
+      if ((j.profile || []).length) {
+        const refs = await bottleneckRefs(j, grid, qAct);
+        drawBottleneckBands(j, qAct, refs);
+      }
     } catch (e) { status(`algo error: ${e.message}`); console.error(e); }
   };
   qRedraw = redraw;
   redraw();
-  $("refBl").onchange = (e) => { showBaseline = e.target.checked; drawLatencyChart(j, grid, activeQs().length ? activeQs() : Object.keys(j.series)); };
-  $("refWn").onchange = (e) => { showWinner = e.target.checked; drawLatencyChart(j, grid, activeQs().length ? activeQs() : Object.keys(j.series)); };
   if (j.asm) wireAsmViewer(j);
 }
 
@@ -956,7 +1059,7 @@ async function renderCompare(algos) {
   const title = `${js.map((j) => short(j.algo)).join(" vs ")}`;
   $("page").innerHTML = `
     <section class="cellhead"><h2>${esc(title)}</h2>
-      <p class="hint"><a href="${mhref('')}">← All Winners</a> · same reading as an algorithm page with the series axis swapped: one line per algorithm × selected death rate (header q selector).</p></section>
+      <p class="hint"><a href="${mhref('')}">← All Winners</a> · one line per algorithm × selected death rate (header q); naive/winner overlays via the header refs dropdown.</p></section>
     <section><h3>Latency &amp; bandwidth <span class="sub">one series per algorithm × selected q</span></h3>
       <div id="cmain" class="chart"></div></section>
     ${profNs.length ? `<section><h3>Cycle composition <span class="sub"><span id="cycq"></span>one N per group</span></h3><div class="chiprow" id="cn"></div><div id="cbars" class="chart" style="height:300px"></div><div id="cradar" style="height:340px"></div></section>` : ""}
@@ -991,20 +1094,27 @@ function drawCompareMain(js, grid, qAct) {
     series.push({ name: `${short(j.algo)} q=${fmtq(q)}`, type: "line", symbol: "circle", symbolSize: 6,
       lineStyle: { width: 2, color: cellColor(j.algo) }, itemStyle: { color: cellColor(j.algo) },
       data: pickThreads(j.series[q] || []).map((r) => [r.N, r.ns_particle]) });
-  // references: baseline ghost per q + winner scatter (always on — that's the page's point)
-  if (!js.some((j) => j.algo === BASELINE))
-    for (const q of qAct) {
-      const bl = grid.points.filter((p) => p.algo === BASELINE && p.threads === threads && Math.abs(p.death_q - +q) < 1e-9).sort((a, b) => a.N - b.N);
-      if (bl.length)
-        series.push({ name: `naive q=${fmtq(q)}`, type: "line", symbol: "none",
-          lineStyle: { width: 1.4, type: "dashed", color: "#aaa", opacity: 0.7 }, itemStyle: { color: "#aaa" },
-          data: bl.map((p) => [p.N, p.ns_particle]) });
-    }
-  const byN = {};
-  grid.points.filter((p) => p.threads === threads && qAct.some((q) => Math.abs(p.death_q - +q) < 1e-9))
-    .forEach((p) => { if (!byN[p.N] || p.ns_particle < byN[p.N].ns_particle) byN[p.N] = p; });
-  series.push({ name: "best-of-grid", type: "scatter", symbol: "diamond", symbolSize: 10,
-    itemStyle: { color: "#f0f0f0", borderColor: "#555" }, data: Object.values(byN).map((p) => [p.N, p.ns_particle]) });
+  // references, single-q only, consistent coding: naive gray · winner white diamonds
+  const singleQ = qAct.length === 1;
+  if (singleQ && refSel.naive && !js.some((j) => j.algo === BASELINE)) {
+    const q = +qAct[0];
+    const bl = grid.points.filter((p) => p.algo === BASELINE && p.threads === threads && Math.abs(p.death_q - q) < 1e-9).sort((a, b) => a.N - b.N);
+    if (bl.length)
+      series.push({ name: "naive", type: "scatter", symbol: "diamond", symbolSize: 8,
+        itemStyle: { color: REF_NAIVE, borderColor: "#444", borderWidth: 1 },
+        data: bl.map((p) => [p.N, p.ns_particle]) });
+  }
+  if (singleQ && refSel.winner) {
+    const q = +qAct[0];
+    const byN = {};
+    grid.points.filter((p) => p.threads === threads && Math.abs(p.death_q - q) < 1e-9)
+      .forEach((p) => { if (!byN[p.N] || p.ns_particle < byN[p.N].ns_particle) byN[p.N] = p; });
+    const pts = Object.values(byN).sort((a, b) => a.N - b.N);
+    if (pts.length)
+      series.push({ name: "winner", type: "scatter", symbol: "diamond", symbolSize: 8,
+        itemStyle: { color: REF_WINNER, borderColor: "#555", borderWidth: 1 },
+        data: pts.map((p) => [p.N, p.ns_particle]) });
+  }
   const j0 = js[0];
   const bands = cacheBands(j0);
   chart("cmain", {
@@ -1012,7 +1122,7 @@ function drawCompareMain(js, grid, qAct) {
       const hdr = `<div style="text-align:center;margin-bottom:4px">${fmtN(Math.round(ps[0].axisValue))} Particles</div>`;
       return hdr + ps.map((x) => `${x.marker} ${x.seriesName}: ${x.value[1].toFixed(2)} ns/p · ${(bpp / x.value[1]).toFixed(2)} GB/s`).join("<br/>");
     } },
-    legend: { top: 0, textStyle: { color: "#ccc", fontSize: 10 } },
+    legend: { top: 0, textStyle: { color: "#ccc", fontSize: 10 }, data: series.map((s) => s.name) },
     grid: { left: 55, right: 60, top: 30, bottom: 55, containLabel: true },
     xAxis: { type: "log", name: "N", min: bands.axisMin, max: 20e6, ...AX,
       axisLabel: { ...AX.axisLabel, formatter: (v) => v >= 1e6 ? `${v / 1e6}M` : v >= 1e3 ? `${v / 1e3}K` : v } },
@@ -1021,7 +1131,7 @@ function drawCompareMain(js, grid, qAct) {
         axisLabel: { ...AX.axisLabel, formatter: (v) => +v.toFixed(2) } },
       { type: "value", name: "GB/s", max: ceil * 1.25, ...AX, splitLine: { show: false } },
     ],
-    series: [...series, { name: "__marks", type: "line", data: [], symbol: "none", lineStyle: { opacity: 0 }, silent: true,
+    series: [...series, { name: "bands", type: "line", data: [], symbol: "none", lineStyle: { opacity: 0 }, silent: true,
       markArea: bands,
       markLine: { silent: true, symbol: "none", data: [{ yAxis: floorNs, lineStyle: { type: "dotted", color: "#e67e22", width: 2 },
         label: { formatter: `floor ${floorNs.toFixed(2)} ns/p`, color: "#e67e22", position: "insideEndBottom" } }] } }],
@@ -1151,7 +1261,9 @@ document.addEventListener("click", (e) => {
     };
     ts.onchange = () => { threads = +ts.value; route(); };
     buildQDrop();
-    document.addEventListener("click", (e) => { if (!e.target.closest("#qdrop")) $("qdrop")?.classList.remove("open"); });
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest("#qdrop")) $("qdrop")?.classList.remove("open");
+    });
     window.addEventListener("hashchange", route);
     route();
   } catch (e) { status(`error: ${e.message}`); console.error(e); }
