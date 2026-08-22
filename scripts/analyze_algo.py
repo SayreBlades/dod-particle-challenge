@@ -212,8 +212,11 @@ def asm_digest(asm):
     parts = []
     for L in asm.get("loops") or []:
         ln = f"L{L['lines'][0]}-L{L['lines'][1]}" if L.get("lines") else "?"
-        s = (f"loop {L['loop']} @{ln}: ~{L['insns']} insns/iter, "
-             f"cond-branches {L['cond_branches']}")
+        if L.get("delegates"):
+            s = f"loop {L['loop']} @{ln}: delegates to {L['delegates']} (external)"
+        else:
+            s = (f"loop {L['loop']} @{ln}: ~{L['insns']} insns/iter, "
+                 f"cond-branches {L['cond_branches']}")
         if L.get("stride_bytes"):
             s += f", stride {L['stride_bytes']}B"
         if L.get("notes"):
@@ -297,8 +300,9 @@ reader already has it. Write markdown with EXACTLY these six sections, in order,
 each one a tight paragraph:
 
 ## Intent
-ONE sentence: the hypothesis this algo exists to test. Start with "Hypothesis:". \
-Nothing else. Example: "Hypothesis: compiler auto-vectorization over per-particle \
+ONE sentence: the hypothesis this algo exists to test. Start with "Hypothesis:", \
+followed by a standalone sentence beginning with a capital letter. Nothing else. \
+Example: "Hypothesis: A compiler auto-vectorized pass over per-particle \
 components can approach the streaming ceiling on death-free workloads."
 
 ## Layout & approach

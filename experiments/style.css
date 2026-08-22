@@ -18,12 +18,27 @@ header { position: sticky; top: 0; background: #15171a; padding: 14px 0 6px; bor
 #selectors { float: right; display: flex; gap: 14px; }
 #selectors label { font-size: 12px; color: #aaa; }
 select { background: #23262b; color: #d8d8d8; border: 1px solid #3a3a3a; border-radius: 4px; padding: 3px 6px; font-size: 12px; }
+/* q multi-select dropdown (header) */
+.qdrop { position: relative; display: inline-block; }
+.qbtn { background: #23262b; color: #d8d8d8; border: 1px solid #3a3a3a; border-radius: 4px; padding: 3px 8px;
+  font-size: 12px; cursor: pointer; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qbtn:hover { border-color: #5dade2; }
+.qdrop-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); background: #1c1f23;
+  border: 1px solid #3a3a3a; border-radius: 5px; padding: 5px; min-width: 130px; z-index: 40;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45); }
+.qdrop.open .qdrop-menu { display: block; }
+.qdrop-item { display: flex; align-items: center; gap: 8px; padding: 4px 8px; font-size: 12px;
+  color: #ccc; cursor: pointer; border-radius: 4px; white-space: nowrap; user-select: none; }
+.qdrop-item:hover { background: #23262b; }
+.qdrop-item input { accent-color: #5dade2; margin: 0; pointer-events: none; }
+.qdot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
 .meta { font-size: 12px; color: #aaa; margin-top: 6px; }
 .meta code { background: transparent; padding: 0; }
 #meta { display: none; }
 .machinecard h2 { color: #8ab4f8; }
 .machinfo { line-height: 1.6; color: #aaa; font-size: 11.5px; }
 .machinfo code { background: transparent; padding: 0; color: #d8d8d8; }
+.machinfo .dim { color: #666; }
 #status { font-size: 12px; color: #777; margin: 4px 0 0; min-height: 16px; }
 
 main { padding-top: 14px; }
@@ -53,12 +68,13 @@ table.alg td.n, table.alg th.n { text-align: right; font-variant-numeric: tabula
 
 /* charts */
 .chart { width: 100%; height: 360px; }
+.narrative .chart { margin-bottom: 20px; }   /* breathing room between graph and narrative text */
 .chart.small { height: 240px; }
 
 
 /* cell page */
 .cellhead h2 { font-family: ui-monospace, monospace; }
-.cellfull { color: #888; font-size: 12px; font-family: ui-monospace, monospace; margin: -4px 0 10px; }
+.cellhead h3 { margin: 16px 0 8px; }
 .decl { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: #bbb; }
 .decl b { color: #888; font-weight: 600; margin-right: 4px; }
 
@@ -133,7 +149,7 @@ a.gb-h:hover { color: #5dade2; }
 .gb-asm.cmp { color: #f1c40f; } .gb-asm.vec { color: #48c9b0; } .gb-asm.other { color: #888; }
 
 /* verdict callout (tinted by Holds / Partially / Refuted) */
-.verdict { border-left: 4px solid #888; background: #1c1f23; padding: 12px 16px; }
+.verdict { border-left: 4px solid #888; background: #1c1f23; padding: 12px 16px; margin-top: 16px; }
 .verdict h3 { margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: #aaa; }
 .verdict p { margin: 0; color: #e6e6e6; }
 .verdict.holds { border-left-color: #2ecc71; background: #16221c; }
@@ -159,7 +175,7 @@ table.alg td.walknum { color: #8ab4f8; font-weight: 600; white-space: nowrap; }
 .walkdesc { color: #bbb; font-size: 12.5px; line-height: 1.7; margin: 0; }
 .sched { color: #e8e8e8; font-size: 12px; margin: 8px 0 0; }
 .sched b { color: #fff; }
-.hypothesis { margin-top: 8px; color: #e8e8e8; font-size: 13px; }
+.hypothesis { margin-top: 0; color: #e8e8e8; font-size: 13px; }
 .hypothesis b { color: #fff; }
 h4 { margin: 14px 0 6px; font-size: 13px; color: #cfcfcf; }
 
@@ -178,7 +194,7 @@ footer { color: #666; font-size: 12px; padding: 20px 0; border-top: 1px solid #2
 .asm-gh:hover { color: #5dade2; text-decoration: none; }
 .asm-gh.none { color: #555; }
 
-.asm-body { height: 640px; display: flex; flex-direction: column; margin-top: 4px; }
+.asm-body { height: 640px; display: flex; flex-direction: column; margin: 4px 0 20px; }
 .asm-body > .godbolt,
 .asm-body > .interleave,
 .asm-body > .asm-full,
@@ -223,23 +239,24 @@ a.gb-ln:hover { color: #5dade2; }
 .qchip.on { background: #2c3540; color: #e8f0f8; border-color: #4a6a8a; }
 .qchip:hover { border-color: #5dade2; }
 
-/* hot-bytes layout strip */
-.hotrow { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 4px; }
-.hotcell { background: #0f1115; border: 1px solid #23262b; border-radius: 5px; padding: 8px 12px;
-  font-size: 11.5px; color: #9fb4c7; line-height: 1.6; }
-.hotcell b { color: #8ab4f8; }
-.hotcell span { color: #7a8a99; font-variant-numeric: tabular-nums; }
+/* merged loop cards (stages + schedule + hot-byte budget) */
+.loopcards { display: flex; flex-direction: column; gap: 10px; margin: 10px 0 4px; }
+.loopcard { background: #0f1115; border: 1px solid #23262b; border-radius: 5px; padding: 8px 12px; }
+.lc-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.lc-head b { color: #8ab4f8; }
+.lc-stages { color: #9fb4c7; }
+.lc-sched { font-size: 11px; color: #8ab4f8; background: rgba(138,180,248,0.10); border: 1px solid rgba(138,180,248,0.25);
+  border-radius: 10px; padding: 1px 8px; white-space: nowrap; }
+.lc-bytes { margin-top: 6px; color: #7a8a99; font-variant-numeric: tabular-nums; }
+.lc-pct { color: #9aa; }
+.lc-extra { color: #7a8a99; }
+.lc-asm { margin-top: 5px; color: #8a9aa9; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.lc-asm a.lc-ln { color: #5dade2; }
+.lc-notes { margin-top: 2px; color: #7a8a99; font-size: 11.5px; }
+.lc-call { margin-top: 2px; color: #c9a35c; font-size: 11.5px; }
 .hotbar { display: inline-block; width: 90px; height: 7px; background: #23262b; border-radius: 4px;
   overflow: hidden; vertical-align: middle; margin: 0 6px; }
 .hotbar i { display: block; height: 100%; background: linear-gradient(90deg, #2ecc71, #f1c40f); }
-
-/* ratio strip */
-table.ratio { border-collapse: separate; border-spacing: 4px; font-size: 12px; }
-table.ratio th, table.ratio td { border: 1px solid #2c2c2c; border-radius: 4px; padding: 5px 10px;
-  background: #23262b; text-align: center; font-variant-numeric: tabular-nums; }
-table.ratio tbody th { color: #aaa; white-space: nowrap; }
-table.ratio thead th { color: #888; font-weight: 600; }
-table.ratio td .w { color: #888; font-size: 10.5px; display: block; margin-top: 2px; }
 
 /* how-to-read (bottlenecks) */
 details.howto { background: #15171a; border: 1px solid #2a2a2a; border-radius: 5px;
@@ -248,10 +265,10 @@ details.howto summary { cursor: pointer; color: #8ab4f8; font-weight: 600; }
 details.howto p, details.howto ul { margin: 8px 0; }
 details.howto li { margin: 2px 0 2px 16px; }
 
-/* radar small multiples */
-.radargrid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-.radarcell { flex: 1 1 240px; min-width: 220px; max-width: 340px; background: #0f1115;
-  border: 1px solid #23262b; border-radius: 5px; padding: 6px; }
+/* bottleneck bands: one per profiled N, laid out horizontally; contents (bars over radar) vertical */
+.radargrid { display: flex; flex-direction: row; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
+.radarband { flex: 1 1 250px; min-width: 240px; background: #0f1115; border: 1px solid #23262b; border-radius: 5px; padding: 10px 12px; }
+.chart.nbars { height: 165px; }
 .radartitle { text-align: center; color: #9aa; font-size: 11.5px; padding: 2px 0 4px; }
 
 /* loop digest cards */

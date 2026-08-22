@@ -37,7 +37,7 @@ IS_LINUX = platform.system() == "Linux"
 OBJDUMP = ["objdump"] if IS_LINUX else ["xcrun", "llvm-objdump"]
 ARCH = {"arm64": "arm64", "aarch64": "arm64", "x86_64": "x86_64", "amd64": "x86_64"}.get(
     platform.machine(), platform.machine())
-ASM_SCHEMA = 2
+ASM_SCHEMA = 3
 
 
 def sh(cmd):
@@ -446,9 +446,10 @@ _STD_CALLEE = re.compile(r"^(_?)(std\.|Random\.|math\.|mem\.|start\.)", re.I)
 
 def _is_delegation(sym: str) -> bool:
     """External callee that is the loop's PURPOSE (halide kernel, etc.) — not a
-    spawn discipline call and not an outlined std/library helper."""
+    spawn discipline call, not an outlined std/library helper, and not a
+    project-internal per-particle helper (`layouts.*`) called inside a loop."""
     s = sym.lstrip("_")
-    if "spawn" in s.lower():
+    if "spawn" in s.lower() or s.startswith("layouts."):
         return False
     return not _STD_CALLEE.match(sym)
 
@@ -569,6 +570,43 @@ def detect_loops(insns, attr, arch):
     return out
 
 
+def number_loops(loops, calls):
+    """Renumber loops so loop k == the algorithm's DECLARED loop k.
+
+    A declared loop delegated to an external callee (e.g. `halide.run`) has no
+    backward branch in our step body, so detect_loops never sees it — without
+    this pass the first detected loop would be misnumbered 1. Anchors = detected
+    loops + non-std calls whose source line is NOT inside a detected loop's span
+    (that containment test keeps per-particle helpers inside loops from claiming
+    a loop slot). Anchors sorted by line; delegated loops become entries with a
+    `delegates` field and no body stats."""
+    events = []
+    for L in loops:
+        events.append({"line": L["lines"][0] if L.get("lines") else None, "kind": "loop", "obj": L})
+    for c in calls:
+        if c.get("std") or c.get("line") is None:
+            continue
+        inside = any(L.get("lines") and L["lines"][0] <= c["line"] <= L["lines"][1]
+                     for L in loops)
+        if not inside:
+            events.append({"line": c["line"], "kind": "call", "obj": c})
+    events.sort(key=lambda e: (e["line"] is None, e["line"] if e["line"] is not None else 0))
+    out = []
+    for k, ev in enumerate(events, 1):
+        if ev["kind"] == "loop":
+            ev["obj"]["loop"] = k
+            out.append(ev["obj"])
+        else:
+            c = ev["obj"]
+            out.append({
+                "loop": k, "addr_span": None, "lines": [c["line"], c["line"]],
+                "insns": None, "cond_branches": None, "vector_fp": None, "scalar_fp": None,
+                "stride_bytes": None, "delegates": c["sym"],
+                "notes": [f"delegates to {c['sym']} (external)"],
+            })
+    return out
+
+
 # ---- the bundle ----
 
 def build_asm(algo, shash=None):
@@ -602,6 +640,7 @@ def build_asm(algo, shash=None):
     loops = detect_loops(insns, attr, ARCH)
     fconst = decode_fconst(insns, ARCH)
     calls = external_calls(insns, attr)
+    loops = number_loops(loops, calls)
     asm = {
         "schema": ASM_SCHEMA, "arch": ARCH,
         "source_hash": shash, "symbol": step_symbol(algo_part),
